@@ -1,0 +1,300 @@
+import { prompt_data } from './prompt/prompt_data';
+
+import Groq from 'groq-sdk';
+import { config } from 'dotenv';
+config();
+
+// import Anthropic from '@anthropic-ai/sdk';
+
+const groq1 = new Groq({ apiKey: process.env.GROQ_API_KEY_2 });
+const groq2 = new Groq({ apiKey: process.env.GROQ_API_KEY_2 });
+
+// const anthropic = new Anthropic({
+//   apiKey: process.env.ANTHROPIC_API_KEY, // defaults to process.env["ANTHROPIC_API_KEY"]
+// });
+
+// import ollama from 'ollama';
+
+import { pipeline } from '@xenova/transformers';
+import {
+  AutoTokenizer,
+  AutoModelForCausalLM,
+  AutoModel,
+} from '@xenova/transformers';
+
+class MyClassificationPipeline {
+  static task = 'question-answering'; //'text-classification';
+  static model = 'Xenova/distilbert-base-uncased-distilled-squad'; //robinsmits/Qwen1.5-7B-Dutch-Chat'; //'Xenova/distilbert-base-uncased-finetuned-sst-2-english';
+  static instance = null;
+
+  static async getInstance(progress_callback = null) {
+    if (this.instance === null) {
+      // NOTE: Uncomment this to change the cache directory
+      // env.cacheDir = './.cache';
+
+      this.instance = pipeline(this.task, this.model, { progress_callback });
+    }
+
+    return this.instance;
+  }
+}
+
+// import prompt_data from './prompt/prompt_data.json';
+let assistant = '';
+let resp = '';
+let messages = [];
+let cnt = 0;
+
+async function chatGroq1(system, task, num) {
+  try {
+    cnt = 0;
+    resp = '';
+    const completion = await groq1.chat.completions
+      .create({
+        messages: [
+          {
+            role: 'system',
+            content: system,
+          },
+          {
+            role: 'assistant',
+            content: task,
+          },
+        ],
+        model: 'mixtral-8x7b-32768', //'llama2-70b-4096',//
+        temperature: 0.9,
+        top_p: 1,
+        stop: null,
+        max_tokens: 4096,
+        stream: false,
+      })
+      .then((chatCompletion) => {
+        // process.stdout.write(chatCompletion.choices[0]?.message?.content || '');
+        return chatCompletion.choices[0]?.message?.content || '';
+      });
+
+    try {
+      resp = completion.replace(/\n/g, '');
+      resp = `${resp.replace(/\\/g, '')}`;
+      // resp = JSON.parse(resp);
+    } catch (ex) {
+      console.log(ex);
+      let startIndex = resp.indexOf('{');
+      let endIndex = resp.lastIndexOf('}');
+      let jsonStr = resp.substring(startIndex, endIndex + 1);
+      resp = JSON.parse(jsonStr);
+
+      // question = 'continue';
+      // return;
+      // await chatGroq(system, task, num);
+    }
+
+    // console.log(resp);
+
+    messages.push(resp);
+
+    if (false /*cnt++ <= num*/) {
+      question += `${resp[user1]} - ${resp[user2]} - it's a last part of the dialog.`;
+      question += 'continue the dialog';
+      resp = '';
+      await chatGroq(system, question, num);
+    }
+
+    // console.log(completion);
+    return resp;
+
+    // Возвращаем массив ответов, преобразуем каждый ответ, чтобы вернуть только reply
+  } catch (error) {
+    console.error('Ошибка при взаимодействии:', error);
+    // Возвращаем пустой массив или другое значение, чтобы обработать ошибку на уровне вызова функции
+  }
+}
+
+async function chatGroq2(system, task, num) {
+  try {
+    cnt = 0;
+    resp = '';
+    const completion = await groq2.chat.completions
+      .create({
+        messages: [
+          {
+            role: 'system',
+            content: system,
+          },
+          {
+            role: 'user',
+            content: task,
+          },
+        ],
+        model: 'mixtral-8x7b-32768', //'llama2-70b-4096',//
+        temperature: 0.9,
+        top_p: 1,
+        stop: null,
+        max_tokens: 4096,
+        stream: false,
+      })
+      .then((chatCompletion) => {
+        // process.stdout.write(chatCompletion.choices[0]?.message?.content || '');
+        return chatCompletion.choices[0]?.message?.content || '';
+      });
+
+    try {
+      resp = completion.replace(/\n/g, '');
+      resp = `${resp.replace(/\\/g, '')}`;
+      // resp = JSON.parse(resp);
+    } catch (ex) {
+      console.log(ex);
+      let startIndex = resp.indexOf('{');
+      let endIndex = resp.lastIndexOf('}');
+      let jsonStr = resp.substring(startIndex, endIndex + 1);
+      resp = JSON.parse(jsonStr);
+
+      // question = 'continue';
+      // return;
+      // await chatGroq(system, task, num);
+    }
+
+    // console.log(resp);
+
+    messages.push(resp);
+
+    if (false /*cnt++ <= num*/) {
+      question += `${resp[user1]} - ${resp[user2]} - it's a last part of the dialog.`;
+      question += 'continue the dialog';
+      resp = '';
+      await chatGroq(system, question, num);
+    }
+
+    // console.log(completion);
+    return resp;
+
+    // Возвращаем массив ответов, преобразуем каждый ответ, чтобы вернуть только reply
+  } catch (error) {
+    console.error('Ошибка при взаимодействии:', error);
+    // Возвращаем пустой массив или другое значение, чтобы обработать ошибку на уровне вызова функции
+  }
+}
+
+async function chatANTHROPIC(system, question, assistant) {
+  messages = [];
+  messages.push({ role: 'user', content: question });
+  if (assistant) messages.push({ role: 'assistant', content: assistant });
+  const msg = await anthropic.messages.create({
+    model: 'claude-3-haiku-20240307',
+    max_tokens: 4096,
+    system: system,
+    messages: messages,
+  });
+  if (msg.content[0]) {
+    resp = msg.content[0].text.trim();
+    resp = resp.replace(/[()]/g, '');
+    resp = resp.replace(/\n/g, '');
+    resp = resp.replace(/\\/g, '');
+    try {
+      JSON.parse(resp);
+    } catch (ex) {
+      question = 'continue';
+      await chatANTHROPIC(system, question, msg.content[0].text.trim());
+    }
+  }
+
+  return `${JSON.stringify(resp)}`;
+}
+
+async function chatTranformers(system, task) {
+  const pipe = await pipeline(
+    'text-generation',
+    'Felladrin/onnx-TinyMistral-248M-Chat-v2' 
+  );
+
+  const response = await pipe('Hello!', {
+    max_new_tokens: 500,
+    temperature: 0.9,
+  });
+  return response;
+
+  // let model = await AutoModel.from_pretrained(
+  //   'robinsmits/Qwen1.5-7B-Dutch-Chat'
+  // );
+
+  // let model = await AutoModelForCausalLM.from_pretrained(
+  //   'Salesforce/codegen-350M-mono'
+  // );
+
+  // let tokenizer = await AutoTokenizer.from_pretrained(
+  //   'Salesforce/codegen-350M-mono'
+  // );
+
+  // let text = 'def hello_world():';
+  // let input_ids = tokenizer(text, { return_tensors : 'pt' }).input_ids;
+
+  // let generated_ids = model.generate(input_ids, { max_length : 128 });
+
+  //   const messages = [
+  //     {
+  //       role: 'user',
+  //       content: 'Hoi hoe gaat het ermee? Wat kun je me vertellen over appels?',
+  //     },
+  //   ];
+
+  //   const encoded_ids = tokenizer.apply_chat_template(messages, true, 'pt');
+
+  //   const input_ids = encoded_ids.to('cuda');
+  //   const generated_ids = model.generate(input_ids, 256, true);
+  // }
+}
+
+// async function chatOllama(system, task) {
+// 	return await ollama.chat({
+//     model: 'llama2',
+//     messages: [{ role: 'user', content: system + task }],
+//   });
+// }
+
+/** @type {import('./$types').RequestHandler} */
+export async function POST({ request, url, fetch, cookies }) {
+  let { topic, dialog } = await request.json();
+
+  dialog = JSON.parse(dialog);
+
+  const tmplt = { nl: '', ru: '', uk: '', fr: '', en: '', de: '' };
+
+  const system1 = `[make translations]->[IMPORTANT:output in JSON(!) format:${JSON.stringify(
+    tmplt
+  )}][IMPORTANT:no repeats,no comments,no words transition, no additional content]`;
+  const system2 = `[make translations][IMPORTANT:no repeats,no comments,no additional content][IMPORTANT:output in JSON(!) :${JSON.stringify(
+    tmplt
+  )}]`;
+
+  const task1 = `[read the dialogue]->{${JSON.stringify(
+    dialog
+  )}}->[continue the dialogue as user1]		 
+`;
+
+  // let chat_resp = await chatANTHROPIC(system, task1, assistant);
+  // let chat_resp = await chatHercai(system, task);
+
+  async function chat(chatLLM, system, task) {
+    try {
+      const chat_resp = await chatLLM(system, task, 1);
+      return JSON.parse(chat_resp.match(/\{[^{}]+\}/));
+    } catch (ex) {
+      task =
+        '[review your previous response][find misspellings][offer improved version]';
+      chat(chatLLM, system, task);
+    }
+  }
+
+  let user1 = await chatTranformers(system1, task1);
+
+  dialog.push({ user1: user1 });
+
+  let task2 = `[continue]{dialogue:${JSON.stringify(dialog)}}`;
+  let user2 = await chat(chatGroq2, system2, task2);
+
+  messages = [];
+  let data = { content: [{ user1, user2 }] };
+  let response = new Response(JSON.stringify({ data }));
+  response.headers.append('Access-Control-Allow-Origin', `*`);
+  return response;
+}

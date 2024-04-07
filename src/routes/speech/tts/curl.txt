@@ -1,0 +1,13 @@
+curl -XPOST "https://api.wit.ai/synthesize?v=20230215" -L ^
+    -H "Authorization: Bearer WWJSDBA5JAVB4WP4JNKULL2CAZ7JCPL7" ^
+    -H "Content-Type: application/json" ^
+    -H "Accept: audio/pcm16" ^
+    -d "{\"q\": \"testing wit.ai text to speech\", \"voice\": \"Rebecca\"}" ^
+    -o speech.raw
+
+
+    curl -XPOST "https://api.wit.ai/speech?v=20230215&context=%7B%22locale%22%3A%22nl_NL%22%7D" -i -L -H "Authorization: Bearer WWJSDBA5JAVB4WP4JNKULL2CAZ7JCPL7" -H "Content-Type: audio/mpeg" -H  --data-binary "@waar.mp3"
+
+    curl -XPOST "https://api.wit.ai/speech?v=20230215&context=%7B%22locale%22%3A%22nl_NL%22%7D" -i -L -H "Authorization: Bearer WWJSDBA5JAVB4WP4JNKULL2CAZ7JCPL7" -H "Content-Type: audio/mpeg" --data-binary "@waar.mp3"
+
+    curl -XGET "https://api.wit.ai/message?v=20230215&q=chicago&context=%7B%22timezone%22%3A%22America%2FLos_Angeles%22%2C%22locale%22%3A%22en_CA%22%2C%22coords%22%3A%7B%22lat%22%3A37.47104%2C%22long%22%3A-122.14703%7D%7D" -H "Authorization: Bearer WWJSDBA5JAVB4WP4JNKULL2CAZ7JCPL7"

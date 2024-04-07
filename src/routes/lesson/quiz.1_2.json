@@ -1,0 +1,100 @@
+{
+    "lang":"nl",
+    "content": [
+        {
+            "num": "1",
+            "question": {
+                "nl": "Hallo! Hoe gaat het?",
+                "ru": "Привет! Как дела?",
+                "uk": "Привіт! Як справи?",
+                "fr": "Salut! Comment ça va?",
+                "en": "Hi! How are you?",
+                "de": "Hallo! Wie geht's?"
+            },
+            "answer": {
+                "nl": "Hallo! Goed, dank je. En met jou?",
+                "ru": "Привет! Всё хорошо, спасибо. А у тебя?",
+                "uk": "Привіт! Все добре, дякую. А у тебе?",
+                "fr": "Salut! Bien, merci. Et toi?",
+                "en": "Hi! All good, thanks. And you?",
+                "de": "Hallo! Gut, danke. Und dir?"
+            }
+        },
+        {
+            "num": "2",
+            "question": {
+                "nl": "Wat is er nieuw?",
+                "ru": "Что нового?",
+                "uk": "Що нового?",
+                "fr": "Quoi de neuf?",
+                "en": "What's new?",
+                "de": "Was gibt's Neues?"
+            },
+            "answer": {
+                "nl": "Ik ben onlangs begonnen met het leren van een nieuwe taal.",
+                "ru": "Недавно начал изучать новый язык.",
+                "uk": "Нещодавно почав вивчати нову мову.",
+                "fr": "J'ai récemment commencé à apprendre une nouvelle langue.",
+                "en": "I recently started learning a new language.",
+                "de": "Ich habe vor kurzem angefangen, eine neue Sprache zu lernen."
+            }
+        },
+        {
+            "num": "3",
+            "question": {
+                "nl": "Dat is interessant! Welke taal?",
+                "ru": "Это интересно! Какой язык?",
+                "uk": "Це цікаво! Яку мову?",
+                "fr": "C'est intéressant! Quelle langue?",
+                "en": "That's interesting! Which language?",
+                "de": "Das ist interessant! Welche Sprache?"
+            },
+            "answer": {
+                "nl": "Spaans. Ik ken al een paar zinnen.",
+                "ru": "Испанский. Уже знаю несколько фраз.",
+                "uk": "Іспанську. Вже знаю кілька фраз.",
+                "fr": "Espagnol. Je connais déjà quelques phrases.",
+                "en": "Spanish. I already know a few phrases.",
+                "de": "Spanisch. Ich kenne schon ein paar Sätze."
+            }
+        },
+        {
+            "num": "4",
+            "question": {
+                "nl": "Cool! Waarom heb je besloten het te leren?",
+                "ru": "Класс! А почему ты решил его изучать?",
+                "uk": "Клас! А чому ти вирішив її вивчати?",
+                "fr": "Super! Pourquoi as-tu décidé de l'apprendre?",
+                "en": "Cool! Why did you decide to learn it?",
+                "de": "Cool! Warum hast du dich entschieden, es zu lernen?"
+            },
+            "answer": {
+                "nl": "Ik wil door Spanje reizen.",
+                "ru": "Хочу путешествовать по Испании.",
+                "uk": "Хочу подорожувати Іспанією.",
+                "fr": "Je veux voyager en Espagne.",
+                "en": "I want to travel through Spain.",
+                "de": "Ich möchte durch Spanien reisen."
+            }
+        },
+        {
+            "num": "5",
+            "question": {
+                "nl": "Reizen is geweldig. Heb je al plannen?",
+                "ru": "Путешествия - это здорово. У тебя уже есть планы?",
+                "uk": "Подорожі - це чудово. В тебе вже є плани?",
+                "fr": "Voyager, c'est génial. As-tu déjà des projets?",
+                "en": "Traveling is great. Do you already have plans?",
+                "de": "Reisen ist toll. Hast du schon Pläne?"
+            },
+            "answer": {
+                "nl": "Ja, ik plan om volgende zomer te gaan.",
+                "ru": "Да, планирую поехать следующим летом.",
+                "uk": "Так, планую поїхати наступного літа.",
+                "fr": "Oui, je prévois d'y aller l'été prochain.",
+                "en": "Yes, I plan to go next summer.",
+                "de": "Ja, ich plane, nächsten Sommer zu gehen."
+            }
+        }
+    ]
+}

@@ -1,0 +1,80 @@
+<style>
+	body {
+		font-family: 'Arial', sans-serif;
+		background-color: #f4f4f4;
+		margin: 0;
+		padding: 0;
+	}
+
+	.container {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: space-around;
+		margin: 20px;
+	}
+
+	.card {
+		flex-basis: 35%;
+		max-width: 400px;
+		padding: 20px;
+		border: 1px solid #3498db;
+		border-radius: 10px;
+		margin-bottom: 20px;
+		background-color: #fff;
+		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+	}
+
+	.header,
+	.q {
+		width: 95%;
+		padding: 10px;
+		border: 1px solid #3498db;
+		border-radius: 5px;
+		background-color: white;
+		text-align: center;
+		margin: 10px;
+	}
+
+	.toggleButton {
+		background-color: #3498db;
+		color: #fff;
+		border: none;
+		border-radius: 5px;
+		cursor: pointer;
+	}
+
+	#question {
+		visibility: hidden;
+		text-align: center;
+	}
+</style>
+
+<body>
+	<div class="header">Mijn familie (James) &#8594; Trinidad</div>
+
+	<div class="container">
+		<div class="card">
+			Vader: Ross<br />
+			84-pensioen;<br />
+			met zijn vrouw praten
+		</div>
+
+		<div class="card">
+			Moeder: Rachel<br />
+			78-gepensioeneerd<br />
+			met haar man praten
+		</div>
+
+		<div class="card">
+			Broer: Joey<br />
+			51-kantoor<br />
+			modelvliegtuigen bouwen Janice
+		</div>
+
+		<div class="card">
+			Zus: Monica<br />
+			48-verpleegster<br />
+			koffie zetten
+		</div>
+	</div>
+</body>
