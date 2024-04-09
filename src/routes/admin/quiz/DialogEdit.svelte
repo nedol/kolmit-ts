@@ -17,11 +17,8 @@
   import { values } from 'lodash';
   let isCollapsed = true;
 
-  function toggleCollapse() {
-    isCollapsed.update((n) => !n);
-  }
 
-  export let data = {};
+  export let data = {llang:'', name:''};
   export let ChangeQuizName: any;
 
   const abonent = getContext('abonent');
@@ -34,7 +31,7 @@
   translate.from = llang;
   translate.engine = 'google';
 
-  let dialog_data = { lang: '', content: [] };
+  let dialog_data = { lang: '', content: [], words:[] , html:''};
   const name = data.name;
   let dialog_task: HTMLDivElement, dialog_words, dialog_tmplt;
 

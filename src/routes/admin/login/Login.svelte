@@ -14,6 +14,7 @@
 
   let width, height, value;
   let formData = {
+    func:'',
     name: 'Kolmit',
     email: 'kolmit.be@gmail.com',
     psw: 'kolmit',
