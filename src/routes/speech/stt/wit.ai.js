@@ -1,0 +1,2 @@
+export let ServerAccessToken = 'WWJSDBA5JAVB4WP4JNKULL2CAZ7JCPL7';
+export let ClientAccessToken = 'T3EW7FZMTTAWXULSAQ6WPTJQSCXNTAUU';

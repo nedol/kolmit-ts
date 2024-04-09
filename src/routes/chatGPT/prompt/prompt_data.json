@@ -1,0 +1,19 @@
+{
+    "num": "14",
+    "user1": {
+        "nl": "Heeft u de tafel gedecorëerd?",
+        "ru": "Вы украсили стол?",
+        "uk": "Ви декорували стіл?",
+        "fr": "Avez-vous décoré la table?",
+        "en": "Did you decorate the table?",
+        "de": "Haben Sie den Tisch dekoriert?"
+    },
+    "user2": {
+        "nl": "Ja, ik heeft de tafel gedecorëerd",
+        "ru": "Да, я украсил стол",
+        "uk": "Так, я декорував стіл",
+        "fr": "Oui, je l'ai décorée",
+        "en": "Yes, I decorated it",
+        "de": "Ja, ich habe den Tisch dekoriert"
+    }
+}

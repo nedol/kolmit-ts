@@ -1,0 +1,170 @@
+import md5 from 'md5';
+import { getLevels } from './db'
+import postgres from 'postgres';
+import {SendEmail } from './db'
+
+let sql;
+
+let conStr = {
+  connectionStringSupabase:
+    'postgresql://postgres.abzyzzvokjdnwgjbitga:NissanPathfinder@386/aws-0-eu-central-1.pooler.supabase.com:5432',
+};
+
+export async function CreatePool_(resolve) {
+  sql = postgres(conStr.connectionStringSupabase, {
+    host: 'aws-0-eu-central-1.pooler.supabase.com', // Postgres ip address[s] or domain name[s]
+    port: 5432, // Postgres server port[s]
+    database: 'postgres', // Name of database to connect to
+    username: 'postgres.abzyzzvokjdnwgjbitga', // Username of database user
+    password: 'NissanPathfinder@386', // Password of database user
+    idle_timeout: 20,
+    max_lifetime: 60 * 30,
+  });
+  resolve(sql);
+}
+
+let conStrNeon = {
+  connectionString:
+    'postgresql://nedooleg:nHLhfQB0WS5Y@ep-polished-bush-a2n4g5y9-pooler.eu-central-1.aws.neon.tech:5432/neondb?sslmode=require',
+};
+
+export async function CreatePool(resolve) {
+  sql = postgres(conStrNeon.connectionString, {
+    host: 'ep-polished-bush-a2n4g5y9-pooler.eu-central-1.aws.neon.tech', // Postgres ip address[s] or domain name[s]
+    port: 5432, // Postgres server port[s]
+    database: 'neondb', // Name of database to connect to
+    username: 'nedooleg', // Username of database user
+    password: 'nHLhfQB0WS5Y', // Password of database user
+  });
+  resolve(sql);
+}
+
+export async function SetSQL(sql_) {
+  sql = await sql_;
+}
+
+export async function CreateAdmin(par) {
+  try {
+    let res = await sql`INSERT INTO admins
+			(name , email, operator, psw, lang)
+			VALUES(${par.name},${par.email},${md5(par.email)},${md5(par.psw)},${par.lang})
+			ON CONFLICT ( email)
+			DO NOTHING
+			`;
+
+    return {
+      name: par.name,
+      email: par.email,
+      operator: md5(par.email),
+      psw: md5(par.psw),
+      lang:par.lang
+    };
+  } catch (ex) {
+    console.log();
+  }
+}
+
+export async function GetClasses(par) {
+  let classes, operators, admin;
+  try {
+    operators = await sql`
+			SELECT 
+			id,			
+      class,
+			role,
+			operator as email,
+			name,
+			picture,
+      lang,
+			dep
+			FROM operators
+			WHERE role<>'admin' AND operators.abonent=${par.abonent}`;
+    admin = await sql`
+			SELECT 
+			id,			
+			role,
+			operator as email,
+			name,
+			picture,
+			dep
+			FROM operators
+			WHERE role='admin' AND operators.abonent=${par.abonent}
+			`;
+    classes = await sql`
+     SELECT classes.name  FROM classes
+     INNER JOIN operators ON (operators.operator = classes.owner)
+     WHERE classes.owner=${par.abonent} AND operators.psw = ${par.psw}
+     `;
+  } catch (ex) {
+    console.log(ex);
+  }
+  return { classes, operators, admin };
+}
+
+export async function DeleteUser(par) {
+  let resp;
+  try {
+    resp = await sql`UPDATE operators SET abonent='public' 
+    WHERE operator=${par.email} AND abonent=${par.abonent}`;
+
+  } catch (ex) {
+    console.log(ex);
+  }
+  return { resp };
+}
+
+export async function AddUser(q) {
+  try {
+    let resp = await sql`INSERT INTO operators
+			(class, role, operator , abonent , name, lang )
+			VALUES(${q.class_name}, ${q.role},${q.email}, ${q.abonent}, ${q.name}, ${q.lang})
+			ON CONFLICT (operator, abonent)
+			DO NOTHING`;
+    if (resp.count > 0) {
+      SendEmail({ send_email: q.email, abonent: q.abonent, lang: q.lang });
+    }
+    return { resp };
+  } catch (ex) {
+    return JSON.stringify({ func: q.func, resp: ex });
+  }
+}
+
+export async function UpdateLesson(q) {
+  try {
+    let levels = await getLevels(q.owner);
+    levels.map((item) => {
+      if (q.levels.indexOf(item) === -1) removeModule(item);
+    });
+
+    let res = await sql`INSERT INTO lessons
+			(level , owner, data, lang )
+			VALUES(${q.level},${q.owner},${JSON.parse(q.data)}, ${q.lang})
+			ON CONFLICT (level, owner)
+			DO UPDATE SET
+			owner = EXCLUDED.owner,
+			level = EXCLUDED.level,
+			data = EXCLUDED.data`;
+    return { res };
+  } catch (ex) {
+    return JSON.stringify({ func: q.func, res: ex });
+  }
+}
+
+async function removeModule(item) {
+  return await sql`DELETE FROM lessons WHERE level=${item}`;
+}
+
+export async function UpdateDialog(q) {
+  try {
+    let res = await sql`INSERT INTO dialogs
+			(name , dialog, owner)
+			VALUES(${q.new_name},${q.data},${q.owner})
+			ON CONFLICT (name, owner)
+			DO UPDATE SET
+			name = EXCLUDED.name,
+			dialog = EXCLUDED.dialog`;
+    return { res };
+  } catch (ex) {
+    return JSON.stringify({ func: q.func, res: ex });
+  }
+}

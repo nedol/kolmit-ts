@@ -1,0 +1,37 @@
+[Продолжить диалог: {
+        "num": 9,
+        "user1": {
+            "nl": "Ja, we zijn er erg blij mee. Laten we doorgaan naar de keuken. Het is net hierachter.",
+            "ru": "Да, мы очень довольны. Давайте перейдем к кухне. Она прямо здесь, позади."
+        },
+        "user2": {
+            "nl": "Klinkt goed! Ik ben benieuwd naar de keuken.",
+            "ru": "Звучит замечательно! Я интересуюсь кухней."
+        }
+    }
+]
+[Тема=Housewarming.Dialog.1
+]{язык:nl, уровень изучения языка: A2!
+}{участники: user1,user2
+}{количество реплик участников: 5
+}
+->[Перевод:ru
+]
+{Формат вывода:json
+}{Пример вывода: [
+        {
+            "num": "{dialog_data.content.length}",
+            "user1": {
+                "nl": "{текст}",
+                "ru": "{текст}"
+            },
+            "user2": {
+                "nl": "{текст}",
+                "ru": "{текст}"
+            }
+        },
+        {
+            "num": {dialog_data.content.length+1
+            }, ...
+        }
+    ]

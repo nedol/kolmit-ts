@@ -1,0 +1,40 @@
+import { json } from '@sveltejs/kit';
+import fs from 'fs';
+
+import { CreateAdmin } from '$lib/server/db.admin.js';
+
+/** @type {import('./$types').RequestHandler} */
+export async function POST({ request, url, fetch, cookies }) {
+  const { par } = await request.json();
+
+  const resp = await CreateAdmin(par);
+
+  if (resp) {
+    try {
+    //   let cookie = cookies.get(`abonent:${resp.operator}`);
+    //   cookie = JSON.parse(cookie);
+    //   cookie.lang = lang;
+
+      cookies.set(
+        'abonent:' + resp.operator,
+        JSON.stringify({
+          name: resp.name,
+          abonent: resp.operator,
+          operator: resp.operator,
+          psw: resp.psw,
+          lang: par.lang,
+        }),
+        {
+          path: '/',
+          maxAge: 60 * 60 * 24 * 400,
+        }
+      );
+    } catch (ex) {
+      console.log(ex);
+    }
+  }
+
+  let response = new Response(JSON.stringify({ resp }));
+  response.headers.append('Access-Control-Allow-Origin', `*`);
+  return response;
+}

@@ -1,0 +1,422 @@
+[
+    {
+        "infinitive": "de wastafel",
+        "original": "de wastafel",
+        "translation": {
+            "ru": "умывальник",
+            "fr": "le lavabo",
+            "en": "the sink",
+            "de": "das Waschbecken",
+            "uk": "умивальник"
+        },
+        "example": "Ik heb mijn handen gewassen in de wastafel."
+    },
+    {
+        "infinitive": "de weegschaal",
+        "original": "de weegschaal",
+        "translation": {
+            "ru": "весы",
+            "fr": "la balance",
+            "en": "the scale",
+            "de": "die Waage",
+            "uk": "ваги"
+        },
+        "example": "De weegschaal geeft het gewicht nauwkeurig aan."
+    },
+    {
+        "infinitive": "de wasmachine",
+        "original": "de wasmachine",
+        "translation": {
+            "ru": "стиральная машина",
+            "fr": "le lave-linge",
+            "en": "the washing machine",
+            "de": "die Waschmaschine",
+            "uk": "пральна машина"
+        },
+        "example": "Ik heb de vuile kleren in de wasmachine gestopt."
+    },
+    {
+        "infinitive": "het strijkijzer",
+        "original": "het strijkijzer",
+        "translation": {
+            "ru": "утюг",
+            "fr": "le fer à repasser",
+            "en": "the iron",
+            "de": "das Bügeleisen",
+            "uk": "праска"
+        },
+        "example": "Mijn moeder gebruikt het strijkijzer om de kleren glad te maken."
+    },
+    {
+        "infinitive": "de vuilnisbak",
+        "original": "de vuilnisbak",
+        "translation": {
+            "ru": "мусорное ведро",
+            "fr": "la poubelle",
+            "en": "the trash can",
+            "de": "der Mülleimer",
+            "uk": "смітник"
+        },
+        "example": "Gooi het afval in de vuilnisbak, alsjeblieft."
+    },
+    {
+        "infinitive": "de spiegel",
+        "original": "de spiegel",
+        "translation": {
+            "ru": "зеркало",
+            "fr": "le miroir",
+            "en": "the mirror",
+            "de": "der Spiegel",
+            "uk": "дзеркало"
+        },
+        "example": "Ik kijk mezelf in de spiegel voordat ik naar buiten ga."
+    },
+    {
+        "infinitive": "het scheerapparaat",
+        "original": "het scheerapparaat",
+        "translation": {
+            "ru": "электробритва",
+            "fr": "le rasoir électrique",
+            "en": "the electric shaver",
+            "de": "der Elektrorasierer",
+            "uk": "електричний бритва"
+        },
+        "example": "Mijn vader gebruikt het scheerapparaat om zich elke ochtend te scheren."
+    },
+    {
+        "infinitive": "de droogkast",
+        "original": "de droogkast",
+        "translation": {
+            "ru": "сушильная машина",
+            "fr": "le sèche-linge",
+            "en": "the dryer",
+            "de": "der Trockner",
+            "uk": "сушарка"
+        },
+        "example": "Na het wassen stop ik de natte kleren in de droogkast."
+    },
+    {
+        "infinitive": "de stofzuiger",
+        "original": "de stofzuiger",
+        "translation": {
+            "ru": "пылесос",
+            "fr": "l'aspirateur",
+            "en": "the vacuum cleaner",
+            "de": "der Staubsauger",
+            "uk": "пилосос"
+        },
+        "example": "Ik gebruik de stofzuiger om de vloer schoon te maken."
+    },
+    {
+        "infinitive": "de boormachine",
+        "original": "de boormachine",
+        "translation": {
+            "ru": "дрель",
+            "fr": "la perceuse",
+            "en": "the drill",
+            "de": "die Bohrmaschine",
+            "uk": "дріль"
+        },
+        "example": "Met de boormachine kun je gaten in de muur maken."
+    },
+    {
+        "infinitive": "de gsm",
+        "original": "de gsm",
+        "translation": {
+            "ru": "мобильный телефон",
+            "fr": "le téléphone portable",
+            "en": "the mobile phone",
+            "de": "das Handy",
+            "uk": "мобільний телефон"
+        },
+        "example": "Ik neem altijd mijn gsm mee als ik de deur uitga."
+    },
+    {
+        "infinitive": "de tandenborstel",
+        "original": "de tandenborstel",
+        "translation": {
+            "ru": "зубная щетка",
+            "fr": "la brosse à dents",
+            "en": "the toothbrush",
+            "de": "die Zahnbürste",
+            "uk": "зубна щітка"
+        },
+        "example": "Vergeet niet je tandenborstel te gebruiken voor het slapengaan."
+    },
+    {
+        "infinitive": "de haardroger",
+        "original": "de haardroger",
+        "translation": {
+            "ru": "фен",
+            "fr": "le sèche-cheveux",
+            "en": "the hairdryer",
+            "de": "der Föhn",
+            "uk": "фен"
+        },
+        "example": "Na het douchen gebruik ik de haardroger om mijn haar te drogen."
+    },
+    {
+        "infinitive": "de naaimachine",
+        "original": "de naaimachine",
+        "translation": {
+            "ru": "швейная машина",
+            "fr": "la machine à coudre",
+            "en": "the sewing machine",
+            "de": "die Nähmaschine",
+            "uk": "швейна машина"
+        },
+        "example": "Mijn moeder repareert kleding met de naaimachine."
+    },
+    {
+        "infinitive": "de grasmaaier",
+        "original": "de grasmaaier",
+        "translation": {
+            "ru": "газонокосилка",
+            "fr": "la tondeuse à gazon",
+            "en": "the lawnmower",
+            "de": "der Rasenmäher",
+            "uk": "газонокосарка"
+        },
+        "example": "In de zomer gebruik ik de grasmaaier om het gras kort te houden."
+    },
+    {
+        "infinitive": "de computer",
+        "original": "de computer",
+        "translation": {
+            "ru": "компьютер",
+            "fr": "l'ordinateur",
+            "en": "the computer",
+            "de": "der Computer",
+            "uk": "комп'ютер"
+        },
+        "example": "Ik gebruik de computer voor mijn werk en om te communiceren."
+    },
+    {
+        "infinitive": "het fototoestel",
+        "original": "het fototoestel",
+        "translation": {
+            "ru": "фотоаппарат",
+            "fr": "l'appareil photo",
+            "en": "the camera",
+            "de": "die Kamera",
+            "uk": "фотоапарат"
+        },
+        "example": "Tijdens mijn vakantie neem ik altijd mijn fototoestel mee om mooie momenten vast te leggen."
+    },
+    {
+        "infinitive": "de zetel",
+        "original": "de zetel",
+        "translation": {
+            "ru": "кресло",
+            "fr": "le fauteuil",
+            "en": "the armchair",
+            "de": "der Sessel",
+            "uk": "крісло"
+        },
+        "example": "Ik ontspan graag in mijn favoriete zetel na een lange dag."
+    },
+    {
+        "infinitive": "de boekenkast",
+        "original": "de boekenkast",
+        "translation": {
+            "ru": "книжный шкаф",
+            "fr": "la bibliothèque",
+            "en": "the bookshelf",
+            "de": "das Bücherregal",
+            "uk": "книжкова полиця"
+        },
+        "example": "Mijn boekenkast staat vol met boeken over verschillende onderwerpen."
+    },
+    {
+        "infinitive": "de tv-kast",
+        "original": "de tv-kast",
+        "translation": {
+            "ru": "телевизионный стол",
+            "fr": "le meuble télé",
+            "en": "the TV stand",
+            "de": "der Fernsehschrank",
+            "uk": "телевізійна тумба"
+        },
+        "example": "Ik zet mijn televisie en andere multimedia-apparaten in de tv-kast."
+    },
+    {
+        "infinitive": "het tapijt",
+        "original": "het tapijt",
+        "translation": {
+            "ru": "ковер",
+            "fr": "le tapis",
+            "en": "the carpet",
+            "de": "der Teppich",
+            "uk": "ковер"
+        },
+        "example": "Een kleurrijk tapijt geeft de kamer een warme uitstraling."
+    },
+    {
+        "infinitive": "het schilderij",
+        "original": "het schilderij",
+        "translation": {
+            "ru": "картина",
+            "fr": "le tableau",
+            "en": "the painting",
+            "de": "das Gemälde",
+            "uk": "картина"
+        },
+        "example": "Het schilderij aan de muur brengt kleur in de kamer."
+    },
+    {
+        "infinitive": "de luster",
+        "original": "de luster",
+        "translation": {
+            "ru": "люстра",
+            "fr": "le lustre",
+            "en": "the chandelier",
+            "de": "der Lüster",
+            "uk": "люстра"
+        },
+        "example": "De luster in het midden van de kamer zorgt voor mooie verlichting."
+    },
+    {
+        "infinitive": "de lamp",
+        "original": "de lamp",
+        "translation": {
+            "ru": "лампа",
+            "fr": "la lampe",
+            "en": "the lamp",
+            "de": "die Lampe",
+            "uk": "лампа"
+        },
+        "example": "Ik lees graag een boek bij het licht van de lamp."
+    },
+    {
+        "infinitive": "de vaas",
+        "original": "de vaas",
+        "translation": {
+            "ru": "ваза",
+            "fr": "le vase",
+            "en": "the vase",
+            "de": "die Vase",
+            "uk": "ваза"
+        },
+        "example": "De vaas op de tafel is gevuld met mooie bloemen."
+    },
+    {
+        "infinitive": "het gordijn",
+        "original": "het gordijn",
+        "translation": {
+            "ru": "занавес",
+            "fr": "le rideau",
+            "en": "the curtain",
+            "de": "der Vorhang",
+            "uk": "занавіска"
+        },
+        "example": "'s Avonds sluit ik de gordijnen om wat privacy te hebben."
+    },
+    {
+        "infinitive": "de radiator",
+        "original": "de radiator",
+        "translation": {
+            "ru": "радиатор",
+            "fr": "le radiateur",
+            "en": "the radiator",
+            "de": "der Heizkörper",
+            "uk": "радіатор"
+        },
+        "example": "In de winter zorgt de radiator voor warmte in de kamer."
+    },
+    {
+        "infinitive": "de ladekast",
+        "original": "de ladekast",
+        "translation": {
+            "ru": "комод с ящиками",
+            "fr": "la commode à tiroirs",
+            "en": "the chest of drawers",
+            "de": "die Kommode",
+            "uk": "комод з ящиками"
+        },
+        "example": "Ik bewaar mijn kleding in de ladekast in de slaapkamer."
+    },
+    {
+        "infinitive": "het bed",
+        "original": "het bed",
+        "translation": {
+            "ru": "кровать",
+            "fr": "le lit",
+            "en": "the bed",
+            "de": "das Bett",
+            "uk": "ліжко"
+        },
+        "example": "Na een lange dag ontspan ik graag in mijn comfortabele bed."
+    },
+    {
+        "infinitive": "de kleerkast",
+        "original": "de kleerkast",
+        "translation": {
+            "ru": "гардероб",
+            "fr": "l'armoire",
+            "en": "the wardrobe",
+            "de": "der Kleiderschrank",
+            "uk": "шафа для одягу"
+        },
+        "example": "Mijn kleerkast is georganiseerd met verschillende kledingstukken."
+    },
+    {
+        "infinitive": "het nachtkastje",
+        "original": "het nachtkastje",
+        "translation": {
+            "ru": "тумбочка",
+            "fr": "la table de nuit",
+            "en": "the nightstand",
+            "de": "der Nachttisch",
+            "uk": "тумбочка біля ліжка"
+        },
+        "example": "Op het nachtkastje naast mijn bed staat een lamp en een boek."
+    },
+    {
+        "infinitive": "de matras",
+        "original": "de matras",
+        "translation": {
+            "ru": "матрас",
+            "fr": "le matelas",
+            "en": "the mattress",
+            "de": "die Matratze",
+            "uk": "матрац"
+        },
+        "example": "Een goede matras is essentieel voor een goede nachtrust."
+    },
+    {
+        "infinitive": "het kussen",
+        "original": "het kussen",
+        "translation": {
+            "ru": "подушка",
+            "fr": "le coussin",
+            "en": "the pillow",
+            "de": "das Kissen",
+            "uk": "подушка"
+        },
+        "example": "Ik slaap met twee kussens voor extra comfort."
+    },
+    {
+        "infinitive": "de wekker",
+        "original": "de wekker",
+        "translation": {
+            "ru": "будильник",
+            "fr": "le réveil",
+            "en": "the alarm clock",
+            "de": "der Wecker",
+            "uk": "будильник"
+        },
+        "example": "De wekker staat naast mijn bed om me 's ochtends wakker te maken."
+    },
+    {
+        "infinitive": "het bad",
+        "original": "het bad",
+        "translation": {
+            "ru": "ванна",
+            "fr": "le bain",
+            "en": "the bath",
+            "de": "die Badewanne",
+            "uk": "ванна"
+        },
+        "example": "Na een lange dag ontspan ik graag in een warm bad."
+    }
+]
