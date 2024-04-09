@@ -1,8 +1,8 @@
 import pkg from 'moment';
 const { moment } = pkg;
 
-import pkg from 'lodash';
-const { find, remove, findIndex, difference } = pkg;
+import pkg_l from 'lodash';
+const { find, remove, findIndex, difference } = pkg_l;
 
 import md5 from 'md5';
 import { writable } from 'svelte/store';
