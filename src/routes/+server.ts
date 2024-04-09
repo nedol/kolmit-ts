@@ -6,8 +6,8 @@ const { Email } = pkg;
 
 import md5 from 'md5';
 
-import pkg from 'lodash';
-const { find, findKey } = pkg;
+import pkg_l from 'lodash';
+const { find, findKey } = pkg_l;
 
 import { request } from 'undici';
 
