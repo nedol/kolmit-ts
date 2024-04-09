@@ -24,8 +24,9 @@
   let email = data.operator,
     abonent = data.abonent,
     name = data.name;
-
-  $langs = data.lang;
+  if (!data.check) $view = 'login';
+  else $view = 'class';
+  if (data.lang) $langs = data.lang;
 </script>
 
 {#if email}
