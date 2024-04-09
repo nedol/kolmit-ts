@@ -1,7 +1,7 @@
 import { json } from '@sveltejs/kit';
 import fs from 'fs';
 
-import { UpdateDialog, UpdateLesson } from '$lib/server/db.supabase.js';
+import { UpdateDialog, UpdateLesson } from '$lib/server/db.js';
 
 /** @type {import('./$types').RequestHandler} */
 export async function POST({ request, url, fetch }) {
