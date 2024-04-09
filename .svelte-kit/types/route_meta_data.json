@@ -1,0 +1,58 @@
+{
+	"/": [
+		"src/routes/+page.js",
+		"src/routes/+page.server.ts",
+		"src/routes/+layout.server.js",
+		"src/routes/+layout.server.js",
+		"src/routes/+server.ts"
+	],
+	"/admin": [
+		"src/routes/admin/+page.js",
+		"src/routes/admin/+page.server.ts",
+		"src/routes/+layout.server.js",
+		"src/routes/admin/+server.ts"
+	],
+	"/admin/class": [
+		"src/routes/admin/class/+server.ts"
+	],
+	"/admin/login": [
+		"src/routes/admin/login/+server.js"
+	],
+	"/admin/module": [
+		"src/routes/admin/module/+server.js"
+	],
+	"/chatGPT": [
+		"src/routes/chatGPT/+server.js"
+	],
+	"/lesson": [
+		"src/routes/lesson/+page.js",
+		"src/routes/lesson/+page.server.js",
+		"src/routes/+layout.server.js",
+		"src/routes/+layout.server.js",
+		"src/routes/lesson/+server.js"
+	],
+	"/operator": [
+		"src/routes/operator/+server.ts"
+	],
+	"/site": [
+		"src/routes/site/+page.js",
+		"src/routes/+layout.server.js"
+	],
+	"/site/about": [
+		"src/routes/site/about/+page.js",
+		"src/routes/+layout.server.js"
+	],
+	"/site/js": [
+		"src/routes/site/js/+page.server.js",
+		"src/routes/+layout.server.js"
+	],
+	"/speech/stt": [
+		"src/routes/speech/stt/+server.js"
+	],
+	"/speech/tts": [
+		"src/routes/speech/tts/+server.js"
+	],
+	"/user": [
+		"src/routes/user/+server.js"
+	]
+}
