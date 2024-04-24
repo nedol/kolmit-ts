@@ -1,23 +1,26 @@
 <script>
-  import DialogEdit from './DialogEdit.svelte';
-  import ListenEdit from './ListenEdit.svelte';
-  import TextEdit from './TextEdit.svelte';
-  import WordEdit from './WordEdit.svelte';
-  import WordGameEdit from './WordGameEdit.svelte';
+ import { setContext, onMount, onDestroy } from 'svelte';
+
+  import DialogEdit from './dialog/DialogEdit.svelte';
+  import ListenEdit from './listen/ListenEdit.svelte';
+  import TextEdit from './text/TextEdit.svelte';
+  import WordEdit from './word/WordEdit.svelte';
+  import WordGameEdit from './word/WordGameEdit.svelte';
   import { dc_oper } from '$lib/js/stores.js';
   import { dc_user } from '$lib/js/stores.js';
   import { call_but_status } from '$lib/js/stores.js';
-  const dc = $dc_user || $dc_oper;
+  const dc = $dc_user || $dc_oper; 
 
   export let data;
   export let ChangeQuizName;
+
+  setContext('quiz_data', data);
 </script>
 
-<div />
 <!-- {@debug quiz} -->
 {#if data.quiz}
   {#if data.quiz.includes('dialog')}
-    <DialogEdit {data} {ChangeQuizName} />
+    <DialogEdit {ChangeQuizName} />
   {:else if data.quiz.includes('listen')}
     <ListenEdit {data} />
   {:else if data.quiz === 'text'}

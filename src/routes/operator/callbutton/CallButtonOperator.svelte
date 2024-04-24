@@ -1,10 +1,8 @@
-<script>
+<script lang='ts'>
 	// let status = 'talk';
 	// import 'long-press-event';
 
 	export let status;
-
-	$: console.log('call button status:', status);
 	export let OnLongPress;
 </script>
 

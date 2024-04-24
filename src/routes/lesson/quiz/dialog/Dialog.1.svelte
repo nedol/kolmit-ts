@@ -1,15 +1,17 @@
-<script>
+<script lang="ts">
   import { onMount, onDestroy, getContext } from 'svelte';
   import BottomAppBar, { Section } from '@smui-extra/bottom-app-bar';
+  import Button, { Label } from '@smui/button';
+  import translate from 'translate';
 
   // import '$lib/js/talkify.js';
   // import 'talkify-tts/dist/talkify.min.js';
 
   import IconButton, { Icon } from '@smui/icon-button';
   import CircularProgress from '@smui/circular-progress';
-  import { langs, dicts, l_lang } from '$lib/js/stores.js';
+  import { langs, dicts, llang } from '$lib/js/stores.js';
   const dict = $dicts;
-  let llang = $l_lang;
+
   import {
     mdiPagePreviousOutline,
     mdiArrowRight,
@@ -19,15 +21,9 @@
     mdiMicrophoneOutline,
     mdiAccountConvertOutline,
     mdiVolumeHigh,
+    mdiThumbUpOutline,
     mdiPlay,
   } from '@mdi/js';
-  import {
-    lesson,
-    operator,
-    dc_oper,
-    dc_user,
-    call_but_status,
-  } from '$lib/js/stores.js';
 
   import pkg from 'lodash';
   const { maxBy } = pkg;
@@ -40,11 +36,15 @@
   import Tts from '/src/routes/speech/tts/Tts.svelte';
   import Stt from '/src/routes/speech/stt/Stt.svelte';
 
-  let stt, tts;
+  const operator = getContext('operator');
 
-  let dialog_data;
+  let stt: any, tts;
+
+  let dialog_data: any;
 
   let isFlipped = false;
+
+  let isRepeat = false;
 
   function flipCard() {
     isFlipped = !isFlipped;
@@ -57,6 +57,9 @@
 
   let share_mode = false;
   export let data;
+
+  translate.from = $llang;
+  translate.engine = 'google';
 
   // llang = data.llang;
   let showSpeakerButton = false;
@@ -74,6 +77,29 @@
   let share_button = false;
   let share_button_class = 'button_shared_false';
 
+  import {
+    lesson,
+    dc_oper,
+    dc_user,
+    msg_user,
+    msg_oper,
+    call_but_status,
+  } from '$lib/js/stores.js';
+
+  $: if ($msg_user) {
+    console.log($msg_user);
+  }
+
+  $: if ($msg_oper) {
+    console.log($msg_oper);
+    if ($msg_oper.command === 'repeat') {
+      isRepeat = true;
+      setTimeout(() => {
+        isRepeat = false;
+      }, 2000);
+    }
+  }
+
   $: if (data.name) {
     init();
   }
@@ -84,6 +110,27 @@
 
   $: if (data.cur_qa) {
     cur_qa = data.cur_qa;
+  }
+
+  $: if (q && !q[$langs]) {
+    (async () => {
+      q[$langs] = await Translate(q[$llang], $langs);
+    })();
+  }
+
+  $: if (a && !a[$langs]) {
+    (async () => {
+      a[$langs] = await Translate(a[$llang], $langs);
+    })();
+  }
+
+  async function Translate(text: string, lang: string) {
+    try {
+      return await await translate(text, lang);
+    } catch (error) {
+      console.error('Translation error:', error);
+      return text; // или другое подходящее значение по умолчанию
+    }
   }
 
   if (data.func) {
@@ -114,8 +161,9 @@
 
       return result;
     }
+
     const name = data.name;
-    fetch(`./lesson?dialog=${data.name}&owner=${$operator.abonent}`)
+    fetch(`./lesson?dialog=${data.name}&owner=${operator.abonent}`)
       .then((response) => response.json())
       .then((data) => {
         dialog_data = data.data.dialog;
@@ -145,7 +193,7 @@
       }, 0);
     }
     q = dialog_data.content[cur_qa].user1;
-    q_shfl = q[llang].slice(0);
+    q_shfl = q[$llang].slice(0);
     let ar = q_shfl
       .toLowerCase()
       .replaceAll('?', '')
@@ -153,7 +201,7 @@
       .split(' ');
     // q_shfl = shuffle(ar).toString().replaceAll(',', ' ');
     a = dialog_data.content[cur_qa].user2;
-    a_shfl = a[llang].slice(0);
+    a_shfl = a[$llang].slice(0);
     ar = a_shfl
       .toLowerCase()
       .replaceAll('?', '')
@@ -207,7 +255,7 @@
       await dc.SendData(
         {
           lesson: {
-            llang: llang,
+            llang: $llang,
             quiz: 'dialog.client',
             name: dialog_data.name,
             html: dialog_data.html ? dialog_data.html[cur_html] : null,
@@ -225,7 +273,7 @@
 
   function onChangeClick() {
     data = {
-      llang: llang,
+      llang: $llang,
       html: dialog_data.html ? dialog_data.html[cur_html] : '',
       user1: dialog_data.content[cur_qa].user1,
       user2: dialog_data.content[cur_qa].user2,
@@ -242,7 +290,7 @@
       dc.SendData(
         {
           lesson: {
-            llang: llang,
+            llang: $llang,
             quiz: client_quiz,
             name: dialog_data.name,
             html: dialog_data.html ? dialog_data.html[cur_html] : '',
@@ -273,7 +321,7 @@
   }
 
   async function speak() {
-    Speak(dialog_data.content[cur_qa].user1[llang]);
+    Speak(dialog_data.content[cur_qa].user1[$llang]);
   }
 
   function onClickMicrophone() {
@@ -320,6 +368,13 @@
 <!-- <RV bind:this={voice}></RV> -->
 
 <!-- <VoiceRSS bind:this={voice}></VoiceRSS> -->
+{#if isRepeat}
+  <div style="position: absolute;right:0">
+    <Button>
+      <Label>{dict['Repeat'][$langs]}</Label>
+    </Button>
+  </div>
+{/if}
 
 {#if data.quiz == 'dialog'}
   <!-- Ваш контент для лицевой стороны -->
@@ -333,7 +388,7 @@
 
       <div style="text-align: center;">
         <div class="tip" style="visibility:{visibility[1]}">
-          {dialog_data.content[cur_qa].user1[llang]}
+          {dialog_data.content[cur_qa].user1[$llang]}
         </div>
       </div>
       <div style="text-align: center">
@@ -375,14 +430,12 @@
         {dict['Проконтролируй ответ'][$langs]}:
       </div>
       <div class="user2" style="visibility:{visibility[1]}">
-        {@html dialog_data.content[cur_qa].user2[llang]}
+        {@html dialog_data.content[cur_qa].user2[$llang]}
       </div>
 
       {#if dialog_data.html}
         <div class="html_data">{@html dialog_data.html[cur_html]}</div>
       {/if}
-
-      <!-- <Vosk bind:this={stt} {SttResult} {StopListening}></Vosk> -->
     {:else}
       <div style="text-align:center">
         <span

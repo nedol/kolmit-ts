@@ -12,9 +12,10 @@ import { call_but_status } from '$lib/js/stores.js';
 
 export class RTCBase {
 	constructor(user, uid, signal) {
+		
 		this.type = user.type;
 		this.abonent = user.abonent;
-		this.em = user.em;
+		this.operator = user.operator;
 		this.uid = uid;
 
 		this.signal = signal;
@@ -45,7 +46,7 @@ export class RTCBase {
 		par.status = 'check';
 		par.type = this.type;
 		par.abonent = this.abonent;
-		par.em = this.em;
+		par.operator = this.operator;
 		par.uid = this.uid;
 		// par.abonent = this.abonent.toLowerCase();
 		this.signal.SendMessage(par, () => {
@@ -152,7 +153,7 @@ export class RTCBase {
 
 		this.conf = ice_conf;
 		//    try{
-		//         this.conf = (await (await fetch(this.host.host_server+'users/'+this.em+'ice_conf.json')).json());
+		//         this.conf = (await (await fetch(this.host.host_server+'users/'+this.operator+'ice_conf.json')).json());
 		//     }catch(ex){
 
 		//     }
@@ -262,7 +263,7 @@ export class RTCBase {
 		par.type = this.type;
 		par.abonent = this.abonent.toLowerCase();
 		par.uid = this.uid;
-		par.em = this.em.toLowerCase();
+		par.operator = this.operator.toLowerCase();
 		par.status = status;
 		this.signal.SendMessage(par, () => {
 			this.status = status;

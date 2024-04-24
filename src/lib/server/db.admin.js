@@ -1,7 +1,7 @@
 import md5 from 'md5';
-import { getLevels } from './db'
+import { getLevels } from './db';
 import postgres from 'postgres';
-import {SendEmail } from './db'
+import { SendEmail } from './db';
 
 let sql;
 
@@ -57,56 +57,43 @@ export async function CreateAdmin(par) {
       email: par.email,
       operator: md5(par.email),
       psw: md5(par.psw),
-      lang:par.lang
+      lang: par.lang,
     };
   } catch (ex) {
     console.log();
   }
 }
 
-export async function GetClasses(par) {
-  let classes, operators, admin;
+export async function GetGroups(par) {
+  let groups, operators, admin;
   try {
     operators = await sql`
 			SELECT 
-			id,			
-      class,
-			role,
-			operator as email,
-			name,
-			picture,
-      lang,
-			dep
+			*
 			FROM operators
 			WHERE role<>'admin' AND operators.abonent=${par.abonent}`;
     admin = await sql`
 			SELECT 
-			id,			
-			role,
-			operator as email,
-			name,
-			picture,
-			dep
+			*
 			FROM operators
 			WHERE role='admin' AND operators.abonent=${par.abonent}
 			`;
-    classes = await sql`
-     SELECT classes.name  FROM classes
-     INNER JOIN operators ON (operators.operator = classes.owner)
-     WHERE classes.owner=${par.abonent} AND operators.psw = ${par.psw}
+    groups = await sql`
+     SELECT groups.name  FROM groups
+     INNER JOIN operators ON (operators.abonent = groups.owner)
+     WHERE operators.operator=${par.abonent} AND operators.psw = ${par.psw}
      `;
   } catch (ex) {
     console.log(ex);
   }
-  return { classes, operators, admin };
+  return { groups, operators, admin };
 }
 
 export async function DeleteUser(par) {
   let resp;
   try {
-    resp = await sql`UPDATE operators SET abonent='public' 
-    WHERE operator=${par.email} AND abonent=${par.abonent}`;
-
+    resp = await sql`UPDATE operators SET "group"='public', abonent='public' 
+    WHERE operator=${par.operator} AND abonent=${par.abonent}`;
   } catch (ex) {
     console.log(ex);
   }
@@ -116,8 +103,8 @@ export async function DeleteUser(par) {
 export async function AddUser(q) {
   try {
     let resp = await sql`INSERT INTO operators
-			(class, role, operator , abonent , name, lang )
-			VALUES(${q.class_name}, ${q.role},${q.email}, ${q.abonent}, ${q.name}, ${q.lang})
+			("group", role, operator , abonent , name, lang )
+			VALUES(${q.class_name}, ${q.role},${q.operator}, ${q.abonent}, ${q.name}, ${q.lang})
 			ON CONFLICT (operator, abonent)
 			DO NOTHING`;
     if (resp.count > 0) {

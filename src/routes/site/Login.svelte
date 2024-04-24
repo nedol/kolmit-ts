@@ -6,7 +6,7 @@
 	import Textfield from '@smui/textfield';
 	import loadImage from 'blueimp-load-image/js/load-image.js';
 	import 'blueimp-load-image/js/load-image-scale.js';
-	import SelectMenu from './SelectMenu.svelte';
+	// import SelectMenu from './SelectMenu.svelte';
 	import { dicts } from '$lib/js/stores.js';
 	import { signal } from '$lib/js/stores.js';
 	import operator_svg from '$lib/images/operator.svg';
@@ -15,12 +15,12 @@
 
 	let width, height, value, abonent;
 	let formData = {
-		name: 'Test',
-		email: 'test@test.com',
-		psw: 'test',
-		confirmPassword: 'test',
+		name: 'Test',//'WH',//
+		email: 'test@test.com',//,'white@house.usa'
+		psw: 'test',//'test',
+		confirmPassword: 'test',//'test',
 		picture: '',
-		lang: 'en'
+		lang: 'ru',//'en'
 	};
 
 	if (!formData.picture) {
@@ -91,7 +91,7 @@
 			body: JSON.stringify({ par }),
 			headers: headers
 		});
-
+	
 		location.reload();
 	}
 </script>
@@ -154,7 +154,7 @@
 		</div>
 	</div>
 </form>
-<SelectMenu bind:lang />
+<!-- <SelectMenu bind:lang /> -->
 
 {#if !passwordMatch}
 	<p style="color: red;">{$dicts['Пароли не совпадают'][lang]}</p>

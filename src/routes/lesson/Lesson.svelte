@@ -1,5 +1,7 @@
-<script>
-  import { onMount, onDestroy } from 'svelte';
+<script lang="ts">
+  import { onMount, onDestroy, getContext } from 'svelte';
+
+  import translate from 'translate';
 
   import pkg from 'lodash';
   const { find, findKey, mapValues } = pkg;
@@ -17,33 +19,35 @@
   import Checkbox from '@smui/checkbox';
   import Quiz from './quiz/Quiz.svelte';
 
-  import { operator } from '$lib/js/stores.js';
-  import { users } from '$lib/js/stores.js';
+  import { users, langs } from '$lib/js/stores.js';
   import { msg_oper } from '$lib/js/stores.js';
 
-  import { quiz_users_ } from '$lib/js/stores.js';
+  import { quiz_userst } from '$lib/js/stores.js';
   import { users_status } from '$lib/js/stores.js';
+  import { view } from '$lib/js/stores.js';
 
   import operator_svg from '$lib/images/operator.svg';
 
   // import lesson_data from './lesson.json';
-  let lesson_data;
+  let lesson_data: any;
 
-  function findPic(email) {
-    const pic = find($users[0].pictures, { operator: email });
+  const group = getContext('group');
+  const operator = getContext('operator');
+
+  function findPic(operator: any) {
+    const pic = find(group[0].pictures, { operator: operator });
     return pic ? pic.pictures : operator_svg;
   }
 
-  let usersPic = $users[0].staff.map((item) => ({
-    email: item.email,
-    src: findPic(item.email),
+  let usersPic = group.map((item: any) => ({
+    operator: item.operator,
+    src: findPic(item.operator),
     name: item.name,
     status: item.status,
   }));
 
   import tutor_src from '$lib/images/tutor.png';
   // import { view } from '$lib/js/stores.js';
-  export let view;
 
   import { lesson } from '$lib/js/stores.js';
 
@@ -63,18 +67,9 @@
     true,
   ];
 
-  let display = 'hidden';
-
   $: if ($lesson.data) {
     // if (view !== 'lesson')
     data = $lesson.data;
-  }
-
-  $: if (view === 'lesson') {
-    display = 'block';
-  } else {
-    display = 'none';
-    data.quiz = '';
   }
 
   let level;
@@ -89,10 +84,10 @@
   let quiz_users = {};
 
   $: if ($users_status) {
-    BuildQuizUsers($quiz_users_);
+    BuildQuizUsers($quiz_userst);
   }
 
-  BuildQuizUsers($quiz_users_);
+  BuildQuizUsers($quiz_userst);
 
   $: if ($msg_oper && $msg_oper['quiz_users']) {
     // console.log($msg_oper['quiz_users']);
@@ -108,11 +103,11 @@
         },
       ];
       qu[quiz].map((user) => {
-        if (user === $operator.em) {
+        if (user === operator.operator) {
           checked[quiz] = true;
           return false;
         }
-        let obj = find(usersPic, { email: user });
+        let obj = find(usersPic, { operator: user });
         let obj_pic = find($users[0].pictures, { operator: user });
         // obj.src = obj_pic.picture;
         // console.log(obj);
@@ -151,9 +146,12 @@
     // // Устанавливаем высоту контейнера равной высоте родительского окна
     // containerHeight = parentHeight + 'px';
 
-    const lessonData = await fetchLesson($operator.abonent);
+    const lessonData = await fetchLesson(operator.abonent);
     lesson_data = lessonData.data;
     level = lesson_data.module;
+
+    translate.from = lesson_data.lang;
+    translate.engine = 'google';
   });
 
   onDestroy(() => {
@@ -163,18 +161,18 @@
     quiz_users = '';
   });
 
-  function onClickQuiz(ev) {
-    if (ev) {
+  function onClickQuiz(type, level, theme, name) {
+    try {
+      data.theme = theme;
       data.llang = lesson_data.lang;
-      data.level = ev.currentTarget.attributes['level'].value.replace('.', '');
-      data.name = ev.currentTarget.attributes['name'].value;
-      data.theme = ev.currentTarget.attributes['theme_name'].value;
-      data.words = find(lesson_data.module.themes, {
-        name: ev.currentTarget.attributes['theme_name'].value,
-      })['words'];
-      data.quiz = ev.currentTarget.attributes['type'].value;
-      if (ev.currentTarget.attributes['highlight'])
-        data.highlight = ev.currentTarget.attributes['highlight'].value;
+      data.level = level;
+      data.quiz = type;
+      data.name = name;
+
+      // if (ev.currentTarget.attributes['highlight'])
+      //   data.highlight = ev.currentTarget.attributes['highlight'].value;
+    } catch (ex) {
+      console.log(ex);
     }
   }
 
@@ -192,23 +190,23 @@
     let par = {};
     par.proj = 'kolmit';
     par.func = 'quiz_users';
-    par.abonent = $operator.abonent;
+    par.abonent = operator.abonent;
     par.quiz = name;
     if (!checked[name]) {
       checked[node.currentTarget.attributes['name'].value];
       let obj = find(usersPic, {
-        email: $operator.em,
+        operator: operator.operator,
       });
 
       quiz_users[name].push({
         src: obj.src,
-        email: $operator.em,
+        operator: operator.operator,
         name: obj.name,
       });
 
-      par.add = $operator.em;
+      par.add = operator.operator;
     } else {
-      let el = find(quiz_users[name], { email: $operator.em });
+      let el = find(quiz_users[name], { operator: operator.operator });
       try {
         // el = '';
         const ind = quiz_users[name].indexOf(el);
@@ -218,7 +216,7 @@
       } catch (ex) {
         console.log(ex);
       }
-      par.rem = $operator.em;
+      par.rem = operator.operator;
     }
     quiz_users = quiz_users;
 
@@ -247,20 +245,34 @@
   }
 
   function OnClickUserCard(ev) {
-    if (ev.currentTarget.attributes['email']) {
-      const em = ev.currentTarget.attributes['email'].value;
+    if (ev.currentTarget.attributes['operator']) {
+      const operator = ev.currentTarget.attributes['operator'].value;
     } else {
-      onClickQuiz(ev);
+      // onClickQuiz(ev);
     }
+  }
+
+  async function Translate(text: string, lang: string) {
+    try {
+      return await translate(text, lang);
+    } catch (error) {
+      console.error('Translation error:', error);
+      return text; // или другое подходящее значение по умолчанию
+    }
+  }
+
+  async function OnThemeNameInput(theme) {
+    theme.name[$langs] = await Translate(theme.name[lesson_data.lang], $langs);
+    level = level;
   }
 </script>
 
 <!-- svelte-ignore a11y-missing-content -->
 <!-- {@debug display} -->
-<div style="display:{display}">
+<div>
   <!-- {@debug data} -->
   {#if data.quiz}
-    <Quiz {data} bind:lesson_display={display} />
+    <Quiz {data} />
   {:else if level}
     <div class="lesson-container" style="">
       <div class="module_level">
@@ -271,7 +283,16 @@
         <div class="accordion-container">
           <Accordion multiple>
             <Panel class="panel" disabled={disabled[parseInt(t)]}>
-              <Header><h4>{theme.name}</h4></Header>
+              <Header
+                :use={theme.name[$langs]
+                  ? theme.name[$langs]
+                  : (() => {
+                      OnThemeNameInput(theme);
+                    })()}
+                ><h4>
+                  {theme.name[lesson_data.lang]}({theme.name[$langs]})
+                </h4></Header
+              >
               <Content>
                 {#if theme.lessons}
                   {#each theme.lessons as lesson}
@@ -327,14 +348,20 @@
                             <a
                               href="#"
                               use:disablePanel
-                              on:click={onClickQuiz}
+                              on:click={() => {
+                                onClickQuiz(
+                                  quiz.type,
+                                  level.level,
+                                  theme.name[lesson_data.lang],
+                                  quiz.name
+                                );
+                              }}
                               style="width:100%"
                               {t}
                               type={quiz.type}
                               name={quiz.name}
                               level={level.level}
-                              theme={theme.num}
-                              theme_name={theme.name}
+                              theme ={theme.name[lesson_data.lang]}
                               title={quiz.title}
                               highlight={quiz.highlight || ''}
                               >{quiz.name}
@@ -357,16 +384,16 @@
                             <!-- {@debug quiz_users} -->
                             <div class="user-cards">
                               {#each quiz_users[quiz.name] as qu, q}
-                                {#if qu.email !== $operator.em}
+                                {#if qu.operator !== operator.operator}
                                   <div
                                     on:click={OnClickUserCard}
-                                    email={qu.email}
+                                    operator={qu.operator}
                                     {t}
                                     type={quiz.type}
                                     name={quiz.name}
                                     level={level.level}
                                     theme={theme.num}
-                                    theme_name={theme.name}
+                                    theme_name={theme.name[$langs]}
                                   >
                                     <Card
                                       style="width:30px;  margin-right:15px"
@@ -392,7 +419,7 @@
                                         {#if qu.name}
                                           {qu.name.slice(0, 8)}
                                         {:else}
-                                          {qu.email.slice(0, 8)}
+                                          {qu.operator.slice(0, 8)}
                                         {/if}
                                       </h3>
                                     </Card>

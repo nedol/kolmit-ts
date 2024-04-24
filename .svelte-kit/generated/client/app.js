@@ -18,9 +18,9 @@ export const dictionary = {
 		"/": [~3],
 		"/admin": [~4],
 		"/lesson": [~5,[2]],
-		"/site": [6],
-		"/site/about": [7],
-		"/site/js": [~8]
+		"/public": [~6],
+		"/site": [7],
+		"/site/about": [8]
 	};
 
 export const hooks = {

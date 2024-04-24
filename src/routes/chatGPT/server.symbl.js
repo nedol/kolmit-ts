@@ -1,8 +1,8 @@
 import Anthropic from '@anthropic-ai/sdk';
 
 const anthropic = new Anthropic({
-	apiKey:
-		'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'
+	apiKey:''
+		
 });
 
 import prompt_data from './prompt/prompt_data.json';

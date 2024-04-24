@@ -5,7 +5,7 @@
 
 	import CallButtonUser from './CallButtonUser.svelte';
 
-	export let abonent, em, operator, poster, name;
+	export let abonent, operator, operator, poster, name;
 
 	import { call_but_status } from '$lib/js/stores.js';
 
@@ -35,7 +35,7 @@
 	let video_element, parent_div;
 
 	$: if (status) {
-		$users_status[em] = status;
+		$users_status[operator] = status;
 	}
 
 	let progress = {
@@ -71,7 +71,7 @@
 	};
 
 	let user = {
-		em: em,
+		operator: operator,
 		abonent: abonent,
 		type: 'user'
 	};
@@ -89,8 +89,8 @@
 
 
 	function OnMessage(data) {
-		if (data.operators && data.operators[em]) {
-			let res = groupBy(data.operators[em], 'status');
+		if (data.operators && data.operators[operator]) {
+			let res = groupBy(data.operators[operator], 'status');
 			try {
 				if (res && res['offer']) {
 					if (status !== 'call') {
@@ -122,7 +122,7 @@
 			}
 		}
 
-		if (data.operator && data.operator.em === rtc.em) {
+		if (data.operator && data.operator.operator === rtc.operator) {
 			status = 'active';
 			// $call_but_status = 'active';
 		}
@@ -155,8 +155,8 @@
 		}
 
 		if (data.func === 'talk') {
-			console.log('user talk', data.em);
-			if (data.em === em) {
+			console.log('user talk', data.operator);
+			if (data.operator === operator) {
 				$call_but_status = 'talk';
 				status = 'talk';
 				video_button_display = true;
@@ -181,7 +181,7 @@
 	}
 
 	let OnClickCallButton = function (ev, email) {
-		// if (email && email !== rtc.em) return;
+		// if (email && email !== rtc.operator) return;
 		try {
 			// Fix up for prefixing
 			if (!window.AudioContext) {

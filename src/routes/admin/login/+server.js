@@ -11,12 +11,12 @@ export async function POST({ request, url, fetch, cookies }) {
 
   if (resp) {
     try {
-    //   let cookie = cookies.get(`abonent:${resp.operator}`);
-    //   cookie = JSON.parse(cookie);
-    //   cookie.lang = lang;
+      //   let cookie = cookies.get(`kolmit.admin:${resp.operator}`);
+      //   cookie = JSON.parse(cookie);
+      //   cookie.lang = lang;
 
       cookies.set(
-        'abonent:' + resp.operator,
+        'kolmit.admin:' + resp.operator,
         JSON.stringify({
           name: resp.name,
           abonent: resp.operator,

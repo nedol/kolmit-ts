@@ -36,6 +36,7 @@ declare module '$env/static/private' {
 	export const LANGCHAIN_TRACING_V2: string;
 	export const LANGCHAIN_API_KEY: string;
 	export const ANTHROPIC_API_KEY: string;
+	export const HF_TOKEN: string;
 	export const ALLUSERSPROFILE: string;
 	export const APPDATA: string;
 	export const ChocolateyInstall: string;
@@ -167,6 +168,7 @@ declare module '$env/dynamic/private' {
 		LANGCHAIN_TRACING_V2: string;
 		LANGCHAIN_API_KEY: string;
 		ANTHROPIC_API_KEY: string;
+		HF_TOKEN: string;
 		ALLUSERSPROFILE: string;
 		APPDATA: string;
 		ChocolateyInstall: string;

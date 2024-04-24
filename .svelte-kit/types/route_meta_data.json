@@ -4,7 +4,7 @@
 		"src/routes/+page.server.ts",
 		"src/routes/+layout.server.js",
 		"src/routes/+layout.server.js",
-		"src/routes/+server.ts"
+		"src/routes/+server.js"
 	],
 	"/admin": [
 		"src/routes/admin/+page.js",
@@ -12,8 +12,8 @@
 		"src/routes/+layout.server.js",
 		"src/routes/admin/+server.ts"
 	],
-	"/admin/class": [
-		"src/routes/admin/class/+server.ts"
+	"/admin/group": [
+		"src/routes/admin/group/+server.ts"
 	],
 	"/admin/login": [
 		"src/routes/admin/login/+server.js"
@@ -29,10 +29,14 @@
 		"src/routes/lesson/+page.server.js",
 		"src/routes/+layout.server.js",
 		"src/routes/+layout.server.js",
-		"src/routes/lesson/+server.js"
+		"src/routes/lesson/+server.ts"
 	],
 	"/operator": [
 		"src/routes/operator/+server.ts"
+	],
+	"/public": [
+		"src/routes/public/+page.server.ts",
+		"src/routes/+layout.server.js"
 	],
 	"/site": [
 		"src/routes/site/+page.js",
@@ -40,10 +44,6 @@
 	],
 	"/site/about": [
 		"src/routes/site/about/+page.js",
-		"src/routes/+layout.server.js"
-	],
-	"/site/js": [
-		"src/routes/site/js/+page.server.js",
 		"src/routes/+layout.server.js"
 	],
 	"/speech/stt": [

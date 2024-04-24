@@ -1,14 +1,14 @@
 import { writable } from 'svelte/store';
 
-export let operator = writable();
+export let operatorst = writable();
 
 export let editable = writable(false);
 
-export let view = writable();
+export let view = writable('group');
 
 export let langs = writable('en');
 
-export let l_lang = writable('nl')
+export let llang = writable('nl')
 
 export let pswd = writable();
 
@@ -32,7 +32,7 @@ export let users = writable();
 
 export let users_status = writable({});
 
-export let quiz_users_ = writable();
+export let quiz_userst = writable();
 
 export let call_but_status = writable('inactive');
 

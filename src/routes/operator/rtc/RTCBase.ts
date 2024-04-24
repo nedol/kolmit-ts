@@ -10,7 +10,7 @@ export class RTCBase {
 		this.signal = signal;
 		this.type = operator.type;
 		this.abonent = operator.abonent;
-		this.em = operator.em;
+		this.operator = operator.operator;
 		this.role = operator.role;
 		this.uid = uid;
 		this.status;
@@ -37,7 +37,7 @@ export class RTCBase {
 		par.status = 'check';
 		par.type = this.type;
 		par.abonent = this.abonent;
-		par.em = this.em;
+		par.operator = this.operator;
 		par.uid = this.uid;
 		// par.abonent = this.abonent.toLowerCase();
 		this.signal.SendMessage(par, (resp) => {

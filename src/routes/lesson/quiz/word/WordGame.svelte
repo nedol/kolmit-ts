@@ -27,7 +27,7 @@
 	import { dc_oper } from '$lib/js/stores.js';
 	import { dc_user } from '$lib/js/stores.js';
 	import { call_but_status } from '$lib/js/stores.js';
-	import { operator } from '$lib/js/stores.js';
+
 	import { find } from 'lodash';
 	export let data;
 

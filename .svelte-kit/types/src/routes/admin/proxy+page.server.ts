@@ -4,7 +4,7 @@ import dict from '$lib/dict/dict.json';
 import os from 'os';
 
 import { CreatePool, GetUsers } from '$lib/server/db.js'; //src\lib\server\server.db.js
-import {  SetSQL, GetClasses } from '$lib/server/db.admin.js'; 
+import {  SetSQL, GetGroups } from '$lib/server/db.admin.js'; 
 
 let kolmit;
 
@@ -18,7 +18,7 @@ export async function load({ fetch, cookies, route, url, stuff }) {
 	let abonent = url.searchParams.get('abonent');
 	let lang = url.searchParams.get('lang');
 	let name = url.searchParams.get('name');
-	let email = url.searchParams.get('email');
+	let operator = url.searchParams.get('operator');
 	let psw = url.searchParams.get('psw');
 	let sql = ''
 
@@ -36,10 +36,10 @@ export async function load({ fetch, cookies, route, url, stuff }) {
 		dict: dict
 	};
 	try {
-		res = cookies.get('abonent:' + abonent);
+		res = cookies.get('kolmit.admin:' + abonent);
 
 		if (psw) {
-			kolmit = { operator: email, psw: md5(psw), name: name, lang: lang };
+			kolmit = { operator: operator, psw: md5(psw), name: name, lang: lang };
 		} else {
 			if (res) {
 				kolmit = JSON.parse(res);
@@ -61,20 +61,20 @@ export async function load({ fetch, cookies, route, url, stuff }) {
 		psw: kolmit.psw
 	};
 
-	let { operators, admin, classes } = await GetClasses(params); 
+	let { operators, admin, groups } = await GetGroups(params); 
 
 
 	return {
 		check: true,
 		host: host,
-		classes: classes,
+		groups: groups,
+		operators:operators,
 		// url: decodeURIComponent(url.toString()),
 		operator: kolmit.operator,
 		name: kolmit.name,
 		abonent: abonent,
 		lang: kolmit.lang,
 		dict: dict,
-		users: operators
 	};
 }
 

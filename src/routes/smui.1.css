@@ -29,6 +29,7 @@
   > .smui-paper__content {
   height: auto;
   padding: 8px 5px;
+
 }
 body {
   overflow-y: auto;
@@ -54,5 +55,10 @@ body {
   /* width: 25px;
   height: 25px; */
 }
+
+.mdc-image-list__supporting{
+  display: block;
+}
+
 
 

@@ -1,7 +1,7 @@
 <script>
   import Volgorde from './Volgorde.svelte';
   import Dialog from './dialog/Dialog.1.svelte';
-  import Listen from './listen/Listen.svelte';
+  import Listen from './listen/Listen.nl.svelte';
   import Text from './text/Text.svelte';
   import Word from './word/Word.svelte';
   import WordGame from './word/WordGame.svelte';

@@ -10,9 +10,6 @@ export async function POST({ request, url, fetch }) {
 	const { func, owner, level, name, new_name, data } = await request.json();
 
 	switch (func) {
-		case 'upd_lesson':
-			UpdateLesson({ owner, level, data });
-			break;
 		case 'upd_dlg':
 			UpdateDialog({ owner, level, name, new_name, data });
 			break;

@@ -5,7 +5,7 @@
 	import CallButtonUser from './CallButtonUser.svelte';
 	import { view } from '$lib/js/stores.js';
 
-	export let abonent, em, name;
+	export let abonent, operator, name;
 
 	import poster from '$lib/images/tutor.png';
 
@@ -37,7 +37,7 @@
 	let video_element, parent_div;
 
 	$: if (status) {
-		$users_status[em] = status;
+		$users_status[operator] = status;
 	}
 
 	let progress = {
@@ -73,7 +73,7 @@
 	};
 
 	let user = {
-		em: em,
+		operator: operator,
 		abonent: abonent,
 		type: 'user'
 	};
@@ -89,8 +89,8 @@
 	}
 
 	function OnMessage(data) {
-		if (data.operators && data.operators[em]) {
-			let res = groupBy(data.operators[em], 'status');
+		if (data.operators && data.operators[operator]) {
+			let res = groupBy(data.operators[operator], 'status');
 			try {
 				if (res && res['offer']) {
 					if (status !== 'call') {
@@ -122,7 +122,7 @@
 			}
 		}
 
-		if (data.operator && data.operator.em === rtc.em) {
+		if (data.operator && data.operator.operator === rtc.operator) {
 			status = 'active';
 			// $call_but_status = 'active';
 		}
@@ -155,8 +155,8 @@
 		}
 
 		if (data.func === 'talk') {
-			console.log('user talk', data.em);
-			if (data.em === em) {
+			console.log('user talk', data.operator);
+			if (data.operator === operator) {
 				$call_but_status = 'talk';
 				status = 'talk';
 				video_button_display = true;
@@ -210,7 +210,7 @@
 				{#if name}
 					{name.slice(0, 8)}
 				{:else}
-					{em.slice(0, 8)}
+					{operator.slice(0, 8)}
 				{/if}
 			</h3>
 		</Card>
@@ -223,7 +223,13 @@
 		margin-right: auto;
 		margin-left: auto;
 		margin-top: auto;
-		max-width: 50px;
-		max-height: 50px;
+		max-width: 65px;
+		max-height: 65px;
+	}
+
+	.card-display{
+		position:absolute;
+		bottom: 70px;
+
 	}
 </style>

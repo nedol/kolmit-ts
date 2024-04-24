@@ -13,7 +13,7 @@ export async function GET(event, fetch) {
 	let q = {};
 	q.abonent = event.url.searchParams.get('abonent');
 	q.type = event.url.searchParams.get('type');
-	q.em = event.url.searchParams.get('em');
+	q.operator = event.url.searchParams.get('operator');
 
 	let resp;
 
@@ -57,7 +57,7 @@ export async function POST(event) {
 
 		resp = await promise;
 
-		// console.log(resp);
+		console.log(resp);
 	} catch (ex) {
 		console.log(par.func + ex);
 	}
@@ -69,9 +69,9 @@ export async function POST(event) {
 function OperatorWaiting(q, resolve) {
 	try {
 		if (!global.rtcPool[q.type][q.abonent]) global.rtcPool[q.type][q.abonent] = {};
-		if (!global.rtcPool[q.type][q.abonent][q.em])
-			global.rtcPool[q.type][q.abonent][q.em] = { resolve: '' };
-		global.rtcPool[q.type][q.abonent][q.em].resolve = resolve;
+		if (!global.rtcPool[q.type][q.abonent][q.operator])
+			global.rtcPool[q.type][q.abonent][q.operator] = { resolve: '' };
+		global.rtcPool[q.type][q.abonent][q.operator].resolve = resolve;
 	} catch (ex) {
 		console.log('OperatorWaiting ex:' + ex);
 	}

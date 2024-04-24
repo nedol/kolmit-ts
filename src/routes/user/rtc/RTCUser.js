@@ -61,7 +61,7 @@ export default class RTCUser extends RTCBase {
 				par.status = 'call';
 				par.type = this.type;
 				par.abonent = this.abonent.toLowerCase();
-				par.em = this.em.toLowerCase();
+				par.user = this.operator.toLowerCase();
 				par.uid = this.uid;
 				this.signal.SendMessage(par, () => {
 					this.status = 'call';
@@ -81,7 +81,7 @@ export default class RTCUser extends RTCBase {
 	OnMessage(data) {
 		let that = this;
 
-		if (data.operators && data.em === that.em) {
+		if (data.operators && data.operator === that.operator) {
 			if (data.operators[that.abonent] && data.operators[that.abonent].abonent === that.abonent) {
 				if (data.operators[that.abonent].status === 'offer') {
 					// that.pcPull[data.operators[that.abonent].abonent].params['rem_desc'] = data.operators[that.abonent].desc;
@@ -98,7 +98,7 @@ export default class RTCUser extends RTCBase {
 			}
 		}
 
-		if (data.operator && data.operator.em === that.abonent) {
+		if (data.operator && data.operator.operator === that.abonent) {
 			// that.pcPull[data.operator.abonent].params['rem_desc'] = data.operator.desc;
 			// that.pcPull[data.operator.abonent].params['rem_cand'] = data.operator.cand;
 		}
@@ -117,7 +117,7 @@ export default class RTCUser extends RTCBase {
 		}
 
 		if (data.func === 'redirect') {
-			that.em = data.abonent.operator;
+			that.operator = data.abonent.operator;
 			// that.pcPull['all'].params = data.abonent.pcPull;
 			that.InitRTC(data.abonent.operator, async () => {
 				let promise = new Promise((resolve, reject) => {

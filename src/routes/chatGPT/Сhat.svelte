@@ -18,15 +18,8 @@
 
 	let userInput = '';
 	let messages = [];
-	let display = 'none';
-	export let view;
 
-	$: if (view === 'chat') {
-		display = 'block';
-	} else {
-		display = 'none';
-	}
-
+	
 	// Function to call ChatGPT
 	async function callChatGPT() {
 		try {
@@ -87,10 +80,10 @@
 	}
 </script>
 
-<div style="display:{display}">
+<div>
 	<div
 		class="chat-container"
-		style="visibility: {view === 'chat' ? 'visible' : 'hidden'}; overflow-y: auto;"
+		style="overflow-y: auto;"
 	>
 		{#each messages as { text, isQuestion }, index (index)}
 			<div class="userMessage {isQuestion}" key={index}>
@@ -98,7 +91,7 @@
 			</div>
 		{/each}
 	</div>
-	<div class="input-container" style="display:{display}">
+	<div class="input-container">
 		<button on:click={callChatGPT}>Отправить</button>
 		<div class="mic-button">
 			<IconButton on:click={micClicked}>

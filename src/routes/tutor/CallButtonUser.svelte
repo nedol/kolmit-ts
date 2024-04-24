@@ -10,7 +10,7 @@
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 <!-- svelte-ignore a11y-no-static-element-interactions -->
 <div class="callObject" on:long-press={OnLongPress} on:click>
-	<!-- {@debug em, status} -->
+	<!-- {@debug operator, status} -->
 	<svg
 		class="callButton"
 		{status}

@@ -1,14 +1,14 @@
 <script>
-	import { onMount } from 'svelte';
+	import { onMount, getContext } from 'svelte';
 	import Card, { Content, PrimaryAction, Media, MediaContent } from '@smui/card';
 
 	let display = 'block';
 	export let srcObject = '';
 	let lv, card, parent_div;
 
-	import { posterst } from '$lib/js/stores.js';
-	$: if ($posterst) {
-	}
+
+	const oper = getContext('operator')
+	const poster = oper.picture;
 
 	onMount(async () => {});
 
@@ -31,7 +31,7 @@
 					<video
 						class="oper_video_local"
 						bind:this={lv}
-						poster={$posterst}
+						poster={poster}
 						autoplay
 						playsinline
 						muted

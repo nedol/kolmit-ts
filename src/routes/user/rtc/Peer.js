@@ -13,7 +13,7 @@ export class Peer {
 		par.func = 'call';
 		par.abonent = that.rtc.abonent;
 		par.type = this.rtc.type;
-		par.em = this.rtc.em;
+		par.operator = this.rtc.operator;
 		par.uid = this.rtc.uid;
 		par.desc = desc; //.sdp.replace(/max-message-size:([0-9]+)/g, 'max-message-size:'+262144+'\r\n');
 		par.status = 'call';
@@ -32,7 +32,7 @@ export class Peer {
 		par.func = 'call';
 		par.type = this.rtc.type;
 		par.uid = this.rtc.uid;
-		par.em = this.rtc.em;
+		par.operator = this.rtc.operator;
 		par.cand = this.params['loc_cand'];
 		par.status = 'call';
 		par.abonent = this.rtc.abonent;
@@ -128,7 +128,7 @@ export class Peer {
 		par.type = this.rtc.type;
 		par.uid = this.rtc.uid;
 		par.oper_uid = this.rtc.oper_uid;
-		par.em = this.rtc.em;
+		par.target = this.rtc.operator;
 		par.desc = this.params['loc_desc']; //.sdp.replace(/max-message-size:([0-9]+)/g, 'max-message-size:'+262144+'\r\n');
 		par.cand = this.params['loc_cand'];
 		par.status = 'call';

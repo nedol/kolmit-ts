@@ -1,9 +1,22 @@
-<script>
+<script lang="ts">
   import {
     onMount /*, onDestroy, getContext, setContext*/,
     setContext,
   } from 'svelte';
+
   import { page, navigating, updated } from '$app/stores';
+
+  import langs_list from '$lib/dict/lang_list.json';
+
+  import ISO6391 from 'iso-google-locales';
+
+  // let langs_list = JSON.parse(localStorage.getItem('langs_list'));
+  //ISO6391.getAllNames();
+
+  import translate from 'translate';
+  translate.from = 'en';
+  translate.engine = 'google';
+
   import List, { Item, Graphic, Separator, Text } from '@smui/list';
 
   import TopAppBar, {
@@ -16,8 +29,6 @@
 
   import { lesson } from '$lib/js/stores.js';
 
-  import ru_flag from '$lib/images/flag-square-250_ru.png';
-
   import { editable } from '$lib/js/stores.js';
   $: if ($editable) {
     edited_display = $editable;
@@ -28,13 +39,14 @@
   import { langs } from '$lib/js/stores.js';
 
   import { dicts } from '$lib/js/stores.js';
+
   $: if ($dicts) {
     console.log($dicts);
   }
 
   let menu = 'menu';
 
-  let topAppBar;
+  let topAppBar
   let abonent;
 
   onMount(async () => {
@@ -44,141 +56,112 @@
 
   let lang_menu = false;
 
-  let langAr = {
-    en: `https://cdn.countryflags.com/thumbs/united-kingdom/flag-square-250.png
-			`,
-    fr: `
-			https://cdn.countryflags.com/thumbs/france/flag-square-250.png
-			`,
-    nl: `
-			https://cdn.countryflags.com/thumbs/netherlands/flag-square-250.png
-			`,
-    de: `https://cdn.countryflags.com/thumbs/germany/flag-square-250.png
-			`,
-    uk: `
-			https://cdn.countryflags.com/thumbs/ukraine/flag-square-250.png
-			`,
-    ru: ru_flag,
-  };
+  $: if ($dicts && !$dicts['CLASS'][$langs]) {
+    (async () => {
+      try {
+        $dicts['CLASS'][$langs] = await translate(
+          $dicts['CLASS']['en'],
+          $langs
+        );
+      } catch (ex) {
+        let name = ISO6391.getName($langs);
+        let ind = langs_list.indexOf(name);
+        if (ind !== -1) {
+          let ar = langs_list.splice(ind, 1);
+          localStorage.setItem('langs_list', JSON.stringify(langs_list));
+          langs_list = langs_list;
+          $langs = 'en';
+        }
+      }
+    })();
+  }
 
-  function setLang(lang) {
-    fetch(`./?func=cookie&abonent=${abonent}&lang=${lang}`)
-      .then(() => console.log())
-      .catch((error) => {
-        console.log(error);
-      });
+  $: if ($dicts && !$dicts['LESSON'][$langs]) {
+    (async () => {
+      try {
+        $dicts['LESSON'][$langs] = await translate(
+          $dicts['LESSON']['en'],
+          $langs
+        );
+      } catch (ex) {
+        console.log(ex);
+        $langs = 'en';
+      }
+    })();
+  }
+
+  function setLang(ev) {
+    let lang = ev.currentTarget.outerText;
+    let code = ISO6391.getCode(lang);
+    if (code !== 'English') {
+      $langs = code;
+    }
+    // console.log($langs);
+    lang_menu = false;
+
+    // TODO:
+    // fetch(`./?func=cookie&abonent=${abonent}&lang=${lang}`)
+    //   .then(() => console.log())
+    //   .catch((error) => {
+    //     console.log(error);
+    //   });
   }
 </script>
 
-
-  {#if $dicts && $dicts['CLASS'][$langs]}
-    <header>
-      <div class="top-app-bar-container flexor">
-        <TopAppBar bind:this={topAppBar} variant="fixed" dense>
-          <Row>
-            <div class="sec_items">
-              {#if $view !== 'login'}
-                <Section>
-                  <Title
-                    on:click={() => {
-                      $view = 'class';
-                    }}>{$dicts ? $dicts['CLASS'][$langs] : 'CLASS'}</Title
-                  >
-
-                  <Title
-                    on:click={async () => {
-                      console.log();
-                      $lesson.data = { quiz: '' };
-                      $view = 'lesson';
-                    }}>{$dicts ? $dicts['LESSON'][$langs] : 'LESSON'}</Title
-                  >
-                  <!-- <IconButton class="material-icons" aria-label="Bookmark this page">bookmark</IconButton> -->
-                </Section>
-              {/if}
-            </div>
-
-            <Section align="end">
-              <IconButton
-                class="material-icons"
-                on:click={() => {
-                  lang_menu = !lang_menu;
-                }}><img src={langAr[$langs]} alt={langAr[$langs]} /></IconButton
-              >
-              {#if lang_menu}
-                <div
-                  class="lang_list"
-                  style="position:absolute; display: flex; margin-top:300px"
+{#if $dicts && $langs && $dicts['CLASS'][$langs]}
+  <header>
+    <div class="top-app-bar-container flexor">
+      <TopAppBar bind:this={topAppBar} variant="fixed" dense>
+        <Row>
+          <div class="sec_items">
+            {#if $view !== 'login'}
+              <Section>
+                <Title
+                  on:click={() => {
+                    $view = 'group';
+                  }}>{$dicts ? $dicts['CLASS'][$langs] : 'CLASS'}</Title
                 >
-                  <List dense>
-                    <Item
-                      on:SMUI:action={() => {
-                        $langs = 'en';
-                        setLang($langs);
-                        lang_menu = false;
-                      }}
-                    >
-                      <!-- <Graphic class="material-icons">edit</Graphic> -->
-                      <img src={langAr['en']} alt="English" />
-                    </Item>
-                    <Item
-                      on:SMUI:action={() => {
-                        $langs = 'fr';
-                        setLang($langs);
-                        lang_menu = false;
-                      }}
-                    >
-                      <!-- <Graphic class="material-icons">edit</Graphic> -->
-                      <img src={langAr['fr']} alt="Français" />
-                    </Item>
-                    <Item
-                      on:SMUI:action={() => {
-                        $langs = 'nl';
-                        setLang($langs);
-                        lang_menu = false;
-                      }}
-                    >
-                      <!-- <Graphic class="material-icons">edit</Graphic> -->
-                      <img src={langAr['nl']} alt="Nederlands" />
-                    </Item>
-                    <Item
-                      on:SMUI:action={() => {
-                        $langs = 'de';
-                        setLang($langs);
-                        lang_menu = false;
-                      }}
-                    >
-                      <!-- <Graphic class="material-icons">edit</Graphic> -->
-                      <img src={langAr['de']} alt="Deutch" />
-                    </Item>
-                    <Item
-                      on:SMUI:action={() => {
-                        $langs = 'uk';
-                        setLang($langs);
-                        lang_menu = false;
-                      }}
-                    >
-                      <!-- <Graphic class="material-icons">edit</Graphic> -->
-                      <img src={langAr['uk']} alt="Український" />
-                    </Item>
-                    <Item
-                      on:SMUI:action={() => {
-                        $langs = 'ru';
-                        setLang($langs);
-                        lang_menu = false;
-                      }}
-                    >
-                      <img src={langAr['ru']} alt="Русский" />
-                    </Item>
-                  </List>
-                </div>
-              {/if}
-            </Section>
-          </Row>
-        </TopAppBar>
-        <div class="flexor-content"></div>
-      </div>
-    </header>
-  {/if}
+                <Title
+                  on:click={async () => {
+                    console.log();
+                    $lesson.data = { quiz: '' };
+                    $view = 'lesson';
+                  }}>{$dicts ? $dicts['LESSON'][$langs] : 'LESSON'}</Title
+                >
+                <!-- <IconButton class="material-icons" aria-label="Bookmark this page">bookmark</IconButton> -->
+              </Section>
+            {/if}
+          </div>
+
+          <Section align="end">
+            <span
+              class="lang_span"
+              on:click={() => {
+                lang_menu = !lang_menu;
+              }}
+              >{(() => {
+                return ISO6391.getNativeName($langs);
+              })()}</span
+            >
+            {#if lang_menu}
+              <div class="lang_list">
+                {#each langs_list as lang}
+                  <div
+                    style="color:black; margin:10px;font-size:smaller"
+                    on:click={setLang}
+                  >
+                    {lang}
+                  </div>
+                {/each}
+              </div>
+            {/if}
+          </Section>
+        </Row>
+      </TopAppBar>
+      <div class="flexor-content"></div>
+    </div>
+  </header>
+{/if}
 
 <style>
   header {
@@ -198,6 +181,19 @@
 
     overflow: auto;
     display: inline-block;
+  }
+
+  .lang_span {
+    font-size: smaller;
+  }
+
+  .lang_list {
+    position: absolute;
+    top: 50px;
+    height: 80vh;
+    overflow: auto;
+    justify-content: center; /* Выравниваем содержимое по центру вертикально */
+    align-items: center; /* Выравниваем содержимое по центру горизонтально */
   }
 
   img {

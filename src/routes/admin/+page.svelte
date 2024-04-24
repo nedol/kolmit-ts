@@ -1,41 +1,47 @@
 <script lang="ts">
   import { onMount, setContext } from 'svelte';
+  import Header from './Header.svelte'
   import Login from './login/Login.svelte';
   import { langs } from '$lib/js/stores.js';
   import { view } from '$lib/js/stores.js';
-  $view = 'lesson';
+
+  import { Dict } from '../dict/dict';
+  // $view = 'lesson';
 
   $: if ($view) {
     console.log($view);
   }
 
-  import Class from './class/ClassEditor.svelte';
+  import GroupEditor from './group/GroupEditor.svelte';
 
   import { dicts } from '$lib/js/stores.js';
   import ModuleEditor from './module/ModuleEditor.svelte';
 
   export let data;
 
-  let callcenter,
-    cc_display = 'none';
 
-  $dicts = data.dict[0];
 
-  let email = data.operator,
+  $: if (data.dict[0]){
+     $dicts = (data.dict[0]);
+     setContext('dict', new Dict(data.dict[0]))
+  }
+
+  let operator = data.operator,
     abonent = data.abonent,
     name = data.name;
-  if (!data.check) $view = 'login';
-  else $view = 'class';
+  // if (!data.check) $view = 'login';
+
   if (data.lang) $langs = data.lang;
 </script>
 
-{#if email}
-  {#if $view === 'class'}
-    <Class {data} />
-  {:else if $view === 'lesson'}
+{#if operator}
+  <Header></Header>
+  {#if $view === 'group'}
+    <GroupEditor {data} />
+  {:else if $view === 'lesson' || $view === 'quiz'}
     <!-- <Admin {email} {abonent} {name} /> -->
     <ModuleEditor {abonent}></ModuleEditor>
   {/if}
 {:else}
-  <Login {email} {abonent} />
+  <Login {operator} {abonent} />
 {/if}

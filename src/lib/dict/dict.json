@@ -176,29 +176,21 @@
 			"uk": "Передача файлу",
 			"nl": "Bestand verzenden"
 		},
-		"Launch Call Center": {
-			"en": "Launch Call Center",
-			"ru": "Запустить колл-центр",
-			"fr": "Editer le centre d'appel",
-			"de": "Call Center starten",
-			"uk": "Запустити колл-центр",
-			"nl": "Belcentrum starten"
+		"Remove": {
+			"en": "Remove",
+			"ru": "Удалить",
+			"fr": "Supprimer",
+			"de": "Löschen",
+			"uk": "Видалити",
+			"nl": "Verwijder"
 		},
-		"Edit Call Center": {
-			"en": "Edit Call Center",
-			"ru": "Редактировать колл-центр",
-			"fr": "Editer le centre d'appel",
-			"de": "Call Center bearbeiten",
-			"uk": "Редагувати колл-центр",
-			"nl": "Belcentrum bewerken"
-		},
-		"Cancel Edit Call Center": {
-			"en": "Cancel Edit Call Center",
-			"ru": "Завершить редактировать колл-центр",
-			"fr": "Terminer l'édition du centre d'appels",
-			"de": "Bearbeitung des Call Centers abbrechen",
-			"uk": "Скасувати редагування колл-центру",
-			"nl": "Bewerking van het belcentrum annuleren"
+		"Language": {
+			"en": "Language",
+			"ru": "Язык",
+			"fr": "De langue",
+			"de": "Sprach",
+			"uk": "Вибір мови",
+			"nl": "Taal"
 		},
 		"Language Select": {
 			"en": "Language Select",
@@ -208,13 +200,13 @@
 			"uk": "Вибір мови",
 			"nl": "Taal selecteren"
 		},
-		"New Dep": {
-			"en": "New Dep",
-			"ru": "Новый отдел",
-			"fr": "Nouveau tronçon",
-			"de": "Neue Abteilung",
-			"uk": "Новий відділ",
-			"nl": "Nieuwe afdeling"
+		"Name": {
+			"en": "Name",
+			"ru": "Имя",
+			"fr": "De langue",
+			"de": "Sprach",
+			"uk": "Вибір мови",
+			"nl": "Name"
 		},
 		"Admin": {
 			"en": "Admin",
@@ -223,14 +215,6 @@
 			"de": "Administrator",
 			"uk": "Адміністратор",
 			"nl": "Beheerder"
-		},
-		"Dep": {
-			"en": "Dep",
-			"ru": "Отдела",
-			"fr": "Division",
-			"de": "Abteilung",
-			"uk": "Відділ",
-			"nl": "Afdeling"
 		},
 		"Desc": {
 			"en": "Desc",
@@ -248,14 +232,6 @@
 			"uk": "Неправильний пароль. Спробуйте ще раз.",
 			"nl": "Ongeldig wachtwoord. Probeer het opnieuw."
 		},
-		"input admin name": {
-			"en": "input admin name",
-			"ru": "введите имя администратора",
-			"fr": "entrer l'adresse e-mail *",
-			"de": "Geben Sie den Administratornamen ein",
-			"uk": "Введіть ім'я адміністратора",
-			"nl": "Voer de beheerdersnaam in"
-		},
 		"input operator name": {
 			"en": "input operator name",
 			"ru": "введите имя оператора",
@@ -263,22 +239,6 @@
 			"de": "Geben Sie den Operatornamen ein",
 			"uk": "Введіть ім'я оператора",
 			"nl": "Voer de operatornaam in"
-		},
-		"input admin email": {
-			"en": "input admin email *",
-			"ru": "введите email администратора *",
-			"fr": "entrer l'adresse",
-			"de": "Geben Sie die Administrator-E-Mail-Adresse ein *",
-			"uk": "Введіть електронну адресу адміністратора *",
-			"nl": "Voer de e-mail van de beheerder in *"
-		},
-		"input operator email": {
-			"en": "input operator email *",
-			"ru": "введите email оператора *",
-			"fr": "entrer e-mail",
-			"de": "Geben Sie die E-Mail-Adresse des Operators ein *",
-			"uk": "Введіть електронну адресу оператора *",
-			"nl": "Voer de e-mail van de operator in *"
 		},
 		"input user name *": {
 			"en": "input user name *",
@@ -472,6 +432,14 @@
 			"uk": "Необмеж",
 			"nl": "Onbeperkt"
 		},
+		"Save": {
+			"en": "Save",
+			"ru": "Сохранить",
+			"fr": "Sauver",
+			"de": "Speichern",
+			"uk": "Зберегти",
+			"nl": "Opslaan"
+		},
 		"Save and Close": {
 			"en": "Save and Close",
 			"ru": "Сохранить и закрыть",
@@ -479,6 +447,14 @@
 			"de": "Speichern und schließen",
 			"uk": "Зберегти та закрити",
 			"nl": "Opslaan en sluiten"
+		},
+		"Close": {
+			"en": "Close",
+			"ru": "Закрыть",
+			"fr": "Fermer",
+			"de": "Schließen",
+			"uk": "Закрити",
+			"nl": "Sluiten"
 		},
 		"How to introduce you?": {
 			"en": "How to introduce you?",
@@ -511,6 +487,14 @@
 			"nl": "LES",
 			"de": "UNTERRICHT"
 		},
+		"Operator": {
+			"en": "Operator",
+			"ru": "Оператор",
+			"fr": "Operator",
+			"uk": "Оператор",
+			"nl": "Operator",
+			"de": "Operator"
+		},
 		"Твой ход": {
 			"en": "Your turn",
 			"ru": "Твой ход",
@@ -526,6 +510,25 @@
 			"uk": "Вам дзвонить:",
 			"nl": "Je hebt een telefoontje van:",
 			"de": "Ein Anruf von:"
+		},
+		"Repeat": {
+			"en": "Repeat it",
+			"ru": "Повторить",
+			"fr": "Qu'est-ce que c'est?",
+			"uk": "Повторіть",
+			"nl": "Wablieft?",
+			"de": "Wablieft?"
+		},
+		"content_builder": {
+			"en": "content-builder",
+			"ru": "контент-генератор",
+			"fr": "générateur de contenu",
+			"uk": "конструктор контенту",
+			"nl": "content-bouwer",
+			"de": "content-builder"
+		},
+		"Title": {
+			"nl": "Titеl"
 		}
 	}
 ]

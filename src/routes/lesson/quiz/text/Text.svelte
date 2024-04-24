@@ -50,7 +50,7 @@
 			)
 				.then((response) => response.json())
 				.then((data) => {
-					orig_text = text = data.obj.text;
+					orig_text = text = data.data.text;
 					fetchText();
 				})
 				.catch((error) => {
@@ -291,7 +291,7 @@
 		<Accordion>
 			<Panel>
 				<Header>
-					<h3>{data.title}</h3>
+					<h3>{data.name}</h3>
 					<IconButton class="material-icons">
 						<Icon tag="svg" viewBox="0 0 24 24">
 							<path fill="currentColor" d={mdiChevronDownCircleOutline} />

@@ -1,9 +1,9 @@
 import { writable } from 'svelte/store';
 
-import { operator } from '$lib/js/stores.js';
+import { operatorst } from '$lib/js/stores.js';
 
 let oper;
-operator.subscribe((data) => {
+operatorst.subscribe((data) => {
 	oper = data;
 });
 
@@ -47,21 +47,10 @@ export class DataChannelUser {
 				console.log('set dc_user');
 				if (that.dc.readyState === 'open') {
 					console.log(that.pc.pc_key + ' datachannel open');
-					//after redirect:
-					// const url = new URL(window.location.href);
-					// let em = url.searchParams.get('em');
-					// this.rtc.em = em;
+
 				}
 
-				// if(that.cnt_call === 0) {
-				//     that.cnt_call = 5;
-				that.SendDCCall();
-				//}
-				//after redirect:
-				// const url = new URL(window.location.href);
-				// let ab = url.searchParams.get('abonent');
-				// that.rtc.abonent = ab;
-				// that.rtc.trans = ab;
+				that.SendDCCall();		
 
 				that.dc.onclose = () => {
 					msg_user.set({ func: 'mute' });
@@ -83,7 +72,7 @@ export class DataChannelUser {
 					that.rtc.OnMessage(JSON.parse(data), that);
 
 					data = JSON.parse(data);
-					data.em = this.rtc.em;
+					data.operator = this.rtc.operator;
 					console.log('$msg_user:', data);
 					await msg_user.set(data);
 					data = '';
@@ -197,7 +186,7 @@ export class DataChannelUser {
 		par.call = that.rtc.call_num;
 		par.type = that.rtc.type;
 		par.email = that.rtc.email.from;
-		par.profile = { email: oper.em, name: oper.name, img: poster };
+		// par.profile = { email: oper.operator, name: oper.name, img: poster };
 
 		if (that.dc.readyState === 'open') {
 			that.SendData(par);

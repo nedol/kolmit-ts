@@ -1,6 +1,8 @@
 <script lang="ts">
   import { setContext, onMount, onDestroy } from 'svelte';
 
+  import translate from 'translate';
+
   import pkg from 'lodash';
   const { find, findKey, mapValues } = pkg;
 
@@ -24,21 +26,17 @@
   } from '@mdi/js';
   import Accordion, { Panel, Header, Content } from '@smui-extra/accordion';
 
-  // import Select, { Option } from '@smui/select';
+  import { langs, llang, dicts } from '$lib/js/stores.js';
 
   import Quiz from '../quiz/Quiz.svelte';
 
   import operator_svg from '$lib/images/operator.svg';
 
-  import tutor_src from '$lib/images/tutor.png';
-  // import { view } from '$lib/js/stores.js';
-  let view = 'lesson';
   let value = 'dialog';
 
-  import { lesson } from '$lib/js/stores.js';
-  let menu: Menu;
+  import { view } from '$lib/js/stores.js';
 
-  let clicked = '';
+  let menu: Menu;
 
   let disabled = [
     true,
@@ -56,44 +54,43 @@
     true,
   ];
 
-  let display = 'hidden';
-
-  $: if ($lesson.data) {
-    // if (view !== 'lesson')
-    data = $lesson.data;
-  }
-  $: if (view === 'lesson') {
-    display = 'block';
-  } else {
-    display = 'none';
-    data.quiz = '';
-  }
-
   export let abonent: any;
   setContext('abonent', abonent);
 
-  let llang = ' ',
-    llang_input;
+  let llang_input;
 
-  let lesson_data: any;
+  let lesson_data = { data: '' };
   let levels: any = [];
   let module_input: any;
 
-  let module = {
-    level: ' ',
-    themes: [],
-  };
-
   const quizes = ['', 'listen', 'text', 'dialog', 'word'];
-  let input_quiz
-
-  let data = {};
-  let panel_disabled = true;
 
   let containerWidth = '100%'; // Исходная ширина - 100% ширины родительского окна
   let containerHeight = '100vh';
 
-  let checked = {};
+  // $: if ($langs && lesson_data.data.module && llang) {
+
+  //   lesson_data.data.module.themes.map(async (theme) => {
+  //     if (!theme.name[$langs]) {
+  //       theme.name[$langs] = await Translate(theme.name[llang], $langs);
+  //     }
+  //   });
+
+  // }
+
+  async function Translate(text: string) {
+    try {
+      translate.from = $llang;
+
+      return (
+        ($dicts[text] && $dicts[text][$langs]) ??
+        (await translate(text.trim(), $langs))
+      );
+    } catch (error) {
+      console.error('Translation error:', error);
+      return text; // или другое подходящее значение по умолчанию
+    }
+  }
 
   export async function fetchLesson(owner: string, level: string) {
     try {
@@ -123,33 +120,31 @@
     containerHeight = parentHeight + 'px';
 
     // const modules = JSON.parse(localStorage.getItem('kolmit'))['modules'];
-    lesson_data = await fetchLesson(abonent);
+    lesson_data = await fetchLesson(abonent, '');
   });
 
   $: if (lesson_data && lesson_data.data) {
-    module = lesson_data.data.module; //lessonData.data.module;
-    module.level = lesson_data.level;
     levels = lesson_data.levels;
-    llang = lesson_data.lang.trim();
+    $llang = lesson_data.lang.trim();
+
+    translate.engine = 'google';
   }
 
   onDestroy(() => {});
 
   async function saveLessonData() {
     try {
-      if (!module.level) {
+      if (!lesson_data.data.module.level) {
         module_input.focus();
         return;
       }
-
-      lesson_data.data = { module: module };
 
       const response = await fetch(`/admin`, {
         method: 'POST',
         body: JSON.stringify({
           func: 'upd_lesson',
-          lang: llang,
-          level: module.level,
+          lang: $llang,
+          level: lesson_data.level,
           levels: levels,
           data: JSON.stringify(lesson_data.data),
           owner: abonent,
@@ -159,26 +154,26 @@
       if (!response.ok) {
         throw new Error('Failed to fetch data');
       }
-      lesson_data = await response.json();
+      const data = await response.json();
+
+      //  lesson_data.data = data;
     } catch (error) {
       console.error(error);
       return [];
     }
   }
 
-  function onClickQuiz(ev) {
-    if (ev.currentTarget.attributes['type'].value !== 'quiz') {
-      data.llang = lesson_data.lang.trim();
-      data.level = ev.currentTarget.attributes['level'].value;
-      data.name = ev.currentTarget.attributes['name'].value;
-      // data.theme = ev.currentTarget.attributes['theme'].value;
-      // data.words = find(lesson_data.module.themes, {
-      // 	name: ev.currentTarget.attributes['theme_name'].value
-      // })['words'];
-      data.quiz = ev.currentTarget.attributes['type'].value;
-      if (ev.currentTarget.attributes['highlight'])
-        data.highlight = ev.currentTarget.attributes['highlight'].value;
-    }
+  function onClickQuiz(quiz: any, level) {
+    $view = 'quiz';
+
+    lesson_data.data.llang = lesson_data.lang.trim();
+    lesson_data.data.level = level;
+    lesson_data.data.name = quiz.name;
+    // data.theme = ev.currentTarget.attributes['theme'].value;
+    // data.words = find(lesson_data.module.themes, {
+    // 	name: ev.currentTarget.attributes['theme_name'].value
+    // })['words'];
+    lesson_data.data.quiz = quiz.type;
   }
 
   function disablePanel(node) {
@@ -187,14 +182,6 @@
       disabled[parseInt(t)] = false;
     } catch (ex) {}
     // disabled = 'disabled';
-  }
-
-  function OnClickUserCard(ev) {
-    if (ev.currentTarget.attributes['email']) {
-      const em = ev.currentTarget.attributes['email'].value;
-    } else {
-      onClickQuiz(ev);
-    }
   }
 
   export function findDeep(obj, predicate, path = '') {
@@ -241,92 +228,103 @@
     });
   }
 
-  function OnAddTheme(ev) {
-    lesson_data.data.module = module;
-    lesson_data.level = module.level;
-    module.themes.unshift({
-      name: 'Theme name',
+  function OnAddTheme() {
+    lesson_data.data.module.themes.push({
+      name: { [$langs]: 'undefined' },
       lessons: [{ quizes: [] }],
     });
     console.log(module.level);
-    module = module;
+    lesson_data = lesson_data;
   }
 
   function OnRemoveThemeItem(ev) {
-    find(module.themes, {
+    find(lesson_data.data.module.themes, {
       name: ev.currentTarget.attributes['name'].nodeValue,
     });
   }
 
   function OnRemoveItem(ev) {
     deleteObjectByName(module, ev.currentTarget.attributes['name'].nodeValue);
-    module = module;
+    lesson_data = lesson_data;
   }
 
   function OnChangeThemeName(ev) {
-    const name = ev.currentTarget.attributes['name'].nodeValue;
     const upd = ev.target.innerText;
     if (name === upd) return;
-    let item = findDeep(module, (value) => value.name === name, {
-      childrenPath: 'themes',
-    });
+    let item = findDeep(
+      lesson_data.data.module.themes,
+      (value) => value[0].name[$langs] === name,
+      {
+        childrenPath: 'themes',
+      }
+    );
+
     if (item) {
-      item.name = upd;
+      item[0].name[$langs] = upd;
     }
-    module = module;
+    lesson_data = lesson_data;
   }
 
   function OnAddQuiz(ev) {
-    const theme = find(module.themes, {
-      name: ev.currentTarget.attributes['name'].nodeValue,
+    const theme = find(lesson_data.data.module.themes, {
+      name: { [$langs]: ev.currentTarget.attributes['name'].value },
     });
     theme.lessons[0].quizes.push({
       type: 'quiz',
       name: 'Quiz name',
     });
-    module = module;
+    lesson_data = lesson_data;
   }
 
   function OnSelectQuiztype(ev) {
-
-    const name = ev.target.parentElement.attributes['name'].nodeValue;
-    let item = findDeep(module, (value) => value.name === name, {
-      childrenPath: 'quizes',
-    });
+    const type = ev.target.value;
+    const name = ev.target.attributes['name'].value;
+    let item = findDeep(
+      lesson_data.data.module,
+      (value) => value.name === name,
+      {
+        childrenPath: 'quizes',
+      }
+    );
+    console.log(item);
     if (item) {
-      item.type = ev.target.value;
+      item.type = type;
     }
-    module = module;
+    lesson_data = lesson_data;
   }
 
   function ChangeQuizName(name, new_name) {
-    let item = findDeep(module, (value) => value.name === name, {
-      childrenPath: 'quizes',
-    });
+    let item = findDeep(
+      lesson_data.data.module,
+      (value) => value.name === name,
+      {
+        childrenPath: 'quizes',
+      }
+    );
     if (item) {
       item.name = new_name;
     }
-    module = module;
+    lesson_data = lesson_data;
   }
 
   function OnChangeQuizName(ev) {}
 
   async function ChangeLevel(ev: any) {
-    module.level = ev.target.attributes['level'].nodeValue.trim();
-    lesson_data = await fetchLesson(abonent, module.level);
-    menu.setOpen(false)
+    lesson_data.data.module.level = ev.target.attributes['level'].nodeValue;
+    lesson_data = await fetchLesson(abonent, lesson_data.data.module.level);
+    menu.setOpen(false);
   }
 
   let level = '';
   async function OnInput(ev) {
     lesson_data.level = ev.target.value;
     module = {
-      level: module.level,
+      level: lesson_data.data.module.level,
       themes: [],
     };
 
     levels.map(async (item) => {
-      if (item !== module.level) {
+      if (item !== lesson_data.data.module.level) {
         lesson_data.data.module.themes = [];
       } else {
         //  lesson_data = await fetchLesson(abonent, module.level);
@@ -334,7 +332,7 @@
     });
   }
 
-  function OnClickQuizName(ev){
+  function OnClickQuizName(ev) {
     // ev.target.select()
   }
 
@@ -347,45 +345,59 @@
   }
 
   async function OnRemModule(ev) {
-    const rem_level = module.level;
+    const rem_level = lesson_data.data.module.level;
     const ind = lesson_data.levels.indexOf(rem_level);
     lesson_data.levels.splice(ind, 1);
-    module = module;
-    lesson_data.data = await fetchLesson(abonent, module.level)['data'];
-    module.level = lesson_data.levels[0];
+    lesson_data = lesson_data;
+    lesson_data.data = await fetchLesson(
+      abonent,
+      lesson_data.data.module.level
+    )['data'];
+    lesson_data.data.module.level = lesson_data.levels[0];
+  }
+
+  async function OnThemeNameInput(theme) {
+    if (theme.name && theme.name[$llang]) {
+      theme.name[$langs] = await Translate(theme.name[$llang], $langs);
+      lesson_data = lesson_data;
+    }
   }
 </script>
 
-{#if data.quiz}
-  <Quiz bind:data bind:lesson_display={display} {ChangeQuizName} />
-{:else if module}
+{#if $view === 'quiz'}
+  <Quiz data={lesson_data.data} {ChangeQuizName} />
+{:else if lesson_data.data && lesson_data.data.module}
   <!-- svelte-ignore a11y-missing-content -->
 
-  <div style="display:{display}; height:1500px">
+  <div style="height:1500px; margin-top:20px                              ">
     <div class="level_container" style="">
-      <button class="save" on:click={saveLessonData}>Сохранить</button>
+      <button class="save" on:click={saveLessonData}>
+        {#await Translate('Save', $langs) then data}
+          {data}
+        {/await}
+      </button>
 
       <div>
         <div class="add_module" style="display:inline-flex">
-          <IconButton class="material-icons" on:click={OnAddModule}
+          <IconButton class="material-icons" on:click={OnAddModule}                              
             >add</IconButton
-          >
+          >                     
         </div>
-        <Textfield
+        <Textfield          
           bind:this={module_input}
           class="module_text"
           style="width:50px; text-align:center"
-          value={module.level}
+          value={lesson_data.level}
           label="Module"
           on:input={OnInput}
-          on:click= {() => menu.setOpen(true)}
+          on:click={() => menu.setOpen(true)}
         ></Textfield>
 
         <Textfield
           bind:this={llang_input}
           class="module_text"
           style="display:inline-flex; width:55px;text-align:center"
-          bind:value={llang}
+          bind:value={$llang}
           label="Language"
         ></Textfield>
 
@@ -412,27 +424,30 @@
     </div>
 
     <div class="lesson-container" style="">
-      {#each module.themes as theme, t}
+      {#each lesson_data.data.module.themes as theme, t}
         <div class="accordion-container">
           <Accordion multiple>
             <Panel class="panel">
               <Header>
-                <!-- <h4><input value={theme.name} /></h4> -->
-                <!-- <Textfield bind:value={theme.name} style="width: 368px;">
+                <!-- <h4><input value={theme.name[$langs]} /></h4> -->
+                <!-- <Textfield bind:value={theme.name[$langs]} style="width: 368px;">
 									<HelperText slot="helper">Helper Text</HelperText>
 								</Textfield> -->
-                <div
-                  contenteditable
-                  on:blur={OnChangeThemeName}
-                  name={theme.name}
-                  style="font-weight: 600;width:90%"
-                >
-                  {theme.name}
-                </div>
+
+                <input
+                  placeholder="Input Theme Name"
+                  :use={theme.name[$langs]
+                    ? theme.name[$langs]
+                    : ((ev) => {
+                        OnThemeNameInput(theme);
+                      })()}
+                  bind:value={theme.name[$langs]}
+                  style="font-weight: bold; width:90%"
+                />
                 <div class="rem_theme">
                   <IconButton
                     class="material-icons "
-                    name={theme.name}
+                    name={theme.name[$langs]}
                     on:click={OnRemoveItem}>remove</IconButton
                   >
                 </div>
@@ -445,12 +460,14 @@
                       {#each lesson.quizes as quiz}
                         <!-- {@debug quiz} -->
 
-                        <div class="quiz-container" name={quiz.name}>
+                        <div class="quiz-container">
                           <div
-                            on:click={onClickQuiz}
+                            on:click={() => {
+                              onClickQuiz(quiz, lesson_data.data.module.level);
+                            }}
                             type={quiz.type}
                             name={quiz.name}
-                            level={module.level}
+                            level={lesson_data.data.module.level}
                             highlight={quiz.highlight || ''}
                           >
                             {#if quiz.type === 'dialog'}
@@ -503,33 +520,34 @@
                           <!-- svelte-ignore a11y-invalid-attribute -->
                           {#if quiz.type === 'quiz'}
                             <input
-                              class="quiz_name"      
+                              class="quiz_name"
                               on:click={OnClickQuizName}
                               autofocus
                               contenteditable
                               {t}
                               name={quiz.name}
                               theme={theme.num}
-                              theme_name={theme.name}                            
-                              bind:value={quiz.name}/>
-                        
+                              theme_name={theme.name[$langs]}
+                              bind:value={quiz.name}
+                            />
                           {:else}
                             <input
                               on:click={OnClickQuizName}
                               style="width:80%"
                               {t}
                               name={quiz.name}
-                              level={module.level}
+                              level={lesson_data.data.level}
                               theme={theme.num}
-                              theme_name={theme.name}
-                              title={quiz.title}
+                              theme_name={theme.name[$langs]}
                               bind:value={quiz.name}
                             />
                           {/if}
 
                           {#if quiz.type === 'quiz'}
-                          
-                            <select on:change={OnSelectQuiztype}>
+                            <select
+                              on:change={OnSelectQuiztype}
+                              name={quiz.name}
+                            >
                               {#each quizes as quizOption}
                                 <option value={quizOption}>{quizOption}</option>
                               {/each}
@@ -550,7 +568,7 @@
                   <div class="add_quiz">
                     <IconButton
                       class="material-icons"
-                      name={theme.name}
+                      name={theme.name[$langs]}
                       on:click={OnAddQuiz}>add</IconButton
                     >
                   </div>
@@ -560,9 +578,9 @@
           </Accordion>
         </div>
       {/each}
-      {#if module.level && llang !== ' '}
+      {#if lesson_data.data.module.level && $llang !== ' '}
         <div class="add_theme">
-          <IconButton class="material-icons" on:click={OnAddTheme}
+          <IconButton class="material-icons" on:click={() => OnAddTheme()}
             >add</IconButton
           >
         </div>
@@ -670,18 +688,17 @@
   }
 
   div:focus,
-  input:focus
-  {
+  input:focus {
     /* background: lightcyan; */
     outline: none; /* Убираем также контур */
   }
 
-  select{
-    border:0;
-    background-color: lightgray ;
+  select {
+    border: 0;
+    background-color: lightgray;
   }
 
-  option{
+  option {
     font-size: larger;
   }
 </style>

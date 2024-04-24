@@ -59,7 +59,7 @@ function getHash(par) {
 }
 
 export function SendEmail(q, new_email) {
-  let em = new Email();
+  let operator = new Email();
   const abonent = q.abonent;
   const mail = q.send_email;
   const hash = getHash(mail);
@@ -71,7 +71,7 @@ export function SendEmail(q, new_email) {
   }[q.lang];
 
 
-  em.SendMail(
+  operator.SendMail(
     `nedooleg@gmail.com`,
      mail,
     {
@@ -97,14 +97,14 @@ export async function CreateOperator(par) {
 		operator = ${md5(par.email)}, 
 		psw = ${md5(par.psw)}, 
 		picture = ${par.picture} 
-		WHERE operator = ${par.email} AND abonent=${par.abonent}
+		WHERE email = ${par.email} AND abonent=${par.abonent}
 		`;
     return {
+      operator: md5(par.email),
       name: par.name,
       email: par.email,
-      hash: md5(par.email),
       psw: md5(par.psw),
-      lang: par.lang,
+      lang: par.lang
     };
   } catch (er) {
     console.log(er);
@@ -132,6 +132,30 @@ async function updateUsers(users, q) {
   return JSON.stringify({ func: q.func, dep: users[0] });
 }
 
+export async function GetGroup(par) {
+      //всех кто в группе, кроме себя
+      const group = await sql`
+			SELECT "group", abonent, role, operator, picture, lang, name
+      	FROM operators
+        WHERE operators.abonent=${par.abonent} 
+        AND  operators.operator<>${par.operator}
+        AND operators.group=(
+        SELECT "group" FROM operators
+        WHERE operators.abonent=${par.abonent} 
+        AND operator=${par.operator}
+      )`;
+  
+      const oper = await sql`
+			SELECT 
+			"group", abonent, role, operator, picture, lang, name
+			FROM operators
+			WHERE operators.abonent=${par.abonent} AND operator=${par.operator}
+      `;
+
+  return { group, oper };
+    
+}
+
 
 export async function GetUsers(par) {
   let operators,
@@ -141,22 +165,14 @@ export async function GetUsers(par) {
     if (par.abonent) {
       operators = await sql`
 			SELECT 
-			id,			
-			role,
-			operator as email,
-			name,
-			picture,
-			dep
+			*,
+			operator as email
 			FROM operators
 			WHERE role<>'admin' AND operators.abonent=${par.abonent}`;
       admin = await sql`
 			SELECT 
-			id,			
-			role,
-			operator as email,
-			name,
-			picture,
-			dep
+			*,
+			operator as email
 			FROM operators
 			WHERE role='admin' AND operators.abonent=${par.abonent}
 			`;
@@ -164,7 +180,7 @@ export async function GetUsers(par) {
       users = await sql`SELECT  users, quiz_users
 			FROM operators
 			INNER JOIN users ON (operators.abonent = users.operator = operators.operator) 
-			WHERE operators.operator=users.operators.operator AND operators.operator=${par.em} 
+			WHERE operators.operator=users.operators.operator AND operators.operator=${par.operator} 
 				AND operators.psw=${par.psw};`;
     }
   } catch (ex) {
@@ -179,22 +195,22 @@ export async function CheckOperator(q) {
 
   // console.log(sql);
 
-  if (q.psw && q.hash && getHash(q.em) === q.hash) {
+  if (q.psw && q.operator) {
     try {
       await sql`
-			INSERT INTO operators (psw, operator, abonent,  name) VALUES(${q.psw}, ${q.em}, 
+			INSERT INTO operators (psw, operator, abonent,  name) VALUES(${q.psw}, ${q.operator}, 
 			, ${q.name})`;
     } catch (ex) {}
   }
 
-  if (q.em) {
+  if (q.operator) {
     if (q.abonent) {
       result = await sql`
-			SELECT * FROM  operators WHERE operator=${q.em} AND abonent=${q.abonent} AND psw=${q.psw}`;
+			SELECT * FROM  operators WHERE operator=${q.operator} AND abonent=${q.abonent} AND psw=${q.psw}`;
     } else {
       result = result;
       await sql`
-			SELECT * FROM  operators WHERE operator=${q.em} AND abonent=${q.abonent} AND psw=${q.psw}`;
+			SELECT * FROM  operators WHERE operator=${q.operator} AND abonent=${q.abonent} AND psw=${q.psw}`;
     }
 
     result = result;
@@ -213,7 +229,7 @@ export async function CheckOperator(q) {
     }
   } else {
     result = await sql`
-		SELECT * FROM  operators WHERE operator=${q.em}`;
+		SELECT * FROM  operators WHERE operator=${q.operator}`;
 
     return result;
   }
@@ -268,7 +284,7 @@ export async function ChangeDep(q) {
 	FROM operators as oper
 	INNER JOIN users as usr ON (operators.abonent = users.operator)
 	WHERE oper.abonent=${q.abonent} AND oper.operator=${
-    q.em || q.operator
+    q.operator || q.operator
   } AND oper.psw=${q.psw}`;
 
   if (res[0]) {
@@ -284,10 +300,10 @@ export async function ChangeDep(q) {
 export async function AddDep(q) {
   if (q.abonent) {
     let res = await sql`SELECT *, (SELECT users FROM users WHERE operator=${
-      q.abonent || q.em
+      q.abonent || q.operator
     }) as users
 		FROM  operators as oper
-		WHERE oper.operator=${q.abonent || q.em}  AND abonent=${q.abonent} AND psw=${
+		WHERE oper.operator=${q.abonent || q.operator}  AND abonent=${q.abonent} AND psw=${
       q.psw
     }
 		`;
@@ -318,7 +334,7 @@ export async function RemDep(q) {
   let res = sql`SELECT users 
 		FROM operators as oper
 		INNER JOIN users as usr ON (operators.abonent = users.operator)
-		WHERE oper.operator=${q.em || q.abonent} AND oper.psw=${q.psw}`;
+		WHERE oper.operator=${q.operator || q.abonent} AND oper.psw=${q.psw}`;
 
   if (res[0]) {
     let users = JSON.parse(res[0].users);
@@ -331,10 +347,10 @@ export async function RemDep(q) {
 
 export async function ChangeOperator(q) {
   const res = await sql`SELECT *, (SELECT users FROM users WHERE operator=${
-    q.abonent || q.em
+    q.abonent || q.operator
   }) as users 
 		FROM  operators as oper 
-		WHERE oper.operator=${q.abonent || q.em}  AND abonent=${q.abonent} AND psw=${
+		WHERE oper.operator=${q.abonent || q.operator}  AND abonent=${q.abonent} AND psw=${
     q.psw
   }`;
 
@@ -368,7 +384,7 @@ export async function ChangeOperator(q) {
 export async function RemoveOperator(q) {
   const res = sql`SELECT *, (SELECT users FROM users WHERE operator=?) as users ' +
 		'FROM  operators as oper 
-		'WHERE oper.operator=${q.abonent || q.em}  AND abonent=${q.abonent} AND psw=${
+		'WHERE oper.operator=${q.abonent || q.operator}  AND abonent=${q.abonent} AND psw=${
     q.psw
   }`;
   try {
@@ -389,7 +405,7 @@ export async function RemoveOperator(q) {
 export async function GetText(q) {
   try {
     let res = await sql`SELECT text, questions FROM texts
-		WHERE level= ${q.level} AND theme=${q.theme} AND title=${q.title} AND owner=${q.owner}`;
+		WHERE level= ${q.level} AND title=${q.title} AND owner=${q.owner}`;
     //debugger;
     return { text: res[0].text, questions: res[0].questions };
   } catch (ex) {
@@ -475,9 +491,9 @@ export async function UpdateQuizUsers(q) {
 export async function GetDict(q) {
   try {
     let res = await sql`SELECT words FROM dicts
-		WHERE type=${q.type} AND level= ${q.level} AND theme=${q.theme} AND owner=${q.owner}`;
-    //debugger;
-    return res[0].words;
+		WHERE type=${q.type} AND level= ${q.level}  AND owner=${q.owner}`;
+    if (res[0]) return res[0].words;
+    else return res;
   } catch (ex) {
     // debugger;
     return JSON.stringify({ func: q.func, res: ex });
