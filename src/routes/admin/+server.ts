@@ -2,7 +2,7 @@ import { json } from '@sveltejs/kit';
 import fs from 'fs';
 
 import {
-	GetClasses,UpdateDialog, UpdateLesson,
+	llang,UpdateDialog, UpdateLesson,
 } from '$lib/server/db.admin.js';
 
 /** @type {import('./$types').RequestHandler} */
@@ -14,7 +14,7 @@ export async function POST({ request, url, fetch }) {
 	switch (func) {
 
 		case 'get_classes':
-			resp = GetClasses({ owner, psw, lang });
+			resp = GetGroups({ owner, psw, lang });
 
 		case 'upd_lesson':
 			UpdateLesson({ owner, level, levels, data, lang });
