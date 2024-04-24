@@ -68,8 +68,8 @@
         let ind = langs_list.indexOf(name);
         if (ind !== -1) {
           let ar = langs_list.splice(ind, 1);
-          localStorage.setItem('langs_list', JSON.stringify(langs_list));
-          langs_list = langs_list;
+          // localStorage.setItem('langs_list', JSON.stringify(langs_list));
+          // langs_list = langs_list;
           $langs = 'en';
         }
       }

@@ -2,7 +2,7 @@ import { json } from '@sveltejs/kit';
 import fs from 'fs';
 
 import {
-	llang,UpdateDialog, UpdateLesson,
+	GetGroups,UpdateDialog, UpdateLesson,
 } from '$lib/server/db.admin.js';
 
 /** @type {import('./$types').RequestHandler} */
