@@ -389,15 +389,28 @@
           <p><span class="mdc-typography--overline">{cur_qa + 1}</span></p>
         </div>
         <div class="title">{dict['Переведи'][$langs]}:</div>
-        <div class="user1   mdc-typography--headline6">
+        <div class="user1 mdc-typography--headline6">
           {q[$langs]}
         </div>
 
         <div style="text-align: center;">
-          <div class="tip   mdc-typography--headline6" style="visibility:{visibility[1]}">
+          <div
+            class="tip mdc-typography--headline6"
+            style="visibility:{visibility[1]}"
+          >
             {dialog_data.content[cur_qa].user1[$llang]}
           </div>
         </div>
+
+        {#if showSpeakerButton}
+          <div class="speaker-button">
+            <IconButton on:click={speak}>
+              <Icon tag="svg" viewBox="0 0 24 24">
+                <path fill="currentColor" d={mdiPlay} />
+              </Icon>
+            </IconButton>
+          </div>
+        {/if}
         <div style="text-align: center">
           <span style="color: darkgreen;">
             {@html stt_text}
@@ -421,16 +434,6 @@
 
           <Stt bind:this={stt} {SttResult} {StopListening} bind:display_audio
           ></Stt>
-
-          {#if showSpeakerButton}
-            <div class="speaker-button">
-              <IconButton on:click={speak}>
-                <Icon tag="svg" viewBox="0 0 24 24">
-                  <path fill="currentColor" d={mdiPlay} />
-                </Icon>
-              </IconButton>
-            </div>
-          {/if}
         </div>
 
         <div class="title" style="visibility:{visibility[1]}">
@@ -516,13 +519,13 @@
     transform-style: preserve-3d;
     transition: transform 0.5s;
     height: 90vh;
-
   }
   .margins {
     display: flex;
-    justify-content: space-between; /* Распределяет пространство между элементами равномерно */
+    justify-content: start; /* Распределяет пространство между элементами равномерно */
     align-items: center; /* Центрирует элементы по вертикали */
     text-align: left; /* Сбрасываем выравнивание текста по умолчанию */
+    height: 30px;
   }
 
   /* Если вы хотите добавить пространство между элементами, вы можете использовать margin */
@@ -561,14 +564,15 @@
     position: relative;
     font-size: large;
     border-radius: 25px;
-    top: -20px;
+    top: -5px;
+    float:right
   }
 
   .html_data {
     position: relative;
     overflow-y: auto;
     height: 44vh;
-    margin-top: 20px;
+    margin-top: 10px;
   }
 
   .counter {
@@ -607,7 +611,7 @@
     color: grey;
     position: relative;
     text-align: center;
-    margin: 5px;
+    margin: 0px;
     font-size: 0.8em;
   }
 
@@ -674,6 +678,6 @@
     position: relative;
     transform-style: preserve-3d;
     transition: transform 0.5s;
-    height: calc(100vh - 22vh);
+    height: calc(100vh - 23vh);
   }
 </style>

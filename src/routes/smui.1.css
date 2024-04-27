@@ -52,8 +52,8 @@ body {
 }
 .mdc-icon-button {
   padding: 1px;
-  /* width: 25px;
-  height: 25px; */
+  width: 25px;
+  height: 25px; 
 }
 
 .mdc-image-list__supporting{

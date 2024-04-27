@@ -189,7 +189,7 @@
   bind:this={audioPlayer}
   src={audioUrl}
   controls
-  style="display:{display_audio};width:50%"
+  style="display:{display_audio};width:65%"
 ></audio>
 
 <!-- <button on:click={playAudio}>Воспроизвести</button> -->

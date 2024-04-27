@@ -300,7 +300,7 @@
     color: grey;
     position: relative;
     text-align: center;
-    margin: 5px;
+    margin: 0px;
     font-size: 0.8em;
   }
 
