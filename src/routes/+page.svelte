@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount, setContext } from 'svelte';
-
+  import Header from './Header.svelte';
   import { wss } from '$lib/js/stores.js';
   import Operator from './operator/Operator.svelte';
   import Login from './site/Login.svelte';
@@ -20,10 +20,10 @@
     setContext('operator', data.operator[0]);
     setContext('abonent', data.operator[0].abonent);
 
-    operator = data.operator[0].operator,
-      abonent = data.operator[0].abonent,
-      name = data.operator[0].name,
-      user_pic = data.operator ? data.operator[0].picture : '';
+    (operator = data.operator[0].operator),
+      (abonent = data.operator[0].abonent),
+      (name = data.operator[0].name),
+      (user_pic = data.operator ? data.operator[0].picture : '');
 
     $signal = new SignalingChannel(operator);
 
@@ -39,12 +39,14 @@
     }
   }
 
-  if(data.operator){
+  if (data.operator) {
     Init();
   }
 
   onMount(async () => {});
 </script>
+
+<Header></Header>
 
 {#if operator && data.group}
   <Operator {operator} {abonent} {name} />

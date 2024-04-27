@@ -78,6 +78,7 @@
       role: 'operator',
       class_name: class_name,
       name: name,
+      email:email,
       operator: operator,
       abonent: abonent,
       lang: user_lang,
@@ -154,7 +155,7 @@
       translate.from = $llang;
 
       return (
-        ($dicts[text] && $dicts[text][$langs]) ??
+        ($dicts[text] && $dicts[text][$langs]) ||
         (await translate(text.trim(), $langs))
       );
     } catch (error) {
@@ -164,50 +165,51 @@
   }
 </script>
 
-{#each groups as item}
-  <div class="accordion-container">
-    <Accordion multiple>
-      <Panel class="panel">
-        <Header><b>{item.name}</b></Header>
-        <Content>
-          {#if card_display === item.name}
-            <div class="card-container">
-              <!-- {#if name} -->
-              <Card style="width:100%">
-                <div style="display:inline-flex">
-                  <div style="display:block;">
-                    <Content>
-                      {#await Translate('Language', $langs) then data}
+<div style="margin-top:50px">
+  {#each groups as item}
+    <div class="accordion-container">
+      <Accordion multiple>
+        <Panel class="panel">
+          <Header><b>{item.name}</b></Header>
+          <Content>
+            {#if card_display === item.name}
+              <div class="card-container">
+                <!-- {#if name} -->
+                <Card style="width:100%">
+                  <div style="display:inline-flex">
+                    <div style="display:block;">
+                      <Content>
+                        {#await Translate('Language', $langs) then data}
+                          <Textfield
+                            class="shaped-filled"
+                            variant="filled"
+                            bind:value={user_lang}
+                            label={data}
+                          ></Textfield>
+                        {/await}
+                      </Content>
+                      <Content>
+                        {#await Translate('Name', $langs) then data}
+                          <Textfield
+                            class="shaped-filled"
+                            variant="filled"
+                            bind:value={name}
+                            label={data}
+                          ></Textfield>
+                        {/await}
+                      </Content>
+                      <Content>
                         <Textfield
                           class="shaped-filled"
                           variant="filled"
-                          bind:value={user_lang}
-                          label={data}
+                          bind:value={email}
+                          label="E-mail"
                         ></Textfield>
-                      {/await}
-                    </Content>
-                    <Content>
-                      {#await Translate('Name', $langs) then data}
-                        <Textfield
-                          class="shaped-filled"
-                          variant="filled"
-                          bind:value={name}
-                          label={data}
-                        ></Textfield>
-                      {/await}
-                    </Content>
-                    <Content>
-                      <Textfield
-                        class="shaped-filled"
-                        variant="filled"
-                        bind:value={email}
-                        label="E-mail"
-                      ></Textfield>
-                    </Content>
-                  </div>
-                  {#if picture}
-                    <Image
-                      style="
+                      </Content>
+                    </div>
+                    {#if picture}
+                      <Image
+                        style="
                     display: block;
                     flex:1;
                     margin-left: auto;
@@ -215,89 +217,92 @@
                     max-height: 100px;
                     max-width:max-content
                   "
-                      src={picture}
-                    />
-                  {/if}
+                        src={picture}
+                      />
+                    {/if}
+                  </div>
+
+                  <Actions>
+                    <Button on:click={() => OnSaveUser(item.name)}>
+                      <Label>{data.dict[0]['Save and Close'][$langs]}</Label>
+                    </Button>
+                    <Button on:click={() => OnDeleteUser(operator)}>
+                      <Label>{data.dict[0]['Remove'][$langs]}</Label>
+                    </Button>
+                    <Button on:click={() => (card_display = 'false')}>
+                      <Label>{data.dict[0]['Close'][$langs]}</Label>
+                    </Button>
+                  </Actions>
+                </Card>
+              </div>
+            {:else}
+              <button class="save" on:click={saveClassData}>
+                {#await Translate('Save', $langs) then data}
+                  {data}
+                {/await}
+              </button>
+
+              <div class="deps_div">
+                <div class="flexy-dad">
+                  <!-- {@debug data} -->
+                  {#each data.operators as operator, i}
+                    {#if operator.group === item.name}
+                      <div
+                        class="mdc-elevation--z{i + 1} flexy-boy"
+                        on:click={(ev) => {
+                          (card_display = item.name), OnClickUser({ operator });
+                        }}
+                      >
+                        <Item style="text-align: center;">
+                          {#if operator.picture}
+                            <!-- {@debug operator} -->
+                            <Image
+                              src={operator.picture}
+                              style="max-height:50px; max-width:max-content"
+                              alt="Image {i + 1}"
+                            />
+                          {:else}
+                            <Image
+                              src={operator_svg}
+                              style="width:50px"
+                              alt="Image {i + 1}"
+                            />
+                          {/if}
+                          <Supporting>
+                            <Label>{operator.name}</Label>
+                          </Supporting>
+                        </Item>
+                      </div>
+                    {/if}
+                  {/each}
                 </div>
 
-                <Actions>
-                  <Button on:click={() => OnSaveUser(item.name)}>
-                    <Label>{data.dict[0]['Save and Close'][$langs]}</Label>
-                  </Button>
-                  <Button on:click={() => OnDeleteUser(operator)}>
-                    <Label>{data.dict[0]['Remove'][$langs]}</Label>
-                  </Button>
-                  <Button on:click={() => (card_display = 'false')}>
-                    <Label>{data.dict[0]['Close'][$langs]}</Label>
-                  </Button>
-                </Actions>
-              </Card>
-            </div>
-          {:else}
-            <button class="save" on:click={saveClassData}>
-              {#await Translate('Save', $langs) then data}
-                {data}
-              {/await}
-            </button>
-
-            <div class="deps_div">
-              <div class="flexy-dad">
-                <!-- {@debug data} -->
-                {#each data.operators as operator, i}
-                  {#if operator.group === item.name}
-                    <div
-                      class="mdc-elevation--z{i + 1} flexy-boy"
-                      on:click={(ev) => {
-                        (card_display = item.name), OnClickUser({ operator });
-                      }}
-                    >
-                      <Item style="text-align: center;">
-                        {#if operator.picture}
-                          <!-- {@debug operator} -->
-                          <Image
-                            src={operator.picture}
-                            style="max-height:50px; max-width:max-content"
-                            alt="Image {i + 1}"
-                          />
-                        {:else}
-                          <Image
-                            src={operator_svg}
-                            style="width:50px"
-                            alt="Image {i + 1}"
-                          />
-                        {/if}
-                        <Supporting>
-                          <Label>{operator.name}</Label>
-                        </Supporting>
-                      </Item>
-                    </div>
-                  {/if}
-                {/each}
+                <div class="add_user">
+                  <IconButton
+                    class="material-icons"
+                    on:click={(ev) => {
+                      card_display = item.name;
+                      OnAddUser(ev);
+                    }}>add</IconButton
+                  >
+                </div>
+                <!-- <div class="empty" style="height:100px" /> -->
               </div>
-
-              <div class="add_user">
-                <IconButton
-                  class="material-icons"
-                  on:click={(ev) => {
-                    card_display = item.name;
-                    OnAddUser(ev);
-                  }}>add</IconButton
-                >
-              </div>
-              <!-- <div class="empty" style="height:100px" /> -->
-            </div>
-          {/if}
-        </Content>
-      </Panel>
-    </Accordion>
-  </div>
-{/each}
+            {/if}
+          </Content>
+        </Panel>
+      </Accordion>
+    </div>
+  {/each}
+</div>
 
 <div class="add_class">
   <IconButton class="material-icons" on:click={OnAddClass}>add</IconButton>
 </div>
 
 <style>
+  .accordion-container {
+  }
   .flexy-dad {
     display: flex;
     flex-wrap: wrap;

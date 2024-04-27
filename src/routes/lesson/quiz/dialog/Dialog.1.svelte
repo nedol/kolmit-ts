@@ -9,6 +9,9 @@
 
   import IconButton, { Icon } from '@smui/icon-button';
   import CircularProgress from '@smui/circular-progress';
+  import Chip, { Set, LeadingIcon, TrailingIcon, Text } from '@smui/chips';
+  import '$lib/css/Typography.scss';
+
   import { langs, dicts, llang } from '$lib/js/stores.js';
   const dict = $dicts;
 
@@ -185,11 +188,11 @@
     if (!dialog_data.content[cur_qa]) {
       cur_qa = 0;
       cur_html++;
-      if (!dialog_data.html[cur_html]) {
+      if (dialog_data.html && !dialog_data.html[cur_html]) {
         cur_html = 0;
       }
       setTimeout(() => {
-        onChangeClick();
+        // onChangeClick();
       }, 0);
     }
     q = dialog_data.content[cur_qa].user1;
@@ -368,134 +371,153 @@
 <!-- <RV bind:this={voice}></RV> -->
 
 <!-- <VoiceRSS bind:this={voice}></VoiceRSS> -->
-{#if isRepeat}
-  <div style="position: absolute;right:0">
-    <Button>
-      <Label>{dict['Repeat'][$langs]}</Label>
-    </Button>
-  </div>
-{/if}
+<main>
+  {#if isRepeat}
+    <div style="position: absolute;right:0">
+      <Button>
+        <Label>{dict['Repeat'][$langs]}</Label>
+      </Button>
+    </div>
+  {/if}
 
-{#if data.quiz == 'dialog'}
-  <!-- Ваш контент для лицевой стороны -->
-  <div class="card">
-    {#if q || a}
-      <div class="cnt">{cur_qa + 1}</div>
-      <div class="title">{dict['Переведи'][$langs]}:</div>
-      <div class="user1">
-        {q[$langs]}
-      </div>
-
-      <div style="text-align: center;">
-        <div class="tip" style="visibility:{visibility[1]}">
-          {dialog_data.content[cur_qa].user1[$llang]}
+  {#if data.quiz == 'dialog'}
+    <!-- Ваш контент для лицевой стороны -->
+    <div class="card">
+      {#if q || a}
+        <!-- <div class="cnt">{cur_qa + 1}</div> -->
+        <div class="counter">
+          <p><span class="mdc-typography--overline">{cur_qa + 1}</span></p>
         </div>
-      </div>
-      <div style="text-align: center">
-        <span style="color: darkgreen;">
-          {@html stt_text}
-        </span>
-      </div>
+        <div class="title">{dict['Переведи'][$langs]}:</div>
+        <div class="user1">
+          {q[$langs]}
+        </div>
 
-      <div class="margins" style="text-align: center;">
-        <IconButton
-          class="material-icons"
-          aria-label="Back"
-          on:click={onClickMicrophone}
-        >
-          <Icon tag="svg" viewBox="0 0 24 24">
-            {#if isListening}
-              <path fill="currentColor" d={mdiMicrophone} />
-            {:else}
-              <path fill="currentColor" d={mdiMicrophoneOutline} />
-            {/if}
-          </Icon>
-        </IconButton>
-
-        <Stt bind:this={stt} {SttResult} {StopListening} bind:display_audio
-        ></Stt>
-
-        {#if showSpeakerButton}
-          <div class="speaker-button">
-            <IconButton on:click={speak}>
-              <Icon tag="svg" viewBox="0 0 24 24">
-                <path fill="currentColor" d={mdiPlay} />
-              </Icon>
-            </IconButton>
+        <div style="text-align: center;">
+          <div class="tip" style="visibility:{visibility[1]}">
+            {dialog_data.content[cur_qa].user1[$llang]}
           </div>
-        {/if}
-      </div>
+        </div>
+        <div style="text-align: center">
+          <span style="color: darkgreen;">
+            {@html stt_text}
+          </span>
+        </div>
 
-      <div class="title" style="visibility:{visibility[1]}">
-        {dict['Проконтролируй ответ'][$langs]}:
-      </div>
-      <div class="user2" style="visibility:{visibility[1]}">
-        {@html dialog_data.content[cur_qa].user2[$llang]}
-      </div>
-
-      {#if dialog_data.html}
-        <div class="html_data">{@html dialog_data.html[cur_html]}</div>
-      {/if}
-    {:else}
-      <div style="text-align:center">
-        <span
-          class="material-symbols-outlined"
-          style="font-size: 20px; color: blue; scale:1.5;"
-        >
-          <CircularProgress style="height: 50px; width: 50px;" indeterminate />
-        </span>
-      </div>
-    {/if}
-
-    <BottomAppBar bind:this={bottomAppBar}>
-      <Section>
-        {#if cur_qa > 0}
-          <button on:click={onBackQA} class="arrow-button arrow-button-left"
-            >&#8592;</button
+        <div class="margins" style="text-align: center;">
+          <IconButton
+            class="material-icons"
+            aria-label="Back"
+            on:click={onClickMicrophone}
           >
-        {/if}</Section
-      >
-      <Section>
-        {#if share_button && $call_but_status === 'talk'}
-          <div class={share_button_class} on:click={onShare}>
-            <IconButton>
-              <Icon tag="svg" viewBox="0 0 24 24">
-                <path fill="currentColor" d={mdiShareVariant} />
-              </Icon>
-            </IconButton>
-          </div>
-        {/if}
-      </Section>
-
-      <Section>
-        <div class="flip_button" on:click={onChangeClick}>
-          <IconButton>
             <Icon tag="svg" viewBox="0 0 24 24">
-              <path fill="currentColor" d={mdiAccountConvertOutline} />
+              {#if isListening}
+                <path fill="currentColor" d={mdiMicrophone} />
+              {:else}
+                <path fill="currentColor" d={mdiMicrophoneOutline} />
+              {/if}
             </Icon>
           </IconButton>
+
+          <Stt bind:this={stt} {SttResult} {StopListening} bind:display_audio
+          ></Stt>
+
+          {#if showSpeakerButton}
+            <div class="speaker-button">
+              <IconButton on:click={speak}>
+                <Icon tag="svg" viewBox="0 0 24 24">
+                  <path fill="currentColor" d={mdiPlay} />
+                </Icon>
+              </IconButton>
+            </div>
+          {/if}
         </div>
-      </Section>
-      <Section>
-        <button on:click={onClickQ} class="toggleButton">
-          <span class="material-symbols-outlined"> ? </span>
-        </button>
-      </Section>
 
-      <Section>
-        <button on:click={onNextQA} class="arrow-button arrow-button-right"
-          >&#8594;</button
+        <div class="title" style="visibility:{visibility[1]}">
+          {dict['Проконтролируй ответ'][$langs]}:
+        </div>
+        <div class="user2" style="visibility:{visibility[1]}">
+          {@html dialog_data.content[cur_qa].user2[$llang]}
+        </div>
+
+        {#if dialog_data.html}
+          <div class="html_data">{@html dialog_data.html[cur_html]}</div>
+        {/if}
+      {:else}
+        <div style="text-align:center">
+          <span
+            class="material-symbols-outlined"
+            style="font-size: 20px; color: blue; scale:1.5;"
+          >
+            <CircularProgress
+              style="height: 50px; width: 50px;"
+              indeterminate
+            />
+          </span>
+        </div>
+      {/if}
+
+      <BottomAppBar bind:this={bottomAppBar}>
+        <Section>
+          {#if cur_qa > 0}
+            <button on:click={onBackQA} class="arrow-button arrow-button-left"
+              >&#8592;</button
+            >
+          {/if}</Section
         >
-      </Section>
-    </BottomAppBar>
-  </div>
-{/if}
+        <Section>
+          {#if share_button && $call_but_status === 'talk'}
+            <div class={share_button_class} on:click={onShare}>
+              <IconButton>
+                <Icon tag="svg" viewBox="0 0 24 24">
+                  <path fill="currentColor" d={mdiShareVariant} />
+                </Icon>
+              </IconButton>
+            </div>
+          {/if}
+        </Section>
 
-{#if data.quiz == 'dialog.client'}
-  <Dialog2 {data} {onChangeClick} />
-{/if}
+        <Section>
+          <div class="flip_button" on:click={onChangeClick}>
+            <IconButton>
+              <Icon tag="svg" viewBox="0 0 24 24">
+                <path fill="currentColor" d={mdiAccountConvertOutline} />
+              </Icon>
+            </IconButton>
+          </div>
+        </Section>
+        <Section>
+          <button on:click={onClickQ} class="toggleButton">
+            <span class="material-symbols-outlined"> ? </span>
+          </button>
+        </Section>
+
+        <Section>
+          <button on:click={onNextQA} class="arrow-button arrow-button-right"
+            >&#8594;</button
+          >
+        </Section>
+      </BottomAppBar>
+    </div>
+  {/if}
+
+  {#if data.quiz == 'dialog.client'}
+    <Dialog2 {data} {onChangeClick} />
+  {/if}
+</main>
 
 <style>
+  main {
+    /* background-color: #fff; */
+    transition: transform 0.3s ease-in-out;
+    width: 98%;
+    margin: 0 auto;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.5s;
+    height: 90vh;
+
+  }
   .margins {
     display: flex;
     justify-content: space-between; /* Распределяет пространство между элементами равномерно */
@@ -549,11 +571,32 @@
     margin-top: 20px;
   }
 
+  .counter {
+    position: absolute;
+    background-color: #f0f0f0;
+    padding: 3px;
+    border-radius: 25px;
+    width: 35px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    text-align: center;
+  }
+
+  .counter p {
+    margin: 0;
+    font-size: 18px;
+    color: #333;
+  }
+
+  .counter span {
+    font-weight: bold;
+    font-size: 18px;
+    color: #ff5733; /* цвет счетчика */
+  }
   .cnt {
     position: absolute;
     text-align: left;
-    left: 20px;
-    top: 3px;
+    left: 15px;
+    top: -2px;
     z-index: 2;
     font-size: 1em;
     margin-bottom: 10px;
@@ -632,6 +675,6 @@
     position: relative;
     transform-style: preserve-3d;
     transition: transform 0.5s;
-    height: calc(100vh - 24vh);
+    height: calc(100vh - 20vh);
   }
 </style>

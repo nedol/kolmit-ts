@@ -395,7 +395,7 @@
 
     <div class="word">
       <!-- {@debug currentWord} -->
-      <h3>{word}</h3>
+      <h5>{word}</h5>
 
       {#if showSpeakerButton}
         <div class="speaker-button">
@@ -465,6 +465,7 @@
     transform-style: preserve-3d;
     transition: transform 0.5s;
     height: 90vh;
+    margin-top:40px
   }
   .title {
     color: grey;

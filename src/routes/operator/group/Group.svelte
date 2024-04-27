@@ -3,7 +3,7 @@
   // import { getContext } from 'svelte';
   import { getContext, onMount } from 'svelte';
 
-  import Tutor from '../../tutor/Tutor.svelte'
+  import Tutor from '../../tutor/Tutor.svelte';
 
   import '$lib/css/Elevation.scss';
 
@@ -25,7 +25,7 @@
 
   import User from '../../user/User.svelte';
 
-  let operator = getContext('operator')
+  let operator = getContext('operator');
 
   let cnt;
 
@@ -38,8 +38,6 @@
     'Content-Type': 'application/json',
     // Authorization: `Bearer ${token}`
   };
-
-  
 
   async function OperatorWaiting(par: any) {
     fetch(`./user`, {
@@ -105,7 +103,6 @@
         <Item style="text-align: center">
           <!-- {@debug user} -->
           <User
-
             name={user.name}
             operator={user.operator}
             abonent={user.abonent}
@@ -124,7 +121,15 @@
         </Item>
       </div>
     {/each}
-      <Tutor name={operator.name} abonent={operator.abonent} ></Tutor>
+    <div class="mdc-elevation--z{group.length} flexy-boy">
+      <Item style="text-align: center">
+        <Tutor name="AI Tutor"></Tutor>
+
+        <Supporting>
+          <Label>AI Tutor</Label>
+        </Supporting>
+      </Item>
+    </div>
   </div>
   <!-- <div class="empty" style="height:100px" /> -->
 </div>
@@ -133,7 +138,7 @@
   .deps_div {
     overflow-y: scroll;
     margin-left: 10px;
-    margin-top: 20px;
+    margin-top: 40px;
   }
   ::-webkit-scrollbar {
     display: none;
@@ -147,8 +152,8 @@
   .flexy-boy {
     display: flex;
     justify-content: center;
-    align-items: center;
-    width: 100px;
+    /* align-items: center; */
+    width: 90px;
     height: 100px;
     margin: 0 30px 30px 0;
   }

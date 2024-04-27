@@ -83,7 +83,7 @@
       translate.from = $llang;
 
       return (
-        ($dicts[text] && $dicts[text][$langs]) ??
+        ($dicts[text] && $dicts[text][$langs]) ||
         (await translate(text.trim(), $langs))
       );
     } catch (error) {
@@ -364,234 +364,244 @@
   }
 </script>
 
-{#if $view === 'quiz'}
-  <Quiz data={lesson_data.data} {ChangeQuizName} />
-{:else if lesson_data.data && lesson_data.data.module}
-  <!-- svelte-ignore a11y-missing-content -->
+<main>
+  {#if $view === 'quiz'}
+    <Quiz data={lesson_data.data} {ChangeQuizName} />
+  {:else if lesson_data.data && lesson_data.data.module}
+    <!-- svelte-ignore a11y-missing-content -->
 
-  <div style="height:1500px; margin-top:20px                              ">
-    <div class="level_container" style="">
-      <button class="save" on:click={saveLessonData}>
-        {#await Translate('Save', $langs) then data}
-          {data}
-        {/await}
-      </button>
+    <div style="height:1500px; margin-top:20px                              ">
+      <div class="level_container" style="">
+        <button class="save" on:click={saveLessonData}>
+          {#await Translate('Save', $langs) then data}
+            {data}
+          {/await}
+        </button>
 
-      <div>
-        <div class="add_module" style="display:inline-flex">
-          <IconButton class="material-icons" on:click={OnAddModule}                              
-            >add</IconButton
-          >                     
+        <div>
+          <div class="add_module" style="display:inline-flex">
+            <IconButton class="material-icons" on:click={OnAddModule}
+              >add</IconButton
+            >
+          </div>
+          <Textfield
+            bind:this={module_input}
+            class="module_text"
+            style="width:50px; text-align:center"
+            value={lesson_data.level}
+            label="Module"
+            on:input={OnInput}
+            on:click={() => menu.setOpen(true)}
+          ></Textfield>
+
+          <Textfield
+            bind:this={llang_input}
+            class="module_text"
+            style="display:inline-flex; width:55px;text-align:center"
+            bind:value={$llang}
+            label="Language"
+          ></Textfield>
+
+          <div class="rem_module" style="display:inline-flex">
+            <IconButton class="material-icons rem_module" on:click={OnRemModule}
+              >remove</IconButton
+            >
+          </div>
+
+          <Menu bind:this={menu}>
+            <List>
+              {#each levels as level}
+                <Item
+                  on:SMUI:action={ChangeLevel}
+                  {level}
+                  style="text-align:center"
+                >
+                  <Text>{level}</Text>
+                </Item>
+              {/each}
+            </List>
+          </Menu>
         </div>
-        <Textfield          
-          bind:this={module_input}
-          class="module_text"
-          style="width:50px; text-align:center"
-          value={lesson_data.level}
-          label="Module"
-          on:input={OnInput}
-          on:click={() => menu.setOpen(true)}
-        ></Textfield>
-
-        <Textfield
-          bind:this={llang_input}
-          class="module_text"
-          style="display:inline-flex; width:55px;text-align:center"
-          bind:value={$llang}
-          label="Language"
-        ></Textfield>
-
-        <div class="rem_module" style="display:inline-flex">
-          <IconButton class="material-icons rem_module" on:click={OnRemModule}
-            >remove</IconButton
-          >
-        </div>
-
-        <Menu bind:this={menu}>
-          <List>
-            {#each levels as level}
-              <Item
-                on:SMUI:action={ChangeLevel}
-                {level}
-                style="text-align:center"
-              >
-                <Text>{level}</Text>
-              </Item>
-            {/each}
-          </List>
-        </Menu>
       </div>
-    </div>
 
-    <div class="lesson-container" style="">
-      {#each lesson_data.data.module.themes as theme, t}
-        <div class="accordion-container">
-          <Accordion multiple>
-            <Panel class="panel">
-              <Header>
-                <!-- <h4><input value={theme.name[$langs]} /></h4> -->
-                <!-- <Textfield bind:value={theme.name[$langs]} style="width: 368px;">
+      <div class="lesson-container" style="">
+        {#each lesson_data.data.module.themes as theme, t}
+          <div class="accordion-container">
+            <Accordion multiple>
+              <Panel class="panel">
+                <Header>
+                  <!-- <h4><input value={theme.name[$langs]} /></h4> -->
+                  <!-- <Textfield bind:value={theme.name[$langs]} style="width: 368px;">
 									<HelperText slot="helper">Helper Text</HelperText>
 								</Textfield> -->
 
-                <input
-                  placeholder="Input Theme Name"
-                  :use={theme.name[$langs]
-                    ? theme.name[$langs]
-                    : ((ev) => {
-                        OnThemeNameInput(theme);
-                      })()}
-                  bind:value={theme.name[$langs]}
-                  style="font-weight: bold; width:90%"
-                />
-                <div class="rem_theme">
-                  <IconButton
-                    class="material-icons "
-                    name={theme.name[$langs]}
-                    on:click={OnRemoveItem}>remove</IconButton
-                  >
-                </div>
-              </Header>
-              <Content>
-                {#if theme.lessons}
-                  {#each theme.lessons as lesson}
-                    <!-- <div>{lesson.num}.{lesson.title}</div> -->
-                    {#if lesson.quizes}
-                      {#each lesson.quizes as quiz}
-                        <!-- {@debug quiz} -->
-
-                        <div class="quiz-container">
-                          <div
-                            on:click={() => {
-                              onClickQuiz(quiz, lesson_data.data.module.level);
-                            }}
-                            type={quiz.type}
-                            name={quiz.name}
-                            level={lesson_data.data.module.level}
-                            highlight={quiz.highlight || ''}
-                          >
-                            {#if quiz.type === 'dialog'}
-                              <Icon
-                                tag="svg"
-                                viewBox="0 0 24 24"
-                                width="30px"
-                                height="30px"
-                              >
-                                <path fill="grey" d={mdiAccountMultiple} />
-                              </Icon>
-                            {:else if quiz.type === 'text'}
-                              <Icon
-                                tag="svg"
-                                viewBox="0 0 24 24"
-                                width="30px"
-                                height="30px"
-                              >
-                                <path fill="grey" d={mdiTextBoxOutline} />
-                              </Icon>
-                            {:else if quiz.type === 'word'}
-                              <Icon
-                                tag="svg"
-                                viewBox="0 0 24 24"
-                                width="30px"
-                                height="30px"
-                              >
-                                <path fill="grey" d={mdiFileWordBoxOutline} />
-                              </Icon>
-                            {:else if quiz.type === 'listen'}
-                              <Icon
-                                tag="svg"
-                                viewBox="0 0 24 24"
-                                width="30px"
-                                height="30px"
-                              >
-                                <path fill="grey" d={mdiEarHearing} />
-                              </Icon>
-                            {:else if quiz.type === 'quiz'}
-                              <Icon
-                                tag="svg"
-                                viewBox="0 0 24 24"
-                                width="30px"
-                                height="30px"
-                              >
-                                <path fill="grey" d={mdiHelp} />
-                              </Icon>
-                            {/if}
-                          </div>
-                          <!-- svelte-ignore a11y-invalid-attribute -->
-                          {#if quiz.type === 'quiz'}
-                            <input
-                              class="quiz_name"
-                              on:click={OnClickQuizName}
-                              autofocus
-                              contenteditable
-                              {t}
-                              name={quiz.name}
-                              theme={theme.num}
-                              theme_name={theme.name[$langs]}
-                              bind:value={quiz.name}
-                            />
-                          {:else}
-                            <input
-                              on:click={OnClickQuizName}
-                              style="width:80%"
-                              {t}
-                              name={quiz.name}
-                              level={lesson_data.data.level}
-                              theme={theme.num}
-                              theme_name={theme.name[$langs]}
-                              bind:value={quiz.name}
-                            />
-                          {/if}
-
-                          {#if quiz.type === 'quiz'}
-                            <select
-                              on:change={OnSelectQuiztype}
-                              name={quiz.name}
-                            >
-                              {#each quizes as quizOption}
-                                <option value={quizOption}>{quizOption}</option>
-                              {/each}
-                            </select>
-                          {/if}
-
-                          <div class="rem_quiz">
-                            <IconButton
-                              class="material-icons"
-                              name={quiz.name}
-                              on:click={OnRemoveItem}>remove</IconButton
-                            >
-                          </div>
-                        </div>
-                      {/each}
-                    {/if}
-                  {/each}
-                  <div class="add_quiz">
+                  <input
+                    placeholder="Input Theme Name"
+                    :use={theme.name[$langs]
+                      ? theme.name[$langs]
+                      : ((ev) => {
+                          OnThemeNameInput(theme);
+                        })()}
+                    bind:value={theme.name[$langs]}
+                    style="font-weight: bold; width:90%"
+                  />
+                  <div class="rem_theme">
                     <IconButton
-                      class="material-icons"
+                      class="material-icons "
                       name={theme.name[$langs]}
-                      on:click={OnAddQuiz}>add</IconButton
+                      on:click={OnRemoveItem}>remove</IconButton
                     >
                   </div>
-                {/if}
-              </Content>
-            </Panel>
-          </Accordion>
-        </div>
-      {/each}
-      {#if lesson_data.data.module.level && $llang !== ' '}
-        <div class="add_theme">
-          <IconButton class="material-icons" on:click={() => OnAddTheme()}
-            >add</IconButton
-          >
-        </div>
-      {/if}
-    </div>
+                </Header>
+                <Content>
+                  {#if theme.lessons}
+                    {#each theme.lessons as lesson}
+                      <!-- <div>{lesson.num}.{lesson.title}</div> -->
+                      {#if lesson.quizes}
+                        {#each lesson.quizes as quiz}
+                          <!-- {@debug quiz} -->
 
-    <div style="height:100px"></div>
-  </div>
-{/if}
+                          <div class="quiz-container">
+                            <div
+                              on:click={() => {
+                                onClickQuiz(
+                                  quiz,
+                                  lesson_data.data.module.level
+                                );
+                              }}
+                              type={quiz.type}
+                              name={quiz.name}
+                              level={lesson_data.data.module.level}
+                              highlight={quiz.highlight || ''}
+                            >
+                              {#if quiz.type === 'dialog'}
+                                <Icon
+                                  tag="svg"
+                                  viewBox="0 0 24 24"
+                                  width="30px"
+                                  height="30px"
+                                >
+                                  <path fill="grey" d={mdiAccountMultiple} />
+                                </Icon>
+                              {:else if quiz.type === 'text'}
+                                <Icon
+                                  tag="svg"
+                                  viewBox="0 0 24 24"
+                                  width="30px"
+                                  height="30px"
+                                >
+                                  <path fill="grey" d={mdiTextBoxOutline} />
+                                </Icon>
+                              {:else if quiz.type === 'word'}
+                                <Icon
+                                  tag="svg"
+                                  viewBox="0 0 24 24"
+                                  width="30px"
+                                  height="30px"
+                                >
+                                  <path fill="grey" d={mdiFileWordBoxOutline} />
+                                </Icon>
+                              {:else if quiz.type === 'listen'}
+                                <Icon
+                                  tag="svg"
+                                  viewBox="0 0 24 24"
+                                  width="30px"
+                                  height="30px"
+                                >
+                                  <path fill="grey" d={mdiEarHearing} />
+                                </Icon>
+                              {:else if quiz.type === 'quiz'}
+                                <Icon
+                                  tag="svg"
+                                  viewBox="0 0 24 24"
+                                  width="30px"
+                                  height="30px"
+                                >
+                                  <path fill="grey" d={mdiHelp} />
+                                </Icon>
+                              {/if}
+                            </div>
+                            <!-- svelte-ignore a11y-invalid-attribute -->
+                            {#if quiz.type === 'quiz'}
+                              <input
+                                class="quiz_name"
+                                on:click={OnClickQuizName}
+                                autofocus
+                                contenteditable
+                                {t}
+                                name={quiz.name}
+                                theme={theme.num}
+                                theme_name={theme.name[$langs]}
+                                bind:value={quiz.name}
+                              />
+                            {:else}
+                              <input
+                                on:click={OnClickQuizName}
+                                style="width:80%"
+                                {t}
+                                name={quiz.name}
+                                level={lesson_data.data.level}
+                                theme={theme.num}
+                                theme_name={theme.name[$langs]}
+                                bind:value={quiz.name}
+                              />
+                            {/if}
+
+                            {#if quiz.type === 'quiz'}
+                              <select
+                                on:change={OnSelectQuiztype}
+                                name={quiz.name}
+                              >
+                                {#each quizes as quizOption}
+                                  <option value={quizOption}
+                                    >{quizOption}</option
+                                  >
+                                {/each}
+                              </select>
+                            {/if}
+
+                            <div class="rem_quiz">
+                              <IconButton
+                                class="material-icons"
+                                name={quiz.name}
+                                on:click={OnRemoveItem}>remove</IconButton
+                              >
+                            </div>
+                          </div>
+                        {/each}
+                      {/if}
+                    {/each}
+                    <div class="add_quiz">
+                      <IconButton
+                        class="material-icons"
+                        name={theme.name[$langs]}
+                        on:click={OnAddQuiz}>add</IconButton
+                      >
+                    </div>
+                  {/if}
+                </Content>
+              </Panel>
+            </Accordion>
+          </div>
+        {/each}
+        {#if lesson_data.data.module.level && $llang !== ' '}
+          <div class="add_theme">
+            <IconButton class="material-icons" on:click={() => OnAddTheme()}
+              >add</IconButton
+            >
+          </div>
+        {/if}
+      </div>
+
+      <div style="height:100px"></div>
+    </div>
+  {/if}
+</main>
 
 <style>
+  main {
+    margin-top: 40px;
+  }
   .module_level {
     position: fixed;
     background-color: rgba(255, 255, 255, 0.8);

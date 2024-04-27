@@ -25,7 +25,7 @@
   }
 </script>
 
-{#if $dicts && $langs && $dicts['CLASS'][$langs]}
+<!-- {#if $dicts && $langs && $dicts['CLASS'][$langs]} -->
   <header>
     <div class="top-app-bar-container flexor">
       <TopAppBar bind:this={topAppBar} variant="fixed" dense>
@@ -78,7 +78,7 @@
       <div class="flexor-content"></div>
     </div>
   </header>
-{/if}
+<!-- {/if} -->
 
 <style>
   header {

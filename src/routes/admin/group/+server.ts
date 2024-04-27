@@ -7,11 +7,11 @@ import { DeleteUser, AddUser } from '$lib/server/db.admin.js';
 export async function POST({ request, url, fetch }) {
 	let resp;
 
-	const { func, class_name, role, name, operator, abonent, lang } = await request.json();
+	const { func, class_name, role, name,  email, operator, abonent, lang } = await request.json();
 
 	switch (func) {
 		case 'add_user':
-			resp = await AddUser({ class_name, role,  name, operator, abonent, lang });
+			resp = await AddUser({ class_name, role,  name, email, operator, abonent, lang });
 			break;
 		case 'del_user':
 			resp = await DeleteUser({ name, operator, abonent });

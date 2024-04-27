@@ -20,7 +20,7 @@
 
   let content = '',
     new_content = false,
-    num = 5;
+    num = 10;
 
   translate.from = 'en';
   translate.engine = 'google';
@@ -58,21 +58,22 @@
   $: if (dialog_data && $llang)
     prompt = `
 [Act as a teaching methodologist of Dutch]     
-{dialogue:${JSON.stringify(dialog_data && dialog_data.content[dialog_data.content.length - 1] ? dialog_data.content[dialog_data.content.length - 1] : '')}}   
+{@dialogue:${JSON.stringify(dialog_data && dialog_data.content[dialog_data.content.length - 1] ? dialog_data.content[dialog_data.content.length - 1] : '')}}   
 ->[[Continue the dialogue by adding ${num} of participants' lines]
 {Use the words:${dialog_data.words}}
 {no repeats}
-{Topic=${name}}{language:${$llang} , language learning level: A2}
+{Topic=${name}}{Learning language:${$llang} }{ Learning language  level: ${data.level}}
 {participants: user1, user2}]*${num}
-->[Translate to:${$langs} and to 'en']
-->[Output]{output format:json}{output example: 
+->[Literal translation to:${$langs}]
+->[Output]{output format:json}<output example: 
   [
     {
-     "user1": { "en":"...","${$llang}": "..." , "${$langs}":"..."}, 
-     "user2": { "en":"...","${$llang}": "..." , "${$langs}":"..."} 
+     "user1": { "${$llang}": "..." , "${$langs}":"..."}, 
+     "user2": { "${$llang}": "..." , "${$langs}":"..."} 
     },
     ...
-]
+]>
+->[Check JSON]
 `;
 
   $: if (dialog_data && $langs) {
@@ -102,7 +103,7 @@
     try {
       translate.from = $llang;
 
-      return ($dicts[text] && $dicts[text][$langs]) ?? await translate(text.trim(), $langs);
+      return ($dicts[text] && $dicts[text][$langs]) || await translate(text.trim(), $langs);
     } catch (error) {
       console.error('Translation error:', error);
       return text; // или другое подходящее значение по умолчанию
@@ -163,7 +164,7 @@
       body: JSON.stringify({
         func: 'upd_dlg',
         owner: abonent,
-        level: '12',
+        level: data.level,
         name: name,
         new_name: new_name,
         data: data,
@@ -259,7 +260,7 @@
   }
 </script>
 
-<div class="dialog_container">
+<main>
   <div class="container">
     <div class="dialog-field">
       {#await Translate('Title', $langs) then data}
@@ -471,11 +472,11 @@
         <button class="save" on:click={() => OnSave()}>{data}</button>{/await}
     </div>
   </div>
-</div>
+</main>
 
 <style>
-  .dialog_container {
-    margin: 10px;
+  main {
+    margin: 20px;
   }
   .content_generator {
     height: 40px;

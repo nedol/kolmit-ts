@@ -84,7 +84,7 @@
     <div>
       <Textfield
         bind:value={formData.email}
-        label="{$dicts.get('Email',$langs)}:"
+        label="{$dicts['Email',$langs]}:"
         required
       />
     </div>

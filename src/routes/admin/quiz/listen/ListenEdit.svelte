@@ -158,7 +158,7 @@
       translate.from = $llang;
 
       return (
-        ($dicts[text] && $dicts[text][$langs]) ??
+        ($dicts[text] && $dicts[text][$langs]) ||
         (await translate(text.trim(), $langs))
       );
     } catch (error) {
@@ -168,7 +168,7 @@
   }
 </script>
 
-<div class="dialog_container">
+<main>
   <div class="container">
     <div class="dialog-field">
       {#await translate('Title', $langs) then data}
@@ -233,11 +233,11 @@
       <button class="save" on:click={() => OnSave()}>Сохранить</button>
     </div>
   </div>
-</div>
+</main>
 
 <style>
-  .dialog_container {
-    margin: 10px;
+  main {
+    margin: 20px;
   }
   .content_generator {
     height: 40px;

@@ -168,11 +168,13 @@
 <Tts bind:this={tts}></Tts>
 
 <div class="container">
-  <div style="position: absolute;right:0; font-size:small; z-index:2">
-    <Button on:click={() => SendRepeat()} {variant}>
-      <Label>{dict['Repeat'][$langs]}</Label>
-    </Button>
-  </div>
+  {#if dc}
+    <div class="repeat_but">
+      <Button on:click={() => SendRepeat()} {variant}>
+        <Label>{dict['Repeat'][$langs]}</Label>
+      </Button>
+    </div>
+  {/if}
 
   <div class="card">
     <div class="title">{dict['Проконтролируй вопрос'][$langs]}:</div>
@@ -271,6 +273,15 @@
 
     /* border: 1px solid #ccc; */
     /* border-radius: 5px; */
+  }
+
+  .repeat_but {
+    position: absolute;
+    right: 0;
+    font-size: small;
+    right: -15px;
+    top: -30px;
+    z-index: 2;
   }
 
   .card {

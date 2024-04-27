@@ -269,13 +269,13 @@
 
 <!-- svelte-ignore a11y-missing-content -->
 <!-- {@debug display} -->
-<div>
+<main>
   <!-- {@debug data} -->
   {#if data.quiz}
     <Quiz {data} />
   {:else if level}
-    <div class="lesson-container" style="">
-      <div class="module_level">
+    <div class="lesson-container">
+      <div class="module_level mdc-typography--subtitle2">
         <div>Module {level.level}</div>
       </div>
 
@@ -289,9 +289,9 @@
                   : (() => {
                       OnThemeNameInput(theme);
                     })()}
-                ><h4>
+                ><div class="mdc-typography--subtitle1">
                   {theme.name[lesson_data.lang]}({theme.name[$langs]})
-                </h4></Header
+                </div></Header
               >
               <Content>
                 {#if theme.lessons}
@@ -302,7 +302,7 @@
                         <!-- {@debug quiz} -->
                         {#if quiz.name}
                           <div
-                            class="quiz-container"
+                            class="quiz-container mdc-typography--caption"
                             use:AddCheck
                             name={quiz.name}
                           >
@@ -441,14 +441,26 @@
     </div>
     <div style="height:100px"></div>
   {/if}
-</div>
+</main>
 
 <style>
-  .module_level {
+    main {
+      width: 90%;          
+    margin: 0 auto;
+    /* background-color: #fff;
+    transition: transform 0.3s ease-in-out;
+
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.5s; */
+    height: 90vh;
+    margin-top:40px
+  }
+  .module_level{
     position: fixed;
     background-color: rgba(255, 255, 255, 0.8);
     padding: 10px;
-    bottom: -15px;
+    bottom: 25px;
     left: 50%;
     transform: translate(-50%, -50%);
     z-index: 1;

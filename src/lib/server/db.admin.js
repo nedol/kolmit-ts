@@ -102,9 +102,10 @@ export async function DeleteUser(par) {
 
 export async function AddUser(q) {
   try {
+    let operator = md5(q.email);
     let resp = await sql`INSERT INTO operators
-			("group", role, operator , abonent , name, lang )
-			VALUES(${q.class_name}, ${q.role},${q.operator}, ${q.abonent}, ${q.name}, ${q.lang})
+			("group", role, operator , email, abonent , name, lang )
+			VALUES(${q.class_name}, ${q.role},${operator}, ${q.email}, ${q.abonent}, ${q.name}, ${q.lang})
 			ON CONFLICT (operator, abonent)
 			DO NOTHING`;
     if (resp.count > 0) {

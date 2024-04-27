@@ -12,10 +12,13 @@
     "prepare": "smui-theme compile ./src/routes/smui.css -i src/theme"
   },
   "devDependencies": {
+    "@material/typography": "^14.0.0",
+    "@smui/chips": "^7.0.0-beta.18",
     "@smui/fab": "^7.0.0-beta.18",
     "@smui/icon-button": "^7.0.0-beta.18",
     "@smui/layout-grid": "^7.0.0-beta.18",
     "@smui/menu": "^7.0.0-beta.18",
+    "@smui/paper": "^7.0.0-beta.18",
     "@smui/segmented-button": "^7.0.0-beta.18",
     "@smui/select": "^7.0.0-beta.18",
     "@smui/tab": "^7.0.0-beta.18",
