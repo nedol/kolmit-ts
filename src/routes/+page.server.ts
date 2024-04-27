@@ -87,6 +87,7 @@ export async function load({ fetch, cookies, route, url, stuff }) {
 		host: host,
 		// url: decodeURIComponent(url.toString()),
 		operator: oper,
+		abonent: abonent,
 		dict: dict,
 		group: group,
 		quiz_users: {}, //res && res.quiz_users ? res.quiz_users : '',

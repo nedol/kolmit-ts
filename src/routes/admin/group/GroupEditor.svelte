@@ -337,7 +337,7 @@
   }
   .deps_div {
     overflow-y: scroll;
-    margin-left: 10px;
+    margin-left: 0px;
     margin-top: 20px;
   }
   ::-webkit-scrollbar {

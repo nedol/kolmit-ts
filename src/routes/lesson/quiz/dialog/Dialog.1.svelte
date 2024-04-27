@@ -389,12 +389,12 @@
           <p><span class="mdc-typography--overline">{cur_qa + 1}</span></p>
         </div>
         <div class="title">{dict['Переведи'][$langs]}:</div>
-        <div class="user1">
+        <div class="user1   mdc-typography--headline6">
           {q[$langs]}
         </div>
 
         <div style="text-align: center;">
-          <div class="tip" style="visibility:{visibility[1]}">
+          <div class="tip   mdc-typography--headline6" style="visibility:{visibility[1]}">
             {dialog_data.content[cur_qa].user1[$llang]}
           </div>
         </div>
@@ -574,7 +574,7 @@
   .counter {
     position: absolute;
     background-color: #f0f0f0;
-    padding: 3px;
+    padding: 0px;
     border-radius: 25px;
     width: 35px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -614,7 +614,7 @@
   .user1 {
     text-align: center;
     font-size: 1em;
-    margin-bottom: 10px;
+    margin-bottom: 0px;
     color: #333;
   }
 
@@ -628,8 +628,7 @@
   .tip {
     text-align: center;
     font-size: 1em;
-    margin-bottom: 10px;
-
+    margin-bottom: 0px;
     color: #2196f3;
   }
 

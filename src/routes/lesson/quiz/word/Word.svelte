@@ -311,7 +311,7 @@
   }
 
   function onPrev() {
-    if (currentWordIndex === 1) return;
+    if (currentWordIndex <= 0) return;
     currentWord = words[--currentWordIndex];
   }
 
@@ -395,7 +395,7 @@
 
     <div class="word">
       <!-- {@debug currentWord} -->
-      <h5>{word}</h5>
+      <span class="mdc-typography--headline5">{word}</span>
 
       {#if showSpeakerButton}
         <div class="speaker-button">
@@ -450,6 +450,7 @@
         </Accordion>
       {/if}
     </div>
+    <div style="height:100px"></div>
 
     <!-- {/if} -->
   {/if}
@@ -457,9 +458,10 @@
 
 <style>
   main {
+    display: inline-grid;
     background-color: #fff;
     transition: transform 0.3s ease-in-out;
-    width: 90%;
+    width: 98%;
     margin: 0 auto;
     position: relative;
     transform-style: preserve-3d;

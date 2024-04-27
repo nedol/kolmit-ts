@@ -175,13 +175,13 @@
       </Button>
     </div>
   {/if}
-
+ 
   <div class="card">
     <div class="title">{dict['Проконтролируй вопрос'][$langs]}:</div>
 
     <div class="user1">
       {#if data.user1}
-        <div>{@html data.user1[$llang]}</div>
+        <div class="">{@html data.user1[$llang]}</div>
       {/if}
     </div>
 
@@ -189,13 +189,13 @@
 
     <div class="user2">
       {#if data.user2}
-        <div>{@html data.user2[$langs]}</div>
+        <div class="mdc-typography--headline6">{@html data.user2[$langs]}</div>
       {/if}
     </div>
 
     <div class="tip">
       {#if data.user2['a_shfl'] && hint_visible}
-        <div>{@html data.user2['a_shfl']}</div>
+        <div class="mdc-typography--headline6">{@html data.user2['a_shfl']}</div>
       {/if}
     </div>
 

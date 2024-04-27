@@ -18,7 +18,7 @@
   function Init() {
     setContext('group', data.group);
     setContext('operator', data.operator[0]);
-    setContext('abonent', data.operator[0].abonent);
+    setContext('abonent', data.abonent);
 
     (operator = data.operator[0].operator),
       (abonent = data.operator[0].abonent),

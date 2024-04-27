@@ -460,7 +460,7 @@
     position: fixed;
     background-color: rgba(255, 255, 255, 0.8);
     padding: 10px;
-    bottom: 25px;
+    top: 60px;
     left: 50%;
     transform: translate(-50%, -50%);
     z-index: 1;

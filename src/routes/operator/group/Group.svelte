@@ -137,7 +137,7 @@
 <style>
   .deps_div {
     overflow-y: scroll;
-    margin-left: 10px;
+    margin-left: 0px;
     margin-top: 40px;
   }
   ::-webkit-scrollbar {
@@ -147,14 +147,15 @@
   .flexy-dad {
     display: flex;
     flex-wrap: wrap;
+    justify-content: center
   }
 
   .flexy-boy {
     display: flex;
     justify-content: center;
-    /* align-items: center; */
     width: 90px;
     height: 100px;
-    margin: 0 30px 30px 0;
+    margin: 0 0px 0px 0;
+    scale: .8;
   }
 </style>
