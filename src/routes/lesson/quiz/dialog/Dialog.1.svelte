@@ -674,6 +674,6 @@
     position: relative;
     transform-style: preserve-3d;
     transition: transform 0.5s;
-    height: calc(100vh - 20vh);
+    height: calc(100vh - 22vh);
   }
 </style>
