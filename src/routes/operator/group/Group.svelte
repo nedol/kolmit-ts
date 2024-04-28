@@ -137,6 +137,7 @@
 
 <style>
   .deps_div {
+    height: 90vh;
     overflow-y: scroll;
     margin-left: 0px;
     margin-top: 40px;

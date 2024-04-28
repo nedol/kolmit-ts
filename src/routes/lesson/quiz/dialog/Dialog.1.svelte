@@ -23,8 +23,6 @@
     mdiMicrophone,
     mdiMicrophoneOutline,
     mdiAccountConvertOutline,
-    mdiVolumeHigh,
-    mdiThumbUpOutline,
     mdiPlay,
   } from '@mdi/js';
 
@@ -323,8 +321,8 @@
     return array;
   }
 
-  async function speak() {
-    Speak(dialog_data.content[cur_qa].user1[$llang]);
+  async function speak(text) {
+    Speak(text);
   }
 
   function onClickMicrophone() {
@@ -404,7 +402,7 @@
 
         {#if showSpeakerButton}
           <div class="speaker-button">
-            <IconButton on:click={speak}>
+            <IconButton on:click={speak(dialog_data.content[cur_qa].user1[$llang])}>
               <Icon tag="svg" viewBox="0 0 24 24">
                 <path fill="currentColor" d={mdiPlay} />
               </Icon>
@@ -436,11 +434,23 @@
           ></Stt>
         </div>
 
-        <div class="title" style="visibility:{visibility[1]}">
+        <div class="title">
           {dict['Проконтролируй ответ'][$langs]}:
         </div>
-        <div class="user2" style="visibility:{visibility[1]}">
+        <div class="user2">
           {@html dialog_data.content[cur_qa].user2[$llang]}
+        </div>
+        {#if showSpeakerButton}
+          <div class="speaker-button">
+            <IconButton on:click={speak(dialog_data.content[cur_qa].user2[$llang])}>
+              <Icon tag="svg" viewBox="0 0 24 24">
+                <path fill="currentColor" d={mdiPlay} />
+              </Icon>
+            </IconButton>
+          </div>
+        {/if}
+        <div class="user2_tr" style="visibility:{visibility[1]}">
+          {@html dialog_data.content[cur_qa].user2[$langs]}
         </div>
 
         {#if dialog_data.html}
@@ -463,11 +473,16 @@
       <BottomAppBar bind:this={bottomAppBar}>
         <Section>
           {#if cur_qa > 0}
-            <button on:click={onBackQA} class="arrow-button arrow-button-left"
-              >&#8592;</button
+            <Icon
+              tag="svg"
+              on:click={onBackQA}
+              viewBox="0 0 24 24"
+              style="margin-top:0px"
             >
-          {/if}</Section
-        >
+              <path fill="grey" d={mdiArrowLeft} />
+            </Icon>
+          {/if}
+        </Section>
         <Section>
           {#if share_button && $call_but_status === 'talk'}
             <div class={share_button_class} on:click={onShare}>
@@ -496,9 +511,14 @@
         </Section>
 
         <Section>
-          <button on:click={onNextQA} class="arrow-button arrow-button-right"
-            >&#8594;</button
+          <Icon
+            tag="svg"
+            on:click={onNextQA}
+            viewBox="0 0 24 24"
+            style="margin-top:0px"
           >
+            <path fill="grey" d={mdiArrowRight} />
+          </Icon>
         </Section>
       </BottomAppBar>
     </div>
@@ -551,12 +571,14 @@
   }
 
   .flip_button {
+    position: relative;
     font-size: 1.5em;
+    text-align: center;
     color: grey;
     border: none;
     border-radius: 5px;
     cursor: pointer;
-    bottom: 57px;
+    bottom: -5px;
     width: 50px;
   }
 
@@ -565,13 +587,13 @@
     font-size: large;
     border-radius: 25px;
     top: -5px;
-    float:right
+    float: right;
   }
 
   .html_data {
     position: relative;
     overflow-y: auto;
-    height: 44vh;
+    height: 55vh;
     margin-top: 10px;
   }
 
@@ -580,20 +602,23 @@
     background-color: #f0f0f0;
     padding: 0px;
     border-radius: 25px;
-    width: 35px;
+    width: 30px;
+    height: 30px;
+    top: -10px;
+    left: -20px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     text-align: center;
   }
 
   .counter p {
     margin: 0;
-    font-size: 18px;
+    font-size: 15px;
     color: #333;
   }
 
   .counter span {
-    font-weight: bold;
-    font-size: 18px;
+    font-weight: 700;
+    font-size: 15px;
     color: #ff5733; /* цвет счетчика */
   }
   .cnt {
@@ -610,6 +635,7 @@
   .title {
     color: grey;
     position: relative;
+    line-height: normal;
     text-align: center;
     margin: 0px;
     font-size: 0.8em;
@@ -617,6 +643,7 @@
 
   .user1 {
     text-align: center;
+    line-height: normal;
     font-size: 1em;
     margin-bottom: 0px;
     color: #333;
@@ -624,13 +651,23 @@
 
   .user2 {
     text-align: center;
-    font-size: 1em;
+    line-height: normal;
+    font-size: 0.8em;
     color: #2196f3;
     text-align: center;
   }
 
+  .user2_tr {
+    text-align: center;
+    line-height: normal;
+    font-size: 0.8em;
+    margin-bottom: 0px;
+    color: #333;
+  }
+
   .tip {
     text-align: center;
+    line-height: normal;
     font-size: 1em;
     margin-bottom: 0px;
     color: #2196f3;
@@ -638,7 +675,7 @@
 
   .arrow-button {
     position: relative;
-    top: 15px;
+    top: 0px;
     /* margin: 10px */
     /* font-size: 1.5em; */
     font-weight: 600;

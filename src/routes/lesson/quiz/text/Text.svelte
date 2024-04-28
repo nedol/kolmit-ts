@@ -235,7 +235,7 @@
       if (selection && selection.toString().trim() !== '') {
         if (event.target.attributes['trans']) {
           x = rect.x;
-          y = rect.y - 28 + window.scrollY;
+          y = rect.y - 22 + window.scrollY;
           trans_div.style.top = `${y}px`;
           trans_div.style.left = `${x}px`;
           trans_div.style.visibility = 'visible';
@@ -248,7 +248,7 @@
         const selectedText = selection.toString().trim();
         trans = await Translate(selectedText);
         x = rect.x;
-        y = rect.y - 20 + window.scrollY;
+        y = rect.y - 22 + window.scrollY;
 
         trans_div.style.top = `${y}px`;
         trans_div.style.left = `${x}px`;
@@ -298,7 +298,7 @@
       <Panel>
         <Paper>
           <Title>{data.name}</Title>
-          <Subtitle>This is a sheet of paper.</Subtitle>
+          <Subtitle></Subtitle>
           <Content>
             <div
               style="line-height: 2.2;justify-content: center;"
@@ -313,6 +313,7 @@
     </Accordion>
   </div>
 </main>
+<div style="height:100px"></div>
 
 <div id="translationOverlay" bind:this={trans_div}>{trans}</div>
 
@@ -325,12 +326,13 @@
   #translationOverlay {
     display: block;
     position: absolute;
-    /* width: 400px; */
-    word-break: break-all;
-    background-color: rgba(255, 255, 255, 0.61);
+    line-height: 2.2;
+    width: 70%;
+    word-wrap: break-word;
     right: 5px;
     /* padding: 5px; */
     /* white-space: nowrap; */
+    font-size: small;
     height: auto;
     color: green;
     visibility: hidden;
@@ -358,7 +360,7 @@
   }
 
   ::selection {
-    color: rgb(27, 155, 49);
-    background: yellow;
+    /* color: rgb(27, 155, 49); */
+    background: rgb(190, 201, 205);
   }
 </style>

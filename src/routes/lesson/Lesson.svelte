@@ -267,19 +267,19 @@
   }
 </script>
 
-<!-- svelte-ignore a11y-missing-content -->
-<!-- {@debug display} -->
+
 <main>
-  <!-- {@debug data} -->
+
   {#if data.quiz}
     <Quiz {data} />
   {:else if level}
     <div class="lesson-container">
-      <div class="module_level mdc-typography--subtitle2">
-        <div>Module {level.level}</div>
+      <div class="module_level">
+        <div class="mdc-typography--caption">{level.level}</div>
       </div>
 
       {#each level.themes as theme, t}
+      <br>
         <div class="accordion-container">
           <Accordion multiple>
             <Panel class="panel" disabled={disabled[parseInt(t)]}>
@@ -289,8 +289,10 @@
                   : (() => {
                       OnThemeNameInput(theme);
                     })()}
-                ><div class="mdc-typography--subtitle1">
-                  {theme.name[lesson_data.lang]}({theme.name[$langs]})
+                ><div
+                  class="mdc-typography--subtitle2"
+                >
+                  {theme.name[lesson_data.lang]}<br><small>({theme.name[$langs]})</small>
                 </div></Header
               >
               <Content>
@@ -361,7 +363,7 @@
                               type={quiz.type}
                               name={quiz.name}
                               level={level.level}
-                              theme ={theme.name[lesson_data.lang]}
+                              theme={theme.name[lesson_data.lang]}
                               title={quiz.title}
                               highlight={quiz.highlight || ''}
                               >{quiz.name}
@@ -444,8 +446,8 @@
 </main>
 
 <style>
-    main {
-      width: 90%;          
+  main {
+    width: 90%;
     margin: 0 auto;
     /* background-color: #fff;
     transition: transform 0.3s ease-in-out;
@@ -453,15 +455,15 @@
     position: relative;
     transform-style: preserve-3d;
     transition: transform 0.5s; */
-    height: 90vh;
-    margin-top:40px
+
+    margin-top: 40px;
   }
-  .module_level{
+  .module_level {
     position: fixed;
-    background-color: rgba(255, 255, 255, 0.8);
+    /* background-color: rgba(255, 255, 255, 0.8); */
     padding: 10px;
     top: 60px;
-    left: 50%;
+    left: 20px;
     transform: translate(-50%, -50%);
     z-index: 1;
   }

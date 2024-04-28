@@ -337,7 +337,7 @@
   .html_data {
     position: relative;
     overflow-y: auto;
-    height: 44vh;
+    height: 55vh;
     margin-top: 20px;
   }
 
