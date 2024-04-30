@@ -9,7 +9,7 @@
 
   import Textfield from '@smui/textfield';
 
-  import operator_svg from '$lib/images/operator.svg';
+
   import ImageList, {
     Item,
     ImageAspectContainer,
@@ -57,7 +57,7 @@
     name = user.operator.name;
     operator = user.operator.operator;
     email = user.operator.email;
-    picture = user.operator.picture ? user.operator.picture : operator_svg;
+    picture = user.operator.picture ? user.operator.picture : '/assets/operator.svg';
     user_lang = user.operator.lang;
   }
 
@@ -263,7 +263,7 @@
                             />
                           {:else}
                             <Image
-                              src={operator_svg}
+                              src='/assets/operator.svg'
                               style="width:50px"
                               alt="Image {i + 1}"
                             />

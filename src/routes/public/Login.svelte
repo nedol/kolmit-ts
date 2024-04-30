@@ -9,7 +9,7 @@
 	// import SelectMenu from './SelectMenu.svelte';
 	import { dicts } from '$lib/js/stores.js';
 	import { signal } from '$lib/js/stores.js';
-	import operator_svg from '$lib/images/operator.svg';
+	// import operator_svg from '$lib/images/operator.svg';
 	// let operator_svg =
 	// 	'https://kolmit-service.onrender.com/_app/immutable/assets/operator.7238a518.svg';
 
@@ -24,7 +24,7 @@
 	};
 
 	if (!formData.picture) {
-		formData.picture = operator_svg;
+		formData.picture = '/assets/operator.svg';
 	}
 
 	let lang = 'en';

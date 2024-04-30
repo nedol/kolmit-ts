@@ -16,8 +16,6 @@
 
   import Button, { Label } from '@smui/button';
 
-  import operator_svg from '$lib/images/operator.svg';
-
   import pkg from 'lodash';
   const { forEach, findIndex } = pkg;
 

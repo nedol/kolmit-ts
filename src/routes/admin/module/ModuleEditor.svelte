@@ -30,7 +30,6 @@
 
   import Quiz from '../quiz/Quiz.svelte';
 
-  import operator_svg from '$lib/images/operator.svg';
 
   let value = 'dialog';
 

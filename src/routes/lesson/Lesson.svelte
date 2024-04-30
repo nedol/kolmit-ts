@@ -26,7 +26,7 @@
   import { users_status } from '$lib/js/stores.js';
   import { view } from '$lib/js/stores.js';
 
-  import operator_svg from '$lib/images/operator.svg';
+
 
   // import lesson_data from './lesson.json';
   let lesson_data: any;
@@ -36,7 +36,7 @@
 
   function findPic(operator: any) {
     const pic = find(group[0].pictures, { operator: operator });
-    return pic ? pic.pictures : operator_svg;
+    return pic ? pic.pictures : '/assets/operator.svg';
   }
 
   let usersPic = group.map((item: any) => ({

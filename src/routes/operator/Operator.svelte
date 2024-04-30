@@ -68,7 +68,7 @@
   import { posterst } from '$lib/js/stores.js';
   import operator_svg from '$lib/images/operator.svg';
 
-  $posterst = operator_svg;
+  $posterst = '/assets/operator.svg';
 
   let rtc: any;
   let topAppBar;
