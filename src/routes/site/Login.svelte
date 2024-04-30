@@ -24,7 +24,7 @@
 	};
 
 	if (!formData.picture) {
-		formData.picture = operator_svg;
+		formData.picture = '/assets/operator.svg';
 	}
 
 	let lang = 'en';
