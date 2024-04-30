@@ -386,7 +386,10 @@
         <div class="counter">
           <p><span class="mdc-typography--overline">{cur_qa + 1}</span></p>
         </div>
-        <div class="title">{dict['Переведи'][$langs]}:</div>
+        {#await translate('Translate this', $langs) then data}
+          <div class="title">{data}:</div>
+        {/await}
+
         <div class="user1 mdc-typography--headline6">
           {q[$langs]}
         </div>
@@ -402,7 +405,9 @@
 
         {#if showSpeakerButton}
           <div class="speaker-button">
-            <IconButton on:click={speak(dialog_data.content[cur_qa].user1[$llang])}>
+            <IconButton
+              on:click={speak(dialog_data.content[cur_qa].user1[$llang])}
+            >
               <Icon tag="svg" viewBox="0 0 24 24">
                 <path fill="currentColor" d={mdiPlay} />
               </Icon>
@@ -434,15 +439,18 @@
           ></Stt>
         </div>
 
-        <div class="title">
-          {dict['Проконтролируй ответ'][$langs]}:
-        </div>
+        {#await translate('Check up the answer', $langs) then data}
+          <div class="title">{data}:</div>
+        {/await}
+
         <div class="user2">
           {@html dialog_data.content[cur_qa].user2[$llang]}
         </div>
         {#if showSpeakerButton}
           <div class="speaker-button">
-            <IconButton on:click={speak(dialog_data.content[cur_qa].user2[$llang])}>
+            <IconButton
+              on:click={speak(dialog_data.content[cur_qa].user2[$llang])}
+            >
               <Icon tag="svg" viewBox="0 0 24 24">
                 <path fill="currentColor" d={mdiPlay} />
               </Icon>

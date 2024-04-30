@@ -3,7 +3,7 @@
 
   import { getContext, onMount } from 'svelte';
 
-  import { llang, langs, dicts } from '$lib/js/stores.js';
+  import { nlang, llang, langs, dicts } from '$lib/js/stores.js';
 
   import Tab, { Label } from '@smui/tab';
   import TabBar from '@smui/tab-bar';
@@ -21,6 +21,7 @@
   let content = '',
     new_content = false,
     num = 10;
+
 
   translate.from = 'en';
   translate.engine = 'google';
@@ -59,14 +60,14 @@
     prompt = `
 [Act as a teaching methodologist of Dutch]     
 {@dialogue:${JSON.stringify(dialog_data && dialog_data.content[dialog_data.content.length - 1] ? dialog_data.content[dialog_data.content.length - 1] : '')}}   
-->[[Continue the dialogue by adding ${num} of participants' lines]
+->[[Continue the dialogue for 2 users learning language by adding ${num} of participants' lines]
 {Use the words:${dialog_data.words}}
 {no repeats}
 {Topic=${name}}{Learning language:${$llang} }{ Learning language  level: ${data.level}}
 {participants: user1, user2}]*${num}
 ->[Literal translation to:${$langs}]
 ->[Output]{output format:json}<output example: 
-  [
+  <[
     {
      "user1": { "${$llang}": "..." , "${$langs}":"..."}, 
      "user2": { "${$llang}": "..." , "${$langs}":"..."} 
@@ -95,32 +96,35 @@
       // dialog_data.content = [];
     });
 
-
-
   onMount(() => {});
 
-  async function Translate(text: string) {
+  async function Translate(text: string, lang: string) {
     try {
-      translate.from = $llang;
+      translate.from = lang;
 
-      return ($dicts[text] && $dicts[text][$langs]) || await translate(text.trim(), $langs);
+      return (
+        ($dicts[text] && $dicts[text][$langs]) ||
+        (await translate(text.trim(), $langs))
+      );
     } catch (error) {
       console.error('Translation error:', error);
       return text; // или другое подходящее значение по умолчанию
     }
   }
 
-  function TranslateContentToCurrentLang() {
-    dialog_data.content.map((item: any, i) => {
-      Object.keys(item).map(async (key: string) => {
-        if (item[key][$llang] && !item[key][$langs]) {
-          let tr = await Translate(item[key][$llang]);
-          item[key][$langs] = tr;
-          dialog_data = dialog_data;
-        }
-      });
-    });
-  }
+  async function TranslateContentToCurrentLang() {
+  await Promise.all(dialog_data.content.map(async (item: any) => {
+    await Promise.all(Object.keys(item).map(async (key: string) => {
+      if (item[key][$nlang] && !item[key][$langs]) {
+        let tr = await Translate(item[key][$nlang], $nlang);
+        item[key][$langs] = tr;
+        dialog_data = dialog_data;
+      }
+    }));
+  }));
+
+}
+
 
   function splitHtmlContent(inputString: string) {
     // Регулярное выражение для поиска содержимого внутри тегов <html>...</html>
@@ -252,7 +256,11 @@
       .readText()
       .then((text) => {
         content = text;
-        dialog_data.content = dialog_data.content.concat(JSON.parse(text));
+        if (dialog_data && dialog_data.content)
+          dialog_data.content = dialog_data.content.concat(JSON.parse(text));
+        else {
+          dialog_data = {content :JSON.parse(text)}
+        }
       })
       .catch((err) => {
         console.error('Failed to read clipboard contents: ', err);
@@ -304,7 +312,7 @@
     <Panel>
       <Header
         ><b>
-          {#await Translate('content_builder',$langs)  then data}
+          {#await Translate('content_builder', $langs) then data}
             {data}
           {/await}
         </b></Header

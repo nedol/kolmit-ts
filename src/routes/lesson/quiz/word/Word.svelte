@@ -37,7 +37,8 @@
   const abonent = getContext('abonent');
 
   let words = [],
-    word;
+    word,
+    example;
   let shuffleWords;
   let hints;
   let currentWordIndex = 0;
@@ -48,6 +49,7 @@
   let userContent = '';
   let div_input;
   let result = '<span></span>';
+  let resultElement;
   let hintIndex = 0;
   let errorIndex = 0;
   let showCheckMark = false;
@@ -129,9 +131,13 @@
 
   $: if (currentWord) {
     (async () => {
-      word = (await translate(currentWord['original'], $langs)).toLowerCase();
+      example = await translate(currentWord['example'], $langs);
+      word = currentWord['original'].replace(/(de|het)\s*/gi, '');
+      let filteredExample = currentWord['example'].replace(
+         new RegExp(`\\b(de |het )?(?=\\b${word}\\b)`, 'gi'), '');
+      resultElement = filteredExample.split(new RegExp(word, 'i'));
+      // console.log(resultElement)
     })();
-
     // Устанавливаем фокус в конец строки
     setFocus();
   }
@@ -157,7 +163,6 @@
 
   function onShuffleWords(ev) {
     shuffle(words);
-
     currentWord = words[0];
   }
 
@@ -218,7 +223,7 @@
     if (trimmedUserContent.toLowerCase() === targetWord.toLowerCase()) {
       showCheckMark = true; // Показываем галочку
       showNextButton = true;
-      speak(currentWord.original);
+      speak(currentWord.example);
 
       if (hintIndex != 0 || errorIndex != 0) {
         // Перемещаем текущее слово в конец своей "десятки" в words
@@ -242,7 +247,7 @@
         errorIndex = 0;
       }
 
-      userContent = currentWord.example;
+      userContent = currentWord.original;
       highlightWords(userContent);
       // nextWord();
     } else {
@@ -371,7 +376,7 @@
 				</IconButton> -->
       </button>
 
-      <button on:click={jumpNext10} class="next10-button">+10</button>
+      <!-- <button on:click={jumpNext10} class="next10-button">+10</button> -->
       <button on:click={onPrev} class="prev-button">-1</button>
       <button on:click={onShuffleWords} class="shuffle-button">
         <i class="material-symbols-outlined" style="font-size: 15px;  scale:1.5"
@@ -391,11 +396,15 @@
         {/if}
       </div>
     </div>
-    <div class="title">{dict['Напиши перевод'][$langs]}:</div>
+
+    {#await translate('Write translation', $langs) then data}
+      <div class="title">{data}:</div>
+    {/await}
 
     <div class="word">
-      <!-- {@debug currentWord} -->
-      <span class="mdc-typography--headline5">{word}</span>
+      {#if example}
+        <span class="mdc-typography--headline5">{example}</span>
+      {/if}
 
       {#if showSpeakerButton}
         <div class="speaker-button">
@@ -416,15 +425,23 @@
     <div>{currentWordIndex + 1}/{words.length}</div>
 
     <div class="input-container">
-      <div
-        class="input"
-        contenteditable="true"
-        on:input={onChangeUserContent}
-        bind:this={div_input}
-        bind:innerHTML={userContent}
-      >
-        {@html result}
-      </div>
+      {#if currentWord}
+        {#if resultElement && (resultElement[0] || resultElement[1])}
+          <span class="example">{@html resultElement[0]}</span>
+        {/if}
+        <div
+          class="input"
+          contenteditable="true"
+          on:input={onChangeUserContent}
+          bind:this={div_input}
+          bind:innerHTML={userContent}
+        >
+          {@html result}
+        </div>
+        {#if resultElement && resultElement[1]}
+          <span class="example">{@html resultElement[1]}</span>
+        {/if}
+      {/if}
     </div>
 
     <!-- {#if hintIndex != 0} -->
@@ -467,7 +484,7 @@
     transform-style: preserve-3d;
     transition: transform 0.5s;
     height: 90vh;
-    margin-top:40px
+    margin-top: 40px;
   }
   .title {
     color: grey;
@@ -493,6 +510,10 @@
     align-items: center;
     margin: 0;
     text-align: center;
+  }
+
+  .example {
+    color: #2196f3;
   }
 
   h1 {

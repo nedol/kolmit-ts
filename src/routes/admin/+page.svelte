@@ -1,8 +1,8 @@
 <script lang="ts">
   import { onMount, setContext } from 'svelte';
-  import Header from './Header.svelte'
+  import Header from './Header.svelte';
   import Login from './login/Login.svelte';
-  import { langs } from '$lib/js/stores.js';
+  import { langs, nlang } from '$lib/js/stores.js';
   import { view } from '$lib/js/stores.js';
 
   import { Dict } from '../dict/dict';
@@ -19,11 +19,9 @@
 
   export let data;
 
-
-
-  $: if (data.dict[0]){
-     $dicts = (data.dict[0]);
-     setContext('dict', new Dict(data.dict[0]))
+  $: if (data.dict[0]) {
+    $dicts = data.dict[0];
+    setContext('dict', new Dict(data.dict[0]));
   }
 
   let operator = data.operator,
@@ -31,7 +29,10 @@
     name = data.name;
   // if (!data.check) $view = 'login';
 
-  if (data.lang) $langs = data.lang;
+  if (data.lang) {
+    $nlang = data.lang;
+    $langs = data.lang;
+  }
 </script>
 
 {#if operator}

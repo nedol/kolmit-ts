@@ -233,7 +233,7 @@
       name: { [$langs]: 'undefined' },
       lessons: [{ quizes: [] }],
     });
-    console.log(module.level);
+    console.log(lesson_data.data.module.level);
     lesson_data = lesson_data;
   }
 
@@ -244,7 +244,7 @@
   }
 
   function OnRemoveItem(ev) {
-    deleteObjectByName(module, ev.currentTarget.attributes['name'].nodeValue);
+    deleteObjectByName(lesson_data.data.module, ev.currentTarget.attributes['name'].nodeValue);
     lesson_data = lesson_data;
   }
 
@@ -657,10 +657,10 @@
     position: relative;
 
     background-color: aliceblue;
-    border-radius: 25px;
-    width: 50px;
-    height: 50px;
-    scale: 0.8;
+    border-radius: 24px;
+    width: 24px;
+    height: 24px;
+    scale: 1.2;
   }
 
   div > .rem_quiz,

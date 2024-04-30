@@ -106,7 +106,7 @@
             name={user.name}
             operator={user.operator}
             abonent={user.abonent}
-            poster={user.picture ? user.picture : operator_svg}
+            poster={user.picture ? user.picture : '/assets/operator.svg'}
             {OnClickUpload}
           />
           <!-- <Image

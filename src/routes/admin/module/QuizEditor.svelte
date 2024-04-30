@@ -165,9 +165,9 @@
 
     background-color: aliceblue;
     border-radius: 25px;
-    width: 50px;
-    height: 50px;
-    scale: 0.8;
+    width: 25px;
+    height: 25px;
+    scale: 1.2;
   }
 
   div > .rem_quiz,

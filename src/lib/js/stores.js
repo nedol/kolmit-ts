@@ -6,9 +6,11 @@ export let editable = writable(false);
 
 export let view = writable('group');
 
-export let langs = writable('en');
+export let nlang = writable('en');//native lang
 
-export let llang = writable('nl')
+export let langs = writable('en');//current lang
+
+export let llang = writable('nl');//learning
 
 export let pswd = writable();
 
