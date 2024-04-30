@@ -10,8 +10,8 @@
 	import { dicts } from '$lib/js/stores.js';
 	import { signal } from '$lib/js/stores.js';
 	
-	// let operator_svg =
-	// 	'https://kolmit-service.onrender.com/_app/immutable/assets/operator.7238a518.svg';
+	let operator_svg =
+	 	'https://kolmit-service.onrender.com/_app/immutable/assets/operator.7238a518.svg';
 
 	let width, height, value, abonent;
 	let formData = {

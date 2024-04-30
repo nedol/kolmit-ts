@@ -320,7 +320,7 @@
 <style>
   main {
     text-align: center;
-    width: 90%;
+    width: 98vw;
     margin: 0 auto;
   }
   #translationOverlay {
@@ -338,12 +338,8 @@
     visibility: hidden;
   }
 
-  .accordion-container {
-    margin-top: 40px;
-  }
-
   .text_container {
-    width: 90%;
+    width: 90vw;
     line-height: 50px;
     /* font-weight: 100; */
     margin: 0 auto;

@@ -541,7 +541,7 @@
   main {
     /* background-color: #fff; */
     transition: transform 0.3s ease-in-out;
-    width: 98%;
+    width: 98vw;
     margin: 0 auto;
     position: relative;
     transform-style: preserve-3d;

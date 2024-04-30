@@ -15,7 +15,7 @@
   import { mdiAccountBox, mdiVolumeHigh } from '@mdi/js';
   import { muted } from '$lib/js/stores.js';
 
-  export let abonent, poster, name, operator;
+  export let abonent, poster = '/assets/operator.svg', name, operator;
 
   // const operator = getContext('operator')
 

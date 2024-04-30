@@ -9,7 +9,7 @@
     MediaContent,
   } from '@smui/card';
 
-  export let abonent, operator, poster, name;
+  export let abonent, operator, poster  = '/assets/operator.svg', name;
 
   import { click_call_func } from '$lib/js/stores.js';
 
