@@ -10,7 +10,6 @@ import { writable } from 'svelte/store';
 
 import { tarifs } from './tarifs.json';
 
-import user_pic from '$lib/images/operator.svg';
 
 import postgres from 'postgres';
 
@@ -312,7 +311,7 @@ export async function AddDep(q) {
 					name: '',
 					role: 'admin',
 					email: '',
-					picture: { user_pic }
+					picture: '/assets/operator.svg'
 				},
 				staff: []
 			};

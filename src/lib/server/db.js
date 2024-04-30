@@ -9,8 +9,6 @@ import { writable } from 'svelte/store';
 
 import { tarifs } from './tarifs.json';
 
-import user_pic from '$lib/images/operator.svg';
-
 import postgres from 'postgres';
 
 export let sql;
