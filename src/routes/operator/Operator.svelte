@@ -66,7 +66,7 @@
 
   import { view } from '$lib/js/stores.js';
   import { posterst } from '$lib/js/stores.js';
-  import operator_svg from '$lib/images/operator.svg';
+ 
 
   $posterst = '/assets/operator.svg';
 
@@ -190,7 +190,7 @@
     video: {
       display: 'none',
       srcObject: '',
-      poster: operator_svg,
+      poster: '/assets/operator.svg',
     },
   };
 
