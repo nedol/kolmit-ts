@@ -447,7 +447,7 @@
 
 <style>
   main {
-    width: 90%;
+    width: 90vw;
     margin: 0 auto;
     /* background-color: #fff;
     transition: transform 0.3s ease-in-out;
@@ -456,7 +456,7 @@
     transform-style: preserve-3d;
     transition: transform 0.5s; */
 
-    margin-top: 40px;
+    /* margin-top: 40px; */
   }
   .module_level {
     position: fixed;

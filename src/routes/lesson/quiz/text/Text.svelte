@@ -338,6 +338,10 @@
     visibility: hidden;
   }
 
+  .accordion-container {
+    margin-top: 40px;
+  }
+
   .text_container {
     width: 90vw;
     line-height: 50px;
