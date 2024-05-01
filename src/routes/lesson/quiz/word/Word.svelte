@@ -574,8 +574,8 @@
     position: relative;
     width: 100%;
     margin: 10px auto;
-    display: flex; /* Добавлено свойство display: flex; */
-    align-items: center; /* Добавлено свойство align-items: center; */
+    display: grid; /* Добавлено свойство display: flex; */
+    justify-items: center; /* Добавлено свойство align-items: center; */
   }
 
   .words_div {
