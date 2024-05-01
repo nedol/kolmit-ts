@@ -48,7 +48,7 @@
   let arrayOfArrays;
   let userContent = '';
   let div_input;
-  let result = '<span></span>';
+  let result = '';
   let resultElement;
   let hintIndex = 0;
   let errorIndex = 0;
@@ -126,32 +126,25 @@
   }
 
   let bottomAppBar;
+  let sentence_span;
 
   $: if (div_input) div_input.focus();
 
   function replaceWordWithInput(sentence, word) {
     // Вычисляем количество совпадающих символов
+
+    word = word.replace(/\b(?:the |a |an |het |de )\b/gi, '').trim();
     const wordLength = word.length;
     const matches = (sentence.match(new RegExp(word, 'i')) || []).length;
     const matchPercentage = (matches / wordLength) * 100;
-    
+
     // Если процент совпадения больше или равен 90%, заменяем слово на <input>
-    if (matchPercentage >= 9) {
-       const regex = new RegExp(word, 'gi');
-      return sentence.replace(regex, () => {
-      return `<div
-        class="input"
-        contenteditable="true"
-        on:input={onChangeUserContent}
-        bind:this={div_input}
-        bind:innerHTML=${userContent}
-        style="min-width: 60px"
-      >
-        ${result}
-      </div>`;
-    
-    });
-  
+    if (matchPercentage >= 8) {
+      const regex = new RegExp(word, 'gi');
+      return sentence.replace(
+        regex,
+        `<span class="sentence_span" style="width:120px"></span>`
+      );
     } else {
       return sentence;
     }
@@ -161,7 +154,15 @@
     (async () => {
       example = await translate(currentWord['example'], $langs);
 
-      resultElement = replaceWordWithInput(currentWord.example,currentWord.original);
+      resultElement = replaceWordWithInput(
+        currentWord.example,
+        currentWord.original
+      );
+
+      setTimeout(() => {
+        const spanElement = document.querySelector('.sentence_span');
+        if (spanElement) spanElement.appendChild(div_input);
+      }, 100);
 
       // word = currentWord['original'].replace(/(de|het)\s*/gi, '');
       // let filteredExample = currentWord['example'].replace(
@@ -456,20 +457,19 @@
     <div>{currentWordIndex + 1}/{words.length}</div>
 
     <div class="input-container">
+      {#if resultElement}
+        {@html resultElement}
+      {/if}
       <div
         class="input"
         contenteditable="true"
         on:input={onChangeUserContent}
         bind:this={div_input}
         bind:innerHTML={userContent}
-        style="display:none;min-width: 60px"
+        style="width: 100px"
       >
         {@html result}
       </div>
-
-      {#if resultElement}
-        {@html resultElement}
-      {/if}
     </div>
 
     <!-- {#if hintIndex != 0} -->
@@ -586,14 +586,15 @@
   }
 
   .input {
-    flex: 1;
-    letter-spacing: 2px;
+    display: grid;
+    /* flex: 1; */
+    /* letter-spacing: 2px; */
     padding: 10px;
     text-align: center;
     color: blue;
     background-color: aliceblue;
     border: none;
-    font-size: large;
+    /* font-size: large; */
   }
 
   .input:focus {
