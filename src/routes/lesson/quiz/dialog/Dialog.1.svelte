@@ -717,6 +717,7 @@
   .card {
     transition: transform 0.3s ease-in-out;
     width: 100%;
+    top: 45px;
     /* border: grey solid 1px; */
     border-radius: 5px;
     margin: 0 auto;

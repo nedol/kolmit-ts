@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Поиск скрытого слова</title>
+</head>
+<body>
+  <p>В <span id="hidden-word"><input type="text" id="user-input"></span> предложение содержит много слов.</p>
+  <button onclick="checkWord()">Проверить</button>
+
+  <script>
+    function checkWord() {
+      // Получаем введенное пользователем значение
+      var userInput = document.getElementById('user-input').value.trim().toLowerCase();
+
+      // Получаем скрытое слово
+      var hiddenWord = document.getElementById('hidden-word').innerText.trim().toLowerCase();
+
+      // Проверяем совпадение
+      if (userInput === hiddenWord) {
+        alert('Правильно! Вы угадали скрытое слово.');
+      } else {
+        alert('Неправильно. Попробуйте снова.');
+      }
+    }
+  </script>
+</body>
+</html>
