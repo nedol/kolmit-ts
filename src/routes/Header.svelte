@@ -46,7 +46,7 @@
 
   let menu = 'menu';
 
-  let topAppBar
+  let topAppBar;
   let abonent;
 
   onMount(async () => {
@@ -241,7 +241,7 @@
   @media screen and (max-width: 767px) {
     .sec_items {
       position: absolute;
-      left: 30%;
+      left: 40%;
       top: 15%;
     }
   }

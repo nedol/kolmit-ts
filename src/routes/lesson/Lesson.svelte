@@ -19,14 +19,12 @@
   import Checkbox from '@smui/checkbox';
   import Quiz from './quiz/Quiz.svelte';
 
-  import { users, langs } from '$lib/js/stores.js';
+  import { users, langs, llang, dicts } from '$lib/js/stores.js';
   import { msg_oper } from '$lib/js/stores.js';
 
   import { quiz_userst } from '$lib/js/stores.js';
   import { users_status } from '$lib/js/stores.js';
   import { view } from '$lib/js/stores.js';
-
-
 
   // import lesson_data from './lesson.json';
   let lesson_data: any;
@@ -252,9 +250,14 @@
     }
   }
 
-  async function Translate(text: string, lang: string) {
+  async function Translate(text: string, from_lang: string, to_lang: string) {
     try {
-      return await translate(text, lang);
+      translate.from = from_lang;
+
+      return (
+        ($dicts[text] && $dicts[text][$langs]) ||
+        (await translate(text.trim(), to_lang))
+      );
     } catch (error) {
       console.error('Translation error:', error);
       return text; // или другое подходящее значение по умолчанию
@@ -262,14 +265,12 @@
   }
 
   async function OnThemeNameInput(theme) {
-    theme.name[$langs] = await Translate(theme.name[lesson_data.lang], $langs);
+    theme.name = await Translate(theme.name, $llang, $langs);
     level = level;
   }
 </script>
 
-
 <main>
-
   {#if data.quiz}
     <Quiz {data} />
   {:else if level}
@@ -279,22 +280,21 @@
       </div>
 
       {#each level.themes as theme, t}
-      <br>
+        <br />
         <div class="accordion-container">
           <Accordion multiple>
             <Panel class="panel" disabled={disabled[parseInt(t)]}>
-              <Header
-                :use={theme.name[$langs]
-                  ? theme.name[$langs]
-                  : (() => {
-                      OnThemeNameInput(theme);
-                    })()}
-                ><div
-                  class="mdc-typography--subtitle2"
-                >
-                  {theme.name[lesson_data.lang]}<br><small>({theme.name[$langs]})</small>
-                </div></Header
-              >
+              {#await Translate(theme.name, $llang, $langs) then data}
+                <Header
+                  :use={theme.name
+                    ? theme.name
+                    : (() => {
+                        OnThemeNameInput(theme);
+                      })()}
+                  ><div class="mdc-typography--subtitle2">
+                    {theme.name}<br /><small>({data})</small>
+                  </div></Header
+                >{/await}
               <Content>
                 {#if theme.lessons}
                   {#each theme.lessons as lesson}
@@ -354,7 +354,7 @@
                                 onClickQuiz(
                                   quiz.type,
                                   level.level,
-                                  theme.name[lesson_data.lang],
+                                  theme.name,
                                   quiz.name
                                 );
                               }}
@@ -363,7 +363,7 @@
                               type={quiz.type}
                               name={quiz.name}
                               level={level.level}
-                              theme={theme.name[lesson_data.lang]}
+                              theme={theme.name}
                               title={quiz.title}
                               highlight={quiz.highlight || ''}
                               >{quiz.name}
@@ -395,7 +395,7 @@
                                     name={quiz.name}
                                     level={level.level}
                                     theme={theme.num}
-                                    theme_name={theme.name[$langs]}
+                                    theme_name={theme.name}
                                   >
                                     <Card
                                       style="width:30px;  margin-right:15px"

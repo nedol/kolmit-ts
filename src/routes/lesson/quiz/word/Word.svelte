@@ -171,7 +171,7 @@
       // console.log(resultElement)
     })();
     // Устанавливаем фокус в конец строки
-    //setFocus();
+    setFocus();
   }
 
   onMount(async () => {});

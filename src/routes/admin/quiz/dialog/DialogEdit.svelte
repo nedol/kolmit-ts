@@ -22,7 +22,6 @@
     new_content = false,
     num = 10;
 
-
   translate.from = 'en';
   translate.engine = 'google';
 
@@ -48,24 +47,29 @@
 
   $: if ($langs) {
     (async () => {
-      grammar_title = await translate('Grammar', $langs);
-      context_title = await translate('Context', $langs);
+      grammar_title = await Translate('Grammar', 'en', $langs);
+      context_title = await Translate('Context', 'en', $langs);
       // prompt_title = await translate('Prompt', $langs);
-      words_title = await translate('Words', $langs);
-      content_title = await translate('Content', $langs);
+      words_title = await Translate('Words', 'en', $langs);
+      content_title = await Translate('Content', 'en', $langs);
     })();
   }
 
-  $: if (dialog_data && $llang)
+  // {@dialogue: ${dlg_content} 
+  $: if (dialog_data && $llang) {
+    const dlg_content = dialog_data.content.map((line) => {
+      return JSON.stringify(line);
+    });
     prompt = `
-[Act as a teaching methodologist of Dutch]     
-{@dialogue:${JSON.stringify(dialog_data && dialog_data.content[dialog_data.content.length - 1] ? dialog_data.content[dialog_data.content.length - 1] : '')}}   
-->[[Continue the dialogue for 2 users learning language by adding ${num} of participants' lines]
-{Use the words:${dialog_data.words}}
-{no repeats}
+[Act as a language teaching methodologist]  
+->[[Build the dialogue users asking each other the questions about the Context, by adding 10 of participants' lines]
+{There is dlg_content:${dlg_content}}
+{Context: ${dialog_data.html}}   
+{Use the words:${dialog_data.words} and the most commonly used phrases and words in colloquial speech}
+{No repetition of lines and phrases from dlg_content in output. Ensure that the conversation flows naturally and smoothly.}
 {Topic=${name}}{Learning language:${$llang} }{ Learning language  level: ${data.level}}
 {participants: user1, user2}]*${num}
-->[Literal translation to:${$langs}]
+->[Literal translation to:${$llang} and ${$langs}]
 ->[Output]{output format:json}<output example: 
   <[
     {
@@ -74,8 +78,9 @@
     },
     ...
 ]>
-->[Check JSON]
+->[Check output is in JSON and fix it if not]
 `;
+  }
 
   $: if (dialog_data && $langs) {
     TranslateContentToCurrentLang();
@@ -98,13 +103,13 @@
 
   onMount(() => {});
 
-  async function Translate(text: string, lang: string) {
+  async function Translate(text: string, from_lang: string, to_lang: string) {
     try {
-      translate.from = lang;
+      translate.from = from_lang;
 
       return (
-        ($dicts[text] && $dicts[text][$langs]) ||
-        (await translate(text.trim(), $langs))
+        ($dicts[text] && $dicts[text][to_lang]) ||
+        (await translate(text.trim(), to_lang))
       );
     } catch (error) {
       console.error('Translation error:', error);
@@ -113,18 +118,21 @@
   }
 
   async function TranslateContentToCurrentLang() {
-  await Promise.all(dialog_data.content.map(async (item: any) => {
-    await Promise.all(Object.keys(item).map(async (key: string) => {
-      if (item[key][$nlang] && !item[key][$langs]) {
-        let tr = await Translate(item[key][$nlang], $nlang);
-        item[key][$langs] = tr;
-        dialog_data = dialog_data;
-      }
-    }));
-  }));
-
-}
-
+    await Promise.all(
+      dialog_data.content.map(async (item: any) => {
+        await Promise.all(
+          Object.keys(item).map(async (key: string) => {
+            console.log(key, item)
+            if (item[key][$llang] && !item[key][$langs]) {
+              let tr = await Translate(item[key][$llang], $llang, $langs);
+              item[key][$langs] = tr;
+              dialog_data = dialog_data;
+            }
+          })
+        );
+      })
+    );
+  }
 
   function splitHtmlContent(inputString: string) {
     // Регулярное выражение для поиска содержимого внутри тегов <html>...</html>
@@ -259,7 +267,7 @@
         if (dialog_data && dialog_data.content)
           dialog_data.content = dialog_data.content.concat(JSON.parse(text));
         else {
-          dialog_data = {content :JSON.parse(text)}
+          dialog_data = { content: JSON.parse(text) };
         }
       })
       .catch((err) => {
@@ -271,7 +279,7 @@
 <main>
   <div class="container">
     <div class="dialog-field">
-      {#await Translate('Title', $langs) then data}
+      {#await Translate('Title', 'en', $langs) then data}
         <label for="dialog_name">{data}</label>
       {/await}
 
@@ -284,7 +292,7 @@
     </div>
     {#if data.level}
       <div class="dialog-field">
-        {#await Translate('Level', $langs) then data}
+        {#await Translate('Level', 'en', $langs) then data}
           <label for="dialog_level">{data}</label>
         {/await}
 
@@ -294,7 +302,7 @@
 
     {#if $llang}
       <div class="dialog-field">
-        {#await Translate('Language', $langs) then data}
+        {#await Translate('Language', 'en', $langs) then data}
           <label for="dialog_lang">{data}</label>
         {/await}
 
@@ -312,7 +320,7 @@
     <Panel>
       <Header
         ><b>
-          {#await Translate('content_builder', $langs) then data}
+          {#await Translate('content_builder', 'en', $langs) then data}
             {data}
           {/await}
         </b></Header
@@ -385,7 +393,7 @@
                 {@html prompt}
               </div> -->
                   <button class="copy_prompt" on:click={CopyPrompt}>
-                    {#await Translate('Copy Prompt', $langs) then data}
+                    {#await Translate('Copy', 'en', $langs) then data}
                       {data}
                     {/await}
                   </button>
@@ -394,7 +402,7 @@
             {:else if active === content_title}
               <Paper variant="unelevated">
                 <Content>
-                  {#await Translate('Run your favorite AI chat with the copied prompt and paste result here', $langs) then data}
+                  {#await Translate('Run your favorite AI chat with the copied prompt and paste result here', 'en', $langs) then data}
                     <textarea
                       id="dialog_content"
                       rows="20"
@@ -405,7 +413,7 @@
                     ></textarea>
                   {/await}
                   <button class="paste_content" on:click={PasteContent}>
-                    {#await Translate('Paste Content', $langs) then data}
+                    {#await Translate('Paste Content', 'en', $langs) then data}
                       {data}
                     {/await}
                   </button>
@@ -416,7 +424,7 @@
 
           <div class="container">
             <button class="save" disabled on:click={CreateContent}>
-              {#await Translate('Create content', $langs) then data}
+              {#await Translate('Create content', 'en', $langs) then data}
                 {data}
               {/await}
             </button>
@@ -429,10 +437,10 @@
   <table>
     <thead>
       <tr>
-        {#await Translate('User 1', $langs) then data}
+        {#await Translate('User 1', 'en', $langs) then data}
           <th>{data}</th>{/await}
 
-        {#await Translate('User 2', $langs) then data}
+        {#await Translate('User 2', 'en', $langs) then data}
           <th>{data}</th>{/await}
       </tr>
     </thead>
@@ -476,7 +484,7 @@
       >add</IconButton
     >
     <div class="container">
-      {#await Translate('Save', $langs) then data}
+      {#await Translate('Save', 'en', $langs) then data}
         <button class="save" on:click={() => OnSave()}>{data}</button>{/await}
     </div>
   </div>

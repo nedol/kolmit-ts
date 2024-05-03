@@ -547,7 +547,7 @@
 <style>
   main {
     text-align: center;
-    margin-top: 20px;
+    margin-top: 40px;
   }
   .hint-button {
     display: inline-block;

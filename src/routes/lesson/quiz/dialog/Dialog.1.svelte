@@ -1,6 +1,7 @@
 <script lang="ts">
   import { onMount, onDestroy, getContext } from 'svelte';
-  import BottomAppBar, { Section } from '@smui-extra/bottom-app-bar';
+  // import BottomAppBar, { Section } from '@smui-extra/bottom-app-bar';
+  import TopAppBar, { Row, Title, Section } from '@smui/top-app-bar';
   import Button, { Label } from '@smui/button';
   import translate from 'translate';
 
@@ -379,6 +380,61 @@
   {/if}
 
   {#if data.quiz == 'dialog'}
+    <div class="top-app-bar-container flexor">
+      <TopAppBar bind:this={bottomAppBar}>
+        <Row>
+        <Section>
+          {#if cur_qa > 0}
+            <Icon
+              tag="svg"
+              on:click={onBackQA}
+              viewBox="0 0 24 24"
+              style="margin-top:0px; scale:.5"
+            >
+              <path fill="white" d={mdiArrowLeft} />
+            </Icon>
+          {/if}
+        </Section>
+        <Section>
+          {#if share_button && $call_but_status === 'talk'}
+            <div class={share_button_class} on:click={onShare}>
+              <IconButton>
+                <Icon tag="svg" viewBox="0 0 24 24">
+                  <path fill="currentColor" d={mdiShareVariant} />
+                </Icon>
+              </IconButton>
+            </div>
+          {/if}
+        </Section>
+
+        <Section>
+          <div class="flip_button" on:click={onChangeClick}>
+            <IconButton>
+              <Icon tag="svg" viewBox="0 0 24 24">
+                <path fill="currentColor" d={mdiAccountConvertOutline} />
+              </Icon>
+            </IconButton>
+          </div>
+        </Section>
+        <Section>
+          <button on:click={onClickQ} class="toggleButton">
+            <span class="material-symbols-outlined"> ? </span>
+          </button>
+        </Section>
+
+        <Section>
+          <Icon
+            tag="svg"
+            on:click={onNextQA}
+            viewBox="0 0 24 24"
+            style="margin-top:0px; scale:.5"
+          >
+            <path fill="white" d={mdiArrowRight} />
+          </Icon>
+        </Section>
+      </Row>
+      </TopAppBar>
+    </div>
     <!-- Ваш контент для лицевой стороны -->
     <div class="card">
       {#if q || a}
@@ -477,58 +533,6 @@
           </span>
         </div>
       {/if}
-
-      <BottomAppBar bind:this={bottomAppBar}>
-        <Section>
-          {#if cur_qa > 0}
-            <Icon
-              tag="svg"
-              on:click={onBackQA}
-              viewBox="0 0 24 24"
-              style="margin-top:0px"
-            >
-              <path fill="grey" d={mdiArrowLeft} />
-            </Icon>
-          {/if}
-        </Section>
-        <Section>
-          {#if share_button && $call_but_status === 'talk'}
-            <div class={share_button_class} on:click={onShare}>
-              <IconButton>
-                <Icon tag="svg" viewBox="0 0 24 24">
-                  <path fill="currentColor" d={mdiShareVariant} />
-                </Icon>
-              </IconButton>
-            </div>
-          {/if}
-        </Section>
-
-        <Section>
-          <div class="flip_button" on:click={onChangeClick}>
-            <IconButton>
-              <Icon tag="svg" viewBox="0 0 24 24">
-                <path fill="currentColor" d={mdiAccountConvertOutline} />
-              </Icon>
-            </IconButton>
-          </div>
-        </Section>
-        <Section>
-          <button on:click={onClickQ} class="toggleButton">
-            <span class="material-symbols-outlined"> ? </span>
-          </button>
-        </Section>
-
-        <Section>
-          <Icon
-            tag="svg"
-            on:click={onNextQA}
-            viewBox="0 0 24 24"
-            style="margin-top:0px"
-          >
-            <path fill="grey" d={mdiArrowRight} />
-          </Icon>
-        </Section>
-      </BottomAppBar>
     </div>
   {/if}
 
@@ -548,6 +552,18 @@
     transition: transform 0.5s;
     height: 90vh;
   }
+  .top-app-bar-container {
+        /* display: inline-block; */
+    position:relative;
+    top:30px;
+    border: 1px solid
+      var(--mdc-theme-text-hint-on-background, rgba(0, 0, 0, 0.1));
+    margin: 0 18px 18px 0;
+    background-color: var(--mdc-theme-background, #fff);
+    /* overflow: auto; */
+
+  }
+
   .margins {
     display: flex;
     justify-content: start; /* Распределяет пространство между элементами равномерно */
@@ -601,7 +617,7 @@
   .html_data {
     position: relative;
     overflow-y: auto;
-    height: 55vh;
+    height: 62vh;
     margin-top: 10px;
   }
 
@@ -717,7 +733,7 @@
   .card {
     transition: transform 0.3s ease-in-out;
     width: 100%;
-    top: 45px;
+    top: 110px;
     /* border: grey solid 1px; */
     border-radius: 5px;
     margin: 0 auto;

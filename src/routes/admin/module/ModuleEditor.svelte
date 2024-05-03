@@ -30,7 +30,6 @@
 
   import Quiz from '../quiz/Quiz.svelte';
 
-
   let value = 'dialog';
 
   import { view } from '$lib/js/stores.js';
@@ -77,13 +76,13 @@
 
   // }
 
-  async function Translate(text: string) {
+  async function Translate(text: string, from_lang: string, to_lang: string) {
     try {
-      translate.from = $llang;
+      translate.from = from_lang;
 
       return (
         ($dicts[text] && $dicts[text][$langs]) ||
-        (await translate(text.trim(), $langs))
+        (await translate(text.trim(), to_lang))
       );
     } catch (error) {
       console.error('Translation error:', error);
@@ -229,7 +228,7 @@
 
   function OnAddTheme() {
     lesson_data.data.module.themes.push({
-      name: { [$langs]: 'undefined' },
+      name: 'Input Theme Name',
       lessons: [{ quizes: [] }],
     });
     console.log(lesson_data.data.module.level);
@@ -243,7 +242,10 @@
   }
 
   function OnRemoveItem(ev) {
-    deleteObjectByName(lesson_data.data.module, ev.currentTarget.attributes['name'].nodeValue);
+    deleteObjectByName(
+      lesson_data.data.module,
+      ev.currentTarget.attributes['name'].nodeValue
+    );
     lesson_data = lesson_data;
   }
 
@@ -252,21 +254,21 @@
     if (name === upd) return;
     let item = findDeep(
       lesson_data.data.module.themes,
-      (value) => value[0].name[$langs] === name,
+      (value) => value[0].name === name,
       {
         childrenPath: 'themes',
       }
     );
 
     if (item) {
-      item[0].name[$langs] = upd;
+      item[0].name = upd;
     }
     lesson_data = lesson_data;
   }
 
   function OnAddQuiz(ev) {
     const theme = find(lesson_data.data.module.themes, {
-      name: { [$langs]: ev.currentTarget.attributes['name'].value },
+      name: ev.currentTarget.attributes['name'].value,
     });
     theme.lessons[0].quizes.push({
       type: 'quiz',
@@ -356,8 +358,8 @@
   }
 
   async function OnThemeNameInput(theme) {
-    if (theme.name && theme.name[$llang]) {
-      theme.name[$langs] = await Translate(theme.name[$llang], $langs);
+    if (theme.name) {
+      theme.name = await Translate(theme.name[$llang], $llang, $langs);
       lesson_data = lesson_data;
     }
   }
@@ -372,16 +374,19 @@
     <div style="height:1500px; margin-top:20px                              ">
       <div class="level_container" style="">
         <button class="save" on:click={saveLessonData}>
-          {#await Translate('Save', $langs) then data}
+          {#await Translate('Сохранить', 'ru', $langs) then data}
             {data}
           {/await}
         </button>
 
         <div>
           <div class="add_module" style="display:inline-flex">
-            <IconButton class="material-icons" on:click={OnAddModule}
-              >add</IconButton
-            >
+            {#await Translate('Добавить модуль', 'ru', $langs) then data}
+              <IconButton
+                class="material-icons"
+                on:click={OnAddModule}
+                title={data}>add</IconButton
+              >{/await}
           </div>
           <Textfield
             bind:this={module_input}
@@ -402,9 +407,13 @@
           ></Textfield>
 
           <div class="rem_module" style="display:inline-flex">
-            <IconButton class="material-icons rem_module" on:click={OnRemModule}
-              >remove</IconButton
-            >
+            {#await Translate('Удалить модуль', 'ru', $langs) then data}
+              <IconButton
+                class="material-icons rem_module"
+                on:click={OnRemModule}
+                title={data}>remove</IconButton
+              >
+            {/await}
           </div>
 
           <Menu bind:this={menu}>
@@ -436,20 +445,23 @@
 
                   <input
                     placeholder="Input Theme Name"
-                    :use={theme.name[$langs]
-                      ? theme.name[$langs]
+                    :use={theme.name
+                      ? theme.name
                       : ((ev) => {
                           OnThemeNameInput(theme);
                         })()}
-                    bind:value={theme.name[$langs]}
+                    bind:value={theme.name}
                     style="font-weight: bold; width:90%"
                   />
                   <div class="rem_theme">
-                    <IconButton
-                      class="material-icons "
-                      name={theme.name[$langs]}
-                      on:click={OnRemoveItem}>remove</IconButton
-                    >
+                    {#await Translate('Remove theme', 'en', $langs) then data}
+                      <IconButton
+                        class="material-icons"
+                        title={data}
+                        name={theme.name}
+                        on:click={OnRemoveItem}>remove</IconButton
+                      >
+                    {/await}
                   </div>
                 </Header>
                 <Content>
@@ -560,22 +572,28 @@
                             {/if}
 
                             <div class="rem_quiz">
-                              <IconButton
-                                class="material-icons"
-                                name={quiz.name}
-                                on:click={OnRemoveItem}>remove</IconButton
-                              >
+                              {#await Translate('Remove quiz', 'en', $langs) then data}
+                                <IconButton
+                                  class="material-icons"
+                                  title={data}
+                                  name={quiz.name}
+                                  on:click={OnRemoveItem}>remove</IconButton
+                                >
+                              {/await}
                             </div>
                           </div>
                         {/each}
                       {/if}
                     {/each}
                     <div class="add_quiz">
-                      <IconButton
-                        class="material-icons"
-                        name={theme.name[$langs]}
-                        on:click={OnAddQuiz}>add</IconButton
-                      >
+                      {#await Translate('Add quiz', 'en', $langs) then data}
+                        <IconButton
+                          class="material-icons"
+                          title={data}
+                          name={theme.name}
+                          on:click={OnAddQuiz}>add</IconButton
+                        >
+                      {/await}
                     </div>
                   {/if}
                 </Content>
@@ -585,9 +603,13 @@
         {/each}
         {#if lesson_data.data.module.level && $llang !== ' '}
           <div class="add_theme">
-            <IconButton class="material-icons" on:click={() => OnAddTheme()}
-              >add</IconButton
-            >
+            {#await Translate('Add theme', 'en', $langs) then data}
+              <IconButton
+                class="material-icons"
+                on:click={() => OnAddTheme()}
+                title={data}>add</IconButton
+              >
+            {/await}
           </div>
         {/if}
       </div>
@@ -677,6 +699,7 @@
 
   .add_theme {
     position: relative;
+    top:10px
   }
 
   select {
