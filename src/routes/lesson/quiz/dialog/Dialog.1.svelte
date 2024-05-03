@@ -394,6 +394,15 @@
               >
                 <path fill="white" d={mdiArrowLeft} />
               </Icon>
+              {:else}
+                      <Icon
+                tag="svg"
+                on:click={onBackQA}
+                viewBox="0 0 24 24"
+                style="visibility:hidden;margin-top:0px; scale:.5;width:50px"
+              >
+                <path fill="" d={mdiArrowLeft} />
+              </Icon>
             {/if}
           </Section>
           <Section>
