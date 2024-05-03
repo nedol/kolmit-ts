@@ -389,7 +389,8 @@
                 tag="svg"
                 on:click={onBackQA}
                 viewBox="0 0 24 24"
-                style="margin-top:0px; scale:.5"
+                style="margin-top:0px; scale:.5;width:50px"
+
               >
                 <path fill="white" d={mdiArrowLeft} />
               </Icon>
@@ -427,12 +428,13 @@
             </button>
           </Section>
 
-          <Section>
+          <Section align="end">
             <Icon
               tag="svg"
               on:click={onNextQA}
               viewBox="0 0 24 24"
-              style="margin-top:0px; scale:.5"
+              style="margin-top:0px; scale:.5; width:50px"
+
             >
               <path fill="white" d={mdiArrowRight} />
             </Icon>
@@ -522,7 +524,6 @@
 
         {#if dialog_data.html}
           <div class="html_data">{@html dialog_data.html[cur_html]}</div>
-         
         {/if}
       {:else}
         <div style="text-align:center">
@@ -549,7 +550,7 @@
   main {
     overflow-y: clip;
     transition: transform 0.3s ease-in-out;
-    width: 92%;
+    width: 100vw;
     margin: 0 auto;
     position: relative;
     transform-style: preserve-3d;
@@ -670,6 +671,7 @@
   }
 
   .user1 {
+    width:100vw;
     text-align: center;
     line-height: normal;
     font-size: 1em;
