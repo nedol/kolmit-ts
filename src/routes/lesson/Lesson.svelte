@@ -447,7 +447,7 @@
 
 <style>
   main {
-    width: 90vw;
+    /* width: 90vw; */
     margin: 0 auto;
     /* background-color: #fff;
     transition: transform 0.3s ease-in-out;

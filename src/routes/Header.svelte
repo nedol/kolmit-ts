@@ -171,9 +171,7 @@
   }
 
   .top-app-bar-container {
-    /* max-width: 480px; */
-    /* width: 100%; */
-    /* height: 100vh; */
+    top:0;
     border: 1px solid
       var(--mdc-theme-text-hint-on-background, rgba(0, 0, 0, 0.1));
     margin: 0 18px 18px 0;
@@ -241,7 +239,7 @@
   @media screen and (max-width: 767px) {
     .sec_items {
       position: absolute;
-      left: 40%;
+      left: 35%;
       top: 15%;
     }
   }
