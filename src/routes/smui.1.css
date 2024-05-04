@@ -29,7 +29,6 @@
   > .smui-paper__content {
   height: auto;
   padding: 8px 5px;
-
 }
 body {
   overflow-y: auto;
@@ -38,6 +37,7 @@ body {
 .mdc-top-app-bar {
   background-color: #9eb2cc;
   background-color: var(--mdc-theme-primary, #9eb2cc);
+  /* width:98% */
 }
 .form-field-container {
   width: 0;
@@ -53,12 +53,9 @@ body {
 .mdc-icon-button {
   padding: 1px;
   width: 25px;
-  height: 25px; 
+  height: 25px;
 }
 
-.mdc-image-list__supporting{
+.mdc-image-list__supporting {
   display: block;
 }
-
-
-

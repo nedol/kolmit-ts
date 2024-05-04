@@ -153,7 +153,7 @@
   async function init() {
     function splitHtmlContent(inputString) {
       // Регулярное выражение для поиска содержимого внутри тегов <html>...</html>
-      const regex = /html>(.*?)<\/html>/gs;
+      const regex = /<(?:!DOCTYPE html|html(?:\s[^>]*)?)>(.*?)<\/html>/gs;
 
       // Используем matchAll для поиска всех совпадений в строке
       const matches = inputString.matchAll(regex);
@@ -514,6 +514,7 @@
         <div class="user2">
           {@html dialog_data.content[cur_qa].user2[$llang]}
         </div>
+
         {#if showSpeakerButton}
           <div class="speaker-button">
             <IconButton
@@ -531,6 +532,7 @@
 
         {#if dialog_data.html}
           <div class="html_data">{@html dialog_data.html[cur_html]}</div>
+          <!-- <iframe srcdoc={dialog_data.html[cur_html]} class="html_data" width="100%" height="700vh"></iframe> -->
         {/if}
       {:else}
         <div style="text-align:center">
@@ -577,10 +579,12 @@
 
   .margins {
     display: flex;
+    position: relative;
     justify-content: start; /* Распределяет пространство между элементами равномерно */
-    align-items: center; /* Центрирует элементы по вертикали */
-    text-align: left; /* Сбрасываем выравнивание текста по умолчанию */
+    width: 20px;
+    left:20px; /* Сбрасываем выравнивание текста по умолчанию */
     height: 30px;
+
   }
 
   /* Если вы хотите добавить пространство между элементами, вы можете использовать margin */
@@ -623,14 +627,17 @@
     border-radius: 25px;
     top: -5px;
     float: right;
+    right:30px;
   }
 
   .html_data {
+    display: grid;
     position: relative;
     overflow-y: auto;
-    height: 62vh;
-    margin-top: 10px;
-    margin-bottom: 100px;
+    height: 70vh;
+    margin: 0 auto;
+    margin-top:10px;
+    border: 0;
   }
 
   .counter {
