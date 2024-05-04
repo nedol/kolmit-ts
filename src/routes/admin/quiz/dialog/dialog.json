@@ -1,37 +1,104 @@
-[Продолжить диалог: {
-        "num": 9,
-        "user1": {
-            "nl": "Ja, we zijn er erg blij mee. Laten we doorgaan naar de keuken. Het is net hierachter.",
-            "ru": "Да, мы очень довольны. Давайте перейдем к кухне. Она прямо здесь, позади."
-        },
-        "user2": {
-            "nl": "Klinkt goed! Ik ben benieuwd naar de keuken.",
-            "ru": "Звучит замечательно! Я интересуюсь кухней."
-        }
-    }
-]
-[Тема=Housewarming.Dialog.1
-]{язык:nl, уровень изучения языка: A2!
-}{участники: user1,user2
-}{количество реплик участников: 5
-}
-->[Перевод:ru
-]
-{Формат вывода:json
-}{Пример вывода: [
+{
+    "html": "<html lang=\"nl\">\n<head>\n<meta charset=\"UTF-8\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n<title>Familie 2</title>\n<link rel=\"stylesheet\" href=\"https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap\">\n<style>\nbody {\n  font-family: 'Roboto', sans-serif;\n  margin: 0;\n  padding: 0;\n}\n.container {\n  max-width: 800px;\n  margin: 20px auto;\n  padding: 20px;\n  background-color: #f9f9f9;\n  border-radius: 8px;\n  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);\n}\n</style>\n</head>\n<body>\n<div class=\"container\">\n<h2>Familie 2</h2>\n<p>Hallo! Mijn naam is Amir Jallad. Ik ben de jongere broer van Marc. Hij heeft jullie al veel verteld over onze familie. Ik wil jullie nog een beetje meer vertellen over mezelf en mijn gezin. Ik ben 40 jaar geleden geboren in Tripoli, in Libanon. Toen ik 10 jaar was, zijn onze ouders naar Frankrijk verhuisd. Zij wonen nog steeds in Reims, in het noorden van Frankrijk. Ik woon nu met mijn gezin in Toulouse. Dat ligt in het zuiden van Frankrijk. Ik ben loodgieter en ik heb heel veel werk. Dat is goed want zo kan ik veel geld verdienen. Ik kan heel goed dingen repareren, dus de mensen bellen mij vaak. Als ik niet moet werken, speel ik graag rugby met mijn vrienden. Ik ben getrouwd met Julie en wij hebben een dochtertje van 2, Elise. Julie is verkoopster in een schoenwinkel. Zij winkelt heel graag en koopt dan mooie kleren voor onze dochters. Ik heb ook nog een dochter uit mijn eerste huwelijk. Zij heet Aisha en zij is 14 jaar. Zij speelt graag met haar kleine zus en ze kan heel goed tekenen. De mama van Aisha heette Bouchra. Zij was mijn eerste vrouw maar ze is jammer genoeg overleden toen Aisha 3 jaar was. Ze is gestorven in een auto-ongeval. Gelukkig klikt het goed tussen Julie en Aisha! Mijn oudere broer en zus wonen nu allebei met hun gezin in België, maar we bezoeken elkaar regelmatig en we houden via e-mail en Skype.</p>\n</div>\n</body>\n</html>",
+    "content": [
         {
-            "num": "{dialog_data.content.length}",
             "user1": {
-                "nl": "{текст}",
-                "ru": "{текст}"
+                "nl": "Waar is Amir geboren?",
+                "ru": "Где родился Амир?"
             },
             "user2": {
-                "nl": "{текст}",
-                "ru": "{текст}"
+                "nl": "Amir is geboren in Tripoli, in Libanon.",
+                "ru": "Амир родился в Триполи, в Ливане."
             }
         },
         {
-            "num": {dialog_data.content.length+1
-            }, ...
+            "user1": {
+                "nl": "Waar wonen Amirs ouders?",
+                "ru": "Где живут родители Амира?"
+            },
+            "user2": {
+                "nl": "Amirs ouders wonen in Reims, in het noorden van Frankrijk.",
+                "ru": "Родители Амира живут в Реймсе, на севере Франции."
+            }
+        },
+        {
+            "user1": {
+                "nl": "Wat is Amirs beroep?",
+                "ru": "Кем работает Амир?"
+            },
+            "user2": {
+                "nl": "Amir is loodgieter.",
+                "ru": "Амир работает водопроводчиком."
+            }
+        },
+        {
+            "user1": {
+                "nl": "Wat doet Amir graag in zijn vrije tijd?",
+                "ru": "Чем занимается Амир в свободное время?"
+            },
+            "user2": {
+                "nl": "Amir speelt graag rugby met zijn vrienden.",
+                "ru": "Амир любит играть в регби со своими друзьями."
+            }
+        },
+        {
+            "user1": {
+                "nl": "Met wie is Amir getrouwd?",
+                "ru": "С кем Амир женат?"
+            },
+            "user2": {
+                "nl": "Amir is getrouwd met Julie.",
+                "ru": "Амир женат на Джули."
+            }
+        },
+        {
+            "user1": {
+                "nl": "Hoeveel dochters heeft Amir?",
+                "ru": "Сколько у Амира дочерей?"
+            },
+            "user2": {
+                "nl": "Amir heeft twee dochters, Elise en Aisha.",
+                "ru": "У Амира две дочери, Элиза и Аиша."
+            }
+        },
+        {
+            "user1": {
+                "nl": "Hoe oud is Aisha?",
+                "ru": "Сколько лет Айше?"
+            },
+            "user2": {
+                "nl": "Aisha is 14 jaar oud.",
+                "ru": "Аише 14 лет."
+            }
+        },
+        {
+            "user1": {
+                "nl": "Wat is er met Amirs eerste vrouw gebeurd?",
+                "ru": "Что случилось с первой женой Амира?"
+            },
+            "user2": {
+                "nl": "Amirs eerste vrouw, Bouchra, is overleden in een auto-ongeluk.",
+                "ru": "Первая жена Амира, Бушра, погибла в автокатастрофе."
+            }
+        },
+        {
+            "user1": {
+                "nl": "Hoe is de relatie tussen Julie en Aisha?",
+                "ru": "Какие отношения между Джули и Айшей?"
+            },
+            "user2": {
+                "nl": "Gelukkig klikt het goed tussen Julie en Aisha.",
+                "ru": "К счастью, отношения между Джули и Айшей хорошие."
+            }
+        },
+        {
+            "user1": {
+                "nl": "Waar wonen Amirs oudere broer en zus?","ru": "Где живут старший брат и сестра Амира?"
+            },
+            "user2": {
+                "nl": "Amirs oudere broer en zus wonen nu allebei met hun gezin in België.",
+                "ru": "Старший брат и сестра Амира сейчас оба живут со своими семьями в Бельгии."
+            }
         }
     ]
+}

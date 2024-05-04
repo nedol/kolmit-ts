@@ -55,29 +55,36 @@
     })();
   }
 
-  // {@dialogue: ${dlg_content} 
+  // {@dialogue: ${dlg_content} {There is dlg_content:${dlg_content}}
   $: if (dialog_data && $llang) {
     const dlg_content = dialog_data.content.map((line) => {
       return JSON.stringify(line);
     });
+    let dialog_data_words = dialog_data.words || '';
     prompt = `
 [Act as a language teaching methodologist]  
-->[[Build the dialogue users asking each other the questions about the Context, by adding 10 of participants' lines]
-{There is dlg_content:${dlg_content}}
+[2 users read the Context]
+->[[Build ${num} questions one user asking another one about the understanding of the Context 
+and another user answering following the Context]
 {Context: ${dialog_data.html}}   
-{Use the words:${dialog_data.words} and the most commonly used phrases and words in colloquial speech}
+{Use the most commonly used phrases and words in colloquial speech and ${dialog_data_words}}
 {No repetition of lines and phrases from dlg_content in output. Ensure that the conversation flows naturally and smoothly.}
 {Topic=${name}}{Learning language:${$llang} }{ Learning language  level: ${data.level}}
 {participants: user1, user2}]*${num}
 ->[Literal translation to:${$llang} and ${$langs}]
+->[Build material designed html $Page based on the Context ]
 ->[Output]{output format:json}<output example: 
-  <[
-    {
-     "user1": { "${$llang}": "..." , "${$langs}":"..."}, 
-     "user2": { "${$llang}": "..." , "${$langs}":"..."} 
-    },
-    ...
-]>
+  <{
+    html:$Page,
+    content:[    
+      {
+      "user1": { "${$llang}": "..." , "${$langs}":"..."}, 
+      "user2": { "${$llang}": "..." , "${$langs}":"..."} 
+      },
+      ...
+    ]
+  }
+>
 ->[Check output is in JSON and fix it if not]
 `;
   }
@@ -122,7 +129,7 @@
       dialog_data.content.map(async (item: any) => {
         await Promise.all(
           Object.keys(item).map(async (key: string) => {
-            console.log(key, item)
+            console.log(key, item);
             if (item[key][$llang] && !item[key][$langs]) {
               let tr = await Translate(item[key][$llang], $llang, $langs);
               item[key][$langs] = tr;
@@ -135,14 +142,14 @@
   }
 
   function splitHtmlContent(inputString: string) {
-    // Регулярное выражение для поиска содержимого внутри тегов <html>...</html>
-    const regex = /<html>(.*?)<\/html>/gs;
+    const regex = /<(?:!DOCTYPE html|html(?:\s[^>]*)?)>(.*?)<\/html>/gs;
+    const result = [];
+    let match;
 
-    // Используем matchAll для поиска всех совпадений в строке
-    const matches = inputString.matchAll(regex);
-
-    // Преобразуем итератор в массив и извлекаем только содержимое внутри тегов
-    const result = Array.from(matches, (match) => match[1]);
+    // Используем цикл для поиска всех совпадений
+    while ((match = regex.exec(inputString)) !== null) {
+      result.push(match[0]); // Добавляем найденное совпадение в массив
+    }
 
     return result;
   }
@@ -265,9 +272,14 @@
       .then((text) => {
         content = text;
         if (dialog_data && dialog_data.content)
-          dialog_data.content = dialog_data.content.concat(JSON.parse(text));
+          dialog_data.content = dialog_data.content.concat(
+            JSON.parse(content).content
+          );
         else {
           dialog_data = { content: JSON.parse(text) };
+        }
+        if (dialog_data && JSON.parse(content).html) {
+          dialog_data.html[0] = JSON.parse(content).html;
         }
       })
       .catch((err) => {
@@ -347,9 +359,10 @@
             </TabBar>
             {#if active === context_title}
               {#if viewHTML}
-                <div style="height: 350px; overflow-y:auto">
+                <!-- <div style="height: 350px; overflow-y:auto">
                   {@html dialog_data.html}
-                </div>
+                </div> -->
+                <iframe srcdoc={dialog_data.html} width="100%" height="350px"></iframe>
               {:else}
                 <Paper variant="unelevated">
                   <Content>

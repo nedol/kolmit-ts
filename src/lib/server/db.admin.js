@@ -145,11 +145,12 @@ async function removeModule(item) {
 export async function UpdateDialog(q) {
   try {
     let res = await sql`INSERT INTO dialogs
-			(name , dialog, owner)
-			VALUES(${q.new_name},${q.data},${q.owner})
+			(name , dialog, owner, html)
+			VALUES(${q.new_name},${q.data},${q.owner},${q.data.html} )
 			ON CONFLICT (name, owner)
 			DO UPDATE SET
 			name = EXCLUDED.name,
+      html = EXCLUDED.html,
 			dialog = EXCLUDED.dialog`;
     return { res };
   } catch (ex) {

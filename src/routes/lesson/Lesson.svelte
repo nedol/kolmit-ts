@@ -461,9 +461,8 @@
   .module_level {
     position: fixed;
     /* background-color: rgba(255, 255, 255, 0.8); */
-    padding: 10px;
     top: 60px;
-    left: 20px;
+    right: 0px;
     transform: translate(-50%, -50%);
     z-index: 1;
   }

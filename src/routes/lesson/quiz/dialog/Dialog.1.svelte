@@ -153,7 +153,7 @@
   async function init() {
     function splitHtmlContent(inputString) {
       // Регулярное выражение для поиска содержимого внутри тегов <html>...</html>
-      const regex = /<html>(.*?)<\/html>/gs;
+      const regex = /html>(.*?)<\/html>/gs;
 
       // Используем matchAll для поиска всех совпадений в строке
       const matches = inputString.matchAll(regex);
@@ -390,12 +390,11 @@
                 on:click={onBackQA}
                 viewBox="0 0 24 24"
                 style="margin-top:0px; scale:.5;width:50px"
-
               >
                 <path fill="white" d={mdiArrowLeft} />
               </Icon>
-              {:else}
-                      <Icon
+            {:else}
+              <Icon
                 tag="svg"
                 on:click={onBackQA}
                 viewBox="0 0 24 24"
@@ -443,7 +442,6 @@
               on:click={onNextQA}
               viewBox="0 0 24 24"
               style="margin-top:0px; scale:.5; width:50px"
-
             >
               <path fill="white" d={mdiArrowRight} />
             </Icon>
@@ -680,7 +678,7 @@
   }
 
   .user1 {
-    width:100vw;
+    width: 100vw;
     text-align: center;
     line-height: normal;
     font-size: 1em;

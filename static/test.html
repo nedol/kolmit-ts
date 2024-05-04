@@ -1,29 +1,58 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Поиск скрытого слова</title>
-</head>
-<body>
-  <p>В <span id="hidden-word"><input type="text" id="user-input"></span> предложение содержит много слов.</p>
-  <button onclick="checkWord()">Проверить</button>
+<html lang="nl">
+  <head>
+    <meta charset="UTF-8" />
 
-  <script>
-    function checkWord() {
-      // Получаем введенное пользователем значение
-      var userInput = document.getElementById('user-input').value.trim().toLowerCase();
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-      // Получаем скрытое слово
-      var hiddenWord = document.getElementById('hidden-word').innerText.trim().toLowerCase();
+    <title>Familie 2</title>
 
-      // Проверяем совпадение
-      if (userInput === hiddenWord) {
-        alert('Правильно! Вы угадали скрытое слово.');
-      } else {
-        alert('Неправильно. Попробуйте снова.');
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
+    />
+
+    <style>
+      body {
+        font-family: 'Roboto', sans-serif;
+        margin: 0;
+        padding: 0;
       }
-    }
-  </script>
-</body>
+      .container {
+        max-width: 800px;
+        margin: 20px auto;
+        padding: 20px;
+        background-color: #f9f9f9;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h2>Familie 2</h2>
+
+      <p>
+        Hallo! Mijn naam is Amir Jallad. Ik ben de jongere broer van Marc. Hij
+        heeft jullie al veel verteld over onze familie. Ik wil jullie nog een
+        beetje meer vertellen over mezelf en mijn gezin. Ik ben 40 jaar geleden
+        geboren in Tripoli, in Libanon. Toen ik 10 jaar was, zijn onze ouders
+        naar Frankrijk verhuisd. Zij wonen nog steeds in Reims, in het noorden
+        van Frankrijk. Ik woon nu met mijn gezin in Toulouse. Dat ligt in het
+        zuiden van Frankrijk. Ik ben loodgieter en ik heb heel veel werk. Dat is
+        goed want zo kan ik veel geld verdienen. Ik kan heel goed dingen
+        repareren, dus de mensen bellen mij vaak. Als ik niet moet werken, speel
+        ik graag rugby met mijn vrienden. Ik ben getrouwd met Julie en wij
+        hebben een dochtertje van 2, Elise. Julie is verkoopster in een
+        schoenwinkel. Zij winkelt heel graag en koopt dan mooie kleren voor onze
+        dochters. Ik heb ook nog een dochter uit mijn eerste huwelijk. Zij heet
+        Aisha en zij is 14 jaar. Zij speelt graag met haar kleine zus en ze kan
+        heel goed tekenen. De mama van Aisha heette Bouchra. Zij was mijn eerste
+        vrouw maar ze is jammer genoeg overleden toen Aisha 3 jaar was. Ze is
+        gestorven in een auto-ongeval. Gelukkig klikt het goed tussen Julie en
+        Aisha! Mijn oudere broer en zus wonen nu allebei met hun gezin in
+        België, maar we bezoeken elkaar regelmatig en we houden via e-mail en
+        Skype.
+      </p>
+    </div>
+  </body>
 </html>
