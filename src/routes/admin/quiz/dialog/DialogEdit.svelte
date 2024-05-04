@@ -63,23 +63,23 @@
     let dialog_data_words = dialog_data.words || '';
     prompt = `
 [Act as a language teaching methodologist]  
-[2 users read the Context]
-->[[Build ${num} questions one user asking another one about the understanding of the Context 
-and another user answering following the Context]
-{Context: ${dialog_data.html}}   
+[2 users read  $Context]
+->[[Build users dialogue based in which the users asking each another something about $Context
+and answering following $Context.]
+{$Context: ${dialog_data.html}}   
 {Use the most commonly used phrases and words in colloquial speech and ${dialog_data_words}}
 {No repetition of lines and phrases from dlg_content in output. Ensure that the conversation flows naturally and smoothly.}
 {Topic=${name}}{Learning language:${$llang} }{ Learning language  level: ${data.level}}
 {participants: user1, user2}]*${num}
 ->[Literal translation to:${$llang} and ${$langs}]
-->[Build material designed html $Page based on the Context ]
+->[Build material designed webpage $Page based on the Context {don't use '\n'}]
 ->[Output]{output format:json}<output example: 
   <{
     html:$Page,
     content:[    
       {
-      "user1": { "${$llang}": "..." , "${$langs}":"..."}, 
-      "user2": { "${$llang}": "..." , "${$langs}":"..."} 
+      "user1": { "${$llang}": "{answer. question}" , "${$langs}":"{answer. question}"}, 
+      "user2": { "${$llang}": "{answer. question}" , "${$langs}":"{answer. question}"} 
       },
       ...
     ]

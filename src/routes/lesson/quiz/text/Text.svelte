@@ -20,9 +20,10 @@
   import pkg from 'lodash';
   const { merge } = pkg;
 
-  translate.from = 'nl';
+ 
+  import { langs, llang } from '$lib/js/stores.js';
+   translate.from = $llang;
   translate.engine = 'google';
-  import { langs } from '$lib/js/stores.js';
 
   import { lesson } from '$lib/js/stores.js';
 
@@ -304,6 +305,7 @@
               style="line-height: 2.2;justify-content: center;"
               on:touchend={onSelectionEnd}
               on:mouseup={onSelectionEnd}
+              
             >
               {@html text}
             </div>
@@ -313,7 +315,7 @@
     </Accordion>
   </div>
 </main>
-<div style="height:100px"></div>
+<div style="height:200px"></div>
 
 <div id="translationOverlay" bind:this={trans_div}>{trans}</div>
 

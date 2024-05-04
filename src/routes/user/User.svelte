@@ -212,13 +212,14 @@
     if (data.desc && data.cand) {
       if (status === 'talk') {
         // status = 'talk';
+        // $muted = true;
       } else {
         // status = 'call';
       }
     }
 
     if (data.func === 'call') {
-      $muted = true;
+      // $muted = true;
     }
 
     if (data.func === 'mute') {
@@ -359,6 +360,7 @@
 
   function toggle_remote_audio() {
     isRemoteAudioMute = !isRemoteAudioMute;
+    $muted = isRemoteAudioMute;
   }
 </script>
 

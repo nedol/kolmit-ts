@@ -58,4 +58,4 @@ export let share_mode = writable(false);
 
 export let user_placeholder = writable();
 
-export let muted = writable(false);
+export let muted = writable(true);

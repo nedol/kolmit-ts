@@ -50,7 +50,7 @@
             class="user_video_remote"
             bind:this={video_element}
             on:click
-            on:mute
+    
             muted={$muted}
             {status}
             {poster}

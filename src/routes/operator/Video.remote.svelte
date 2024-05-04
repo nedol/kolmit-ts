@@ -58,7 +58,7 @@
             class="oper_video_remote"
             bind:this={video}
             on:click
-            on:mute
+  
             {status}
             muted={$muted}
             autoplay

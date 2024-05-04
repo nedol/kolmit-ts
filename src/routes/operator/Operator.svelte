@@ -262,9 +262,10 @@
     rtc.SetRemoteVideo = (src: string) => {
       // if ($call_but_status === 'talk') {
       // remote.video.poster = $posterst;
-      // remote.video.srcObject = src;
+      local.audio.paused = true;
+      remote.video.srcObject = src;
       remote.video.display = 'block';
-      // local.audio.paused = true;
+     
       // }
     };
   }
@@ -289,11 +290,12 @@
         $call_but_status = 'talk';
         clearInterval(inter);
         call_cnt = 10;
-        local.audio.paused = true;
-
+        // local.audio.paused = true;
+        // $muted = false;
         rtc.OnTalk();
         video_button_display = true;
         remote.text.display = 'none';
+
         // const dispatch = createEventDispatcher();
         // dispatch('talk');
         // const event = new Event('talk');
@@ -383,7 +385,7 @@
       // console.log('oper talk', data.operator);
 
       $call_but_status = 'talk';
-
+     
       video_button_display = true;
       remote.text.display = 'none';
     }

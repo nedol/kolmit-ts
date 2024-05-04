@@ -1,5 +1,8 @@
 <script lang="ts">
   import { onMount, onDestroy, getContext } from 'svelte';
+
+  import ConText from './Dialog.Context.svelte'
+
   // import BottomAppBar, { Section } from '@smui-extra/bottom-app-bar';
   import TopAppBar, { Row, Title, Section } from '@smui/top-app-bar';
   import Button, { Label } from '@smui/button';
@@ -531,7 +534,8 @@
         </div>
 
         {#if dialog_data.html}
-          <div class="html_data">{@html dialog_data.html[cur_html]}</div>
+          <ConText data={dialog_data}/>
+          <!-- <div class="html_data">{@html dialog_data.html[cur_html]}</div> -->
           <!-- <iframe srcdoc={dialog_data.html[cur_html]} class="html_data" width="100%" height="700vh"></iframe> -->
         {/if}
       {:else}
