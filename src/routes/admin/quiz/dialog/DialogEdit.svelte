@@ -65,14 +65,14 @@
 [Act as a language teaching methodologist]  
 [2 users read  $Context]
 ->[[Build users dialogue based in which the users asking each another something about $Context
-and answering following $Context.]
+and answering following $Context.]{10 phrazes from each user}
 {$Context: ${dialog_data.html}}   
 {Use the most commonly used phrases and words in colloquial speech and ${dialog_data_words}}
 {No repetition of lines and phrases from dlg_content in output. Ensure that the conversation flows naturally and smoothly.}
 {Topic=${name}}{Learning language:${$llang} }{ Learning language  level: ${data.level}}
 {participants: user1, user2}]*${num}
 ->[Literal translation to:${$llang} and ${$langs}]
-->[Build material designed webpage $Page based on the Context {don't use '\n'}]
+->[Build material designed webpage $Page based on the Context.]->{$Page should started <html>}{don't use '\n' or 'n'}]
 ->[Output]{output format:json}<output example: 
   <{
     html:$Page,
@@ -271,15 +271,17 @@ and answering following $Context.]
       .readText()
       .then((text) => {
         content = text;
+        const parsed = JSON.parse(text);
+        const parsed_html = JSON.parse(text).html;
         if (dialog_data && dialog_data.content)
           dialog_data.content = dialog_data.content.concat(
-            JSON.parse(content).content
+            parsed.content
           );
         else {
-          dialog_data = { content: JSON.parse(text) };
+          dialog_data = { content: parsed};
         }
-        if (dialog_data && JSON.parse(content).html) {
-          dialog_data.html[0] = JSON.parse(content).html;
+        if (dialog_data && parsed_html) {
+          dialog_data.html = parsed_html;
         }
       })
       .catch((err) => {

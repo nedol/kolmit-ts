@@ -641,7 +641,7 @@
     display: grid;
     position: relative;
     overflow-y: auto;
-    height: 70vh;
+    height: 60vh;
     margin: 0 auto;
     margin-top:10px;
     border: 0;
