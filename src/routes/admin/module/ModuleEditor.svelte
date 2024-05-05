@@ -61,7 +61,7 @@
   let levels: any = [];
   let module_input: any;
 
-  const quizes = ['', 'listen', 'text', 'dialog', 'word'];
+  const quizes = ['выбери quiz...', 'listen', 'dialog', 'word'];
 
   let containerWidth = '100%'; // Исходная ширина - 100% ширины родительского окна
   let containerHeight = '100vh';
@@ -652,8 +652,7 @@
   }
 
   .lesson-container {
-    /* height: 120vh; */
-
+    height: 90vh;
     overflow-y: auto;
     overflow-x: hidden;
     max-width: 100%;
@@ -699,7 +698,7 @@
 
   .add_theme {
     position: relative;
-    top:10px
+    top: 10px;
   }
 
   select {

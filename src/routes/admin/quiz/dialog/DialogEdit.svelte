@@ -72,7 +72,7 @@ and answering following $Context.]{10 phrazes from each user}
 {Topic=${name}}{Learning language:${$llang} }{ Learning language  level: ${data.level}}
 {participants: user1, user2}]*${num}
 ->[Literal translation to:${$llang} and ${$langs}]
-->[Build material designed webpage $Page based on the Context.]->{$Page should started <html>}{don't use '\n' or 'n'}]
+->[Build webpage $Page based on the Context.]->{Style $Page content for easier reading}{$Page should started <html>}{don't use '\n' or 'n'}]
 ->[Output]{output format:json}<output example: 
   <{
     html:$Page,

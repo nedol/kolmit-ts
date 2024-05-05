@@ -4,12 +4,12 @@
   import { Speak } from '/src/routes/speech/tts/VoiceRSS';
   import Tts from '/src/routes/speech/tts/Tts.svelte';
   import Stt from '/src/routes/speech/stt/Stt.svelte';
+
+  import ConText from './Dialog.Context.svelte';
+
   let stt, tts;
   import { onMount, onDestroy, getContext } from 'svelte';
-  import BottomAppBar, {
-    Section,
-    AutoAdjust,
-  } from '@smui-extra/bottom-app-bar';
+  import TopAppBar, { Row, Title, Section } from '@smui/top-app-bar';
   import IconButton, { Icon } from '@smui/icon-button';
   import Button, { Label } from '@smui/button';
   import {
@@ -166,6 +166,32 @@
 
 <!-- <EasySpeech bind:this={easyspeech}></EasySpeech> -->
 <Tts bind:this={tts}></Tts>
+<div class="top-app-bar-container flexor">
+  <TopAppBar bind:this={bottomAppBar} variant="fixed">
+    <Row>
+      <Section></Section>
+      <Section></Section>
+      <Section>
+        <div style={style_button} on:click={onChangeClick}>
+          <IconButton>
+            <Icon tag="svg" viewBox="0 0 24 24">
+              <path fill="currentColor" d={mdiAccountConvertOutline} />
+            </Icon>
+          </IconButton>
+        </div>
+      </Section>
+      <Section>
+        <div>
+          <button on:click={onClickQ} class="toggleButton">
+            <span class="material-symbols-outlined"> ? </span>
+          </button>
+        </div>
+      </Section>
+
+      <Section></Section>
+    </Row>
+  </TopAppBar>
+</div>
 
 <div class="container">
   {#if dc}
@@ -175,7 +201,7 @@
       </Button>
     </div>
   {/if}
- 
+
   <div class="card">
     <div class="title">{dict['Проконтролируй вопрос'][$langs]}:</div>
 
@@ -195,7 +221,9 @@
 
     <div class="tip">
       {#if data.user2['a_shfl'] && hint_visible}
-        <div class="mdc-typography--headline6">{@html data.user2['a_shfl']}</div>
+        <div class="mdc-typography--headline6">
+          {@html data.user2['a_shfl']}
+        </div>
       {/if}
     </div>
 
@@ -233,37 +261,26 @@
     </div>
 
     {#if data.html}
-      <div class="html_data">{@html data.html}</div>
+      <!-- <div class="html_data">{@html data.html}</div> -->
+      <ConText data={data}/>
     {/if}
-
-    <BottomAppBar bind:this={bottomAppBar}>
-      <Section></Section>
-      <Section></Section>
-      <Section>
-        <div style={style_button} on:click={onChangeClick}>
-          <IconButton>
-            <Icon tag="svg" viewBox="0 0 24 24">
-              <path fill="currentColor" d={mdiAccountConvertOutline} />
-            </Icon>
-          </IconButton>
-        </div>
-      </Section>
-      <Section>
-        <div>
-          <button on:click={onClickQ} class="toggleButton">
-            <span class="material-symbols-outlined"> ? </span>
-          </button>
-        </div>
-      </Section>
-
-      <Section></Section>
-    </BottomAppBar>
   </div>
 </div>
 
 <style>
+  .top-app-bar-container {
+    /* display: inline-block; */
+    position: relative;
+    top: 30px;
+    border: 1px solid
+      var(--mdc-theme-text-hint-on-background, rgba(0, 0, 0, 0.1));
+    margin: 0 18px 18px 0;
+    background-color: var(--mdc-theme-background, #fff);
+    /* overflow: auto; */
+  }
   .container {
-    /* top: -15vh; */
+    position: relative;
+    top: 10vh;
     display: flex;
     flex-direction: column;
     /* justify-content: center; */
@@ -354,11 +371,11 @@
   }
 
   .speaker-button {
-    position: absolute;
-    right: 0;
-    /* transform: translate(0%, -10%); */
+    position: relative;
     font-size: large;
     border-radius: 25px;
-    top: 116px;
+    top: -5px;
+    float: right;
+    right: 30px;
   }
 </style>
