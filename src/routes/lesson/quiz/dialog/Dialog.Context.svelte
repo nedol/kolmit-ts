@@ -67,12 +67,12 @@
   }
 </script>
 
-<main>
-  <Paper>
-    <Title></Title>
-    <Subtitle></Subtitle>
-    <Content>
-      <iframe srcdoc={data.html} class="html_data" width="100%" height="700vh"></iframe>
+<!-- <main> -->
+  <!-- <Paper> -->
+    <!-- <Title></Title>
+    <Subtitle></Subtitle> -->
+    <!-- <Content> -->
+      <iframe srcdoc={data.html} class="html_data" width="100%" height="100vh"></iframe>
  
       <!-- <div
         
@@ -81,9 +81,9 @@
       >
         {@html data.html}
       </div> -->
-    </Content>
-  </Paper>
-</main>
+    <!-- </Content> -->
+  <!-- </Paper> -->
+<!-- </main> -->
 
 <style>
   main {
@@ -112,7 +112,7 @@
     overflow-y: auto;
     height: 70vh;
     margin: 0 auto;
-    margin-top:10px;
+
     border: 0;
   }
 

@@ -586,8 +586,8 @@
 
   .speaker-button {
     position: absolute;
-    left: 75px;
-    bottom: 18px;
+    left: 83px;
+    bottom: 20px;
     color: black;
   }
 

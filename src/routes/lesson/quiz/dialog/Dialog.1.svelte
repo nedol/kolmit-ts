@@ -519,7 +519,7 @@
         </div>
 
         {#if showSpeakerButton}
-          <div class="speaker-button">
+          <div class="speaker-button" style="top:5px">
             <IconButton
               on:click={speak(dialog_data.content[cur_qa].user2[$llang])}
             >
@@ -530,8 +530,11 @@
           </div>
         {/if}
         <div class="user2_tr" style="visibility:{visibility[1]}">
-          {@html dialog_data.content[cur_qa].user2[$langs]}
+          {#await Translate(dialog_data.content[cur_qa].user2[$llang], $langs) then data}
+          {data}
+          {/await}
         </div>
+        <!-- <br> -->
 
         {#if dialog_data.html}
           <ConText data={dialog_data}/>
