@@ -588,7 +588,7 @@
     display: flex;
     position: relative;
     justify-content: start; /* Распределяет пространство между элементами равномерно */
-    width: 20px;
+    width: 65vw;
     left:20px; /* Сбрасываем выравнивание текста по умолчанию */
     height: 30px;
 

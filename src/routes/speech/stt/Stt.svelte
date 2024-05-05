@@ -6,6 +6,8 @@
 
   export let SttResult, StopListening, display_audio;
 
+  $: console.log(display_audio);
+
   let mediaRecorder,
     mediaStream,
     audioAnalyser,
@@ -186,10 +188,11 @@
 </script>
 
 <audio
+class="audio_stt"
   bind:this={audioPlayer}
   src={audioUrl}
   controls
-  style="display:{display_audio};width:65%"
+  style="display:{display_audio};width:65vw"
 ></audio>
 
 <!-- <button on:click={playAudio}>Воспроизвести</button> -->
