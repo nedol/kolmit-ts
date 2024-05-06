@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount, onDestroy, getContext } from 'svelte';
 
-  import ConText from './Dialog.Context.svelte'
+  import ConText from './Dialog.Context.svelte';
 
   // import BottomAppBar, { Section } from '@smui-extra/bottom-app-bar';
   import TopAppBar, { Row, Title, Section } from '@smui/top-app-bar';
@@ -93,6 +93,12 @@
 
   $: if ($msg_user) {
     console.log($msg_user);
+    if ($msg_user.command === 'repeat') {
+      isRepeat = true;
+      setTimeout(() => {
+        isRepeat = false;
+      }, 2000);
+    }
   }
 
   $: if ($msg_oper) {
@@ -375,7 +381,7 @@
 <!-- <VoiceRSS bind:this={voice}></VoiceRSS> -->
 <main>
   {#if isRepeat}
-    <div style="position: absolute;right:0">
+    <div class="repeat_but">
       <Button>
         <Label>{dict['Repeat'][$langs]}</Label>
       </Button>
@@ -457,7 +463,7 @@
       {#if q || a}
         <!-- <div class="cnt">{cur_qa + 1}</div> -->
 
-        {#await Translate('Translate this','en', $langs) then data}
+        {#await Translate('Translate this', 'en', $langs) then data}
           <div class="title">{data}:</div>
         {/await}
 
@@ -510,7 +516,7 @@
           ></Stt>
         </div>
 
-        {#await Translate('Check up the answer','en', $langs) then data}
+        {#await Translate('Check up the answer', 'en', $langs) then data}
           <div class="title">{data}:</div>
         {/await}
 
@@ -531,13 +537,13 @@
         {/if}
         <div class="user2_tr" style="visibility:{visibility[1]}">
           {#await Translate(dialog_data.content[cur_qa].user2[$llang], $langs) then data}
-          {data}
+            {data}
           {/await}
         </div>
         <!-- <br> -->
 
         {#if dialog_data.html}
-          <ConText data={dialog_data}/>
+          <ConText data={dialog_data} />
           <!-- <div class="html_data">{@html dialog_data.html[cur_html]}</div> -->
           <!-- <iframe srcdoc={dialog_data.html[cur_html]} class="html_data" width="100%" height="700vh"></iframe> -->
         {/if}
@@ -573,6 +579,12 @@
     transition: transform 0.5s;
     height: 90vh;
   }
+
+  .repeat_but{
+     position: absolute;
+    top: 85px;
+     right:0px
+  }
   .top-app-bar-container {
     /* display: inline-block; */
     position: relative;
@@ -589,9 +601,8 @@
     position: relative;
     justify-content: start; /* Распределяет пространство между элементами равномерно */
     width: 65vw;
-    left:20px; /* Сбрасываем выравнивание текста по умолчанию */
+    left: 20px; /* Сбрасываем выравнивание текста по умолчанию */
     height: 30px;
-
   }
 
   /* Если вы хотите добавить пространство между элементами, вы можете использовать margin */
@@ -634,7 +645,7 @@
     border-radius: 25px;
     top: -5px;
     float: right;
-    right:30px;
+    right: 30px;
   }
 
   .html_data {
@@ -643,7 +654,7 @@
     overflow-y: auto;
     height: 60vh;
     margin: 0 auto;
-    margin-top:10px;
+    margin-top: 10px;
     border: 0;
   }
 
