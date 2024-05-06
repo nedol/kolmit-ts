@@ -6,7 +6,6 @@
   import Tutor from '../../tutor/Tutor.svelte';
 
   import '$lib/css/Elevation.scss';
-  
 
   import ImageList, {
     Item,
@@ -120,7 +119,9 @@
         </Item>
       </div>
     {/each}
-    <div class="mdc-elevation--z{group.length} flexy-boy">
+  </div>
+  <div class="flexy-dad tutor">
+    <div class="mdc-elevation--z{1} flexy-boy">
       <Item style="text-align: center">
         <Tutor name="AI Tutor"></Tutor>
 
@@ -148,7 +149,15 @@
   .flexy-dad {
     display: flex;
     flex-wrap: wrap;
-    justify-content: center
+    justify-content: center;
+  }
+
+    .tutor {
+    position: absolute;
+    bottom: 50px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: start;
   }
 
   .flexy-boy {
@@ -157,6 +166,6 @@
     width: 90px;
     height: 100px;
     margin: 0 0px 0px 0;
-    scale: .8;
+    scale: 0.8;
   }
 </style>
