@@ -1,4 +1,4 @@
-<script>
+<script lang='ts'>
   import { onMount, onDestroy, getContext } from 'svelte';
   import md5 from 'md5';
   import RTCUser from './rtc/RTCUser';
@@ -15,7 +15,13 @@
   import { mdiAccountBox, mdiVolumeHigh } from '@mdi/js';
   import { muted } from '$lib/js/stores.js';
 
-  export let abonent, poster = '/assets/operator.svg', name, operator;
+  export let user_, group: [];
+  let  poster = user_.picture?user_.picture:'/assets/operator.svg';
+  let name = user_.name;
+  let operator = user_.operator;
+  let abonent = user_.abonent;
+
+  user_.display = 'none' //видимость в группе
 
   // const operator = getContext('operator')
 
@@ -24,8 +30,6 @@
   import { call_but_status } from '$lib/js/stores.js';
 
   import { click_call_func } from '$lib/js/stores.js';
-
-  import { users_status } from '$lib/js/stores.js';
 
   $click_call_func = null;
 
@@ -174,6 +178,7 @@
           if (status !== 'call') {
             status = 'active';
             // $call_but_status = 'active';
+            user_.display = 'block'
           }
         } else if (res['busy']) {
           // if ($click_call_func === null)
@@ -191,6 +196,7 @@
 
           //rtc.abonent = url.searchParams.get('abonent');
           status = 'inactive';
+          user_.display = 'none'
           // $call_but_status = 'inactive';
           $click_call_func = null; //operator -> OnClickCallButton
           parent_div.appendChild(card);
@@ -241,6 +247,7 @@
       if (data.operator === operator) {
         $call_but_status = 'talk';
         status = 'talk';
+        user_.display = 'block'
         video_button_display = true;
         local.audio.paused = true;
         $muted = false;
@@ -279,6 +286,7 @@
     switch (status) {
       case 'inactive':
         // status = 'wait';
+        user_.display = 'none'
         // Call();
         // remote.video.srcObject = null;
         break;
@@ -291,6 +299,7 @@
       case 'active':
         $click_call_func = OnClickCallButton;
         function call() {
+          user_.display = 'block'
           rtc.Call();
           status = 'call';
           $call_but_status = 'call';
@@ -306,6 +315,7 @@
         break;
       case 'call':
         status = 'inactive';
+        user_.display = 'none'
         $call_but_status = 'inactive';
 
         local.audio.paused = true;
@@ -319,6 +329,7 @@
         break;
       case 'talk':
         status = 'inactive';
+        user_.display = 'none'
         $call_but_status = 'inactive';
 
         local.video.display = 'none';
@@ -334,6 +345,7 @@
         break;
       case 'muted':
         status = 'inactive';
+        user_.display = 'none'
         // $call_but_status = 'inactive';
         video_button_display = 'none';
         $click_call_func = null; //operator -> OnClickCallButton
@@ -343,6 +355,7 @@
         // rtc.Call();
         if ($call_but_status === 'talk') {
           status = 'inactive';
+          user_.display = 'none'
           $call_but_status = 'inactive';
           rtc.OnInactive();
         }
@@ -364,6 +377,8 @@
   }
 </script>
 
+
+
 <VideoRemote
   {...remote.video}
   {name}
@@ -374,5 +389,7 @@
   bind:status
   on:click={OnClickCallButton}
 ></VideoRemote>
+
+
 
 <AudioLocal {...local.audio} bind:paused={local.audio.paused} />

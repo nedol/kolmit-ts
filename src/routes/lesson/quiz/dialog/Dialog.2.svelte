@@ -1,9 +1,11 @@
-<script>
-  import { langs } from '$lib/js/stores.js';
-  import { llang } from '$lib/js/stores.js';
+<script lang="ts">
+  import { dicts, langs, llang } from '$lib/js/stores.js';
+
   import { Speak } from '/src/routes/speech/tts/VoiceRSS';
   import Tts from '/src/routes/speech/tts/Tts.svelte';
   import Stt from '/src/routes/speech/stt/Stt.svelte';
+
+  import translate from 'translate';
 
   import ConText from './Dialog.Context.svelte';
 
@@ -48,7 +50,6 @@
     };
   }
 
-  import { dicts } from '$lib/js/stores.js';
   let dict = $dicts;
 
   import pkg from 'lodash';
@@ -159,6 +160,20 @@
       );
   }
 
+  async function Translate(text: string) {
+    try {
+      translate.from = $llang;
+
+      return (
+        ($dicts[text] && $dicts[text][$langs]) ||
+        (await translate(text.trim(), $langs))
+      );
+    } catch (error) {
+      console.error('Translation error:', error);
+      return text; // или другое подходящее значение по умолчанию
+    }
+  }
+
   onDestroy(() => {
     data = '';
   });
@@ -188,20 +203,20 @@
         </div>
       </Section>
 
-      <Section></Section>
+      <Section align="end">
+        {#if dc}
+          <div class="repeat_but">
+            <Button on:click={() => SendRepeat()} {variant}>
+              <Label>{dict['Repeat'][$langs]}</Label>
+            </Button>
+          </div>
+        {/if}
+      </Section>
     </Row>
   </TopAppBar>
 </div>
 
 <div class="container">
-  {#if dc}
-    <div class="repeat_but">
-      <Button on:click={() => SendRepeat()} {variant}>
-        <Label>{dict['Repeat'][$langs]}</Label>
-      </Button>
-    </div>
-  {/if}
-
   <div class="card">
     <div class="title">{dict['Проконтролируй вопрос'][$langs]}:</div>
 
@@ -211,11 +226,15 @@
       {/if}
     </div>
 
-    <div class="title">{dict['Переведи и ответь'][$langs]}:</div>
+    {#await Translate('Переведи и ответь', 'ru', $langs) then data}
+      <div class="title">{data}:</div>
+    {/await}
 
     <div class="user2">
       {#if data.user2}
-        <div class="mdc-typography--headline6">{@html data.user2[$langs]}</div>
+        {#await Translate(data.user2[$llang], $llang, $langs) then data}
+          <div class="mdc-typography--headline6">{data}</div>
+        {/await}
       {/if}
     </div>
 
@@ -261,8 +280,7 @@
     </div>
 
     {#if data.html}
-      <!-- <div class="html_data">{@html data.html}</div> -->
-      <ConText data={data}/>
+      <div class="html_data">{@html data.html}</div>
     {/if}
   </div>
 </div>
@@ -296,8 +314,8 @@
     position: absolute;
     right: 0;
     font-size: small;
-    right: -15px;
-    top: -30px;
+    right: 5px;
+
     z-index: 2;
   }
 

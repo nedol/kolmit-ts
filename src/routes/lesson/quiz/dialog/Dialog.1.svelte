@@ -457,7 +457,7 @@
       {#if q || a}
         <!-- <div class="cnt">{cur_qa + 1}</div> -->
 
-        {#await translate('Translate this', $langs) then data}
+        {#await Translate('Translate this','en', $langs) then data}
           <div class="title">{data}:</div>
         {/await}
 
@@ -510,7 +510,7 @@
           ></Stt>
         </div>
 
-        {#await translate('Check up the answer', $langs) then data}
+        {#await Translate('Check up the answer','en', $langs) then data}
           <div class="title">{data}:</div>
         {/await}
 

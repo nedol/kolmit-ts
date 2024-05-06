@@ -54,10 +54,10 @@
   $: if ($dc_oper_state === 'closed' || $dc_user_state === 'closed') {
   }
 
-  import { msg_user } from '$lib/js/stores.js';
-  $: if ($msg_user) {
-    OnMessage($msg_user, null);
-  }
+  // import { msg_user } from '$lib/js/stores.js';
+  // $: if ($msg_user) {
+    // OnMessage($msg_user, null);
+  // }
 
   import { msg_oper } from '$lib/js/stores.js';
   $: if ($msg_oper) {
@@ -262,7 +262,7 @@
     rtc.SetRemoteVideo = (src: string) => {
       // if ($call_but_status === 'talk') {
       // remote.video.poster = $posterst;
-      local.audio.paused = true;
+      // local.audio.paused = true;
       remote.video.srcObject = src;
       remote.video.display = 'block';
      
@@ -290,7 +290,7 @@
         $call_but_status = 'talk';
         clearInterval(inter);
         call_cnt = 10;
-        // local.audio.paused = true;
+        local.audio.paused = true;
         // $muted = false;
         rtc.OnTalk();
         video_button_display = true;
@@ -465,8 +465,8 @@
   <BottomAppBar slot="oper" variant="static" bind:this={bottomAppBar}>
     <Section>
       <div class="remote_div">
-        <div
-          style="position: relative; bottom:30px; scale:.8"
+        <div class="user_placeholder"
+          
           bind:this={$user_placeholder}
         ></div>
 
@@ -584,6 +584,12 @@
     z-index: 1;
   }
 
+  .user_placeholder{
+    position: relative; 
+    bottom:30px; 
+    scale:.8;
+    left:-20px;
+    }
   .speaker-button {
     position: absolute;
     left: 83px;

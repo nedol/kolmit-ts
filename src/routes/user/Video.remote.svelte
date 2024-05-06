@@ -49,8 +49,7 @@
           <video
             class="user_video_remote"
             bind:this={video_element}
-            on:click
-    
+            on:click    
             muted={$muted}
             {status}
             {poster}
@@ -72,7 +71,7 @@
     position: relative;
     scale: 1;
     top: 10px;
-    left: 0px;
+    left: 10px;
     height: 70px;
     width: 70px;
   }

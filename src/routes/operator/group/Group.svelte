@@ -89,35 +89,25 @@
 <!-- {@debug operator} -->
 <div class="deps_div">
   <div class="flexy-dad">
-    {#each group as user, i}
-      <br />
+    {#each group as user, i }
+      {#if user}
+        <br />
+        <div
+          class="mdc-elevation--z{i+1} flexy-boy"
+          style="display:{user.display}"
+          on:click={(ev) => {
+            OnClickUser({ user });
+          }}
+        >
+          <Item style="text-align: center">
+            <User {group} bind:user_={user} {OnClickUpload} />
 
-      <div
-        class="mdc-elevation--z{i + 1} flexy-boy"
-        on:click={(ev) => {
-          OnClickUser({ user });
-        }}
-      >
-        <Item style="text-align: center">
-          <!-- {@debug user} -->
-          <User
-            name={user.name}
-            operator={user.operator}
-            abonent={user.abonent}
-            poster={user.picture ? user.picture : '/assets/operator.svg'}
-            {OnClickUpload}
-          />
-          <!-- <Image
-              src={user.picture}
-              style="max-height:50px; max-width:max-content"
-              alt="Image {i + 1}"
-            /> -->
-
-          <Supporting>
-            <Label>{user.name}</Label>
-          </Supporting>
-        </Item>
-      </div>
+            <Supporting>
+              <Label>{user.name}</Label>
+            </Supporting>
+          </Item>
+        </div>
+      {/if}
     {/each}
   </div>
   <div class="flexy-dad tutor">
@@ -149,10 +139,10 @@
   .flexy-dad {
     display: flex;
     flex-wrap: wrap;
-    justify-content: center;
+    /* justify-content: center; */
   }
 
-    .tutor {
+  .tutor {
     position: absolute;
     bottom: 50px;
     display: flex;

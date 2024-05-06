@@ -86,7 +86,7 @@ export class RTCBase {
 
 			if (pc.con.iceConnectionState === 'disconnected') {
 				console.log(pc.pc_key + ' ICE state change event: disconnected', that);
-				pc.con.SendAnswer();
+				pc.SendAnswer();
 			}
 
 			if (pc.con.iceConnectionState === 'connected') {

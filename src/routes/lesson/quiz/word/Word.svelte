@@ -123,7 +123,7 @@
     });
   }
 
-  let bottomAppBar;
+  let topAppBar;
   let sentence_span;
 
   $: if (div_input) div_input.focus();
@@ -397,7 +397,7 @@
 {#if words}
   <main>
     <div class="top-app-bar-container flexor">
-      <TopAppBar bind:this={bottomAppBar} variant="fixed">
+      <TopAppBar bind:this={topAppBar} variant="fixed">
         <Row>
           <Section>
             <button class="hint-button" on:click={showHint}>
@@ -420,7 +420,7 @@
               >
             </button></Section
           >
-          <Section></Section>
+          <Section>   <div>{currentWordIndex + 1}/{words.length}</div></Section>
 
           <Section align="end">
             {#if showNextButton}
@@ -447,7 +447,7 @@
       {/if}
 
       {#if showSpeakerButton}
-        <div class="speaker-button">
+        <div class="speaker-button" >
           <IconButton on:click={onSpeach}>
             <Icon tag="svg" viewBox="0 0 24 24">
               <path fill="currentColor" d={mdiVolumeHigh} />
@@ -461,8 +461,6 @@
 				</button> -->
       {/if}
     </div>
-
-    <div>{currentWordIndex + 1}/{words.length}</div>
 
     <div class="input-container">
       {#if resultElement}
@@ -492,7 +490,7 @@
                 </Icon>
               </IconButton>
             </Header>
-            <Content style="line-height: 2.2;">
+            <Content style="line-height: 2.2; overflow-y:auto; height:70vh !important">
               {#each hints as hint}
                 <span class="hint_button" on:click={OnClickHint}>
                   {@html hint.original + '&nbsp;' + '&nbsp;'}
@@ -517,7 +515,7 @@
     position: relative;
     transform-style: preserve-3d;
     transition: transform 0.5s;
-    height: 90vh;
+    height: 80vh;
     margin-top: 30px;
   }
 
@@ -529,7 +527,7 @@
     color: grey;
     position: relative;
     text-align: center;
-    margin-top: 70px;
+    margin-top: 50px;
   }
 
   .hint_button {
@@ -574,18 +572,19 @@
 
   .speaker-button {
     position: absolute;
-    flex: auto;
-    top: 260px;
+    /* flex: auto; */
+    top: 210px;
     right: 30px;
     transform: translate(50%, 0%);
     font-size: large;
+    z-index: 1;
   }
 
   .input-container {
     position: relative;
     color: #2196f3;
-    width: 100%;
-    margin: 10px auto;
+    width: 90vw;
+    margin: 0 auto;
     display: grid; /* Добавлено свойство display: flex; */
     justify-items: center; /* Добавлено свойство align-items: center; */
   }
@@ -594,7 +593,7 @@
     position: relative;
     text-align: center;
     overflow-y: auto;
-    height: 54vh;
+    height: 70vh;
   }
 
   .input {

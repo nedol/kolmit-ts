@@ -89,7 +89,7 @@
 <style>
   .card-container {
     position: relative;
-    left: 0px;
+    left: -8px;
     scale: 0.8;
     bottom: 20px;
   }
