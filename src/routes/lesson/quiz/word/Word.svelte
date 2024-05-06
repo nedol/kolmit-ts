@@ -515,7 +515,7 @@
     position: relative;
     transform-style: preserve-3d;
     transition: transform 0.5s;
-    height: 90vh;
+    height: 80vh;
     margin-top: 100px;
   }
 
