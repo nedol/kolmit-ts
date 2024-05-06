@@ -503,7 +503,7 @@
         </Accordion>
       {/if}
     </div>
-    <div style="height:100px"></div>
+
   </main>
 {/if}
 
