@@ -1,5 +1,7 @@
 <script>
   import { onMount, onDestroy, getContext } from 'svelte';
+  import TopAppBar, { Row, Title, Section } from '@smui/top-app-bar';
+
   import { llang } from '$lib/js/stores.js';
   // import words from './80.json';
   import translate from 'translate';
@@ -13,10 +15,6 @@
   import RV from '../../../speech/tts/RV.svelte';
   let voice;
 
-  import BottomAppBar, {
-    Section,
-    AutoAdjust,
-  } from '@smui-extra/bottom-app-bar';
   import Accordion, { Panel, Header, Content } from '@smui-extra/accordion';
   import IconButton, { Icon } from '@smui/icon-button';
   import {
@@ -132,10 +130,15 @@
 
   function replaceWordWithInput(sentence, word) {
     // Вычисляем количество совпадающих символов
+    const lastDotIndex = sentence.lastIndexOf('.');
+    if (lastDotIndex !== -1) {
+      sentence = sentence.slice(0, lastDotIndex) + sentence.slice(lastDotIndex + 1);
+    }
 
     word = word.replace(/\b(?:the |a |an |het |de )\b/gi, '').trim();
     const wordLength = word.length;
     const matches = (sentence.match(new RegExp(word, 'i')) || []).length;
+
     const matchPercentage = (matches / wordLength) * 100;
 
     // Если процент совпадения больше или равен 90%, заменяем слово на <input>
@@ -379,63 +382,66 @@
 
 <RV bind:this={voice}></RV>
 
-<main>
-  {#if !words[0]}
-    <div style="text-align:center">
-      <span
-        class="material-symbols-outlined"
-        style="font-size: 20px; color: blue; scale:1.5;"
-      >
-        <CircularProgress style="height: 50px; width: 50px;" indeterminate />
-      </span>
-    </div>
-  {/if}
+{#if !words[0]}
+  <div style="text-align:center">
+    <span
+      class="material-symbols-outlined"
+      style="font-size: 20px; color: blue; scale:1.5;"
+    >
+      <CircularProgress style="height: 50px; width: 50px;" indeterminate />
+    </span>
+  </div>
+{/if}
 
-  {#if words}
-    <div style="position:relative;float:left">
-      <!-- <IconButton class="material-icons"  on:click={showHint}>
-				<Icon tag="svg" viewBox="0 0 24 24">
-					<path fill="currentColor" d={mdiHelp} />
-				</Icon>
-			</IconButton> -->
-
-      <button class="hint-button" on:click={showHint}>
-        <span class="material-symbols-outlined"> ? </span>
-        <!-- <IconButton class="material-icons" on:click={showHint}>
+{#if words}
+  <div class="top-app-bar-container flexor">
+    <TopAppBar bind:this={bottomAppBar} variant="fixed">
+      <Row>
+        <Section>
+          <button class="hint-button" on:click={showHint}>
+            <span class="material-symbols-outlined"> ? </span>
+            <!-- <IconButton class="material-icons" on:click={showHint}>
 					<Icon tag="svg" viewBox="0 0 24 24">
 						<path fill="currentColor" d={mdiHelp} />
 					</Icon>
 				</IconButton> -->
-      </button>
-
-      <!-- <button on:click={jumpNext10} class="next10-button">+10</button> -->
-      <button on:click={onPrev} class="prev-button">-1</button>
-      <button on:click={onShuffleWords} class="shuffle-button">
-        <i class="material-symbols-outlined" style="font-size: 15px;  scale:1.5"
-          >shuffle</i
+          </button></Section
         >
-      </button>
+        <Section
+          ><button on:click={onPrev} class="prev-button">-1</button></Section
+        >
+        <Section>
+          <button on:click={onShuffleWords} class="shuffle-button">
+            <i
+              class="material-symbols-outlined"
+              style="font-size: 15px;  scale:1.5">shuffle</i
+            >
+          </button></Section
+        >
+        <Section></Section>
 
-      <div style="position:relative;float:right">
-        {#if showNextButton}
-          <button on:click={nextWord} class="next-button"
-            >{dict['Дальше'][$langs]}</button
-          >
-        {:else}
-          <button on:click={checkInput} class="check-button"
-            >{dict['Проверить'][$langs]}</button
-          >
-        {/if}
-      </div>
-    </div>
-
+        <Section align="end">
+          {#if showNextButton}
+            <button on:click={nextWord} class="next-button"
+              >{dict['Дальше'][$langs]}</button
+            >
+          {:else}
+            <button on:click={checkInput} class="check-button"
+              >{dict['Проверить'][$langs]}</button
+            >
+          {/if}</Section
+        >
+      </Row>
+    </TopAppBar>
+  </div>
+  <main>
     {#await translate('Write translation', $langs) then data}
       <div class="title">{data}:</div>
     {/await}
 
     <div class="word">
       {#if example}
-        <span class="mdc-typography--headline5">{example}</span>
+        <span class="mdc-typography--headline6">{example}</span>
       {/if}
 
       {#if showSpeakerButton}
@@ -496,23 +502,26 @@
       {/if}
     </div>
     <div style="height:100px"></div>
-
-    <!-- {/if} -->
-  {/if}
-</main>
+  </main>
+{/if}
 
 <style>
   main {
     display: inline-grid;
-    background-color: #fff;
+    /* background-color: #fff; */
     transition: transform 0.3s ease-in-out;
-    width: 98%;
+    /* width: 98%; */
     margin: 0 auto;
     position: relative;
     transform-style: preserve-3d;
     transition: transform 0.5s;
     height: 90vh;
-    margin-top: 40px;
+    margin-top: 100px;
+  }
+
+  .flexor {
+    position: relative;
+    top: 30px;
   }
   .title {
     color: grey;
@@ -572,6 +581,7 @@
 
   .input-container {
     position: relative;
+    color: #2196f3;
     width: 100%;
     margin: 10px auto;
     display: grid; /* Добавлено свойство display: flex; */
@@ -606,7 +616,7 @@
   .prev-button,
   .check-button,
   .next-button {
-    margin-top: 10px;
+    /* margin-top: 10px; */
     padding: 8px 10px;
     font-size: 16px;
     font-weight: 500;
