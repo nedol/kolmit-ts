@@ -132,7 +132,8 @@
     // Вычисляем количество совпадающих символов
     const lastDotIndex = sentence.lastIndexOf('.');
     if (lastDotIndex !== -1) {
-      sentence = sentence.slice(0, lastDotIndex) + sentence.slice(lastDotIndex + 1);
+      sentence =
+        sentence.slice(0, lastDotIndex) + sentence.slice(lastDotIndex + 1);
     }
 
     word = word.replace(/\b(?:the |a |an |het |de )\b/gi, '').trim();
@@ -394,47 +395,48 @@
 {/if}
 
 {#if words}
-  <div class="top-app-bar-container flexor">
-    <TopAppBar bind:this={bottomAppBar} variant="fixed">
-      <Row>
-        <Section>
-          <button class="hint-button" on:click={showHint}>
-            <span class="material-symbols-outlined"> ? </span>
-            <!-- <IconButton class="material-icons" on:click={showHint}>
+  <main>
+    <div class="top-app-bar-container flexor">
+      <TopAppBar bind:this={bottomAppBar} variant="fixed">
+        <Row>
+          <Section>
+            <button class="hint-button" on:click={showHint}>
+              <span class="material-symbols-outlined"> ? </span>
+              <!-- <IconButton class="material-icons" on:click={showHint}>
 					<Icon tag="svg" viewBox="0 0 24 24">
 						<path fill="currentColor" d={mdiHelp} />
 					</Icon>
 				</IconButton> -->
-          </button></Section
-        >
-        <Section
-          ><button on:click={onPrev} class="prev-button">-1</button></Section
-        >
-        <Section>
-          <button on:click={onShuffleWords} class="shuffle-button">
-            <i
-              class="material-symbols-outlined"
-              style="font-size: 15px;  scale:1.5">shuffle</i
-            >
-          </button></Section
-        >
-        <Section></Section>
+            </button></Section
+          >
+          <Section
+            ><button on:click={onPrev} class="prev-button">-1</button></Section
+          >
+          <Section>
+            <button on:click={onShuffleWords} class="shuffle-button">
+              <i
+                class="material-symbols-outlined"
+                style="font-size: 15px;  scale:1.5">shuffle</i
+              >
+            </button></Section
+          >
+          <Section></Section>
 
-        <Section align="end">
-          {#if showNextButton}
-            <button on:click={nextWord} class="next-button"
-              >{dict['Дальше'][$langs]}</button
-            >
-          {:else}
-            <button on:click={checkInput} class="check-button"
-              >{dict['Проверить'][$langs]}</button
-            >
-          {/if}</Section
-        >
-      </Row>
-    </TopAppBar>
-  </div>
-  <main>
+          <Section align="end">
+            {#if showNextButton}
+              <button on:click={nextWord} class="next-button"
+                >{dict['Дальше'][$langs]}</button
+              >
+            {:else}
+              <button on:click={checkInput} class="check-button"
+                >{dict['Проверить'][$langs]}</button
+              >
+            {/if}</Section
+          >
+        </Row>
+      </TopAppBar>
+    </div>
+
     {#await translate('Write translation', $langs) then data}
       <div class="title">{data}:</div>
     {/await}
@@ -515,19 +517,19 @@
     position: relative;
     transform-style: preserve-3d;
     transition: transform 0.5s;
-    height: 80vh;
-    margin-top: 100px;
+    height: 90vh;
+    margin-top: 30px;
   }
 
   .flexor {
     position: relative;
-    top: 30px;
+    /* top: 30px; */
   }
   .title {
     color: grey;
     position: relative;
     text-align: center;
-    margin-top: 10px;
+    margin-top: 70px;
   }
 
   .hint_button {
