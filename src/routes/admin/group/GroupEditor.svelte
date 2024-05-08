@@ -9,7 +9,6 @@
 
   import Textfield from '@smui/textfield';
 
-
   import ImageList, {
     Item,
     ImageAspectContainer,
@@ -57,7 +56,9 @@
     name = user.operator.name;
     operator = user.operator.operator;
     email = user.operator.email;
-    picture = user.operator.picture ? user.operator.picture : '/assets/operator.svg';
+    picture = user.operator.picture
+      ? user.operator.picture
+      : '/assets/operator.svg';
     user_lang = user.operator.lang;
   }
 
@@ -78,7 +79,7 @@
       role: 'operator',
       class_name: class_name,
       name: name,
-      email:email,
+      email: email,
       operator: operator,
       abonent: abonent,
       lang: user_lang,
@@ -150,13 +151,13 @@
     card_display = '';
   }
 
-  async function Translate(text: string) {
+  async function Translate(text: string, from_lang: string, to_lang: string) {
     try {
-      translate.from = $llang;
+      translate.from = from_lang;
 
       return (
         ($dicts[text] && $dicts[text][$langs]) ||
-        (await translate(text.trim(), $langs))
+        (await translate(text.trim(), to_lang))
       );
     } catch (error) {
       console.error('Translation error:', error);
@@ -179,7 +180,7 @@
                   <div style="display:inline-flex">
                     <div style="display:block;">
                       <Content>
-                        {#await Translate('Language', $langs) then data}
+                        {#await Translate('Language', 'en', $langs) then data}
                           <Textfield
                             class="shaped-filled"
                             variant="filled"
@@ -189,7 +190,7 @@
                         {/await}
                       </Content>
                       <Content>
-                        {#await Translate('Name', $langs) then data}
+                        {#await Translate('Name', 'en', $langs) then data}
                           <Textfield
                             class="shaped-filled"
                             variant="filled"
@@ -237,14 +238,13 @@
               </div>
             {:else}
               <button class="save" on:click={saveClassData}>
-                {#await Translate('Save', $langs) then data}
+                {#await Translate('Save', 'en', $langs) then data}
                   {data}
                 {/await}
               </button>
 
               <div class="deps_div">
                 <div class="flexy-dad">
-                  <!-- {@debug data} -->
                   {#each data.operators as operator, i}
                     {#if operator.group === item.name}
                       <div
@@ -263,7 +263,7 @@
                             />
                           {:else}
                             <Image
-                              src='/assets/operator.svg'
+                              src="/assets/operator.svg"
                               style="width:50px"
                               alt="Image {i + 1}"
                             />

@@ -137,6 +137,9 @@
         return;
       }
 
+      console.log(lesson_data.data)
+      // return;
+
       const response = await fetch(`/admin`, {
         method: 'POST',
         body: JSON.stringify({
@@ -166,7 +169,7 @@
 
     lesson_data.data.llang = lesson_data.lang.trim();
     lesson_data.data.level = level;
-    lesson_data.data.name = quiz.name;
+    lesson_data.data.name = quiz.name[$llang];
     // data.theme = ev.currentTarget.attributes['theme'].value;
     // data.words = find(lesson_data.module.themes, {
     // 	name: ev.currentTarget.attributes['theme_name'].value
@@ -442,23 +445,24 @@
                   <!-- <Textfield bind:value={theme.name[$langs]} style="width: 368px;">
 									<HelperText slot="helper">Helper Text</HelperText>
 								</Textfield> -->
-
+                {#await Translate("Input Theme Name",'en',$langs) then data}
                   <input
-                    placeholder="Input Theme Name"
-                    :use={theme.name
-                      ? theme.name
+                    placeholder={data}
+                    :use={theme.name[$llang]
+                      ? theme.name[$llang]
                       : ((ev) => {
                           OnThemeNameInput(theme);
                         })()}
-                    bind:value={theme.name}
+                    bind:value={theme.name[$llang]}
                     style="font-weight: bold; width:90%"
                   />
+                  {/await}
                   <div class="rem_theme">
                     {#await Translate('Remove theme', 'en', $langs) then data}
                       <IconButton
                         class="material-icons"
                         title={data}
-                        name={theme.name}
+                        name={theme.name[$llang]}
                         on:click={OnRemoveItem}>remove</IconButton
                       >
                     {/await}
@@ -481,7 +485,7 @@
                                 );
                               }}
                               type={quiz.type}
-                              name={quiz.name}
+                              name={quiz.name[$llang]}
                               level={lesson_data.data.module.level}
                               highlight={quiz.highlight || ''}
                             >
@@ -542,8 +546,8 @@
                                 {t}
                                 name={quiz.name}
                                 theme={theme.num}
-                                theme_name={theme.name[$langs]}
-                                bind:value={quiz.name}
+                                theme_name={theme.name[$llang]}
+                                bind:value={quiz.name[$llang]}
                               />
                             {:else}
                               <input
@@ -553,15 +557,15 @@
                                 name={quiz.name}
                                 level={lesson_data.data.level}
                                 theme={theme.num}
-                                theme_name={theme.name[$langs]}
-                                bind:value={quiz.name}
+                                theme_name={theme.name[$llang]}
+                                bind:value={quiz.name[$llang]}
                               />
                             {/if}
 
                             {#if quiz.type === 'quiz'}
                               <select
                                 on:change={OnSelectQuiztype}
-                                name={quiz.name}
+                                name={quiz.name[$llang]}
                               >
                                 {#each quizes as quizOption}
                                   <option value={quizOption}
@@ -576,7 +580,7 @@
                                 <IconButton
                                   class="material-icons"
                                   title={data}
-                                  name={quiz.name}
+                                  name={quiz.name[$llang]}
                                   on:click={OnRemoveItem}>remove</IconButton
                                 >
                               {/await}
@@ -590,7 +594,7 @@
                         <IconButton
                           class="material-icons"
                           title={data}
-                          name={theme.name}
+                          name={theme.name[$llang]}
                           on:click={OnAddQuiz}>add</IconButton
                         >
                       {/await}
@@ -718,6 +722,9 @@
     outline: none;
   }
 
+  ::placeholder{
+    font-weight: 400;
+  }
   div:focus,
   input:focus {
     /* background: lightcyan; */

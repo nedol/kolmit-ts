@@ -146,7 +146,7 @@ export async function UpdateDialog(q) {
   try {
     let res = await sql`INSERT INTO dialogs
 			(name , dialog, owner, html)
-			VALUES(${q.new_name},${q.data},${q.owner},${q.data.html} )
+			VALUES(${q.new_name},${q.data},${q.owner},${q.data.html || ''} )
 			ON CONFLICT (name, owner)
 			DO UPDATE SET
 			name = EXCLUDED.name,

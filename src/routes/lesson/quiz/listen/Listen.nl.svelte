@@ -260,7 +260,8 @@
     return result.trim();
   }
 
-  function generate() {
+  function Generate() {
+    console.log()
     if (name === 'time') {
       generateTime();
     } else if (name === 'numbers') {
@@ -342,7 +343,7 @@
       inputStyle = isCorrect ? 'color: green;' : 'color: red; ';
       setTimeout(() => {
         userContent = '';
-        generate();
+        Generate();
       }, 1000);
 
       // nextWord();
@@ -501,7 +502,7 @@
       <p>{dict['Послушай и напиши'][$langs]}:</p>
 
       {#if !isFirst}
-        <button on:click={generate}>{dict['Старт'][$langs]}</button>
+        <button on:click={Generate}>{dict['Старт'][$langs]}</button>
       {:else}
         <button on:click={repeat}>{dict['Повторить'][$langs]}</button>
         <button on:click={checkInput}>{dict['Проверить'][$langs]}</button>

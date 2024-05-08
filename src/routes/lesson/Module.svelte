@@ -70,7 +70,7 @@
     data = $lesson.data;
   }
 
-  let level;
+  let module;
 
   export let data;
   let panel_disabled = true;
@@ -146,7 +146,7 @@
 
     const lessonData = await fetchLesson(operator.abonent);
     lesson_data = lessonData.data;
-    level = lesson_data.module;
+    module = lesson_data.module;
 
     translate.from = lesson_data.lang;
     translate.engine = 'google';
@@ -155,17 +155,18 @@
   onDestroy(() => {
     data = '';
     lesson_data = '';
-    level = '';
+    module = '';
     quiz_users = '';
   });
 
   function onClickQuiz(type, level, theme, name) {
     try {
       data.theme = theme;
-      data.llang = lesson_data.lang;
+      data.name = name;
+      data.llang = $llang;
       data.level = level;
       data.quiz = type;
-      data.name = name;
+      
 
       // if (ev.currentTarget.attributes['highlight'])
       //   data.highlight = ev.currentTarget.attributes['highlight'].value;
@@ -266,33 +267,33 @@
 
   async function OnThemeNameInput(theme) {
     theme.name = await Translate(theme.name, $llang, $langs);
-    level = level;
+    module = module;
   }
 </script>
 
 <main>
   {#if data.quiz}
     <Quiz {data} />
-  {:else if level}
+  {:else if module}
     <div class="lesson-container">
       <div class="module_level">
-        <div class="mdc-typography--caption">{level.level}</div>
+        <div class="mdc-typography--caption">{module.level}</div>
       </div>
 
-      {#each level.themes as theme, t}
+      {#each module.themes as theme, t}
         <br />
         <div class="accordion-container">
           <Accordion multiple>
             <Panel class="panel" disabled={disabled[parseInt(t)]}>
-              {#await Translate(theme.name, $llang, $langs) then data}
+              {#await Translate(theme.name[$llang], $llang, $langs) then data}
                 <Header
-                  :use={theme.name
-                    ? theme.name
+                  :use={theme.name[$llang]
+                    ? theme.name[$llang]
                     : (() => {
                         OnThemeNameInput(theme);
                       })()}
                   ><div class="mdc-typography--subtitle2">
-                    {theme.name}<br /><small>({data})</small>
+                    {theme.name[$llang]}<br /><small>({data})</small>
                   </div></Header
                 >{/await}
               <Content>
@@ -302,11 +303,11 @@
                     {#if lesson.quizes}
                       {#each lesson.quizes as quiz}
                         <!-- {@debug quiz} -->
-                        {#if quiz.name}
+                        {#if quiz.name[$llang]}
                           <div
                             class="quiz-container mdc-typography--caption"
                             use:AddCheck
-                            name={quiz.name}
+                            name={quiz.name[$llang]}
                           >
                             {#if quiz.type === 'dialog'}
                               <Icon
@@ -353,28 +354,28 @@
                               on:click={() => {
                                 onClickQuiz(
                                   quiz.type,
-                                  level.level,
-                                  theme.name,
-                                  quiz.name
+                                  module.level,
+                                  theme.name[$llang],
+                                  quiz.name[$llang]
                                 );
                               }}
                               style="width:100%"
                               {t}
                               type={quiz.type}
-                              name={quiz.name}
-                              level={level.level}
-                              theme={theme.name}
+                              name={quiz.name[$llang]}
+                              level={module.level}
+                              theme={theme.name[$llang]}
                               title={quiz.title}
                               highlight={quiz.highlight || ''}
-                              >{quiz.name}
+                              >{quiz.name[$llang]}
                             </a><span />
                             {#if quiz.type === 'dialog'}
                               <div class="form-field-container">
                                 <FormField>
                                   <Checkbox
                                     on:click={OnCheck}
-                                    name={quiz.name}
-                                    bind:checked={checked[quiz.name]}
+                                    name={quiz.name[$llang]}
+                                    bind:checked={checked[quiz.name[$llang]]}
                                     touch
                                   ></Checkbox>
                                 </FormField>
@@ -382,20 +383,20 @@
                             {/if}
                           </div>
 
-                          {#if quiz_users[quiz.name] && quiz_users[quiz.name].length > 0}
+                          {#if quiz_users[quiz.name[$llang]] && quiz_users[quiz.name[$llang]].length > 0}
                             <!-- {@debug quiz_users} -->
                             <div class="user-cards">
-                              {#each quiz_users[quiz.name] as qu, q}
+                              {#each quiz_users[quiz.name[$llang]] as qu, q}
                                 {#if qu.operator !== operator.operator}
                                   <div
                                     on:click={OnClickUserCard}
                                     operator={qu.operator}
                                     {t}
                                     type={quiz.type}
-                                    name={quiz.name}
-                                    level={level.level}
+                                    name={quiz.name[$llang]}
+                                    level={module.level}
                                     theme={theme.num}
-                                    theme_name={theme.name}
+                                    theme_name={theme.name[$llang]}
                                   >
                                     <Card
                                       style="width:30px;  margin-right:15px"

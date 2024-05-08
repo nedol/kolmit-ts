@@ -33,7 +33,7 @@
 
   import RecordedVideo from './RecordedVideo.svelte';
 
-  import Lesson from '../lesson/Lesson.svelte';
+  import Module from '../lesson/Module.svelte';
 
   import Chat from '../chatGPT/Сhat.svelte';
 
@@ -564,7 +564,7 @@
 {#if $view === 'group'}
   <Group />
 {:else if $view === 'lesson'}
-  <Lesson data={group} />
+  <Module data={group} />
 {:else if $view === 'chat'}
   <Chat></Chat>
 {/if}

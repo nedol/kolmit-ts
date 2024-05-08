@@ -1,6 +1,10 @@
 <script lang="ts">
   import { onMount, onDestroy, getContext } from 'svelte';
-  import BottomAppBar, { Section } from '@smui-extra/bottom-app-bar';
+
+  import ConText from './Dialog.Context.svelte';
+
+  // import BottomAppBar, { Section } from '@smui-extra/bottom-app-bar';
+  import TopAppBar, { Row, Title, Section } from '@smui/top-app-bar';
   import Button, { Label } from '@smui/button';
   import translate from 'translate';
 
@@ -89,6 +93,12 @@
 
   $: if ($msg_user) {
     console.log($msg_user);
+    if ($msg_user.command === 'repeat') {
+      isRepeat = true;
+      setTimeout(() => {
+        isRepeat = false;
+      }, 2000);
+    }
   }
 
   $: if ($msg_oper) {
@@ -152,7 +162,7 @@
   async function init() {
     function splitHtmlContent(inputString) {
       // Регулярное выражение для поиска содержимого внутри тегов <html>...</html>
-      const regex = /<html>(.*?)<\/html>/gs;
+      const regex = /<(?:!DOCTYPE html|html(?:\s[^>]*)?)>(.*?)<\/html>/gs;
 
       // Используем matchAll для поиска всех совпадений в строке
       const matches = inputString.matchAll(regex);
@@ -371,7 +381,7 @@
 <!-- <VoiceRSS bind:this={voice}></VoiceRSS> -->
 <main>
   {#if isRepeat}
-    <div style="position: absolute;right:0">
+    <div class="repeat_but">
       <Button>
         <Label>{dict['Repeat'][$langs]}</Label>
       </Button>
@@ -379,14 +389,81 @@
   {/if}
 
   {#if data.quiz == 'dialog'}
+    <div class="top-app-bar-container flexor">
+      <TopAppBar bind:this={bottomAppBar} variant="fixed">
+        <Row>
+          <Section>
+            {#if cur_qa > 0}
+              <Icon
+                tag="svg"
+                on:click={onBackQA}
+                viewBox="0 0 24 24"
+                style="margin-top:0px; scale:.5;width:50px"
+              >
+                <path fill="white" d={mdiArrowLeft} />
+              </Icon>
+            {:else}
+              <Icon
+                tag="svg"
+                on:click={onBackQA}
+                viewBox="0 0 24 24"
+                style="visibility:hidden;margin-top:0px; scale:.5;width:50px"
+              >
+                <path fill="" d={mdiArrowLeft} />
+              </Icon>
+            {/if}
+          </Section>
+          <Section>
+            {#if share_button && $call_but_status === 'talk'}
+              <div class={share_button_class} on:click={onShare}>
+                <IconButton>
+                  <Icon tag="svg" viewBox="0 0 24 24">
+                    <path fill="currentColor" d={mdiShareVariant} />
+                  </Icon>
+                </IconButton>
+              </div>
+            {/if}
+          </Section>
+
+          <Section>
+            <div class="flip_button" on:click={onChangeClick}>
+              <IconButton>
+                <Icon tag="svg" viewBox="0 0 24 24">
+                  <path fill="currentColor" d={mdiAccountConvertOutline} />
+                </Icon>
+              </IconButton>
+            </div>
+          </Section>
+          <Section>
+            <div class="counter">
+              <p><span class="mdc-typography--overline">{cur_qa + 1}</span></p>
+            </div>
+          </Section>
+          <Section>
+            <button on:click={onClickQ} class="toggleButton">
+              <span class="material-symbols-outlined"> ? </span>
+            </button>
+          </Section>
+
+          <Section align="end">
+            <Icon
+              tag="svg"
+              on:click={onNextQA}
+              viewBox="0 0 24 24"
+              style="margin-top:0px; scale:.5; width:50px"
+            >
+              <path fill="white" d={mdiArrowRight} />
+            </Icon>
+          </Section>
+        </Row>
+      </TopAppBar>
+    </div>
     <!-- Ваш контент для лицевой стороны -->
     <div class="card">
       {#if q || a}
         <!-- <div class="cnt">{cur_qa + 1}</div> -->
-        <div class="counter">
-          <p><span class="mdc-typography--overline">{cur_qa + 1}</span></p>
-        </div>
-        {#await translate('Translate this', $langs) then data}
+
+        {#await Translate('Translate this', 'en', $langs) then data}
           <div class="title">{data}:</div>
         {/await}
 
@@ -439,15 +516,16 @@
           ></Stt>
         </div>
 
-        {#await translate('Check up the answer', $langs) then data}
+        {#await Translate('Check up the answer', 'en', $langs) then data}
           <div class="title">{data}:</div>
         {/await}
 
         <div class="user2">
           {@html dialog_data.content[cur_qa].user2[$llang]}
         </div>
+
         {#if showSpeakerButton}
-          <div class="speaker-button">
+          <div class="speaker-button" style="top:5px">
             <IconButton
               on:click={speak(dialog_data.content[cur_qa].user2[$llang])}
             >
@@ -458,11 +536,16 @@
           </div>
         {/if}
         <div class="user2_tr" style="visibility:{visibility[1]}">
-          {@html dialog_data.content[cur_qa].user2[$langs]}
+          {#await Translate(dialog_data.content[cur_qa].user2[$llang], $langs) then data}
+            {data}
+          {/await}
         </div>
+        <!-- <br> -->
 
         {#if dialog_data.html}
-          <div class="html_data">{@html dialog_data.html[cur_html]}</div>
+          <ConText data={dialog_data} />
+          <!-- <div class="html_data">{@html dialog_data.html[cur_html]}</div> -->
+          <!-- <iframe srcdoc={dialog_data.html[cur_html]} class="html_data" width="100%" height="700vh"></iframe> -->
         {/if}
       {:else}
         <div style="text-align:center">
@@ -477,58 +560,6 @@
           </span>
         </div>
       {/if}
-
-      <BottomAppBar bind:this={bottomAppBar} variant="fixed">
-        <Section>
-          {#if cur_qa > 0}
-            <Icon
-              tag="svg"
-              on:click={onBackQA}
-              viewBox="0 0 24 24"
-              style="margin-top:0px"
-            >
-              <path fill="grey" d={mdiArrowLeft} />
-            </Icon>
-          {/if}
-        </Section>
-        <Section>
-          {#if share_button && $call_but_status === 'talk'}
-            <div class={share_button_class} on:click={onShare}>
-              <IconButton>
-                <Icon tag="svg" viewBox="0 0 24 24">
-                  <path fill="currentColor" d={mdiShareVariant} />
-                </Icon>
-              </IconButton>
-            </div>
-          {/if}
-        </Section>
-
-        <Section>
-          <div class="flip_button" on:click={onChangeClick}>
-            <IconButton>
-              <Icon tag="svg" viewBox="0 0 24 24">
-                <path fill="currentColor" d={mdiAccountConvertOutline} />
-              </Icon>
-            </IconButton>
-          </div>
-        </Section>
-        <Section>
-          <button on:click={onClickQ} class="toggleButton">
-            <span class="material-symbols-outlined"> ? </span>
-          </button>
-        </Section>
-
-        <Section>
-          <Icon
-            tag="svg"
-            on:click={onNextQA}
-            viewBox="0 0 24 24"
-            style="margin-top:0px"
-          >
-            <path fill="grey" d={mdiArrowRight} />
-          </Icon>
-        </Section>
-      </BottomAppBar>
     </div>
   {/if}
 
@@ -539,20 +570,38 @@
 
 <style>
   main {
-    /* background-color: #fff; */
+    overflow-y: clip;
     transition: transform 0.3s ease-in-out;
-    width: 92vw;
+    width: 100vw;
     margin: 0 auto;
     position: relative;
     transform-style: preserve-3d;
     transition: transform 0.5s;
     height: 90vh;
   }
+
+  .repeat_but{
+     position: absolute;
+    top: 85px;
+     right:0px
+  }
+  .top-app-bar-container {
+    /* display: inline-block; */
+    position: relative;
+    top: 30px;
+    border: 1px solid
+      var(--mdc-theme-text-hint-on-background, rgba(0, 0, 0, 0.1));
+    margin: 0 18px 18px 0;
+    background-color: var(--mdc-theme-background, #fff);
+    /* overflow: auto; */
+  }
+
   .margins {
     display: flex;
+    position: relative;
     justify-content: start; /* Распределяет пространство между элементами равномерно */
-    align-items: center; /* Центрирует элементы по вертикали */
-    text-align: left; /* Сбрасываем выравнивание текста по умолчанию */
+    width: 65vw;
+    left: 20px; /* Сбрасываем выравнивание текста по умолчанию */
     height: 30px;
   }
 
@@ -596,24 +645,28 @@
     border-radius: 25px;
     top: -5px;
     float: right;
+    right: 30px;
   }
 
   .html_data {
+    display: grid;
     position: relative;
     overflow-y: auto;
-    height: 55vh;
+    height: 60vh;
+    margin: 0 auto;
     margin-top: 10px;
+    border: 0;
   }
 
   .counter {
-    position: absolute;
+    /* position: absolute; */
     background-color: #f0f0f0;
     padding: 0px;
     border-radius: 25px;
     width: 30px;
     height: 30px;
     top: -10px;
-    left: -20px;
+    left: -6px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     text-align: center;
   }
@@ -650,6 +703,7 @@
   }
 
   .user1 {
+    width: 100vw;
     text-align: center;
     line-height: normal;
     font-size: 1em;
@@ -717,7 +771,7 @@
   .card {
     transition: transform 0.3s ease-in-out;
     width: 100%;
-    top: 45px;
+    top: 85px;
     /* border: grey solid 1px; */
     border-radius: 5px;
     margin: 0 auto;
