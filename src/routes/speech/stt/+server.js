@@ -1,6 +1,12 @@
 import path from 'path';
 import { fileURLToPath } from 'url';
 
+import { pipeline } from '@xenova/transformers';
+
+// Allocate a pipeline for sentiment-analysis
+
+// [{'label': 'POSITIVE', 'score': 0.999817686}]
+
 import { HfInference } from '@huggingface/inference';
 const HF_TOKEN = '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';
 
@@ -26,30 +32,48 @@ export async function POST({ url, fetch, cookies, request }) {
   const blob = new Blob([nodeBuffer]);
   const arrayBuffer = await blob.arrayBuffer();
 
-//   let tr = await query(fileContent);
-//   try {
-//     tr = await inference.automaticSpeechRecognition({
-//       data: blob,
-//       model: 'Systran/faster-whisper-base',
-//       language: 'nl',
-//     });
-//   } catch (ex) {
-//     console.log(ex);
-	//   }
-	
-	
+  //   let tr = await query(fileContent);
+  //   try {
+  //     tr = await inference.automaticSpeechRecognition({
+  //       data: blob,
+  //       model: 'Systran/faster-whisper-base',
+  //       language: 'nl',
+  //     });
+  //   } catch (ex) {
+  //     console.log(ex);
+  //   }
 
-  let resp = await sendAudioToSpeechmaticks(buffer);
+  let resp = await query(buffer);
+  // console.log(JSON.stringify(resp));
+  resp = resp.text
 
   let response = new Response(JSON.stringify({ resp }));
   response.headers.append('Access-Control-Allow-Origin', `*`);
   return response;
+
+  // let resp = await sendAudioToSpeechmaticks(buffer);
 }
 
 async function query(data) {
-
   const response = await fetch(
-    'https://api-inference.huggingface.co/models/openai/whisper-large-v3',
+    // 'https://api-inference.huggingface.co/models/openai/whisper-large-v3',//English 5!
+    // 'https://api-inference.huggingface.co/models/hannatoenbreker/whisper-dutch', //0
+    // 'https://api-inference.huggingface.co/models/renesteeman/whisper-tiny-dutch',//3
+    // 'https://api-inference.huggingface.co/models/nithinholla/wav2vec2-large-xlsr-53-dutch',//3
+    // 'https://api-inference.huggingface.co/models/jonatasgrosman/wav2vec2-xls-r-1b-dutch',//0
+    // 'https://api-inference.huggingface.co/models/jonatasgrosman/wav2vec2-large-xlsr-53-dutch',//0
+    // 'https://api-inference.huggingface.co/models/simonsr/wav2vec2-large-xlsr-dutch',//1
+    // 'https://api-inference.huggingface.co/models/wietsedv/wav2vec2-large-xlsr-53-dutch',//2
+    // 'https://api-inference.huggingface.co/models/bartelds/wav2vec2-dutch-large-ft-cgn-3hrs',//0
+    // 'https://api-inference.huggingface.co/models/MehdiHosseiniMoghadam/wav2vec2-large-xlsr-53-Dutch',//2
+    // "https://api-inference.huggingface.co/models/Clementapa/wav2vec2-base-960h-phoneme-reco-dutch",//0
+    // 'https://api-inference.huggingface.co/models/hannatoenbreker/whisper-dutch-small-v2',//!!!русский 5!!!
+    // 'https://api-inference.huggingface.co/models/renesteeman/whisper-tiny-dutch',//3
+    // 'https://api-inference.huggingface.co/models/renesteeman/whisper-tiny-dutch-25',//3
+    // 'https://api-inference.huggingface.co/models/golesheed/whisper-non-native-children-0-dutch',//0
+    // 'https://api-inference.huggingface.co/models/golesheed/whisper-non-native-adult-6-dutch', //English 5!
+    'https://api-inference.huggingface.co/models/golesheed/whisper-9-dutch',// 5!!
+
     {
       headers: {
         Authorization: 'Bearer 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',
