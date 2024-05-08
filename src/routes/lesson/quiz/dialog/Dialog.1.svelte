@@ -135,9 +135,14 @@
     })();
   }
 
-  async function Translate(text: string, lang: string) {
+ async function Translate(text: string, from_lang: string, to_lang: string) {
     try {
-      return await await translate(text, lang);
+      translate.from = from_lang;
+
+      return (
+        ($dicts[text] && $dicts[text][$langs]) ||
+        (await translate(text.trim(), to_lang))
+      );
     } catch (error) {
       console.error('Translation error:', error);
       return text; // или другое подходящее значение по умолчанию
@@ -205,6 +210,9 @@
     }
     q = dialog_data.content[cur_qa].user1;
     q_shfl = q[$llang].slice(0);
+
+    speak(q[$llang]);
+
     let ar = q_shfl
       .toLowerCase()
       .replaceAll('?', '')
@@ -238,6 +246,8 @@
     stt_text = '';
     stt.CollectGarbage();
     showSpeakerButton = false;
+
+    // speak(q[$llang]) 
   }
 
   function onBackQA() {
@@ -462,21 +472,20 @@
     <div class="card">
       {#if q || a}
         <!-- <div class="cnt">{cur_qa + 1}</div> -->
-
-        {#await Translate('Translate this', 'en', $langs) then data}
+        {#await Translate('Answer it', 'en', $langs) then data}
           <div class="title">{data}:</div>
         {/await}
 
-        <div class="user1 mdc-typography--headline6">
-          {q[$langs]}
+        <div class="tip  mdc-typography--headline6">
+          {q[$llang]}
         </div>
 
         <div style="text-align: center;">
           <div
-            class="tip mdc-typography--headline6"
+            class="user1 mdc-typography--headline6"
             style="visibility:{visibility[1]}"
           >
-            {dialog_data.content[cur_qa].user1[$llang]}
+            {dialog_data.content[cur_qa].user1[$langs]}
           </div>
         </div>
 
@@ -497,24 +506,7 @@
           </span>
         </div>
 
-        <div class="margins" style="text-align: center;">
-          <IconButton
-            class="material-icons"
-            aria-label="Back"
-            on:click={onClickMicrophone}
-          >
-            <Icon tag="svg" viewBox="0 0 24 24">
-              {#if isListening}
-                <path fill="currentColor" d={mdiMicrophone} />
-              {:else}
-                <path fill="currentColor" d={mdiMicrophoneOutline} />
-              {/if}
-            </Icon>
-          </IconButton>
-
-          <Stt bind:this={stt} {SttResult} {StopListening} bind:display_audio
-          ></Stt>
-        </div>
+        <br>
 
         {#await Translate('Check up the answer', 'en', $langs) then data}
           <div class="title">{data}:</div>
@@ -536,11 +528,29 @@
           </div>
         {/if}
         <div class="user2_tr" style="visibility:{visibility[1]}">
-          {#await Translate(dialog_data.content[cur_qa].user2[$llang], $langs) then data}
+          {#await Translate(dialog_data.content[cur_qa].user2[$llang],$llang, $langs) then data}
             {data}
           {/await}
         </div>
-        <!-- <br> -->
+        
+        <div class="margins" style="text-align: center;">
+          <IconButton
+            class="material-icons"
+            aria-label="Back"
+            on:click={onClickMicrophone}
+          >
+            <Icon tag="svg" viewBox="0 0 24 24">
+              {#if isListening}
+                <path fill="currentColor" d={mdiMicrophone} />
+              {:else}
+                <path fill="currentColor" d={mdiMicrophoneOutline} />
+              {/if}
+            </Icon>
+          </IconButton>
+
+          <Stt bind:this={stt} {SttResult} {StopListening} bind:display_audio
+          ></Stt>
+        </div>
 
         {#if dialog_data.html}
           <ConText data={dialog_data} />

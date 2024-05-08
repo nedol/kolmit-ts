@@ -135,17 +135,19 @@
 		margin: 5px;
 		padding: 8px;
 		border-radius: 8px;
-		width: 80%;
+		
 	}
 
 	.userMessage.question {
+		width: 80%;
 		background-color: #cce5ff;
 		float: left;
 	}
 
 	.userMessage.answer {
+		width: 80%;
 		background-color: #e0e0e0;
-		margin-left: 60px;
+		/* margin-left: 60px; */
 		float: right;
 	}
 

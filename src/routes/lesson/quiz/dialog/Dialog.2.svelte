@@ -160,13 +160,13 @@
       );
   }
 
-  async function Translate(text: string) {
+ async function Translate(text: string, from_lang: string, to_lang: string) {
     try {
-      translate.from = $llang;
+      translate.from = from_lang;
 
       return (
         ($dicts[text] && $dicts[text][$langs]) ||
-        (await translate(text.trim(), $langs))
+        (await translate(text.trim(), to_lang))
       );
     } catch (error) {
       console.error('Translation error:', error);
@@ -219,7 +219,9 @@
 
 <div class="container">
   <div class="card">
-    <div class="title">{dict['Проконтролируй вопрос'][$langs]}:</div>
+    {#await Translate('Задай вопрос','ru', $langs) then data}
+    <div class="title">{data}:</div>
+    {/await}
 
     <div class="user1">
       {#if data.user1}
@@ -227,7 +229,7 @@
       {/if}
     </div>
 
-    {#await Translate('Переведи и ответь', 'ru', $langs) then data}
+    {#await Translate('Проконтролируй ответ', 'ru', $langs) then data}
       <div class="title">{data}:</div>
     {/await}
 
