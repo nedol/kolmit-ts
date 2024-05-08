@@ -97,6 +97,7 @@
     silenceTimer = '';
     checkLoop = false;
     clearTimeout(silenceTimer);
+    if(mediaRecorder.stop)
     mediaRecorder.stop();
   }
 

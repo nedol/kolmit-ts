@@ -135,7 +135,7 @@
     })();
   }
 
- async function Translate(text: string, from_lang: string, to_lang: string) {
+  async function Translate(text: string, from_lang: string, to_lang: string) {
     try {
       translate.from = from_lang;
 
@@ -247,7 +247,7 @@
     stt.CollectGarbage();
     showSpeakerButton = false;
 
-    // speak(q[$llang]) 
+    // speak(q[$llang])
   }
 
   function onBackQA() {
@@ -367,7 +367,70 @@
 
   function SttResult(text) {
     stt_text = text;
+
+
+
+    if (text &&
+      compareStrings(
+        dialog_data.content[cur_qa].user2[$llang].toLowerCase().trim().replace(/[^\w\s]|_/g, ""),
+        text.toLowerCase().trim().replace(/[^\w\s]|_/g, "")
+      )
+    ) {
+      onNextQA();
+    }
   }
+
+  function compareStrings(str1, str2) {
+    // Используем алгоритм Левенштейна для вычисления расстояния между строками
+    function levenshteinDistance(s, t) {
+        const d = []; // Массив для хранения результатов вычислений
+
+        // Заполняем массив нулями
+        for (let i = 0; i <= s.length; i++) {
+            d[i] = [i];
+        }
+        for (let j = 0; j <= t.length; j++) {
+            d[0][j] = j;
+        }
+
+        // Вычисляем расстояние Левенштейна
+        for (let j = 1; j <= t.length; j++) {
+            for (let i = 1; i <= s.length; i++) {
+                if (s.charAt(i - 1) === t.charAt(j - 1)) {
+                    d[i][j] = d[i - 1][j - 1];
+                } else {
+                    d[i][j] = Math.min(
+                        d[i - 1][j] + 1, // удаление
+                        d[i][j - 1] + 1, // вставка
+                        d[i - 1][j - 1] + 1 // замена
+                    );
+                }
+            }
+        }
+
+        // Расстояние Левенштейна между строками находится в d[s.length][t.length]
+        return d[s.length][t.length];
+    }
+
+    // Вычисляем длины строк
+    const len1 = str1.length;
+    const len2 = str2.length;
+
+    // Вычисляем максимальную длину строки из двух строк
+    const maxLength = Math.max(len1, len2);
+
+    // Вычисляем расстояние Левенштейна между строками
+    const distance = levenshteinDistance(str1, str2);
+
+    // Вычисляем процент совпадения
+    const similarity = (1 - distance / maxLength) * 100;
+
+     console.log('similarityPercentage',similarity)
+
+    // Возвращаем true, если процент совпадения больше 75, иначе false
+    return similarity > 75;
+}
+
 
   onMount(async () => {
     // style_button = style_button_non_shared;
@@ -476,7 +539,7 @@
           <div class="title">{data}:</div>
         {/await}
 
-        <div class="tip  mdc-typography--headline6">
+        <div class="tip mdc-typography--headline6">
           {q[$llang]}
         </div>
 
@@ -500,13 +563,8 @@
             </IconButton>
           </div>
         {/if}
-        <div style="text-align: center">
-          <span style="color: darkgreen;">
-            {@html stt_text}
-          </span>
-        </div>
 
-        <br>
+        <br />
 
         {#await Translate('Check up the answer', 'en', $langs) then data}
           <div class="title">{data}:</div>
@@ -514,6 +572,12 @@
 
         <div class="user2">
           {@html dialog_data.content[cur_qa].user2[$llang]}
+        </div>
+
+        <div style="text-align: center">
+          <span style="color: darkgreen;">
+            {@html stt_text}
+          </span>
         </div>
 
         {#if showSpeakerButton}
@@ -528,11 +592,11 @@
           </div>
         {/if}
         <div class="user2_tr" style="visibility:{visibility[1]}">
-          {#await Translate(dialog_data.content[cur_qa].user2[$llang],$llang, $langs) then data}
+          {#await Translate(dialog_data.content[cur_qa].user2[$llang], $llang, $langs) then data}
             {data}
           {/await}
         </div>
-        
+
         <div class="margins" style="text-align: center;">
           <IconButton
             class="material-icons"
@@ -590,10 +654,10 @@
     height: 90vh;
   }
 
-  .repeat_but{
-     position: absolute;
+  .repeat_but {
+    position: absolute;
     top: 85px;
-     right:0px
+    right: 0px;
   }
   .top-app-bar-container {
     /* display: inline-block; */
