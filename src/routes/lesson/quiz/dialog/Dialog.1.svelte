@@ -368,12 +368,10 @@
   function SttResult(text) {
     stt_text = text;
 
-
-
     if (text &&
       compareStrings(
         dialog_data.content[cur_qa].user2[$llang].toLowerCase().trim().replace(/[^\w\s]|_/g, ""),
-        text.toLowerCase().trim().replace(/[^\w\s]|_/g, "")
+        text.toLowerCase().trim().replace(/[^\w\s]|_/g, "") //replace(/[0-9!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~]/g, '')
       )
     ) {
       onNextQA();
@@ -570,7 +568,7 @@
           <div class="title">{data}:</div>
         {/await}
 
-        <div class="user2">
+        <div class="user2"  style="visibility:{visibility[1]}">
           {@html dialog_data.content[cur_qa].user2[$llang]}
         </div>
 
@@ -591,7 +589,7 @@
             </IconButton>
           </div>
         {/if}
-        <div class="user2_tr" style="visibility:{visibility[1]}">
+        <div class="user2_tr">
           {#await Translate(dialog_data.content[cur_qa].user2[$llang], $llang, $langs) then data}
             {data}
           {/await}
