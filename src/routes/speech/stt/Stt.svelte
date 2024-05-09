@@ -60,7 +60,7 @@
 
   export function CollectGarbage() {
     audioUrl = '';
-    mediaRecorder = '';
+    // mediaRecorder = '';
     audioChunks = '';
   }
 
@@ -97,8 +97,7 @@
     silenceTimer = '';
     checkLoop = false;
     clearTimeout(silenceTimer);
-    if(mediaRecorder.stop)
-    mediaRecorder.stop();
+    if (mediaRecorder.stop) mediaRecorder.stop();
   }
 
   // Функция для начала записи
@@ -111,7 +110,8 @@
       // audioBitsPerSecond: 128000 // Битрейт аудио (по желанию)
     };
 
-    mediaRecorder = new MediaRecorder(mediaStream, options);
+    if (!mediaRecorder) mediaRecorder = new MediaRecorder(mediaStream, options);
+    else mediaRecorder.stream = mediaStream;
     mediaRecorder.ondataavailable = (e) => {
       audioChunks.push(e.data);
     };
@@ -134,7 +134,6 @@
       sendAudioToRecognition(audioBlob);
       audioUrl = URL.createObjectURL(audioBlob);
       display_audio = 'block';
-      mediaRecorder = '';
       mediaStream = '';
     }
   }
@@ -189,7 +188,7 @@
 </script>
 
 <audio
-class="audio_stt"
+  class="audio_stt"
   bind:this={audioPlayer}
   src={audioUrl}
   controls
