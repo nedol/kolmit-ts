@@ -110,6 +110,7 @@
     };
 
     mediaRecorder = new MediaRecorder(mediaStream, options);
+
     mediaRecorder.ondataavailable = (e) => {
       audioChunks.push(e.data);
     };
@@ -132,10 +133,12 @@
       sendAudioToRecognition(audioBlob);
       audioUrl = URL.createObjectURL(audioBlob);
       display_audio = 'block';
-      mediaStream.getTracks().forEach(function(el) {
-        el.stop()
-      })
     }
+    mediaStream.getTracks().forEach(function (el) {
+      el.stop();
+    });
+    mediaStream = '';
+    mediaRecorder = '';
   }
 
   async function sendAudioToRecognition(blob) {

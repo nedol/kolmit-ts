@@ -341,8 +341,7 @@
     return array;
   }
 
-  async function speak(text) {
-    
+  async function speak(text) {    
     Speak(text);
   }
 
@@ -369,14 +368,18 @@
   function SttResult(text) {
     stt_text = text;
 
-    if (text &&
-      compareStrings(
+    if (text){
+      const similarity = compareStrings(
         dialog_data.content[cur_qa].user2[$llang].toLowerCase().trim().replace(/[^\w\s]|_/g, ""),
         text.toLowerCase().trim().replace(/[^\w\s]|_/g, "") //replace(/[0-9!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~]/g, '')
-      )
-    ) {
-      onNextQA();
+      );
+    stt_text+= ` (${similarity.toFixed(0)}%)`
+     if(similarity>75){
+      setTimeout(()=>{   
+        onNextQA();
+      },3000);
     }
+  }
   }
 
   function compareStrings(str1, str2) {
@@ -427,7 +430,7 @@
      console.log('similarityPercentage',similarity)
 
     // Возвращаем true, если процент совпадения больше 75, иначе false
-    return similarity > 75;
+    return similarity;
 }
 
 
