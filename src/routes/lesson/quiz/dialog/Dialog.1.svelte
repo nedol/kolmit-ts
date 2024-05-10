@@ -342,6 +342,7 @@
   }
 
   async function speak(text) {
+    
     Speak(text);
   }
 
@@ -445,7 +446,7 @@
   });
 </script>
 
-<Tts bind:this={tts}></Tts>
+<!-- <Tts bind:this={tts}></Tts> -->
 
 <!-- <RV bind:this={voice}></RV> -->
 

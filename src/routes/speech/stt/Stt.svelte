@@ -6,7 +6,7 @@
 
   export let SttResult, StopListening, display_audio;
 
-  $: console.log(display_audio);
+  // $: console.log(display_audio);
 
   let mediaRecorder,
     mediaStream,
@@ -60,7 +60,6 @@
 
   export function CollectGarbage() {
     audioUrl = '';
-    // mediaRecorder = '';
     audioChunks = '';
   }
 
@@ -110,8 +109,7 @@
       // audioBitsPerSecond: 128000 // Битрейт аудио (по желанию)
     };
 
-    if (!mediaRecorder) mediaRecorder = new MediaRecorder(mediaStream, options);
-    else mediaRecorder.stream = mediaStream;
+    mediaRecorder = new MediaRecorder(mediaStream, options);
     mediaRecorder.ondataavailable = (e) => {
       audioChunks.push(e.data);
     };
@@ -134,7 +132,9 @@
       sendAudioToRecognition(audioBlob);
       audioUrl = URL.createObjectURL(audioBlob);
       display_audio = 'block';
-      mediaStream = '';
+      mediaStream.getTracks().forEach(function(el) {
+        el.stop()
+      })
     }
   }
 
@@ -192,7 +192,7 @@
   bind:this={audioPlayer}
   src={audioUrl}
   controls
-  style="display:{display_audio};width:65vw"
+  style="display:{display_audio};width:200px"
 ></audio>
 
 <!-- <button on:click={playAudio}>Воспроизвести</button> -->

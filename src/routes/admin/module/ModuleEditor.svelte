@@ -3,7 +3,7 @@
 
   import translate from 'translate';
 
-  import pkg from 'lodash';
+  import pkg, { indexOf } from 'lodash';
   const { find, findKey, mapValues } = pkg;
 
   import _ from 'lodash';
@@ -137,7 +137,7 @@
         return;
       }
 
-      console.log(lesson_data.data)
+      console.log(lesson_data.data);
       // return;
 
       const response = await fetch(`/admin`, {
@@ -169,7 +169,7 @@
 
     lesson_data.data.llang = lesson_data.lang.trim();
     lesson_data.data.level = level;
-    lesson_data.data.name = quiz.name[$llang];
+    lesson_data.data.name = quiz.name[$langs];
     // data.theme = ev.currentTarget.attributes['theme'].value;
     // data.words = find(lesson_data.module.themes, {
     // 	name: ev.currentTarget.attributes['theme_name'].value
@@ -205,7 +205,7 @@
 
   function deleteObjectByName(obj, name) {
     Object.keys(obj).forEach((key) => {
-      if (Array.isArray(obj[key])) {
+      if (Array.isArray(obj[key][$langs])) {
         // Удаление объектов с заданным id
         obj[key] = obj[key].filter(
           (item) => !(item.name && item.name === name)
@@ -238,17 +238,20 @@
     lesson_data = lesson_data;
   }
 
-  function OnRemoveThemeItem(ev) {
-    find(lesson_data.data.module.themes, {
-      name: ev.currentTarget.attributes['name'].nodeValue,
-    });
+  function OnRemoveThemeItem(t) {
+    lesson_data.data.module.themes.splice(t, 1);
+    lesson_data = lesson_data;
   }
 
-  function OnRemoveItem(ev) {
-    deleteObjectByName(
-      lesson_data.data.module,
-      ev.currentTarget.attributes['name'].nodeValue
+  function OnRemoveItem(name, t) {
+    let quiz = find(
+      lesson_data.data.module.themes[t].lessons[0].quizes,
+      (q) => {
+        return (q[$langs] = name);
+      }
     );
+    let ind = lesson_data.data.module.themes[t].lessons[0].quizes.indexOf(quiz);
+    lesson_data.data.module.themes[t].lessons[0].quizes.splice(ind, 1);
     lesson_data = lesson_data;
   }
 
@@ -269,27 +272,22 @@
     lesson_data = lesson_data;
   }
 
-  function OnAddQuiz(ev) {
-    const theme = find(lesson_data.data.module.themes, {
-      name: ev.currentTarget.attributes['name'].value,
-    });
-    theme.lessons[0].quizes.push({
+  async function OnAddQuiz(name, t) {
+    lesson_data.data.module.themes[t].lessons[0].quizes.push({
       type: 'quiz',
-      name: 'Quiz name',
+      name: { [$langs]: await Translate('Quiz Name', 'en', $langs) },
     });
     lesson_data = lesson_data;
   }
 
-  function OnSelectQuiztype(ev) {
-    const type = ev.target.value;
-    const name = ev.target.attributes['name'].value;
-    let item = findDeep(
-      lesson_data.data.module,
-      (value) => value.name === name,
-      {
-        childrenPath: 'quizes',
+  function OnSelectQuiztype(type, t, name) {
+    const item = find(
+      lesson_data.data.module.themes[t].lessons[0].quizes,
+      (quiz) => {
+        if (quiz.name[$langs] === name) return quiz;
       }
     );
+
     console.log(item);
     if (item) {
       item.type = type;
@@ -361,9 +359,15 @@
   }
 
   async function OnThemeNameInput(theme) {
-    if (theme.name) {
-      theme.name = await Translate(theme.name[$llang], $llang, $langs);
-      lesson_data = lesson_data;
+    if (!theme.name[$llang]) {
+      Object.keys(theme.name).forEach(async (key) => {
+        if (key !== $llang) {
+          // $langs = key;
+          theme.name[$llang] = await Translate(theme.name[key], key, $llang);
+          lesson_data = lesson_data;
+          return;
+        }
+      });
     }
   }
 </script>
@@ -445,17 +449,17 @@
                   <!-- <Textfield bind:value={theme.name[$langs]} style="width: 368px;">
 									<HelperText slot="helper">Helper Text</HelperText>
 								</Textfield> -->
-                {#await Translate("Input Theme Name",'en',$langs) then data}
-                  <input
-                    placeholder={data}
-                    :use={theme.name[$llang]
-                      ? theme.name[$llang]
-                      : ((ev) => {
-                          OnThemeNameInput(theme);
-                        })()}
-                    bind:value={theme.name[$llang]}
-                    style="font-weight: bold; width:90%"
-                  />
+                  {#await Translate('Input Theme Name', 'en', $langs) then data}
+                    <input
+                      placeholder={data}
+                      :use={theme.name[$llang]
+                        ? theme.name[$llang]
+                        : ((ev) => {
+                            OnThemeNameInput(theme);
+                          })()}
+                      bind:value={theme.name[$llang]}
+                      style="font-weight: bold; width:90%"
+                    />
                   {/await}
                   <div class="rem_theme">
                     {#await Translate('Remove theme', 'en', $langs) then data}
@@ -463,7 +467,7 @@
                         class="material-icons"
                         title={data}
                         name={theme.name[$llang]}
-                        on:click={OnRemoveItem}>remove</IconButton
+                        on:click={() => OnRemoveThemeItem(t)}>remove</IconButton
                       >
                     {/await}
                   </div>
@@ -473,7 +477,7 @@
                     {#each theme.lessons as lesson}
                       <!-- <div>{lesson.num}.{lesson.title}</div> -->
                       {#if lesson.quizes}
-                        {#each lesson.quizes as quiz}
+                        {#each lesson.quizes as quiz, q}
                           <!-- {@debug quiz} -->
 
                           <div class="quiz-container">
@@ -485,7 +489,7 @@
                                 );
                               }}
                               type={quiz.type}
-                              name={quiz.name[$llang]}
+                              name={quiz.name[$langs]}
                               level={lesson_data.data.module.level}
                               highlight={quiz.highlight || ''}
                             >
@@ -547,7 +551,7 @@
                                 name={quiz.name}
                                 theme={theme.num}
                                 theme_name={theme.name[$llang]}
-                                bind:value={quiz.name[$llang]}
+                                bind:value={quiz.name[$langs]}
                               />
                             {:else}
                               <input
@@ -558,14 +562,15 @@
                                 level={lesson_data.data.level}
                                 theme={theme.num}
                                 theme_name={theme.name[$llang]}
-                                bind:value={quiz.name[$llang]}
+                                bind:value={quiz.name[$langs]}
                               />
                             {/if}
 
                             {#if quiz.type === 'quiz'}
                               <select
-                                on:change={OnSelectQuiztype}
-                                name={quiz.name[$llang]}
+                                on:change={() =>
+                                  OnSelectQuiztype(value, t, quiz.name[$langs])}
+                                name={quiz.name[$langs]}
                               >
                                 {#each quizes as quizOption}
                                   <option value={quizOption}
@@ -580,8 +585,10 @@
                                 <IconButton
                                   class="material-icons"
                                   title={data}
-                                  name={quiz.name[$llang]}
-                                  on:click={OnRemoveItem}>remove</IconButton
+                                  name={quiz.name[$langs]}
+                                  on:click={() => {
+                                    OnRemoveItem(quiz.name[$langs], q);
+                                  }}>remove</IconButton
                                 >
                               {/await}
                             </div>
@@ -595,7 +602,9 @@
                           class="material-icons"
                           title={data}
                           name={theme.name[$llang]}
-                          on:click={OnAddQuiz}>add</IconButton
+                          on:click={() => {
+                            OnAddQuiz(theme.name[$llang], t);
+                          }}>add</IconButton
                         >
                       {/await}
                     </div>
@@ -722,7 +731,7 @@
     outline: none;
   }
 
-  ::placeholder{
+  ::placeholder {
     font-weight: 400;
   }
   div:focus,

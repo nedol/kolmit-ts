@@ -5,7 +5,7 @@ export function Speak(text) {
 	// const textAr = text.split(/<[^>]+>.*?<\/[^>]+>/g);
 	// textAr.map((text) => {
 
-	let audio = new Audio(
+	const audio = new Audio(
 		`http://api.voicerss.org/?key=7a4b7dd989dd4086a626f34dbf21d3a9&hl=nl-be&r=-3&c=MP3&f=44khz_16bit_mono&src=${text}`
 	);
 
