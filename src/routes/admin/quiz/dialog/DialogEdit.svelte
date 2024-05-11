@@ -68,7 +68,7 @@
 ->[[Build users dialogue based in which the users asking each another something about $Context
 and answering following $Context.]{10 phrazes from each user}
 {$Context: ${dialog_data.html}}   
-{Use the most commonly used phrases and words in colloquial speech and ${dialog_data_words}}
+{Use the most commonly used phrases and words in colloquial speech}{Use the words and phrazes: ${dialog_data_words}}
 {No repetition of lines and phrases from dlg_content in output. Ensure that the conversation flows naturally and smoothly.}
 {Topic=${name}}{Learning language:${$llang} }{ Learning language  level: ${data.level}}
 {participants: user1, user2}]*${num}
@@ -360,7 +360,7 @@ and answering following $Context.]{10 phrazes from each user}
                 <Label>{tab}</Label>
               </Tab>
             </TabBar>
-            {#if active === context_title}
+            {#if dialog_data && active === context_title }
               {#if viewHTML}
                 <!-- <div style="height: 350px; overflow-y:auto">
                   {@html dialog_data.html}
@@ -403,7 +403,7 @@ and answering following $Context.]{10 phrazes from each user}
             {:else if active === prompt_title}
               <Paper variant="unelevated">
                 <Content>
-                  <textarea rows="20" name="dialog_task" bind:value={prompt}
+                  <textarea rows="20" name="dialog_task" readonly bind:value={prompt}
                   ></textarea>
                   <!-- <div contenteditable="true" bind:this={dialog_task}>
                 {@html prompt}

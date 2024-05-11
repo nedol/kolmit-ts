@@ -37,7 +37,7 @@ body {
 .mdc-top-app-bar {
   background-color: #9eb2cc;
   background-color: var(--mdc-theme-primary, #9eb2cc);
-  /* width:98% */
+  width:99%
 }
 .form-field-container {
   width: 0;

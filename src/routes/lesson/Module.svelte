@@ -115,10 +115,10 @@
     quiz_users = quiz_users;
   }
 
-  export async function fetchLesson(lessonNumber, owner) {
+  export async function fetchLesson( owner, lesson) {
     try {
       const response = await fetch(
-        `./lesson?lesson=${lessonNumber}&owner=${owner}`
+        `./lesson?lesson=${lesson}&owner=${owner}`
       );
       if (!response.ok) {
         throw new Error('Failed to fetch data');
@@ -298,6 +298,7 @@
                 >{/await}
               <Content>
                 {#if theme.lessons}
+                <!-- {@debug theme} -->
                   {#each theme.lessons as lesson}
                     <!-- <div>{lesson.num}.{lesson.title}</div> -->
                     {#if lesson.quizes}

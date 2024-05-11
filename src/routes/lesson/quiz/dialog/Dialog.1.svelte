@@ -125,13 +125,13 @@
 
   $: if (q && !q[$langs]) {
     (async () => {
-      q[$langs] = await Translate(q[$llang], $langs);
+      q[$langs] = await Translate(q[$llang],$llang, $langs);
     })();
   }
 
   $: if (a && !a[$langs]) {
     (async () => {
-      a[$langs] = await Translate(a[$llang], $langs);
+      a[$langs] = await Translate(a[$llang],$llang, $langs);
     })();
   }
 
@@ -541,10 +541,12 @@
           <div class="title">{data}:</div>
         {/await}
 
+        
         <div class="tip mdc-typography--headline6">
           {q[$llang]}
         </div>
 
+         {#await Translate(dialog_data.content[cur_qa].user1[$llang], $llang, $langs) then data}
         <div style="text-align: center;">
           <div
             class="user1 mdc-typography--headline6"
@@ -553,6 +555,7 @@
             {dialog_data.content[cur_qa].user1[$langs]}
           </div>
         </div>
+        {/await}
 
         {#if showSpeakerButton}
           <div class="speaker-button">

@@ -16,10 +16,10 @@
     audioPlayer,
     isRecording = false,
     soundTimer,
-    silenceTimer;
+    silenceTimer = '';
 
   const threshold = 10;
-  const silenceDelay = 2000; //  секунды тишины
+  const silenceDelay =3000; //  секунды тишины
   let checkLoop = true;
 
   onMount(async () => {
@@ -50,9 +50,6 @@
       // дополнительные настройки audioAnalyser
       startRecording();
       checkAudio();
-      // setTimeout(() => {
-      // 	mediaRecorder.stop();
-      // }, 4000);
     } catch (error) {
       console.error('Ошибка доступа к микрофону:', error);
     }
@@ -97,6 +94,8 @@
     checkLoop = false;
     clearTimeout(silenceTimer);
     if (mediaRecorder.stop) mediaRecorder.stop();
+    stopRecording()
+    StopListening();
   }
 
   // Функция для начала записи
@@ -109,15 +108,17 @@
       // audioBitsPerSecond: 128000 // Битрейт аудио (по желанию)
     };
 
-    mediaRecorder = new MediaRecorder(mediaStream, options);
-
+    if(!mediaRecorder)
+      mediaRecorder = new MediaRecorder(mediaStream, options);
+    else
+      mediaRecorder.stream = mediaStream;
     mediaRecorder.ondataavailable = (e) => {
       audioChunks.push(e.data);
     };
 
     mediaRecorder.onstop = (e) => {
       stopRecording();
-      StopListening();
+  
     };
 
     mediaRecorder.start();
@@ -129,16 +130,13 @@
   async function stopRecording() {
     // await audioContext.decodeAudioData(audioBuffer);
     if (audioChunks[0].size > 0) {
-      const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
-      sendAudioToRecognition(audioBlob);
-      audioUrl = URL.createObjectURL(audioBlob);
+      sendAudioToRecognition(audioChunks[0]);
+      audioUrl = URL.createObjectURL(audioChunks[0]);
       display_audio = 'block';
     }
     mediaStream.getTracks().forEach(function (el) {
       el.stop();
     });
-    mediaStream = '';
-    mediaRecorder = '';
   }
 
   async function sendAudioToRecognition(blob) {
@@ -170,6 +168,10 @@
       console.log('Ошибка отправки аудио:', error);
     }
 
+        checkLoop = false;
+    mediaStream = '';
+    mediaRecorder = '';
+    audioAnalyser = '';
     audioChunks = '';
   }
 
@@ -180,6 +182,7 @@
   }
 
   onDestroy(() => {
+    audioContext = '';
     mediaRecorder = '';
     mediaStream = '';
     audioAnalyser = '';

@@ -568,8 +568,8 @@
 
                             {#if quiz.type === 'quiz'}
                               <select
-                                on:change={() =>
-                                  OnSelectQuiztype(value, t, quiz.name[$langs])}
+                                on:change={(event) =>
+                                  OnSelectQuiztype(event.target.value, t, quiz.name[$langs])}
                                 name={quiz.name[$langs]}
                               >
                                 {#each quizes as quizOption}

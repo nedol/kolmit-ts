@@ -70,7 +70,7 @@ export async function GET({ url, fetch, cookies }) {
     return response;
 
   } else if (lesson) {
-	  let owner = lesson;
+    let owner = url.searchParams.get('owner');
 	  let lev = url.searchParams.get('level');
 	  let { data, lang, level, levels } = await GetLesson({ owner: owner, level:lev });
 	  let response = new Response(JSON.stringify({ data, lang, level,levels }));
