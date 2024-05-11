@@ -552,7 +552,7 @@
             class="user1 mdc-typography--headline6"
             style="visibility:{visibility[1]}"
           >
-            {dialog_data.content[cur_qa].user1[$langs]}
+            {data}
           </div>
         </div>
         {/await}
@@ -575,6 +575,7 @@
           <div class="title">{data}:</div>
         {/await}
 
+        
         <div class="user2"  style="visibility:{visibility[1]}">
           {@html dialog_data.content[cur_qa].user2[$llang]}
         </div>

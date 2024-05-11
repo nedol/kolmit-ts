@@ -168,7 +168,6 @@
       console.log('Ошибка отправки аудио:', error);
     }
 
-        checkLoop = false;
     mediaStream = '';
     mediaRecorder = '';
     audioAnalyser = '';
@@ -182,13 +181,12 @@
   }
 
   onDestroy(() => {
-    audioContext = '';
+
     mediaRecorder = '';
     mediaStream = '';
     audioAnalyser = '';
     audioUrl = '';
     audioPlayer = '';
-    audioChunks = '';
     clearTimeout(silenceTimer);
   });
 </script>
