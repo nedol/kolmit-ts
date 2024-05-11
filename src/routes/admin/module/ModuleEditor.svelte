@@ -93,7 +93,7 @@
   export async function fetchLesson(owner: string, level: string) {
     try {
       let lev_str = level ? '&level=' + level : '';
-      const response = await fetch(`./lesson?lesson=${abonent}` + lev_str);
+      const response = await fetch(`./lesson?lesson=${abonent}&owner=${abonent}` + lev_str);
       if (!response.ok) {
         throw new Error('Failed to fetch data');
       }
