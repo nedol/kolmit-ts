@@ -616,7 +616,7 @@
             </Accordion>
           </div>
         {/each}
-        {#if lesson_data.data.module.level && $llang !== ' '}
+        {#if lesson_data.level && $llang !== ' '}
           <div class="add_theme">
             {#await Translate('Add theme', 'en', $langs) then data}
               <IconButton
