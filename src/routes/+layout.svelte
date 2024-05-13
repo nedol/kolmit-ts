@@ -1,7 +1,7 @@
 <script>
 	import "../app.scss";
-    import '../app.scss';
-    import '../app.scss';
+
+  
 
     import './styles.css';
     import './smui.css';

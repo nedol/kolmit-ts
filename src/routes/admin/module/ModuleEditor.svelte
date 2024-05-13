@@ -132,12 +132,12 @@
 
   async function saveLessonData() {
     try {
-      if (!lesson_data.data.module.level) {
+      if (!lesson_data.level) {
         module_input.focus();
         return;
       }
 
-      console.log(lesson_data.data);
+      // console.log(lesson_data.data);
       // return;
 
       const response = await fetch(`/admin`, {
@@ -167,9 +167,11 @@
   function onClickQuiz(quiz: any, level) {
     $view = 'quiz';
 
-    lesson_data.data.llang = lesson_data.lang.trim();
-    lesson_data.data.level = level;
-    lesson_data.data.name = quiz.name[$langs];
+    saveLessonData();
+
+    lesson_data.data.llang = lesson_data.data.lang;
+    // lesson_data.data.level = level;
+    lesson_data.data.name = quiz.name[lesson_data.data.lang];
     // data.theme = ev.currentTarget.attributes['theme'].value;
     // data.words = find(lesson_data.module.themes, {
     // 	name: ev.currentTarget.attributes['theme_name'].value

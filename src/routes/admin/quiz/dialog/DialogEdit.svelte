@@ -63,20 +63,18 @@
     let dialog_data_words = dialog_data.words || '';
     prompt = `
 [Act as a language teaching methodologist]  
-{The aim is to train users in the language based on situational dialogues}
 [2 users read  $Context]
 ->[[Build users dialogue based in which the users asking each another something about $Context
-and answering following $Context.]{10 phrazes from each user}
+and answering following $Context.]{10 phrases from each user}
 {$Context: ${dialog_data.html}}   
-{Use the most commonly used phrases and words in colloquial speech}{Use the words and phrazes: ${dialog_data_words}}
+{Use the most commonly used phrases and words in colloquial speech and ${dialog_data_words}}
 {No repetition of lines and phrases from dlg_content in output. Ensure that the conversation flows naturally and smoothly.}
 {Topic=${name}}{Learning language:${$llang} }{ Learning language  level: ${data.level}}
 {participants: user1, user2}]*${num}
-->[Make the translations to:${$llang} and ${$langs}]
+->[Literal translation to:${$llang} and ${$langs}]
 ->[Build webpage $Page based on the Context.]->{Style $Page content for easier reading}{$Page should started <html>}{don't use '\n' or 'n'}]
 ->[Output]{output format:json}<output example: 
   <{
-    html:$Page,
     content:[    
       {
       "user1": { "${$llang}": "{answer. question}" , "${$langs}":"{answer. question}"}, 
@@ -98,6 +96,8 @@ and answering following $Context.]{10 phrazes from each user}
     .then((response) => response.json())
     .then((data) => {
       dialog_data = data.data.dialog;
+      if(!dialog_data)
+       dialog_data = {'content':[]};
       if (data.data.html) {
         dialog_data.html = splitHtmlContent(data.data.html);
       }
@@ -126,6 +126,7 @@ and answering following $Context.]{10 phrazes from each user}
   }
 
   async function TranslateContentToCurrentLang() {
+
     await Promise.all(
       dialog_data.content.map(async (item: any) => {
         await Promise.all(
@@ -174,20 +175,20 @@ and answering following $Context.]{10 phrazes from each user}
 
   // Функция для сохранения текущего состояния в localStorage
   function OnSave() {
-    SaveDialogData(name, data.name, dialog_data);
+    SaveDialogData(name, data);
     ChangeQuizName(name, data.name);
   }
 
-  async function SaveDialogData(name: string, new_name: string, data: any) {
-    const response = await fetch(`/admin`, {
+  async function SaveDialogData(name: string, data: any) {
+    const response = await fetch(`/admin/module`, {
       method: 'POST',
       body: JSON.stringify({
         func: 'upd_dlg',
         owner: abonent,
         level: data.level,
         name: name,
-        new_name: new_name,
-        data: data,
+        new_name: data.name,
+        data: dialog_data,
       }),
       headers: { 'Content-Type': 'application/json' },
     });
@@ -360,7 +361,7 @@ and answering following $Context.]{10 phrazes from each user}
                 <Label>{tab}</Label>
               </Tab>
             </TabBar>
-            {#if dialog_data && active === context_title }
+            {#if active === context_title}
               {#if viewHTML}
                 <!-- <div style="height: 350px; overflow-y:auto">
                   {@html dialog_data.html}
@@ -403,7 +404,7 @@ and answering following $Context.]{10 phrazes from each user}
             {:else if active === prompt_title}
               <Paper variant="unelevated">
                 <Content>
-                  <textarea rows="20" name="dialog_task" readonly bind:value={prompt}
+                  <textarea rows="20" name="dialog_task" bind:value={prompt}
                   ></textarea>
                   <!-- <div contenteditable="true" bind:this={dialog_task}>
                 {@html prompt}
