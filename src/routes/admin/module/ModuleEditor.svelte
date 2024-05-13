@@ -77,6 +77,8 @@
   // }
 
   async function Translate(text: string, from_lang: string, to_lang: string) {
+    if (!text || !from_lang || !to_lang) return '';
+
     try {
       translate.from = from_lang;
 
@@ -93,7 +95,9 @@
   export async function fetchLesson(owner: string, level: string) {
     try {
       let lev_str = level ? '&level=' + level : '';
-      const response = await fetch(`./lesson?lesson=${abonent}&owner=${abonent}` + lev_str);
+      const response = await fetch(
+        `./lesson?lesson=${abonent}&owner=${abonent}` + lev_str
+      );
       if (!response.ok) {
         throw new Error('Failed to fetch data');
       }
@@ -171,7 +175,7 @@
 
     lesson_data.data.llang = lesson_data.data.lang;
     // lesson_data.data.level = level;
-    lesson_data.data.name = quiz.name[lesson_data.data.lang];
+    lesson_data.data.name = quiz.name;
     // data.theme = ev.currentTarget.attributes['theme'].value;
     // data.words = find(lesson_data.module.themes, {
     // 	name: ev.currentTarget.attributes['theme_name'].value
@@ -233,7 +237,9 @@
 
   function OnAddTheme() {
     lesson_data.data.module.themes.push({
-      name: 'Input Theme Name',
+      name: {
+        [$langs]: '',
+      },
       lessons: [{ quizes: [] }],
     });
     console.log(lesson_data.data.module.level);
@@ -277,7 +283,7 @@
   async function OnAddQuiz(name, t) {
     lesson_data.data.module.themes[t].lessons[0].quizes.push({
       type: 'quiz',
-      name: { [$langs]: await Translate('Quiz Name', 'en', $langs) },
+      name: { [$langs]: '' },
     });
     lesson_data = lesson_data;
   }
@@ -360,18 +366,27 @@
     lesson_data.data.module.level = lesson_data.levels[0];
   }
 
-  async function OnThemeNameInput(theme) {
-    if (!theme.name[$llang]) {
-      Object.keys(theme.name).forEach(async (key) => {
-        if (key !== $llang) {
-          // $langs = key;
-          theme.name[$llang] = await Translate(theme.name[key], key, $llang);
-          lesson_data = lesson_data;
-          return;
-        }
-      });
-    }
-  }
+  // async function OnThemeNameInput(t) {
+  //   // console.log(theme)
+  //   // return;
+  //   let theme = lesson_data.data.module.themes[t];
+  //   if (!theme.name[$llang]) {
+  //     Object.keys(theme.name).forEach(async (key) => {
+  //       console.log(key);
+  //       if (key !== $llang) {
+  //         // theme.name[$llang] = await Translate(theme.name[key], key, $llang);
+  //         // lesson_data = lesson_data;
+  //         return;
+  //       }
+  //     });
+  //   }
+  // }
+
+
+  // function OnThemeNameChange(event: Event, t:number) {
+  //   let theme = lesson_data.data.module.themes[t];
+  //   theme.name[$llang] = 
+  // }
 </script>
 
 <main>
@@ -454,14 +469,10 @@
                   {#await Translate('Input Theme Name', 'en', $langs) then data}
                     <input
                       placeholder={data}
-                      :use={theme.name[$llang]
-                        ? theme.name[$llang]
-                        : ((ev) => {
-                            OnThemeNameInput(theme);
-                          })()}
-                      bind:value={theme.name[$llang]}
+                      bind:value={theme.name[$langs]}
                       style="font-weight: bold; width:90%"
                     />
+                    <!-- {@debug theme, $llang} -->
                   {/await}
                   <div class="rem_theme">
                     {#await Translate('Remove theme', 'en', $langs) then data}
@@ -544,34 +555,44 @@
                             </div>
                             <!-- svelte-ignore a11y-invalid-attribute -->
                             {#if quiz.type === 'quiz'}
+                            {#await Translate('Quiz Name','en', $langs) then data}
                               <input
                                 class="quiz_name"
                                 on:click={OnClickQuizName}
                                 autofocus
                                 contenteditable
                                 {t}
-                                name={quiz.name}
+                                placeholder={data}
+                                name={quiz.name[$langs]}
                                 theme={theme.num}
                                 theme_name={theme.name[$llang]}
                                 bind:value={quiz.name[$langs]}
                               />
+                              {/await}
                             {:else}
+                            {#await Translate('Quiz Name','en', $langs) then data}
                               <input
                                 on:click={OnClickQuizName}
                                 style="width:80%"
                                 {t}
-                                name={quiz.name}
+                                placeholder={data}
+                                name={quiz.name[$langs]}
                                 level={lesson_data.data.level}
                                 theme={theme.num}
                                 theme_name={theme.name[$llang]}
                                 bind:value={quiz.name[$langs]}
                               />
+                              {/await}
                             {/if}
 
                             {#if quiz.type === 'quiz'}
                               <select
                                 on:change={(event) =>
-                                  OnSelectQuiztype(event.target.value, t, quiz.name[$langs])}
+                                  OnSelectQuiztype(
+                                    event.target.value,
+                                    t,
+                                    quiz.name[$langs]
+                                  )}
                                 name={quiz.name[$langs]}
                               >
                                 {#each quizes as quizOption}

@@ -69,9 +69,9 @@ and answering following $Context.]{10 phrases from each user}
 {$Context: ${dialog_data.html}}   
 {Use the most commonly used phrases and words in colloquial speech and ${dialog_data_words}}
 {No repetition of lines and phrases from dlg_content in output. Ensure that the conversation flows naturally and smoothly.}
-{Topic=${name}}{Learning language:${$llang} }{ Learning language  level: ${data.level}}
+{Topic="${name[$llang]}"}{Learning language:${$llang} }{ Learning language  level: ${data.level}}
 {participants: user1, user2}]*${num}
-->[Literal translation to:${$llang} and ${$langs}]
+->[Translation to:${$llang} and ${$langs}]
 ->[Build webpage $Page based on the Context.]->{Style $Page content for easier reading}{$Page should started <html>}{don't use '\n' or 'n'}]
 ->[Output]{output format:json}<output example: 
   <{
@@ -92,7 +92,7 @@ and answering following $Context.]{10 phrases from each user}
     TranslateContentToCurrentLang();
   }
 
-  fetch(`./lesson?dialog=${data.name}&owner=${abonent}`)
+  fetch(`./lesson?dialog=${data.name[$llang]}&owner=${abonent}`)
     .then((response) => response.json())
     .then((data) => {
       dialog_data = data.data.dialog;
@@ -186,8 +186,8 @@ and answering following $Context.]{10 phrases from each user}
         func: 'upd_dlg',
         owner: abonent,
         level: data.level,
-        name: name,
-        new_name: data.name,
+        name: name[llang],
+        new_name: data.name[$llang],
         data: dialog_data,
       }),
       headers: { 'Content-Type': 'application/json' },
@@ -303,7 +303,7 @@ and answering following $Context.]{10 phrases from each user}
         type="text"
         class="dialog_name"
         name="dialog_name"
-        bind:value={data.name}
+        bind:value={data.name[$langs]}
       />
     </div>
     {#if data.level}
