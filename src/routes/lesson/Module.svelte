@@ -148,6 +148,8 @@
     lesson_data = lessonData.data;
     module = lesson_data.module;
 
+    $llang = lesson_data.lang;
+
     translate.from = lesson_data.lang;
     translate.engine = 'google';
   });
@@ -266,7 +268,7 @@
   }
 
   async function OnThemeNameInput(theme) {
-    theme.name = await Translate(theme.name, $llang, $langs);
+    theme.name = await Translate(theme.name[$llang], $llang, $langs);
     module = module;
   }
 </script>
@@ -277,7 +279,7 @@
   {:else if module}
     <div class="lesson-container">
       <div class="module_level">
-        <div class="mdc-typography--caption">{module.level}</div>
+        <div class="mdc-typography--caption">{lesson_data.level}</div>
       </div>
 
       {#each module.themes as theme, t}

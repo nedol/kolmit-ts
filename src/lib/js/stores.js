@@ -10,7 +10,7 @@ export let nlang = writable('en');//native lang
 
 export let langs = writable('en');//current lang
 
-export let llang = writable('nl');//learning
+export let llang = writable('en');//learning
 
 export let pswd = writable();
 
