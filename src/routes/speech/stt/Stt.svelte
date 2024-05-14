@@ -6,8 +6,6 @@
 
   export let SttResult, StopListening, display_audio;
 
-  // $: console.log(display_audio);
-
   let mediaRecorder,
     mediaStream,
     audioAnalyser,
@@ -16,10 +14,10 @@
     audioPlayer,
     isRecording = false,
     soundTimer,
-    silenceTimer = '';
+    silenceTimer;
 
   const threshold = 10;
-  const silenceDelay =3000; //  секунды тишины
+  const silenceDelay = 2000; //  секунды тишины
   let checkLoop = true;
 
   onMount(async () => {
@@ -28,28 +26,38 @@
 
   export async function startAudioMonitoring() {
     try {
-      mediaStream = await navigator.mediaDevices.getUserMedia({
-        audio: {
-          echoCancellation: true,
-          noiseSuppression: true,
-          autoGainControl: true,
-          channelCount: 1,
-          sampleRate: 48000,
-          sampleSize: 16,
-          volume: 1.0,
-        },
-      });
-      const audioContext = new AudioContext();
-      audioAnalyser = audioContext.createAnalyser();
-      const source = audioContext.createMediaStreamSource(mediaStream);
-      source.connect(audioAnalyser);
+     
+        mediaStream = await navigator.mediaDevices.getUserMedia({
+          audio: {
+            echoCancellation: true,
+            noiseSuppression: true,
+            autoGainControl: true,
+            channelCount: 1,
+            sampleRate: 48000,
+            sampleSize: 16,
+            volume: 1.0,
+          },
+        });
+      
 
-      const noiseSuppression = audioContext.createDynamicsCompressor();
-      noiseSuppression.threshold.value = -20; // Устанавливаем порог шумоподавления
-      source.connect(noiseSuppression);
-      // дополнительные настройки audioAnalyser
-      startRecording();
-      checkAudio();
+      // Проверка mediaStream на наличие
+      if (mediaStream) {
+        const audioContext = new AudioContext();
+        audioAnalyser = audioContext.createAnalyser();
+        const source = audioContext.createMediaStreamSource(mediaStream);
+        source.connect(audioAnalyser);
+
+        const noiseSuppression = audioContext.createDynamicsCompressor();
+        noiseSuppression.threshold.value = -20;
+        source.connect(noiseSuppression);
+
+        startRecording();
+        checkAudio();
+      } else {
+        console.error(
+          'Нет доступа к микрофону или пользователь отказался от доступа.'
+        );
+      }
     } catch (error) {
       console.error('Ошибка доступа к микрофону:', error);
     }
@@ -57,7 +65,10 @@
 
   export function CollectGarbage() {
     audioUrl = '';
-    audioChunks = '';
+    audioChunks = [];
+    if (mediaRecorder) {
+      mediaRecorder.stop();
+    }
   }
 
   // Функция для проверки уровня аудио и управления записью
@@ -93,9 +104,7 @@
     silenceTimer = '';
     checkLoop = false;
     clearTimeout(silenceTimer);
-    if (mediaRecorder.stop) mediaRecorder.stop();
-    stopRecording()
-    StopListening();
+    mediaRecorder.stop();
   }
 
   // Функция для начала записи
@@ -108,17 +117,14 @@
       // audioBitsPerSecond: 128000 // Битрейт аудио (по желанию)
     };
 
-    if(!mediaRecorder)
-      mediaRecorder = new MediaRecorder(mediaStream, options);
-    else
-      mediaRecorder.stream = mediaStream;
+    mediaRecorder = new MediaRecorder(mediaStream, options);
     mediaRecorder.ondataavailable = (e) => {
       audioChunks.push(e.data);
     };
 
     mediaRecorder.onstop = (e) => {
       stopRecording();
-  
+      StopListening();
     };
 
     mediaRecorder.start();
@@ -126,17 +132,17 @@
     checkLoop = true;
   }
 
-  // Функция для остановки записи
   async function stopRecording() {
-    // await audioContext.decodeAudioData(audioBuffer);
-    if (audioChunks[0].size > 0) {
+    if (audioChunks[0]?.size > 0) {
       sendAudioToRecognition(audioChunks[0]);
       audioUrl = URL.createObjectURL(audioChunks[0]);
       display_audio = 'block';
+      mediaRecorder = null;
+      mediaStream.getTracks().forEach(function (el) {
+        el.stop();
+      });
+      mediaStream = null;
     }
-    mediaStream.getTracks().forEach(function (el) {
-      el.stop();
-    });
   }
 
   async function sendAudioToRecognition(blob) {
@@ -167,11 +173,6 @@
     } catch (error) {
       console.log('Ошибка отправки аудио:', error);
     }
-
-    mediaStream = '';
-    mediaRecorder = '';
-    audioAnalyser = '';
-    audioChunks = '';
   }
 
   function playAudio() {
@@ -181,22 +182,21 @@
   }
 
   onDestroy(() => {
-
     mediaRecorder = '';
     mediaStream = '';
     audioAnalyser = '';
     audioUrl = '';
     audioPlayer = '';
+    audioChunks = '';
     clearTimeout(silenceTimer);
   });
 </script>
 
 <audio
-  class="audio_stt"
   bind:this={audioPlayer}
   src={audioUrl}
   controls
-  style="display:{display_audio};width:200px"
+  style="display:{display_audio};width:50%"
 ></audio>
 
 <!-- <button on:click={playAudio}>Воспроизвести</button> -->
