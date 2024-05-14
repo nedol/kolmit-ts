@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import { onMount, onDestroy } from 'svelte';
   import { MediaRecorder } from 'extendable-media-recorder';
   // import { connect } from 'extendable-media-recorder-wav-encoder';
@@ -6,9 +6,9 @@
 
   export let SttResult, StopListening, display_audio;
 
-  let mediaRecorder,
-    mediaStream,
-    audioAnalyser,
+  let mediaRecorder: any,
+    mediaStream: any,
+    audioAnalyser: any,
     audioChunks = [],
     audioUrl,
     audioPlayer,
@@ -22,23 +22,18 @@
 
   onMount(async () => {
     // await register(await connect());// не нужно?!
-  });
-
-  export async function startAudioMonitoring() {
     try {
-     
-        mediaStream = await navigator.mediaDevices.getUserMedia({
-          audio: {
-            echoCancellation: true,
-            noiseSuppression: true,
-            autoGainControl: true,
-            channelCount: 1,
-            sampleRate: 48000,
-            sampleSize: 16,
-            volume: 1.0,
-          },
-        });
-      
+      mediaStream = await navigator.mediaDevices.getUserMedia({
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true,
+          channelCount: 1,
+          sampleRate: 48000,
+          sampleSize: 16,
+          volume: 1.0,
+        },
+      });
 
       // Проверка mediaStream на наличие
       if (mediaStream) {
@@ -50,9 +45,6 @@
         const noiseSuppression = audioContext.createDynamicsCompressor();
         noiseSuppression.threshold.value = -20;
         source.connect(noiseSuppression);
-
-        startRecording();
-        checkAudio();
       } else {
         console.error(
           'Нет доступа к микрофону или пользователь отказался от доступа.'
@@ -61,14 +53,30 @@
     } catch (error) {
       console.error('Ошибка доступа к микрофону:', error);
     }
-  }
 
-  export function CollectGarbage() {
-    audioUrl = '';
     audioChunks = [];
-    if (mediaRecorder) {
-      mediaRecorder.stop();
-    }
+    audioUrl = '';
+    const options = {
+      bitsPerSecond: 44100,
+      mimeType: 'audio/wav',
+      // audioBitsPerSecond: 128000 // Битрейт аудио (по желанию)
+    };
+
+    mediaRecorder = new MediaRecorder(mediaStream, options);
+
+    mediaRecorder.ondataavailable = (e) => {
+      audioChunks.push(e.data);
+    };
+
+    mediaRecorder.onstop = (e) => {
+      stopRecording();
+      StopListening();
+    };
+  });
+
+  export async function startAudioMonitoring() {
+    startRecording();
+    checkAudio();
   }
 
   // Функция для проверки уровня аудио и управления записью
@@ -109,40 +117,26 @@
 
   // Функция для начала записи
   function startRecording() {
-    audioChunks = [];
-    audioUrl = '';
-    const options = {
-      bitsPerSecond: 44100,
-      mimeType: 'audio/wav',
-      // audioBitsPerSecond: 128000 // Битрейт аудио (по желанию)
-    };
-
-    mediaRecorder = new MediaRecorder(mediaStream, options);
-    mediaRecorder.ondataavailable = (e) => {
-      audioChunks.push(e.data);
-    };
-
-    mediaRecorder.onstop = (e) => {
-      stopRecording();
-      StopListening();
-    };
-
     mediaRecorder.start();
     isRecording = true;
     checkLoop = true;
   }
 
   async function stopRecording() {
-    if (audioChunks[0]?.size > 0) {
-      sendAudioToRecognition(audioChunks[0]);
-      audioUrl = URL.createObjectURL(audioChunks[0]);
+    const len = audioChunks.length;
+    if (audioChunks[len - 1]?.size > 0) {
+      sendAudioToRecognition(audioChunks[len - 1]);
+      audioUrl = URL.createObjectURL(audioChunks[len - 1]);
       display_audio = 'block';
-      mediaRecorder = null;
-      mediaStream.getTracks().forEach(function (el) {
-        el.stop();
-      });
-      mediaStream = null;
+
+      if (Array.isArray(audioChunks) && audioChunks.length > 0) {
+        audioChunks.splice(0, 1);
+      }
     }
+
+    // mediaStream.getTracks().forEach(function (el) {
+    //   el.stop();
+    // });
   }
 
   async function sendAudioToRecognition(blob) {
