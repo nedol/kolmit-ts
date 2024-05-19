@@ -5,7 +5,6 @@
   // import { createModel, KaldiRecognizer } from 'vosk-browser';
 
   export let SttResult, StopListening, display_audio;
-  
 
   let mediaRecorder: any,
     mediaStream: any,
@@ -61,7 +60,7 @@
     audioUrl = '';
     const options = {
       bitsPerSecond: 44100,
-      mimeType: 'audio/wav',
+      // mimeType: 'audio/wav',
       // audioBitsPerSecond: 128000 // Битрейт аудио (по желанию)
     };
 
@@ -78,7 +77,6 @@
   });
 
   export async function startAudioMonitoring(from, to) {
-
     from_lang = from;
     to_lang = to;
     try {
@@ -151,6 +149,21 @@
     // mediaStream.getTracks().forEach(function (el) {
     //   el.stop();
     // });
+  }
+
+  export async function sendLoadModel() {
+
+    fetch('/speech/stt', {
+      method: 'POST',
+      // mode: 'no-cors',
+      body: JSON.stringify({
+        load: 'model',
+      }),
+      headers: {
+        'Content-Type': 'application/json',
+        // Authorization: `Bearer ${token}`
+      }
+    });
   }
 
   async function sendAudioToRecognition(blob) {

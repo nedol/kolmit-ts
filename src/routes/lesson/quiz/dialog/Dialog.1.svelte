@@ -244,7 +244,6 @@
     Dialog();
     SendData();
     stt_text = '';
-    stt.CollectGarbage();
     showSpeakerButton = false;
 
     // speak(q[$llang])
@@ -352,9 +351,7 @@
       return;
     }
 
-    ////для тестов !!! УБРАть if!!!
-    // if (false)
-    stt.startAudioMonitoring();
+    stt.startAudioMonitoring($llang );
 
     // const text = dialog_data.content[cur_qa].user1[llang].replace(/[^\w\s]/gi, ''); //.split(' ');
 
@@ -366,15 +363,15 @@
   }
 
   function SttResult(text) {
-    stt_text = text;
+    stt_text = text[$llang];
 
-    if (text) {
+    if (stt_text) {
       const similarity = compareStrings(
         dialog_data.content[cur_qa].user2[$llang]
           .toLowerCase()
           .trim()
           .replace(/[^\w\s]|_/g, ''),
-        text
+        stt_text
           .toLowerCase()
           .trim()
           .replace(/[^\w\s]|_/g, '') //replace(/[0-9!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~]/g, '')

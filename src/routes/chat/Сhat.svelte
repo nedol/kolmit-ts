@@ -35,17 +35,24 @@
   let stt: Stt;
 
   $: if ($msg_oper || $msg_user) {
-    console.log($msg_oper || $msg_user);
+    const msg = $msg_oper || $msg_user;
+    if (msg.func === 'chat') {
+      console.log(msg.text[$llang]);
+      messages.unshift({ text: msg.text, isQuestion: 'answer' });
+      messages = messages
+    }
   }
 
   // Function to call ChatGPT
-  async function callChatGPT() {
+  async function callChat() {
     try {
       if (!userInput[$llang]) return;
 
       userInput[$llang] = userInput[$llang].slice(0, 500);
 
-      messages = [{ text: userInput, isQuestion: 'question' }, ...messages];
+      // messages = [{ text: userInput, isQuestion: 'question' }, ...messages];
+       messages.unshift({ text: userInput, isQuestion: 'question' });
+       messages = messages
 
       // const response = await fetch(`/chat`, {
       // 	method: 'POST',
@@ -72,7 +79,7 @@
 
       // let answer = resp ? resp.correct : 'no answer';
 
-      // messages = [{ text: resp, isQuestion: 'answer' }, ...messages];
+      // messages = [{ text: {['nl']:'response'}, isQuestion: 'answer' }, ...messages];
     } catch (error) {
       console.error('Произошла ошибка при обращении к серверу:', error);
     }
@@ -81,13 +88,13 @@
   function handleKeyDown(event) {
     if (event.key === 'Enter' && !event.shiftKey) {
       event.preventDefault();
-      callChatGPT();
+      callChat();
       SendDC();
     }
   }
 
   onMount(() => {
-    callChatGPT(); // Call on component mount for initial question
+    // stt.sendLoadModel();
   });
 
   function micClicked() {
@@ -95,15 +102,16 @@
     stt.startAudioMonitoring($langs, $llang); // Здесь должен быть ваш код для активации микрофона
   }
 
-    function StopListening() {
+  function StopListening() {
     isListening = false;
   }
 
   function SttResult(data) {
-      userInput = data;
-      callChatGPT();
-      isListening = false;
-    }
+    userInput = data;
+    callChat();
+    isListening = false;
+    SendDC(data);
+  }
 
   function SendDC() {
     const dc = $dc_user || $dc_oper;
@@ -112,7 +120,7 @@
         {
           func: 'chat',
           lang: $llang,
-          text: userInput[$llang],
+          text: userInput,
         },
         () => {
           console.log();
@@ -146,6 +154,11 @@
     </Icon>
   </IconButton>
   <Stt bind:this={stt} bind:display_audio {SttResult} {StopListening}></Stt>
+  <button
+    on:click={() => {
+      SendDC('test');
+    }}>Отправить</button
+  >
 </div>
 <!-- </div> -->
 

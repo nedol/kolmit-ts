@@ -171,7 +171,7 @@
   }
 
   .top-app-bar-container {
-    top:0;
+    top: 0;
     border: 1px solid
       var(--mdc-theme-text-hint-on-background, rgba(0, 0, 0, 0.1));
     margin: 0 18px 18px 0;
@@ -192,6 +192,8 @@
     overflow: auto;
     justify-content: center; /* Выравниваем содержимое по центру вертикально */
     align-items: center; /* Выравниваем содержимое по центру горизонтально */
+    background-color: white;
+    /* opacity: 50%; */
   }
 
   img {
@@ -209,10 +211,7 @@
   button.sec_right {
     left: 100px;
   }
-  .lang_list {
-    background-color: white;
-    /* opacity: 50%; */
-  }
+
   @media (max-width: 480px) {
     .top-app-bar-container {
       margin-right: 0;
