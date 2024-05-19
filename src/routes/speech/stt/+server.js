@@ -32,7 +32,7 @@ export async function POST({ url, fetch, cookies, request }) {
 
   // resp = await queryHF(buffer);
 
-  if (from_lang == 'en') {
+  if (from_lang == '_en') {
     resp = await stt_en(arrayBuffer, from_lang);
     resp = {
       [from_lang]: resp.text,
@@ -70,12 +70,12 @@ async function Translate(text, from_lang, to_lang) {
   }
 }
 
-async function stt_en(arrayBuffer) {
+async function stt(arrayBuffer, from_lang) {
   try {
     return await inference.automaticSpeechRecognition({
       data: arrayBuffer,
       model: 'openai/whisper-large-v3',
-      language: 'en',
+      language: from_lang,
     });
   } catch (ex) {
     console.log(ex);
@@ -94,7 +94,7 @@ async function stt_nl(arrayBuffer, from_lang) {
   }
 }
 
-async function stt(arrayBuffer, from_lang) {
+async function stt_en(arrayBuffer, from_lang) {
   try {
     return await inference.automaticSpeechRecognition({
       data: arrayBuffer,
