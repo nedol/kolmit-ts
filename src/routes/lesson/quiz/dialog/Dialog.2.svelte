@@ -283,7 +283,9 @@
     </div>
 
     {#if data.html}
-      <div class="html_data">{@html data.html}</div>
+
+        <ConText data={ data} />
+
     {/if}
   </div>
 </div>

@@ -1,5 +1,5 @@
 <script>
-  import { onMount } from 'svelte';
+  import { getContext, onMount } from 'svelte';
   import Card, {
     Content,
     PrimaryAction,
@@ -187,8 +187,10 @@
     // $call_but_status = status;
   }
 
+  let SetDlgDisplay = getContext('SetDlgDisplay');
+
   let OnClickCallButton = function (ev, email) {
-    $view = 'chat';
+    SetDlgDisplay('block');
   };
 </script>
 
@@ -207,8 +209,6 @@
     >
       <track kind="captions" />
     </video>
-
-
   </div>
 </div>
 

@@ -35,7 +35,7 @@
 
   import Module from '../lesson/Module.svelte';
 
-  import Chat from '../chatGPT/Сhat.svelte';
+  import Chat from '../chat/Сhat.svelte';
 
   import pkg from 'lodash';
   const { find } = pkg;
@@ -51,12 +51,9 @@
   import { dc_oper_state } from '$lib/js/stores.js';
   import { dc_user_state } from '$lib/js/stores.js';
 
-  $: if ($dc_oper_state === 'closed' || $dc_user_state === 'closed') {
-  }
-
   // import { msg_user } from '$lib/js/stores.js';
   // $: if ($msg_user) {
-    // OnMessage($msg_user, null);
+  // OnMessage($msg_user, null);
   // }
 
   import { msg_oper } from '$lib/js/stores.js';
@@ -66,7 +63,18 @@
 
   import { view } from '$lib/js/stores.js';
   import { posterst } from '$lib/js/stores.js';
- 
+
+  let dlg_display = 'none';
+
+  function SetDlgDisplay(val){
+    dlg_display = val;
+  }
+
+  setContext('SetDlgDisplay',SetDlgDisplay);
+
+  $: if ($view === 'group' && $call_but_status === 'talk')
+    dlg_display = 'block';
+  else dlg_display = 'none';
 
   $posterst = '/assets/operator.svg';
 
@@ -234,8 +242,6 @@
 
       local.audio.paused = false;
 
-      return;
-
       call_cnt = 10;
 
       inter = setInterval(function () {
@@ -265,7 +271,7 @@
       // local.audio.paused = true;
       remote.video.srcObject = src;
       remote.video.display = 'block';
-     
+
       // }
     };
   }
@@ -382,10 +388,8 @@
       // }
     }
     if (data.func === 'talk') {
-      // console.log('oper talk', data.operator);
-
       $call_but_status = 'talk';
-     
+
       video_button_display = true;
       remote.text.display = 'none';
     }
@@ -433,20 +437,6 @@
     }
   }
 
-  function onDebug() {
-    if (debug_div.style.opacity === '10') debug_div.style.opacity = '0';
-    else debug_div.style.opacity = '10';
-  }
-
-  function handleChatOpen(ev) {
-    $view = 'chat';
-    // fetch(`./?abonent=${abonent}&func=reset`)
-    // 	.then(() => location.reload())
-    // 	.catch((error) => {
-    // 		console.log(error);
-    // 	});
-  }
-
   function toggle_remote_audio() {
     isRemoteAudioMute = !isRemoteAudioMute;
     $muted = isRemoteAudioMute;
@@ -457,6 +447,19 @@
   });
 </script>
 
+<!-- {@debug $view} -->
+
+<!-- {#if $view === 'group'} -->
+  <Group />
+
+{#if $view === 'lesson'}
+  <Module data={group} />
+{/if}
+
+<div class="dialog" style="display: {dlg_display};">
+  <Chat></Chat>
+</div>
+
 <div
   style="position: relative;
     bottom: 15px;
@@ -465,10 +468,7 @@
   <BottomAppBar slot="oper" variant="static" bind:this={bottomAppBar}>
     <Section>
       <div class="remote_div">
-        <div class="user_placeholder"
-          
-          bind:this={$user_placeholder}
-        ></div>
+        <div class="user_placeholder" bind:this={$user_placeholder}></div>
 
         <VideoRemote
           {...remote.video}
@@ -559,19 +559,20 @@
   <!-- {@debug $call_but_status} -->
 </div>
 
-<!-- {@debug $view} -->
-
-{#if $view === 'group'}
-  <Group />
-{:else if $view === 'lesson'}
-  <Module data={group} />
-{:else if $view === 'chat'}
-  <Chat></Chat>
-{/if}
-
 
 
 <style lang="scss">
+  .dialog {
+    position: absolute;
+    background-color: aliceblue;
+    top: 50px;
+    width: 100vw;
+    height: 92vh;
+    right: 0vw;
+    margin: 0px auto;
+    z-index: 2;
+  }
+
   .remote_msg {
     position: relative;
     font-size: 0.7em;
@@ -584,12 +585,12 @@
     z-index: 1;
   }
 
-  .user_placeholder{
-    position: relative; 
-    bottom:30px; 
-    scale:.8;
-    left:-20px;
-    }
+  .user_placeholder {
+    position: relative;
+    bottom: 30px;
+    scale: 0.8;
+    left: -20px;
+  }
   .speaker-button {
     position: absolute;
     left: 83px;

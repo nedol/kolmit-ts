@@ -125,13 +125,13 @@
 
   $: if (q && !q[$langs]) {
     (async () => {
-      q[$langs] = await Translate(q[$llang],$llang, $langs);
+      q[$langs] = await Translate(q[$llang], $llang, $langs);
     })();
   }
 
   $: if (a && !a[$langs]) {
     (async () => {
-      a[$langs] = await Translate(a[$llang],$llang, $langs);
+      a[$langs] = await Translate(a[$llang], $llang, $langs);
     })();
   }
 
@@ -341,7 +341,7 @@
     return array;
   }
 
-  async function speak(text) {    
+  async function speak(text) {
     Speak(text);
   }
 
@@ -368,50 +368,56 @@
   function SttResult(text) {
     stt_text = text;
 
-    if (text){
+    if (text) {
       const similarity = compareStrings(
-        dialog_data.content[cur_qa].user2[$llang].toLowerCase().trim().replace(/[^\w\s]|_/g, ""),
-        text.toLowerCase().trim().replace(/[^\w\s]|_/g, "") //replace(/[0-9!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~]/g, '')
+        dialog_data.content[cur_qa].user2[$llang]
+          .toLowerCase()
+          .trim()
+          .replace(/[^\w\s]|_/g, ''),
+        text
+          .toLowerCase()
+          .trim()
+          .replace(/[^\w\s]|_/g, '') //replace(/[0-9!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~]/g, '')
       );
-    stt_text+= ` (${similarity.toFixed(0)}%)`
-     if(similarity>75){
-      setTimeout(()=>{   
-        onNextQA();
-      },3000);
+      stt_text += ` (${similarity.toFixed(0)}%)`;
+      if (similarity > 75) {
+        setTimeout(() => {
+          onNextQA();
+        }, 3000);
+      }
     }
-  }
   }
 
   function compareStrings(str1, str2) {
     // Используем алгоритм Левенштейна для вычисления расстояния между строками
     function levenshteinDistance(s, t) {
-        const d = []; // Массив для хранения результатов вычислений
+      const d = []; // Массив для хранения результатов вычислений
 
-        // Заполняем массив нулями
-        for (let i = 0; i <= s.length; i++) {
-            d[i] = [i];
-        }
-        for (let j = 0; j <= t.length; j++) {
-            d[0][j] = j;
-        }
+      // Заполняем массив нулями
+      for (let i = 0; i <= s.length; i++) {
+        d[i] = [i];
+      }
+      for (let j = 0; j <= t.length; j++) {
+        d[0][j] = j;
+      }
 
-        // Вычисляем расстояние Левенштейна
-        for (let j = 1; j <= t.length; j++) {
-            for (let i = 1; i <= s.length; i++) {
-                if (s.charAt(i - 1) === t.charAt(j - 1)) {
-                    d[i][j] = d[i - 1][j - 1];
-                } else {
-                    d[i][j] = Math.min(
-                        d[i - 1][j] + 1, // удаление
-                        d[i][j - 1] + 1, // вставка
-                        d[i - 1][j - 1] + 1 // замена
-                    );
-                }
-            }
+      // Вычисляем расстояние Левенштейна
+      for (let j = 1; j <= t.length; j++) {
+        for (let i = 1; i <= s.length; i++) {
+          if (s.charAt(i - 1) === t.charAt(j - 1)) {
+            d[i][j] = d[i - 1][j - 1];
+          } else {
+            d[i][j] = Math.min(
+              d[i - 1][j] + 1, // удаление
+              d[i][j - 1] + 1, // вставка
+              d[i - 1][j - 1] + 1 // замена
+            );
+          }
         }
+      }
 
-        // Расстояние Левенштейна между строками находится в d[s.length][t.length]
-        return d[s.length][t.length];
+      // Расстояние Левенштейна между строками находится в d[s.length][t.length]
+      return d[s.length][t.length];
     }
 
     // Вычисляем длины строк
@@ -427,12 +433,11 @@
     // Вычисляем процент совпадения
     const similarity = (1 - distance / maxLength) * 100;
 
-     console.log('similarityPercentage',similarity)
+    console.log('similarityPercentage', similarity);
 
     // Возвращаем true, если процент совпадения больше 75, иначе false
     return similarity;
-}
-
+  }
 
   onMount(async () => {
     // style_button = style_button_non_shared;
@@ -537,46 +542,54 @@
     <div class="card">
       {#if q || a}
         <!-- <div class="cnt">{cur_qa + 1}</div> -->
-        {#await Translate('Answer it', 'en', $langs) then data}
+        {#await Translate('Послушай вопрос', 'ru', $langs) then data}
           <div class="title">{data}:</div>
         {/await}
 
-        
         <div class="tip mdc-typography--headline6">
           {q[$llang]}
         </div>
 
-         {#await Translate(dialog_data.content[cur_qa].user1[$llang], $llang, $langs) then data}
-        <div style="text-align: center;">
-          <div
-            class="user1 mdc-typography--headline6"
-            style="visibility:{visibility[1]}"
-          >
-            {data}
+        {#await Translate(dialog_data.content[cur_qa].user1[$llang], $llang, $langs) then data}
+          <div style="text-align: center;">
+            <div
+              class="user1 mdc-typography--headline6"
+              style="visibility:{visibility[1]}"
+            >
+              {data}
+            </div>
           </div>
-        </div>
         {/await}
 
-        {#if showSpeakerButton}
-          <div class="speaker-button">
-            <IconButton
-              on:click={speak(dialog_data.content[cur_qa].user1[$llang])}
-            >
-              <Icon tag="svg" viewBox="0 0 24 24">
-                <path fill="currentColor" d={mdiPlay} />
-              </Icon>
-            </IconButton>
-          </div>
-        {/if}
+        <div
+          class="margins"
+          style="text-align: center; display: flex; align-items: center; justify-content: space-between;"
+        >
+          <br>
+          {#if showSpeakerButton}
+            <div class="speaker-button">
+              <IconButton
+                on:click={speak(dialog_data.content[cur_qa].user1[$llang])}
+              >
+                <Icon tag="svg" viewBox="0 0 24 24">
+                  <path fill="currentColor" d={mdiPlay} />
+                </Icon>
+              </IconButton>
+            </div>
+          {/if}
+        </div>
 
-        <br />
-
-        {#await Translate('Check up the answer', 'en', $langs) then data}
+        {#await Translate('Переведи и ответь', 'ru', $langs) then data}
           <div class="title">{data}:</div>
         {/await}
 
-        
-        <div class="user2"  style="visibility:{visibility[1]}">
+                <div class="user2_tr">
+          {#await Translate(dialog_data.content[cur_qa].user2[$llang], $llang, $langs) then data}
+            {data}
+          {/await}
+        </div>
+
+        <div class="user2" style="visibility:{visibility[1]}">
           {@html dialog_data.content[cur_qa].user2[$llang]}
         </div>
 
@@ -586,41 +599,43 @@
           </span>
         </div>
 
-        {#if showSpeakerButton}
-          <div class="speaker-button" style="top:5px">
+
+
+        <div
+          class="margins"
+          style="text-align: center; display: flex; align-items: center; justify-content: space-between;"
+        >
+          <div>
             <IconButton
-              on:click={speak(dialog_data.content[cur_qa].user2[$llang])}
+              class="material-icons"
+              aria-label="Back"
+              on:click={onClickMicrophone}
             >
               <Icon tag="svg" viewBox="0 0 24 24">
-                <path fill="currentColor" d={mdiPlay} />
+                {#if isListening}
+                  <path fill="currentColor" d={mdiMicrophone} />
+                {:else}
+                  <path fill="currentColor" d={mdiMicrophoneOutline} />
+                {/if}
               </Icon>
             </IconButton>
           </div>
-        {/if}
-        <div class="user2_tr">
-          {#await Translate(dialog_data.content[cur_qa].user2[$llang], $llang, $langs) then data}
-            {data}
-          {/await}
-        </div>
-
-        <div class="margins" style="text-align: center;">
-          <IconButton
-            class="material-icons"
-            aria-label="Back"
-            on:click={onClickMicrophone}
-          >
-            <Icon tag="svg" viewBox="0 0 24 24">
-              {#if isListening}
-                <path fill="currentColor" d={mdiMicrophone} />
-              {:else}
-                <path fill="currentColor" d={mdiMicrophoneOutline} />
-              {/if}
-            </Icon>
-          </IconButton>
-
           <Stt bind:this={stt} {SttResult} {StopListening} bind:display_audio
           ></Stt>
+
+          {#if showSpeakerButton}
+            <div class="speaker-button">
+              <IconButton
+                on:click={speak(dialog_data.content[cur_qa].user2[$llang])}
+              >
+                <Icon tag="svg" viewBox="0 0 24 24">
+                  <path fill="currentColor" d={mdiPlay} />
+                </Icon>
+              </IconButton>
+            </div>
+          {/if}
         </div>
+        <br>
 
         {#if dialog_data.html}
           <ConText data={dialog_data} />
@@ -680,8 +695,6 @@
     display: flex;
     position: relative;
     justify-content: start; /* Распределяет пространство между элементами равномерно */
-    width: 65vw;
-    left: 20px; /* Сбрасываем выравнивание текста по умолчанию */
     height: 30px;
   }
 
@@ -715,7 +728,7 @@
     border: none;
     border-radius: 5px;
     cursor: pointer;
-    bottom: -5px;
+
     width: 50px;
   }
 
@@ -723,9 +736,6 @@
     position: relative;
     font-size: large;
     border-radius: 25px;
-    top: -5px;
-    float: right;
-    right: 30px;
   }
 
   .html_data {
@@ -786,7 +796,7 @@
     width: 100vw;
     text-align: center;
     line-height: normal;
-    font-size: 1em;
+    font-size: .8em;
     margin-bottom: 0px;
     color: #333;
   }

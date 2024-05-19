@@ -102,7 +102,7 @@
     });
 
     let dt = dialog_task.innerHTML.replace(/<[^>]+>/gi, '');
-    const response = await fetch(`/chatGPT`, {
+    const response = await fetch(`/chat`, {
       method: 'POST',
       body: JSON.stringify({ topic: name, dialog: dialog }),
       headers: { 'Content-Type': 'application/json' },

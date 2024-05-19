@@ -127,7 +127,7 @@
 
 <style>
   .deps_div {
-    height: 90vh;
+    /* height: 90vh; */
     overflow-y: scroll;
     margin-left: 0px;
     margin-top: 40px;
@@ -139,6 +139,7 @@
   .flexy-dad {
     display: flex;
     flex-wrap: wrap;
+    margin-bottom: 35px;
     /* justify-content: center; */
   }
 

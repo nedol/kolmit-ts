@@ -1,7 +1,9 @@
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-import { pipeline } from '@xenova/transformers';
+import translate from 'translate'
+translate.engine = 'google';
+// import { pipeline } from '@xenova/transformers';
 
 // Allocate a pipeline for sentiment-analysis
 
@@ -9,13 +11,7 @@ import { pipeline } from '@xenova/transformers';
 
 import { HfInference } from '@huggingface/inference';
 const HF_TOKEN = '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';
-
 const inference = new HfInference(HF_TOKEN);
-
-const { RealtimeSession } = require('speechmatics');
-
-const token = 'WWJSDBA5JAVB4WP4JNKULL2CAZ7JCPL7';
-
 
 // import audioEncoder from 'audio-encoder';
 
@@ -24,6 +20,8 @@ export async function POST({ url, fetch, cookies, request }) {
   // const audioBlob = await request.blob(); // Получаем Blob объект
   const formData = await request.formData();
   const fileContent = formData.get('file');
+  const from_lang = formData.get('from_lang');
+  const to_lang = formData.get('to_lang');
 
   // Преобразование Blob в Buffer
   const buffer = await fileContent.arrayBuffer();
@@ -32,25 +30,67 @@ export async function POST({ url, fetch, cookies, request }) {
   const arrayBuffer = await blob.arrayBuffer();
   let resp;
 
-  try {
-    resp = await inference.automaticSpeechRecognition({
-      data: arrayBuffer,
-      model: 'jonatasgrosman/wav2vec2-large-xlsr-53-dutch',
-      language: 'nl',
-    });
-  } catch (ex) {
-    console.log(ex);
+      // resp = await queryHF(buffer);
+
+  if (from_lang == 'ru') {
+    resp = await stt_ru(arrayBuffer);
+    resp = {
+      [from_lang]: resp.text,
+      [to_lang]: await Translate(resp.text, from_lang, to_lang)
+    };
+
+
+  } else {
+    resp = await stt(arrayBuffer);
+    resp = { [from_lang]: resp.text };
   }
 
-  // resp = await queryHF(buffer);
 
-  resp = resp.text;
   console.log(resp);
   let response = new Response(JSON.stringify({ resp }));
   response.headers.append('Access-Control-Allow-Origin', `*`);
   return response;
 
-  // let resp = await sendAudioToSpeechmaticks(buffer);
+
+}
+
+  async function Translate(text, from_lang, to_lang) {
+    if (!text || !from_lang || !to_lang) return '';
+
+    try {
+      translate.from = from_lang;
+
+      return (
+        await translate(text.trim(), to_lang)
+      );
+    } catch (error) {
+      console.error('Translation error:', error);
+      return text; // или другое подходящее значение по умолчанию
+    }
+  }
+
+async function stt(arrayBuffer) {
+  try {
+    return await inference.automaticSpeechRecognition({
+      data: arrayBuffer,
+      model: 'jonatasgrosman/wav2vec2-large-xlsr-53-dutch',
+      language: 'nld',
+    });
+  } catch (ex) {
+    console.log(ex);
+  }
+}
+
+async function stt_ru(arrayBuffer) {
+  try {
+    return await inference.automaticSpeechRecognition({
+      data: arrayBuffer,
+      model: 'hannatoenbreker/whisper-dutch-small-v2',
+      language: 'rus',
+    });
+  } catch (ex) {
+    console.log(ex);
+  }
 }
 
 async function queryHF(data) {
@@ -71,12 +111,12 @@ async function queryHF(data) {
     // 'https://api-inference.huggingface.co/models/renesteeman/whisper-tiny-dutch-25',//3
     // 'https://api-inference.huggingface.co/models/golesheed/whisper-non-native-children-0-dutch',//0
     // 'https://api-inference.huggingface.co/models/golesheed/whisper-non-native-adult-6-dutch', //English 5!
-    'https://api-inference.huggingface.co/models/golesheed/whisper-9-dutch',// 5!!
+    'https://api-inference.huggingface.co/models/golesheed/whisper-9-dutch', // 5!!
 
     {
       headers: {
         Authorization: 'Bearer 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',
-        language:'nl'
+        language: 'nl',
       },
       method: 'POST',
       body: data,
@@ -86,3 +126,33 @@ async function queryHF(data) {
   return result;
 }
 
+async function queryFF(text) {
+  const url = 'https://api.forefront.ai/v1/chat/completions';
+  const api_key = process.env.FOREFRONT_API_KEY;
+
+  const options = {
+    method: 'POST',
+    headers: {
+      'content-type': 'application/json',
+      authorization: 'Bearer ${api_key}',
+    },
+    body: JSON.stringify({
+      model: 'beowolx/CodeNinja-1.0-OpenChat-7B',
+      messages: [
+        {
+          role: 'user',
+          content: text,
+        },
+      ],
+      max_tokens: 128,
+      temperature: 0.5,
+    }),
+  };
+
+  try {
+    const response = fetch(url, options);
+    return await response.json();
+  } catch (error) {
+    console.error(error);
+  }
+}

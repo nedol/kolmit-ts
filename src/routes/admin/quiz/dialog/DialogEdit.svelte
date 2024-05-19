@@ -200,7 +200,7 @@ and answering following $Context.]{10 phrases from each user}
 
   async function CreateContent() {
     let dt = prompt.replace(/<[^>]+>/gi, '');
-    const response = await fetch(`/chatGPT`, {
+    const response = await fetch(`/chat`, {
       method: 'POST',
       body: JSON.stringify({
         topic: name,

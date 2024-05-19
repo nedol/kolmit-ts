@@ -451,10 +451,15 @@
 
 <style>
   main {
-    /* width: 90vw; */
+    position:fixed;
+    top:20px;
+    left:0;
+    height:100vh;
+    overflow-y: auto;
+    width: 100vw;
     margin: 0 auto;
-    /* background-color: #fff;
-    transition: transform 0.3s ease-in-out;
+   background-color: #fff;
+      /*transition: transform 0.3s ease-in-out;
 
     position: relative;
     transform-style: preserve-3d;

@@ -21,8 +21,8 @@
 	"/admin/module": [
 		"src/routes/admin/module/+server.js"
 	],
-	"/chatGPT": [
-		"src/routes/chatGPT/+server.js"
+	"/chat": [
+		"src/routes/chat/+server.js"
 	],
 	"/lesson": [
 		"src/routes/lesson/+page.js",

@@ -118,7 +118,7 @@
     position: relative;
     scale: 0.8;
     bottom: 20px;
-    left: -10px;
+
   }
   video {
     display: block;

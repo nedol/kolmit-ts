@@ -107,7 +107,7 @@
     const words = words_data.content.map((item:any) => {
       if (item.user1) return item.user1[$langs] + ' - ' + item.user2[$langs];
     });
-    const response = await fetch(`/chatGPT`, {
+    const response = await fetch(`/chat`, {
       method: 'POST',
       body: JSON.stringify({ topic: name, words: words }),
       headers: { 'Content-Type': 'application/json' },

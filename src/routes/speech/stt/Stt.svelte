@@ -5,6 +5,7 @@
   // import { createModel, KaldiRecognizer } from 'vosk-browser';
 
   export let SttResult, StopListening, display_audio;
+  
 
   let mediaRecorder: any,
     mediaStream: any,
@@ -19,6 +20,8 @@
   const threshold = 10;
   const silenceDelay = 2000; //  секунды тишины
   let checkLoop = true;
+  let from_lang = 'en';
+  let to_lang = 'en';
 
   onMount(async () => {
     // await register(await connect());// не нужно?!
@@ -74,9 +77,20 @@
     };
   });
 
-  export async function startAudioMonitoring() {
-    startRecording();
-    checkAudio();
+  export async function startAudioMonitoring(from, to) {
+
+    from_lang = from;
+    to_lang = to;
+    try {
+      // дополнительные настройки audioAnalyser
+      startRecording();
+      checkAudio();
+      // setTimeout(() => {
+      // 	mediaRecorder.stop();
+      // }, 4000);
+    } catch (error) {
+      console.error('Ошибка доступа к микрофону:', error);
+    }
   }
 
   // Функция для проверки уровня аудио и управления записью
@@ -148,6 +162,8 @@
 
       const formData = new FormData();
       formData.append('file', blob, 'audio.wav');
+      formData.append('from_lang', from_lang);
+      formData.append('to_lang', to_lang);
 
       fetch('/speech/stt', {
         method: 'POST',

@@ -57,9 +57,9 @@ export async function POST(event) {
 
 		resp = await promise;
 
-		console.log(resp);
+		// console.log(resp);
 	} catch (ex) {
-		console.log(par.func + ex);
+		console.log(par.func, ex);
 	}
 
 	let response = new Response(JSON.stringify({ resp }));

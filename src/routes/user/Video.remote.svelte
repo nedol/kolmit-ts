@@ -71,7 +71,7 @@
     position: relative;
     scale: 1;
     top: 10px;
-    left: 10px;
+    left: 0px;
     height: 70px;
     width: 70px;
   }

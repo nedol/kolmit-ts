@@ -21,7 +21,7 @@
   let operator = user_.operator;
   let abonent = user_.abonent;
 
-  user_.display = 'none' //видимость в группе
+   //user_.display = 'none' //видимость в группе
 
   // const operator = getContext('operator')
 
@@ -73,9 +73,7 @@
   let video_button_display = false;
   let video_element, parent_div;
 
-  // $: if (status) {
-  //   $users_status[operator.operator] = status;
-  // }
+
 
   let progress = {
     display: 'none',
@@ -178,7 +176,7 @@
           if (status !== 'call') {
             status = 'active';
             // $call_but_status = 'active';
-            user_.display = 'block'
+            //user_.display = 'block'
           }
         } else if (res['busy']) {
           // if ($click_call_func === null)
@@ -196,7 +194,7 @@
 
           //rtc.abonent = url.searchParams.get('abonent');
           status = 'inactive';
-          user_.display = 'none'
+          //user_.display = 'none'
           // $call_but_status = 'inactive';
           $click_call_func = null; //operator -> OnClickCallButton
           parent_div.appendChild(card);
@@ -238,7 +236,7 @@
       status = 'inactive';
       $call_but_status = 'inactive';
       $click_call_func = null; //operator -> OnClickCallButton
-      parent_div.appendChild(card);
+//parent_div.appendChild(card);
       // video_element.load();
     }
 
@@ -247,7 +245,7 @@
       if (data.operator === operator) {
         $call_but_status = 'talk';
         status = 'talk';
-        user_.display = 'block'
+        //user_.display = 'block'
         video_button_display = true;
         local.audio.paused = true;
         $muted = false;
@@ -286,7 +284,7 @@
     switch (status) {
       case 'inactive':
         // status = 'wait';
-        user_.display = 'none'
+        //user_.display = 'none'
         // Call();
         // remote.video.srcObject = null;
         break;
@@ -299,13 +297,13 @@
       case 'active':
         $click_call_func = OnClickCallButton;
         function call() {
-          user_.display = 'block'
+          //user_.display = 'block'
           rtc.Call();
           status = 'call';
           $call_but_status = 'call';
           video_element.load();
 
-          $user_placeholder.appendChild(card);//звонок
+         $user_placeholder.appendChild(card);//звонок
 
           window.scrollTo({ top: 0, behavior: 'smooth' });
         }
@@ -315,7 +313,7 @@
         break;
       case 'call':
         status = 'inactive';
-        user_.display = 'none'
+        //user_.display = 'none'
         $call_but_status = 'inactive';
 
         local.audio.paused = true;
@@ -329,7 +327,7 @@
         break;
       case 'talk':
         status = 'inactive';
-        user_.display = 'none'
+        //user_.display = 'none'
         $call_but_status = 'inactive';
 
         local.video.display = 'none';
@@ -345,7 +343,7 @@
         break;
       case 'muted':
         status = 'inactive';
-        user_.display = 'none'
+        //user_.display = 'none'
         // $call_but_status = 'inactive';
         video_button_display = 'none';
         $click_call_func = null; //operator -> OnClickCallButton
@@ -355,7 +353,7 @@
         // rtc.Call();
         if ($call_but_status === 'talk') {
           status = 'inactive';
-          user_.display = 'none'
+          //user_.display = 'none'
           $call_but_status = 'inactive';
           rtc.OnInactive();
         }

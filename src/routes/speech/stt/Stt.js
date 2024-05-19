@@ -17,38 +17,43 @@ let model,
 	recognizer,
 	loadedModel,
 	audioBuffer = [];
-const threshold = 40;
-const silenceDelay = 3000; //  секунды тишины
+const threshold = 20;
+const silenceDelay = 2000; //  секунды тишины
 let checkLoop = true;
+let from_lang = 'en';
+let to_lang = 'en';
 
 (async () => {
 	await register(await connect());
+	mediaStream = await navigator.mediaDevices.getUserMedia({
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true,
+          channelCount: 1,
+          sampleRate: 48000,
+          sampleSize: 16,
+          volume: 1.0,
+        },
+	});
+
+	audioContext = new AudioContext();
+      audioAnalyser = audioContext.createAnalyser();
+      const source = audioContext.createMediaStreamSource(mediaStream);
+      source.connect(audioAnalyser);
+
+      const noiseSuppression = audioContext.createDynamicsCompressor();
+      noiseSuppression.threshold.value = -20; // Устанавливаем порог шумоподавления
+      source.connect(noiseSuppression);
 })();
 
 let SttResult;
 
-export async function startAudioMonitoring(sttres) {
+export async function startAudioMonitoring(sttres, from, to) {
 	SttResult = sttres;
+	from_lang = from;
+	to_lang = to;
 	try {
-		mediaStream = await navigator.mediaDevices.getUserMedia({
-			audio: {
-				echoCancellation: true,
-				noiseSuppression: true,
-				autoGainControl: true,
-				channelCount: 1,
-				sampleRate: 48000,
-				sampleSize: 16,
-				volume: 1.0
-			}
-		});
-		audioContext = new AudioContext();
-		audioAnalyser = audioContext.createAnalyser();
-		const source = audioContext.createMediaStreamSource(mediaStream);
-		source.connect(audioAnalyser);
-
-		const noiseSuppression = audioContext.createDynamicsCompressor();
-		noiseSuppression.threshold.value = -20; // Устанавливаем порог шумоподавления
-		source.connect(noiseSuppression);
 		// дополнительные настройки audioAnalyser
 		startRecording();
 		checkAudio();
@@ -62,7 +67,7 @@ export async function startAudioMonitoring(sttres) {
 
 // Функция для проверки уровня аудио и управления записью
 function checkAudio() {
-	console.log('startRecording');
+	// console.log('startRecording');
 	const dataArray = new Uint8Array(audioAnalyser.frequencyBinCount);
 	const checkSilence = () => {
 		audioAnalyser.getByteFrequencyData(dataArray);
@@ -73,12 +78,12 @@ function checkAudio() {
 			console.log('threshold:', average);
 			clearTimeout(silenceTimer);
 			silenceTimer = '';
-			console.log('silenceTimer after:', silenceTimer);
-		} else if (average <= threshold - 15 && isRecording) {
+			// console.log('silenceTimer after:', silenceTimer);
+		} else if (average <= threshold && isRecording) {
 			if (!silenceTimer)
 				silenceTimer = setTimeout(() => {
 					MediaRecorderStop();
-					console.log('stopRecording:', average);
+					// console.log('stopRecording:', average);
 				}, silenceDelay);
 		}
 		if (checkLoop) {
@@ -98,41 +103,48 @@ export function MediaRecorderStop() {
 
 // Функция для начала записи
 function startRecording() {
-	audioChunks = [];
-	let options = {
-		bitsPerSecond: 44100,
-		mimeType: 'audio/wav'
-		// audioBitsPerSecond: 128000 // Битрейт аудио (по желанию)
-	};
+  audioChunks = [];
+  let options = {
+    bitsPerSecond: 44100,
+    mimeType: 'audio/wav',
+    // audioBitsPerSecond: 128000 // Битрейт аудио (по желанию)
+  };
 
 	mediaRecorder = new MediaRecorder(mediaStream, options);
-	mediaRecorder.ondataavailable = (e) => {
-		if (false && audioChunks.length < 20) {
-			audioChunks.push(e.data);
-		} else {
-			audioChunks.push(e.data);
+	const audioTrack = mediaStream.getAudioTracks()[0];
+  mediaRecorder.ondataavailable = (e) => {
+    if (false && audioChunks.length < 20) {
+      audioChunks.push(e.data);
+    } else {
+      audioChunks.push(e.data);
 
-			const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+      const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
 
-			sendAudioToRecognition(audioBlob);
-		}
-	};
+      sendAudioToRecognition(audioBlob);
+    }
+  };
 
-	mediaRecorder.onstop = (e) => {
-		stopRecording();
-	};
+  mediaRecorder.onstop = (e) => {
+    stopRecording();
 
-	mediaRecorder.start();
-	isRecording = true;
-	checkLoop = true;
+  };
+
+  mediaRecorder.start();
+  isRecording = true;
+  checkLoop = true;
+  // Мьютирование аудио трека
+
+//   audioTrack.enabled = false; // Отключаем передачу звука
 }
 
 // Функция для остановки записи
 async function stopRecording() {
-	// await audioContext.decodeAudioData(audioBuffer);
-	const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
-	audioUrl = URL.createObjectURL(audioBlob);
-	display_audio = 'block';
+  // await audioContext.decodeAudioData(audioBuffer);
+  const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+  audioUrl = URL.createObjectURL(audioBlob);
+  display_audio = 'block';
+ const audioTrack = mediaStream.getAudioTracks()[0];
+  audioTrack.enabled = true; // включаем передачу звука
 }
 
 async function sendAudioToRecognition(blob) {
@@ -144,6 +156,8 @@ async function sendAudioToRecognition(blob) {
 
 		const formData = new FormData();
 		formData.append('file', blob, 'audio.wav');
+		formData.append('from_lang', from_lang);
+		formData.append('to_lang', to_lang);
 
 		fetch('/speech/stt', {
 			method: 'POST',

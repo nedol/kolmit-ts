@@ -504,7 +504,7 @@ async function HandleCall(q) {
           await global.rtcPool['operator'][q.abonent][q.operator].promise;
           if (global.rtcPool['user'][q.abonent][q.operator].resolve)
             global.rtcPool['user'][q.abonent][q.operator].resolve(remAr);
-          console.log('HandleCall to user', remAr.length);
+          // console.log('HandleCall to user', remAr.length);
           return;
         } else {
           item.status = 'wait';
