@@ -132,9 +132,11 @@
     mediaRecorder.start();
     isRecording = true;
     checkLoop = true;
+    mediaStream.enable = false;
   }
 
   async function stopRecording() {
+    mediaStream.enable = true;
     const len = audioChunks.length;
     if (audioChunks[len - 1]?.size > 0) {
       sendAudioToRecognition(audioChunks[len - 1]);

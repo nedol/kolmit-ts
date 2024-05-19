@@ -220,6 +220,7 @@
   }
 
   .input-container {
+    display: flex;
     position: relative;
     bottom: 0vh;
     padding: 0 10px; /* Добавляем отступы */

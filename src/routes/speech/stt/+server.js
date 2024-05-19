@@ -1,7 +1,7 @@
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-import translate from 'translate'
+import translate from 'translate';
 translate.engine = 'google';
 // import { pipeline } from '@xenova/transformers';
 
@@ -30,63 +30,76 @@ export async function POST({ url, fetch, cookies, request }) {
   const arrayBuffer = await blob.arrayBuffer();
   let resp;
 
-      // resp = await queryHF(buffer);
+  // resp = await queryHF(buffer);
 
-  if (from_lang == 'ru') {
-    resp = await stt_ru(arrayBuffer);
+  if (from_lang == 'en') {
+    resp = await stt_en(arrayBuffer, from_lang);
     resp = {
       [from_lang]: resp.text,
-      [to_lang]: await Translate(resp.text, from_lang, to_lang)
+      [to_lang]: await Translate(resp.text, from_lang, to_lang),
     };
 
-
-  } else {
-    resp = await stt(arrayBuffer);
+  } else if (from_lang == 'nl') {
+    resp = await stt_nl(arrayBuffer);
     resp = { [from_lang]: resp.text };
-  }
 
+  } else  {
+    resp = await stt(arrayBuffer, from_lang);
+    resp = {
+      [from_lang]: resp.text,
+      [to_lang]: await Translate(resp.text, from_lang, to_lang),
+    };
+  }
 
   console.log(resp);
   let response = new Response(JSON.stringify({ resp }));
   response.headers.append('Access-Control-Allow-Origin', `*`);
   return response;
-
-
 }
 
-  async function Translate(text, from_lang, to_lang) {
-    if (!text || !from_lang || !to_lang) return '';
+async function Translate(text, from_lang, to_lang) {
+  if (!text || !from_lang || !to_lang) return '';
 
-    try {
-      translate.from = from_lang;
+  try {
+    translate.from = from_lang;
 
-      return (
-        await translate(text.trim(), to_lang)
-      );
-    } catch (error) {
-      console.error('Translation error:', error);
-      return text; // или другое подходящее значение по умолчанию
-    }
+    return await translate(text.trim(), to_lang);
+  } catch (error) {
+    console.error('Translation error:', error);
+    return text; // или другое подходящее значение по умолчанию
   }
+}
 
-async function stt(arrayBuffer) {
+async function stt_en(arrayBuffer) {
   try {
     return await inference.automaticSpeechRecognition({
       data: arrayBuffer,
-      model: 'jonatasgrosman/wav2vec2-large-xlsr-53-dutch',
-      language: 'nld',
+      model: 'openai/whisper-large-v3',
+      language: 'en',
     });
   } catch (ex) {
     console.log(ex);
   }
 }
 
-async function stt_ru(arrayBuffer) {
+async function stt_nl(arrayBuffer, from_lang) {
+  try {
+    return await inference.automaticSpeechRecognition({
+      data: arrayBuffer,
+      model: 'jonatasgrosman/wav2vec2-large-xlsr-53-dutch',
+      language: 'nl',
+    });
+  } catch (ex) {
+    console.log(ex);
+  }
+}
+
+async function stt(arrayBuffer, from_lang) {
   try {
     return await inference.automaticSpeechRecognition({
       data: arrayBuffer,
       model: 'hannatoenbreker/whisper-dutch-small-v2',
-      language: 'rus',
+      language: from_lang,
     });
   } catch (ex) {
     console.log(ex);
