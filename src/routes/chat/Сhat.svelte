@@ -28,7 +28,7 @@
   import IconButton, { Icon } from '@smui/icon-button';
   import Stt from '../speech/stt/Stt.svelte';
 
-  let userInput = '';
+  let userInput = {};
   let messages = [];
   let isListening = false;
   let display_audio = true;
@@ -39,7 +39,7 @@
     if (msg.func === 'chat') {
       console.log(msg.text[$llang]);
       messages.unshift({ text: msg.text, isQuestion: 'answer' });
-      messages = messages
+      messages = messages;
     }
   }
 
@@ -51,8 +51,8 @@
       userInput[$llang] = userInput[$llang].slice(0, 500);
 
       // messages = [{ text: userInput, isQuestion: 'question' }, ...messages];
-       messages.unshift({ text: userInput, isQuestion: 'question' });
-       messages = messages
+      messages.unshift({ text: userInput, isQuestion: 'question' });
+      messages = messages;
 
       // const response = await fetch(`/chat`, {
       // 	method: 'POST',
@@ -98,28 +98,34 @@
   });
 
   function micClicked() {
-    isListening = true;
-    stt.startAudioMonitoring($langs, $llang); // Здесь должен быть ваш код для активации микрофона
+    if (!isListening) {
+      isListening = true;
+      stt.startAudioMonitoring($langs, $llang); // Здесь должен быть ваш код для активации микрофона
+    } else {
+      stt.MediaRecorderStop();
+      isListening = false;
+    }
   }
 
   function StopListening() {
     isListening = false;
   }
 
-  function SttResult(data) {
+  function SttResult(data: {}) {
+    if(data[$llang])
     userInput = data;
-    callChat();
+    // callChat();
     isListening = false;
-    SendDC(data);
+    // SendDC(data);
   }
 
-  function SendDC() {
+  function SendDC(text: string) {
     const dc = $dc_user || $dc_oper;
     if (dc)
       dc.SendData(
         {
           func: 'chat',
-          lang: $llang,
+          lang: text ? text : $llang,
           text: userInput,
         },
         () => {
@@ -156,7 +162,10 @@
   <Stt bind:this={stt} bind:display_audio {SttResult} {StopListening}></Stt>
   <button
     on:click={() => {
-      SendDC('test');
+      userInput[$llang] = userInput[$llang].slice(0, 500);
+      messages.unshift({ text: userInput, isQuestion: 'question' });
+      messages = messages;
+      SendDC(userInput[$llang]);
     }}>Отправить</button
   >
 </div>
@@ -181,7 +190,7 @@
   <textarea
     id="myTextarea"
     maxlength="500"
-    bind:value={userInput[$llang]}
+    bind:value={userInput[$langs]}
     on:keydown={handleKeyDown}
     placeholder="Задайте вопрос..."
   ></textarea>

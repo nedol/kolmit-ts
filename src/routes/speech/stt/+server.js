@@ -34,21 +34,28 @@ export async function POST({ url, fetch, cookies, request }) {
 
   if (from_lang == '_en') {
     resp = await stt_en(arrayBuffer, from_lang);
-    resp = {
-      [from_lang]: resp.text,
-      [to_lang]: await Translate(resp.text, from_lang, to_lang),
-    };
+    if (resp) {
+      resp = {
+        [from_lang]: resp.text,
+        [to_lang]: await Translate(resp.text, from_lang, to_lang),
+      };
+    }
 
   } else if (from_lang == 'nl') {
     resp = await stt_nl(arrayBuffer);
-    resp = { [from_lang]: resp.text };
+    if (resp) {
+      resp = { [from_lang]: resp.text };
+    }
 
   } else  {
     resp = await stt(arrayBuffer, from_lang);
-    resp = {
-      [from_lang]: resp.text,
-      [to_lang]: await Translate(resp.text, from_lang, to_lang),
-    };
+    if (resp) {
+      resp = {
+        [from_lang]: resp.text,
+        [to_lang]: await Translate(resp.text, from_lang, to_lang),
+      };
+    }
+
   }
 
   console.log(resp);

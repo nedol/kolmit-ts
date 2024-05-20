@@ -93,23 +93,23 @@
 
   // Функция для проверки уровня аудио и управления записью
   function checkAudio() {
-    // console.log('startRecording');
+    console.log('startRecording');
     const dataArray = new Uint8Array(audioAnalyser.frequencyBinCount);
     const checkSilence = () => {
       audioAnalyser.getByteFrequencyData(dataArray);
       const sum = dataArray.reduce((a, b) => a + b, 0);
       const average = sum / dataArray.length;
-      // console.log('average:', average);
+      console.log('average:', average);
       if (average > threshold) {
-        // console.log('threshold:', average);
+        console.log('threshold:', average);
         clearTimeout(silenceTimer);
         silenceTimer = '';
-        // console.log('silenceTimer after:', silenceTimer);
+        console.log('silenceTimer after:', silenceTimer);
       } else if (average <= threshold && isRecording) {
         if (!silenceTimer)
           silenceTimer = setTimeout(() => {
             MediaRecorderStop();
-            // console.log('stopRecording:', average);
+            console.log('stopRecording:', average);
           }, silenceDelay);
       }
       if (checkLoop) {

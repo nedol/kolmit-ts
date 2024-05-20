@@ -1,6 +1,6 @@
 
 import translate from 'translate'
- export async function Translate(text, lang) {
+ export async function Translate_loc(text, lang) {
    try {
      if (lang === 'ru') return text;
      translate.from = 'ru';
@@ -22,4 +22,29 @@ import translate from 'translate'
      console.error('Translation error:', error);
      return text; // или другое подходящее значение по умолчанию
    }
- }
+}
+ 
+   async function Translate(text: string, to_lang: string) {
+     if (to_lang === 'ru') return text;
+     const response = await fetch('./admin', {
+       method: 'POST',
+       headers: {
+         'Content-Type': 'application/json',
+       },
+       body: JSON.stringify({
+         func: 'Translate',
+         text: text,
+         lang: lang,
+       }),
+     });
+
+     if (response.ok) {
+       const result = await response.json();
+       console.log('Результат:', result);
+       // Здесь можно обработать результат, например, отобразить его на странице
+       return result.res;
+     } else {
+       console.error('Ошибка при отправке данных');
+       // Здесь можно обработать ошибку, например, показать сообщение об ошибке пользователю
+     }
+   }
