@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  // import { startAudioMonitoring } from '/src/routes/speech/stt/Stt.js';
+  import { Speak } from '/src/routes/speech/tts/VoiceRSS';
 
   import {
     langs,
@@ -89,13 +89,17 @@
     if (event.key === 'Enter' && !event.shiftKey) {
       event.preventDefault();
       callChat();
-      SendDC();
+      SendDC('');
     }
   }
 
   onMount(() => {
     // stt.sendLoadModel();
   });
+
+  async function speak(text) {
+    Speak(text);
+  }
 
   function micClicked() {
     if (!isListening) {
@@ -112,9 +116,10 @@
   }
 
   function SttResult(data: {}) {
-    if(data[$llang])
-    userInput = data;
-    // callChat();
+    if (data[$llang]) userInput = data;
+    userInput[$llang] = userInput[$llang].slice(0, 500);
+    messages.unshift({ text: userInput, isQuestion: 'question' });
+    messages = messages;
     isListening = false;
     // SendDC(data);
   }
@@ -137,10 +142,19 @@
 
 <div class="chat-container" style="overflow-y: auto;">
   {#each messages as { text, isQuestion }, index (index)}
+  <div style="display:inline-flex">
     <div class="userMessage {isQuestion}" key={index}>
       {text[$llang]}
       <div class="original">{text[$langs]}</div>
     </div>
+    <div class="speaker-button">
+      <IconButton on:click={speak(text[$llang])}>
+        <Icon tag="svg" viewBox="0 0 24 24">
+          <path fill="currentColor" d={mdiPlay} />
+        </Icon>
+      </IconButton>
+    </div>
+  </div>
   {/each}
 </div>
 <br />
@@ -162,13 +176,11 @@
   <Stt bind:this={stt} bind:display_audio {SttResult} {StopListening}></Stt>
   <button
     on:click={() => {
-      userInput[$llang] = userInput[$llang].slice(0, 500);
-      messages.unshift({ text: userInput, isQuestion: 'question' });
-      messages = messages;
       SendDC(userInput[$llang]);
     }}>Отправить</button
   >
 </div>
+
 <!-- </div> -->
 
 <!-- <div class="input-container">
@@ -186,7 +198,7 @@
   </div>
 </div> -->
 
-<div class="textarea-container">
+<!-- <div class="textarea-container">
   <textarea
     id="myTextarea"
     maxlength="500"
@@ -194,7 +206,7 @@
     on:keydown={handleKeyDown}
     placeholder="Задайте вопрос..."
   ></textarea>
-</div>
+</div> -->
 
 <style>
   .chat-container {
@@ -202,7 +214,7 @@
     flex-direction: column-reverse;
     position: relative;
     width: 100%;
-    height: 70vh;
+    height: 80vh;
     background-color: #f4f4f8;
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
@@ -230,9 +242,15 @@
 
   .input-container {
     display: flex;
-    position: relative;
-    bottom: 0vh;
+    position: absolute;
+    bottom: 7vh;
     padding: 0 10px; /* Добавляем отступы */
+    width: 95vw;
+  }
+
+  .speaker-button{
+    position: relative;
+    top:5px
   }
 
   .original {
