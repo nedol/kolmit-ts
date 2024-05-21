@@ -1,85 +1,269 @@
-import fetch from 'node-fetch';
+import { prompt_data } from './prompt/prompt_data';
+import translate from 'translate'
+translate.engine = 'google'
+
+import Groq from 'groq-sdk';
 import { config } from 'dotenv';
 config();
 
-import { HfInference } from '@huggingface/inference';
-const inference = new HfInference('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');
+// import Anthropic from '@anthropic-ai/sdk';
+
+const groq1 = new Groq({ apiKey: process.env.GROQ_API_KEY_2 });
+const groq2 = new Groq({ apiKey: process.env.GROQ_API_KEY_2 });
+
+// const anthropic = new Anthropic({
+//   apiKey: process.env.ANTHROPIC_API_KEY, // defaults to process.env["ANTHROPIC_API_KEY"]
+// });
+
+// import ollama from 'ollama';
+
+import { pipeline } from '@xenova/transformers';
+import {
+  AutoTokenizer,
+  AutoModelForCausalLM,
+  AutoModel,
+} from '@xenova/transformers';
+
+class MyClassificationPipeline {
+  static task = 'question-answering'; //'text-classification';
+  static model = 'Xenova/distilbert-base-uncased-distilled-squad'; //robinsmits/Qwen1.5-7B-Dutch-Chat'; //'Xenova/distilbert-base-uncased-finetuned-sst-2-english';
+  static instance = null;
+
+  static async getInstance(progress_callback = null) {
+    if (this.instance === null) {
+      // NOTE: Uncomment this to change the cache directory
+      // env.cacheDir = './.cache';
+
+      this.instance = pipeline(this.task, this.model, { progress_callback });
+    }
+
+    return this.instance;
+  }
+}
+
+// import prompt_data from './prompt/prompt_data.json';
+let assistant = '';
+let resp = '';
+let messages = [];
+let cnt = 0;
 
 
 
 
-
+// async function chatOllama(system, task) {
+// 	return await ollama.chat({
+//     model: 'llama2',
+//     messages: [{ role: 'user', content: system + task }],
+//   });
+// }
 
 /** @type {import('./$types').RequestHandler} */
 export async function POST({ request, url, fetch, cookies }) {
-  let { topic, dialog } = await request.json();
+  let {question} = await request.json();
 
-  let response = await chatCompletion({
-    inputs: 'Can you please let us know more details about your ',
-  });
+  const system1 = ``;
 
-  // let response = await queryTextGeneration({
-  //   inputs: 'Can you please let us know more details about your ',
-  // });
-  
-  // let response = await query({
-  //   inputs: {
-  //     question: 'What is my name?',
-  //     context: 'My name is Clara and I live in Berkeley.',
-  //   },
-  // });
+  // let chat_resp = await chatANTHROPIC(system, task1, assistant);
+  // let chat_resp = await chatHercai(system, task);
 
-  console.log(JSON.stringify(response));
+  async function chat(chatLLM, system, task) {
+    try {
+      const chat_resp = await chatLLM(system, task, 1);
+      return JSON.parse(chat_resp.match(/\{[^{}]+\}/));
+    } catch (ex) {
+      task =
+        '[review your previous response][find misspellings][offer improved version]';
+      chat(chatLLM, system, task);
+    }
+  }
 
-  // response = new Response(JSON.stringify({ response}));
-  // response.headers.append('Access-Control-Allow-Origin', `*`);
+  translate.from = question.lang;
+  translate.to = 'en';
+  const task1 = await translate( question.text);
+
+  let answer = await chatGroq2(system1, question.text);
+
+  translate.from = 'en';
+ 
+  let res = {
+    [question.lang]: await translate(answer, { to: question.lang }),
+    ['nl']: await translate(answer, { to: 'nl' }),
+    ['en']: answer
+  };
+
+
+  // let task2 = `[continue]{dialogue:${JSON.stringify(dialog)}}`;
+  // let user2 = await chat(chatGroq2, system2, task2);
+
+  let response = new Response(JSON.stringify({ res }));
+  response.headers.append('Access-Control-Allow-Origin', `*`);
   return response;
 }
 
-async function chatCompletion(text) {
-  // const mistal = inference.endpoint(
-  //   'https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.2'
+
+async function chatGroq1(system, task, num) {
+  try {
+    cnt = 0;
+    resp = '';
+    const completion = await groq1.chat.completions
+      .create({
+        messages: [
+          {
+            role: 'system',
+            content: system,
+          },
+          {
+            role: 'assistant',
+            content: task,
+          },
+        ],
+        model: 'mixtral-8x7b-32768', //'llama2-70b-4096',//
+        temperature: 0.9,
+        top_p: 1,
+        stop: null,
+        max_tokens: 4096,
+        stream: false,
+      })
+      .then((chatCompletion) => {
+        // process.stdout.write(chatCompletion.choices[0]?.message?.content || '');
+        return chatCompletion.choices[0]?.message?.content || '';
+      });
+
+    try {
+      resp = completion.replace(/\n/g, '');
+      resp = `${resp.replace(/\\/g, '')}`;
+      // resp = JSON.parse(resp);
+    } catch (ex) {
+      console.log(ex);
+      let startIndex = resp.indexOf('{');
+      let endIndex = resp.lastIndexOf('}');
+      let jsonStr = resp.substring(startIndex, endIndex + 1);
+      resp = JSON.parse(jsonStr);
+
+      // question = 'continue';
+      // return;
+      // await chatGroq(system, task, num);
+    }
+
+    // console.log(resp);
+
+    messages.push(resp);
+
+    if (false /*cnt++ <= num*/) {
+      question += `${resp[user1]} - ${resp[user2]} - it's a last part of the dialog.`;
+      question += 'continue the dialog';
+      resp = '';
+      await chatGroq(system, question, num);
+    }
+
+    // console.log(completion);
+    return resp;
+
+    // Возвращаем массив ответов, преобразуем каждый ответ, чтобы вернуть только reply
+  } catch (error) {
+    console.error('Ошибка при взаимодействии:', error);
+    // Возвращаем пустой массив или другое значение, чтобы обработать ошибку на уровне вызова функции
+  }
+}
+
+async function chatGroq2(system, task) {
+  try {
+
+    const chatCompletion = await groq2.chat.completions
+      .create({
+        messages: [
+          {
+            role: 'system',
+            content: system,
+          },
+          {
+            role: 'user',
+            content: task,
+          },
+        ],
+        model: 'mixtral-8x7b-32768', //'llama2-70b-4096',//
+        temperature: 0.9,
+        top_p: 1,
+        stop: null,
+        max_tokens: 4096,
+        stream: false,
+      });
+    
+    return chatCompletion.choices[0].message.content;
+
+    // Возвращаем массив ответов, преобразуем каждый ответ, чтобы вернуть только reply
+  } catch (error) {
+    console.error('Ошибка при взаимодействии:', error);
+    // Возвращаем пустой массив или другое значение, чтобы обработать ошибку на уровне вызова функции
+  }
+}
+
+async function chatTranformers(system, task) {
+  const pipe = await pipeline(
+    'text-generation',
+    'Felladrin/onnx-TinyMistral-248M-Chat-v2'
+  );
+
+  const response = await pipe(task, {
+    max_new_tokens: 500,
+    temperature: 0.9,
+  });
+  return response;
+
+  // let model = await AutoModel.from_pretrained(
+  //   'robinsmits/Qwen1.5-7B-Dutch-Chat'
   // );
-	const response = await fetch(
-		"https://api-inference.huggingface.co/models/bigscience/bloom",
-		{
-			headers: { Authorization: "Bearer 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" },
-			method: "POST",
-			body: JSON.stringify(text),
-		}
-	);
-	const result = await response;
-	return result;
+
+  // let model = await AutoModelForCausalLM.from_pretrained(
+  //   'Salesforce/codegen-350M-mono'
+  // );
+
+  // let tokenizer = await AutoTokenizer.from_pretrained(
+  //   'Salesforce/codegen-350M-mono'
+  // );
+
+  // let text = 'def hello_world():';
+  // let input_ids = tokenizer(text, { return_tensors : 'pt' }).input_ids;
+
+  // let generated_ids = model.generate(input_ids, { max_length : 128 });
+
+  //   const messages = [
+  //     {
+  //       role: 'user',
+  //       content: 'Hoi hoe gaat het ermee? Wat kun je me vertellen over appels?',
+  //     },
+  //   ];
+
+  //   const encoded_ids = tokenizer.apply_chat_template(messages, true, 'pt');
+
+  //   const input_ids = encoded_ids.to('cuda');
+  //   const generated_ids = model.generate(input_ids, 256, true);
+  // }
 }
 
-async function queryTextGeneration(data) {
-  const response = await fetch(
-    'https://api-inference.huggingface.co/models/bigscience/bloom',
-    {
-      headers: {
-        Authorization: 'Bearer ' + process.env.HF_TOKEN,
-      },
-      method: 'POST',
-      body: JSON.stringify(data),
+
+async function chatANTHROPIC(system, question, assistant) {
+  messages = [];
+  messages.push({ role: 'user', content: question });
+  if (assistant) messages.push({ role: 'assistant', content: assistant });
+  const msg = await anthropic.messages.create({
+    model: 'claude-3-haiku-20240307',
+    max_tokens: 4096,
+    system: system,
+    messages: messages,
+  });
+  if (msg.content[0]) {
+    resp = msg.content[0].text.trim();
+    resp = resp.replace(/[()]/g, '');
+    resp = resp.replace(/\n/g, '');
+    resp = resp.replace(/\\/g, '');
+    try {
+      JSON.parse(resp);
+    } catch (ex) {
+      question = 'continue';
+      await chatANTHROPIC(system, question, msg.content[0].text.trim());
     }
-  );
-  const result = await response.json();
-  return result;
+  }
+
+  return `${JSON.stringify(resp)}`;
 }
-
-
-async function queryAnsweringQuestionInContext(data) {
-  const response = await fetch(
-    'https://api-inference.huggingface.co/models/deepset/roberta-base-squad2',
-    {
-      headers: {
-        Authorization: 'Bearer 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',
-      },
-      method: 'POST',
-      body: JSON.stringify(data),
-    }
-  );
-  const result = await response.json();
-  return result;
-}
-

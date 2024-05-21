@@ -92,6 +92,17 @@
     BuildQuizUsers($msg_oper.quiz_users);
   }
 
+  (async () => {
+    const lessonData = await fetchLesson(operator.abonent);
+    lesson_data = lessonData.data;
+    module = lesson_data.module;
+
+    $llang = lesson_data.lang;
+
+    translate.from = lesson_data.lang;
+    translate.engine = 'google';
+  })();
+
   function BuildQuizUsers(qu) {
     Object.keys(qu).map((quiz) => {
       quiz_users[quiz] = [
@@ -115,11 +126,9 @@
     quiz_users = quiz_users;
   }
 
-  export async function fetchLesson( owner, lesson) {
+  export async function fetchLesson(owner, lesson) {
     try {
-      const response = await fetch(
-        `./lesson?lesson=${lesson}&owner=${owner}`
-      );
+      const response = await fetch(`./lesson?lesson=${lesson}&owner=${owner}`);
       if (!response.ok) {
         throw new Error('Failed to fetch data');
       }
@@ -134,24 +143,12 @@
   onMount(async () => {
     // // Получаем ширину родительского окна при загрузке компонента
     // const parentWidth = window.innerWidth; // Может потребоваться window.innerWidth - некоторое смещение, если у вас есть другие элементы на странице
-
     // // Устанавливаем ширину контейнера равной ширине родительского окна
     // containerWidth = parentWidth + 'px';
-
     // // Получаем высоту родительского окна при загрузке компонента
     // const parentHeight = window.innerHeight; // Может потребоваться window.innerHeight - некоторое смещение, если у вас есть другие элементы на странице
-
     // // Устанавливаем высоту контейнера равной высоте родительского окна
     // containerHeight = parentHeight + 'px';
-
-    const lessonData = await fetchLesson(operator.abonent);
-    lesson_data = lessonData.data;
-    module = lesson_data.module;
-
-    $llang = lesson_data.lang;
-
-    translate.from = lesson_data.lang;
-    translate.engine = 'google';
   });
 
   onDestroy(() => {
@@ -168,7 +165,6 @@
       data.llang = $llang;
       data.level = level;
       data.quiz = type;
-      
 
       // if (ev.currentTarget.attributes['highlight'])
       //   data.highlight = ev.currentTarget.attributes['highlight'].value;
@@ -300,7 +296,7 @@
                 >{/await}
               <Content>
                 {#if theme.lessons}
-                <!-- {@debug theme} -->
+                  <!-- {@debug theme} -->
                   {#each theme.lessons as lesson}
                     <!-- <div>{lesson.num}.{lesson.title}</div> -->
                     {#if lesson.quizes}
@@ -451,15 +447,15 @@
 
 <style>
   main {
-    position:fixed;
-    top:20px;
-    left:0;
-    height:100vh;
+    position: fixed;
+    top: 20px;
+    left: 0;
+    height: 100vh;
     overflow-y: auto;
     width: 100vw;
     margin: 0 auto;
-   background-color: #fff;
-      /*transition: transform 0.3s ease-in-out;
+    background-color: #fff;
+    /*transition: transform 0.3s ease-in-out;
 
     position: relative;
     transform-style: preserve-3d;

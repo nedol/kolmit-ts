@@ -13,6 +13,8 @@
 
   $llang = 'nl';
 
+    let dc = $dc_oper || $dc_user;
+
   import {
     mdiPagePreviousOutline,
     mdiArrowRight,
@@ -25,14 +27,16 @@
     mdiPlay,
   } from '@mdi/js';
 
+  import Button, { Label } from '@smui/button';
   import IconButton, { Icon } from '@smui/icon-button';
   import Stt from '../speech/stt/Stt.svelte';
 
   let userInput = {};
   let messages = [];
   let isListening = false;
-  let display_audio = true;
+  let display_audio = 'none';
   let stt: Stt;
+  let variant = 'outlined';
 
   $: if ($msg_oper || $msg_user) {
     const msg = $msg_oper || $msg_user;
@@ -44,30 +48,31 @@
   }
 
   // Function to call ChatGPT
-  async function callChat() {
+  async function callChat(text) {
     try {
-      if (!userInput[$llang]) return;
 
-      userInput[$llang] = userInput[$llang].slice(0, 500);
 
       // messages = [{ text: userInput, isQuestion: 'question' }, ...messages];
-      messages.unshift({ text: userInput, isQuestion: 'question' });
-      messages = messages;
+      // messages.unshift({ text: userInput, isQuestion: 'question' });
+      // messages = messages;
 
-      // const response = await fetch(`/chat`, {
-      // 	method: 'POST',
-      // 	body: JSON.stringify({ question: userInput }),
-      // 	headers: { 'Content-Type': 'application/json' }
-      // });
+      let  question = {'text': text, lang: $langs, llang: $llang} ;
+
+
+      const response = await fetch(`/chat`, {
+      	method: 'POST',
+      	body: JSON.stringify({question}),
+      	headers: { 'Content-Type': 'application/json' }
+      });
 
       // userInput = '';
 
-      // if (!response.ok) {
-      // 	throw new Error(`HTTP error! Status: ${response.status}`);
-      // }
+      if (!response.ok) {
+      	throw new Error(`HTTP error! Status: ${response.status}`);
+      }
 
-      // const data = await response.json();
-      // const resp = data.response.answer;
+      const data = await response.json();
+      // const resp = data.response;
       // console.log('resp', resp);
       // Переворачиваем массив для обработки с конца
       // const reversedArray = resp.slice().reverse();
@@ -78,8 +83,9 @@
       // });
 
       // let answer = resp ? resp.correct : 'no answer';
+     messages.unshift({ text: data.res, isQuestion: 'answer' });
+     messages = messages
 
-      // messages = [{ text: {['nl']:'response'}, isQuestion: 'answer' }, ...messages];
     } catch (error) {
       console.error('Произошла ошибка при обращении к серверу:', error);
     }
@@ -126,12 +132,32 @@
 
   function SendDC(text: string) {
     const dc = $dc_user || $dc_oper;
-    if (dc)
+    if (dc){
       dc.SendData(
         {
           func: 'chat',
-          lang: text ? text : $llang,
-          text: userInput,
+          lang: $llang,
+          text: text ? text : 'test',
+        },
+        () => {
+          console.log();
+        }
+      );
+    }else{
+      callChat(userInput[$langs]||'Расскажи о себе ');
+    }
+  }
+
+  function SendRepeat() {
+    variant = 'unelevated';
+    setTimeout(() => {
+      variant = 'outlined';
+    }, 1000);
+
+    if (dc)
+      dc.SendData(
+        {
+          command: 'repeat',
         },
         () => {
           console.log();
@@ -142,19 +168,19 @@
 
 <div class="chat-container" style="overflow-y: auto;">
   {#each messages as { text, isQuestion }, index (index)}
-  <div style="display:inline-flex">
-    <div class="userMessage {isQuestion}" key={index}>
-      {text[$llang]}
-      <div class="original">{text[$langs]}</div>
+    <div style="display:inline-flex">
+      <div class="userMessage {isQuestion}" key={index}>
+        {text[$llang]}
+        <div class="original">{text[$langs]}</div>
+      </div>
+      <div class="speaker-button">
+        <IconButton on:click={speak(text[$llang])}>
+          <Icon tag="svg" viewBox="0 0 24 24">
+            <path fill="currentColor" d={mdiPlay} />
+          </Icon>
+        </IconButton>
+      </div>
     </div>
-    <div class="speaker-button">
-      <IconButton on:click={speak(text[$llang])}>
-        <Icon tag="svg" viewBox="0 0 24 24">
-          <path fill="currentColor" d={mdiPlay} />
-        </Icon>
-      </IconButton>
-    </div>
-  </div>
   {/each}
 </div>
 <br />
@@ -174,11 +200,19 @@
     </Icon>
   </IconButton>
   <Stt bind:this={stt} bind:display_audio {SttResult} {StopListening}></Stt>
-  <button
+  <Button
     on:click={() => {
       SendDC(userInput[$llang]);
-    }}>Отправить</button
+    }}><Label>Отправить</Label></Button
   >
+
+  {#if true || dc}
+    <div class="repeat_but">
+      <Button on:click={() => SendRepeat()} {variant}>
+        <Label>Повтор</Label>
+      </Button>
+    </div>
+  {/if}
 </div>
 
 <!-- </div> -->
@@ -214,7 +248,7 @@
     flex-direction: column-reverse;
     position: relative;
     width: 100%;
-    height: 80vh;
+    height: 75vh;
     background-color: #f4f4f8;
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
@@ -242,15 +276,17 @@
 
   .input-container {
     display: flex;
-    position: absolute;
-    bottom: 7vh;
+    position: fixed;
+    flex-direction: row;
+    justify-content: space-between;
+    bottom: 60px;
     padding: 0 10px; /* Добавляем отступы */
     width: 95vw;
   }
 
-  .speaker-button{
+  .speaker-button {
     position: relative;
-    top:5px
+    top: 5px;
   }
 
   .original {

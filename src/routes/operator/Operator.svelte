@@ -559,8 +559,6 @@
   <!-- {@debug $call_but_status} -->
 </div>
 
-
-
 <style lang="scss">
   .dialog {
     position: absolute;
