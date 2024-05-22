@@ -3,8 +3,6 @@ import translate from 'translate'
 translate.engine = 'google'
 
 import Groq from 'groq-sdk';
-import { config } from 'dotenv';
-config();
 
 
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY_1 });
@@ -17,22 +15,6 @@ import {
   AutoModel,
 } from '@xenova/transformers';
 
-class MyClassificationPipeline {
-  static task = 'question-answering'; //'text-classification';
-  static model = 'Xenova/distilbert-base-uncased-distilled-squad'; //robinsmits/Qwen1.5-7B-Dutch-Chat'; //'Xenova/distilbert-base-uncased-finetuned-sst-2-english';
-  static instance = null;
-
-  static async getInstance(progress_callback = null) {
-    if (this.instance === null) {
-      // NOTE: Uncomment this to change the cache directory
-      // env.cacheDir = './.cache';
-
-      this.instance = pipeline(this.task, this.model, { progress_callback });
-    }
-
-    return this.instance;
-  }
-}
 
 // import prompt_data from './prompt/prompt_data.json';
 let assistant = '';
@@ -56,25 +38,11 @@ export async function POST({ request, url, fetch, cookies }) {
 
   const system1 = ``;
 
-  // let chat_resp = await chatANTHROPIC(system, task1, assistant);
-  // let chat_resp = await chatHercai(system, task);
-
-  async function chat(chatLLM, system, task) {
-    try {
-      const chat_resp = await chatLLM(system, task, 1);
-      return JSON.parse(chat_resp.match(/\{[^{}]+\}/));
-    } catch (ex) {
-      task =
-        '[review your previous response][find misspellings][offer improved version]';
-      chat(chatLLM, system, task);
-    }
-  }
-
   translate.from = question.lang;
   translate.to = 'en';
   const task1 = await translate( question.text);
 
-  let answer = await chatGroq2(system1, question.text);
+  let answer = await chatGroq(system1, question.text);
 
   translate.from = 'en';
  
@@ -94,7 +62,7 @@ export async function POST({ request, url, fetch, cookies }) {
 }
 
 
-async function chatGroq2(system, task) {
+async function chatGroq(system, task) {
   try {
 
     const chatCompletion = await groq.chat.completions
