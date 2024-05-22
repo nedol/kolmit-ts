@@ -1,7 +1,7 @@
 <script>
 	import { onMount } from 'svelte';
 	import { applyAction, deserialize } from '$app/forms';
-	import image from 'svelte-image';
+
 	import Button from '@smui/button';
 	import Textfield from '@smui/textfield';
 	import loadImage from 'blueimp-load-image/js/load-image.js';

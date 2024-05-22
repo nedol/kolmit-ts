@@ -6,16 +6,9 @@ import Groq from 'groq-sdk';
 import { config } from 'dotenv';
 config();
 
-// import Anthropic from '@anthropic-ai/sdk';
 
-const groq1 = new Groq({ apiKey: process.env.GROQ_API_KEY_2 });
-const groq2 = new Groq({ apiKey: process.env.GROQ_API_KEY_2 });
+const groq = new Groq({ apiKey: process.env.GROQ_API_KEY_1 });
 
-// const anthropic = new Anthropic({
-//   apiKey: process.env.ANTHROPIC_API_KEY, // defaults to process.env["ANTHROPIC_API_KEY"]
-// });
-
-// import ollama from 'ollama';
 
 import { pipeline } from '@xenova/transformers';
 import {
@@ -101,75 +94,10 @@ export async function POST({ request, url, fetch, cookies }) {
 }
 
 
-async function chatGroq1(system, task, num) {
-  try {
-    cnt = 0;
-    resp = '';
-    const completion = await groq1.chat.completions
-      .create({
-        messages: [
-          {
-            role: 'system',
-            content: system,
-          },
-          {
-            role: 'assistant',
-            content: task,
-          },
-        ],
-        model: 'mixtral-8x7b-32768', //'llama2-70b-4096',//
-        temperature: 0.9,
-        top_p: 1,
-        stop: null,
-        max_tokens: 4096,
-        stream: false,
-      })
-      .then((chatCompletion) => {
-        // process.stdout.write(chatCompletion.choices[0]?.message?.content || '');
-        return chatCompletion.choices[0]?.message?.content || '';
-      });
-
-    try {
-      resp = completion.replace(/\n/g, '');
-      resp = `${resp.replace(/\\/g, '')}`;
-      // resp = JSON.parse(resp);
-    } catch (ex) {
-      console.log(ex);
-      let startIndex = resp.indexOf('{');
-      let endIndex = resp.lastIndexOf('}');
-      let jsonStr = resp.substring(startIndex, endIndex + 1);
-      resp = JSON.parse(jsonStr);
-
-      // question = 'continue';
-      // return;
-      // await chatGroq(system, task, num);
-    }
-
-    // console.log(resp);
-
-    messages.push(resp);
-
-    if (false /*cnt++ <= num*/) {
-      question += `${resp[user1]} - ${resp[user2]} - it's a last part of the dialog.`;
-      question += 'continue the dialog';
-      resp = '';
-      await chatGroq(system, question, num);
-    }
-
-    // console.log(completion);
-    return resp;
-
-    // Возвращаем массив ответов, преобразуем каждый ответ, чтобы вернуть только reply
-  } catch (error) {
-    console.error('Ошибка при взаимодействии:', error);
-    // Возвращаем пустой массив или другое значение, чтобы обработать ошибку на уровне вызова функции
-  }
-}
-
 async function chatGroq2(system, task) {
   try {
 
-    const chatCompletion = await groq2.chat.completions
+    const chatCompletion = await groq.chat.completions
       .create({
         messages: [
           {
