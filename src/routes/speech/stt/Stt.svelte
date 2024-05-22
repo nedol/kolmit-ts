@@ -221,7 +221,7 @@
   bind:this={audioPlayer}
   src={audioUrl}
   controls
-  style="display:{display_audio};width:50%"
+  style="display:{display_audio}"
 ></audio>
 
 <!-- <button on:click={playAudio}>Воспроизвести</button> -->
@@ -229,5 +229,6 @@
 <style>
   audio {
     height: 25px;
+    width:25vw
   }
 </style>

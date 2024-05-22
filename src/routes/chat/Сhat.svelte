@@ -13,7 +13,7 @@
 
   $llang = 'nl';
 
-    let dc = $dc_oper || $dc_user;
+  let dc = $dc_oper || $dc_user;
 
   import {
     mdiPagePreviousOutline,
@@ -50,25 +50,22 @@
   // Function to call ChatGPT
   async function callChat(text) {
     try {
-
-
       // messages = [{ text: userInput, isQuestion: 'question' }, ...messages];
       // messages.unshift({ text: userInput, isQuestion: 'question' });
       // messages = messages;
 
-      let  question = {'text': text, lang: $langs, llang: $llang} ;
-
+      let question = { text: text, lang: $langs, llang: $llang };
 
       const response = await fetch(`/chat`, {
-      	method: 'POST',
-      	body: JSON.stringify({question}),
-      	headers: { 'Content-Type': 'application/json' }
+        method: 'POST',
+        body: JSON.stringify({ question }),
+        headers: { 'Content-Type': 'application/json' },
       });
 
       // userInput = '';
 
       if (!response.ok) {
-      	throw new Error(`HTTP error! Status: ${response.status}`);
+        throw new Error(`HTTP error! Status: ${response.status}`);
       }
 
       const data = await response.json();
@@ -83,9 +80,8 @@
       // });
 
       // let answer = resp ? resp.correct : 'no answer';
-     messages.unshift({ text: data.res, isQuestion: 'answer' });
-     messages = messages
-
+      messages.unshift({ text: data.res, isQuestion: 'answer' });
+      messages = messages;
     } catch (error) {
       console.error('Произошла ошибка при обращении к серверу:', error);
     }
@@ -119,6 +115,7 @@
 
   function StopListening() {
     isListening = false;
+    display_audio = false;
   }
 
   function SttResult(data: {}) {
@@ -132,7 +129,7 @@
 
   function SendDC(text: string) {
     const dc = $dc_user || $dc_oper;
-    if (dc){
+    if (dc) {
       dc.SendData(
         {
           func: 'chat',
@@ -143,8 +140,8 @@
           console.log();
         }
       );
-    }else{
-      callChat(userInput[$langs]||'Расскажи о себе ');
+    } else {
+      callChat(userInput[$langs] || 'Расскажи о себе ');
     }
   }
 

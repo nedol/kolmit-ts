@@ -21,16 +21,14 @@ let cnt = 0;
 export async function POST({ request, url, fetch, cookies }) {
   let {question} = await request.json();
 
-  const system1 = ``;
+  const system = `Don't be verbose.`;
 
   translate.from = question.lang;
   translate.to = 'en';
-  const task1 = await translate( question.text);
+  const task = await translate( question.text);
 
-  let answer = await chatGroq(system1, question.text);
+  let answer = await chatGroq(system, task);
 
-  translate.from = 'en';
- 
   let res = {
     [question.lang]: await translate(answer, { to: question.lang }),
     ['nl']: await translate(answer, { to: 'nl' }),
