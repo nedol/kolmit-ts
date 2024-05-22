@@ -5,15 +5,9 @@ translate.engine = 'google'
 import Groq from 'groq-sdk';
 
 
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY_1 });
-
-
-import { pipeline } from '@xenova/transformers';
-import {
-  AutoTokenizer,
-  AutoModelForCausalLM,
-  AutoModel,
-} from '@xenova/transformers';
+const groq = new Groq({
+  apiKey: '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',
+});
 
 
 // import prompt_data from './prompt/prompt_data.json';
@@ -22,15 +16,6 @@ let resp = '';
 let messages = [];
 let cnt = 0;
 
-
-
-
-// async function chatOllama(system, task) {
-// 	return await ollama.chat({
-//     model: 'llama2',
-//     messages: [{ role: 'user', content: system + task }],
-//   });
-// }
 
 /** @type {import('./$types').RequestHandler} */
 export async function POST({ request, url, fetch, cookies }) {
