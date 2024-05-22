@@ -3,17 +3,23 @@ import { fileURLToPath } from 'url';
 
 import translate from 'translate';
 translate.engine = 'google';
+
 // import { pipeline } from '@xenova/transformers';
 
 // Allocate a pipeline for sentiment-analysis
 
 // [{'label': 'POSITIVE', 'score': 0.999817686}]
 
+// import { AssemblyAI } from 'assemblyai';
+// const client = new AssemblyAI({
+//   apiKey: '22e188d86e704836ba2592c7a56aa440',
+// });
+
 import { HfInference } from '@huggingface/inference';
 const HF_TOKEN = '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';
 const inference = new HfInference(HF_TOKEN);
 
-// import audioEncoder from 'audio-encoder';
+
 
 /** @type {import('./$types').RequestHandler} */
 export async function POST({ url, fetch, cookies, request }) {
@@ -23,11 +29,13 @@ export async function POST({ url, fetch, cookies, request }) {
   const from_lang = formData.get('from_lang');
   const to_lang = formData.get('to_lang');
 
+
   // Преобразование Blob в Buffer
   const buffer = await fileContent.arrayBuffer();
   const nodeBuffer = Buffer.from(buffer);
   const blob = new Blob([nodeBuffer]);
   const arrayBuffer = await blob.arrayBuffer();
+  const audioUrl = await URL.createObjectURL(blob);
   let resp;
 
   // resp = await queryHF(buffer);
@@ -49,6 +57,7 @@ export async function POST({ url, fetch, cookies, request }) {
 
   } else  {
     resp = await stt(arrayBuffer, from_lang);
+    // resp = await stt_as(audioUrl);
     if (resp) {
       resp = {
         [from_lang]: resp.text,
@@ -75,6 +84,14 @@ async function Translate(text, from_lang, to_lang) {
     console.error('Translation error:', error);
     return text; // или другое подходящее значение по умолчанию
   }
+}
+
+async function stt_as(audioUrl) {
+  const params = {
+    audio: audioUrl,
+  };
+  const transcript = await client.transcripts.transcribe(params);
+  return transcript;
 }
 
 async function stt(arrayBuffer, from_lang) {

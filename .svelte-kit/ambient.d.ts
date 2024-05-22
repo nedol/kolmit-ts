@@ -38,6 +38,7 @@ declare module '$env/static/private' {
 	export const ANTHROPIC_API_KEY: string;
 	export const HF_TOKEN: string;
 	export const FOREFRONT_API_KEY: string;
+	export const ASSEMBLY_API_KEY: string;
 	export const ALLUSERSPROFILE: string;
 	export const APPDATA: string;
 	export const ChocolateyInstall: string;
@@ -171,6 +172,7 @@ declare module '$env/dynamic/private' {
 		ANTHROPIC_API_KEY: string;
 		HF_TOKEN: string;
 		FOREFRONT_API_KEY: string;
+		ASSEMBLY_API_KEY: string;
 		ALLUSERSPROFILE: string;
 		APPDATA: string;
 		ChocolateyInstall: string;

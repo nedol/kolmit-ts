@@ -62,6 +62,7 @@
     "@sveltejs/adapter-node": "^5.0.1",
     "@sveltejs/adapter-static": "^3.0.1",
     "@xenova/transformers": "^2.16.1",
+    "assemblyai": "^4.4.3",
     "blueimp-load-image": "^5.16.0",
     "dotenv": "^16.4.5",
     "extendable-media-recorder": "^9.1.11",
