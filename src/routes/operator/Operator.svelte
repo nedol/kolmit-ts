@@ -561,11 +561,11 @@
 
 <style lang="scss">
   .dialog {
-    position: absolute;
+    position: fixed;
     background-color: aliceblue;
     top: 50px;
     width: 100vw;
-    height: 92vh;
+    height: 90vh;
     right: 0vw;
     margin: 0px auto;
     z-index: 2;

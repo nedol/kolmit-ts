@@ -229,6 +229,6 @@
 <style>
   audio {
     height: 25px;
-    width:25vw
+    width:30vw
   }
 </style>

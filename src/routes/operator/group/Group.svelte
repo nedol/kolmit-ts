@@ -140,7 +140,7 @@
     display: flex;
     flex-wrap: wrap;
     margin-bottom: 35px;
-    /* justify-content: center; */
+    justify-content: flex-start;
   }
 
   .tutor {

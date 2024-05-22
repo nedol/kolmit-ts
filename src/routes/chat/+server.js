@@ -1,14 +1,15 @@
+
+
 import { prompt_data } from './prompt/prompt_data';
-import translate from 'translate'
-translate.engine = 'google'
+import translate from 'translate';
+translate.engine = 'deepl'; //'google'
+translate.key = process.env.DEEPL_API_KEY;
 
 import Groq from 'groq-sdk';
-
 
 const groq = new Groq({
   apiKey: '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',
 });
-
 
 // import prompt_data from './prompt/prompt_data.json';
 let assistant = '';
@@ -16,25 +17,29 @@ let resp = '';
 let messages = [];
 let cnt = 0;
 
-
 /** @type {import('./$types').RequestHandler} */
 export async function POST({ request, url, fetch, cookies }) {
-  let {question} = await request.json();
+  let { question } = await request.json();
 
-  const system = `Don't be verbose.`;
+  const system = `
+  Treat the "Test" as not requiring an answer.
+  My goal is to practice colloquial speech and you could help me with it. My language level is A.1.1.
+  You always starting a conversation suggesting a topic. After answering the question, ask your question.
+  Correct my message if you will find grammar mistakes in it.
+  Don't be verbose.`;
 
-  translate.from = question.lang;
-  translate.to = 'en';
-  const task = await translate( question.text);
+  const task = await translate(question.text, {
+    from: question.lang,
+    to: 'en',
+  });
 
   let answer = await chatGroq(system, task);
 
   let res = {
-    [question.lang]: await translate(answer, { to: question.lang }),
-    ['nl']: await translate(answer, { to: 'nl' }),
-    ['en']: answer
+    ['nl']: await translate(answer, { from: 'en', to: question.llang }),
+    ['en']: answer,
+    [question.lang]: await translate(answer, { from: 'en', to: question.lang }),
   };
-
 
   // let task2 = `[continue]{dialogue:${JSON.stringify(dialog)}}`;
   // let user2 = await chat(chatGroq2, system2, task2);
@@ -44,30 +49,27 @@ export async function POST({ request, url, fetch, cookies }) {
   return response;
 }
 
-
 async function chatGroq(system, task) {
   try {
+    const chatCompletion = await groq.chat.completions.create({
+      messages: [
+        {
+          role: 'system',
+          content: system,
+        },
+        {
+          role: 'user',
+          content: task,
+        },
+      ],
+      model: 'mixtral-8x7b-32768', //'llama2-70b-4096',//
+      temperature: 0.9,
+      top_p: 1,
+      stop: null,
+      max_tokens: 4096,
+      stream: false,
+    });
 
-    const chatCompletion = await groq.chat.completions
-      .create({
-        messages: [
-          {
-            role: 'system',
-            content: system,
-          },
-          {
-            role: 'user',
-            content: task,
-          },
-        ],
-        model: 'mixtral-8x7b-32768', //'llama2-70b-4096',//
-        temperature: 0.9,
-        top_p: 1,
-        stop: null,
-        max_tokens: 4096,
-        stream: false,
-      });
-    
     return chatCompletion.choices[0].message.content;
 
     // Возвращаем массив ответов, преобразуем каждый ответ, чтобы вернуть только reply
@@ -119,7 +121,6 @@ async function chatTranformers(system, task) {
   //   const generated_ids = model.generate(input_ids, 256, true);
   // }
 }
-
 
 async function chatANTHROPIC(system, question, assistant) {
   messages = [];

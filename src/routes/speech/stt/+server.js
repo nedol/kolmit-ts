@@ -52,7 +52,10 @@ export async function POST({ url, fetch, cookies, request }) {
   } else if (from_lang == 'nl') {
     resp = await stt_nl(arrayBuffer);
     if (resp) {
-      resp = { [from_lang]: resp.text };
+      resp = {
+        [from_lang]: resp.text,
+        [to_lang]: await Translate(resp.text, from_lang, to_lang),
+      };
     }
 
   } else  {
@@ -64,7 +67,6 @@ export async function POST({ url, fetch, cookies, request }) {
         [to_lang]: await Translate(resp.text, from_lang, to_lang),
       };
     }
-
   }
 
   console.log(resp);

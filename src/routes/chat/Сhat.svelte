@@ -1,6 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { Speak } from '/src/routes/speech/tts/VoiceRSS';
+  import {Transloc} from '/src/routes/translate/Translate'
 
   import {
     langs,
@@ -13,7 +14,7 @@
 
   $llang = 'nl';
 
-  let dc = $dc_oper || $dc_user;
+  $: dc = $dc_oper || $dc_user;
 
   import {
     mdiPagePreviousOutline,
@@ -41,7 +42,7 @@
   $: if ($msg_oper || $msg_user) {
     const msg = $msg_oper || $msg_user;
     if (msg.func === 'chat') {
-      console.log(msg.text[$llang]);
+      // console.log(msg.text[$llang]);
       messages.unshift({ text: msg.text, isQuestion: 'answer' });
       messages = messages;
     }
@@ -96,7 +97,7 @@
   }
 
   onMount(() => {
-    // stt.sendLoadModel();
+    SendDC('No answer.');
   });
 
   async function speak(text) {
@@ -106,7 +107,11 @@
   function micClicked() {
     if (!isListening) {
       isListening = true;
-      stt.startAudioMonitoring($langs, $llang); // Здесь должен быть ваш код для активации микрофона
+      if (dc) {
+        stt.startAudioMonitoring($langs, $llang); // Здесь должен быть ваш код для активации микрофона
+      } else {
+        stt.startAudioMonitoring($llang, $langs);
+      } // Здесь должен быть ваш код для активации микрофона
     } else {
       stt.MediaRecorderStop();
       isListening = false;
@@ -141,9 +146,11 @@
         }
       );
     } else {
-      callChat(userInput[$langs] || 'Расскажи о себе ');
+      callChat(text || 'Расскажи о себе ');
     }
   }
+
+
 
   function SendRepeat() {
     variant = 'unelevated';
@@ -151,7 +158,7 @@
       variant = 'outlined';
     }, 1000);
 
-    if (dc)
+    if (dc) {
       dc.SendData(
         {
           command: 'repeat',
@@ -160,6 +167,7 @@
           console.log();
         }
       );
+    }
   }
 </script>
 
@@ -168,7 +176,9 @@
     <div style="display:inline-flex">
       <div class="userMessage {isQuestion}" key={index}>
         {text[$llang]}
-        <div class="original">{text[$langs]}</div>
+         {#await Transloc(text[$llang], $llang, $langs) then data}
+        <div class="original">{data}</div>
+        {/await}
       </div>
       <div class="speaker-button">
         <IconButton on:click={speak(text[$llang])}>
@@ -197,17 +207,21 @@
     </Icon>
   </IconButton>
   <Stt bind:this={stt} bind:display_audio {SttResult} {StopListening}></Stt>
-  <Button
-    on:click={() => {
-      SendDC(userInput[$llang]);
-    }}><Label>Отправить</Label></Button
-  >
+  {#await Transloc('Отправить', 'ru', $langs) then data}
+    <Button
+      on:click={() => {
+        SendDC(userInput[$llang]);
+      }}><Label>{data}</Label></Button
+    >
+  {/await}
 
-  {#if true || dc}
+  {#if dc}
     <div class="repeat_but">
-      <Button on:click={() => SendRepeat()} {variant}>
-        <Label>Повтор</Label>
-      </Button>
+      {#await Transloc('Повторить', 'ru', $langs) then data}
+        <Button on:click={() => SendRepeat()} {variant}>
+          <Label>{data}</Label>
+        </Button>
+      {/await}
     </div>
   {/if}
 </div>
@@ -243,29 +257,33 @@
   .chat-container {
     display: flex;
     flex-direction: column-reverse;
-    position: relative;
-    width: 100%;
-    height: 75vh;
+    position: absolute;
+    width: 100dvw;
+    height: 70vh;
     background-color: #f4f4f8;
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    padding-bottom: 6px; /* Оставляем место для поля ввода и кнопки */
+    /* padding-bottom: 6px;  */
   }
 
   .userMessage {
     margin: 5px;
     padding: 5px;
     border-radius: 5px;
+    user-select: text;
+    -webkit-user-select: text; /* для совместимости с Safari */
+    -moz-user-select: text; /* для совместимости с Firefox */
+    -ms-user-select: text; /* для совместимости с IE10+ */
   }
 
   .userMessage.question {
-    width: 80%;
+    width: 88%;
     background-color: #cce5ff;
     float: left;
   }
 
   .userMessage.answer {
-    width: 80%;
+    width: 88%;
     background-color: #e0e0e0;
     /* margin-left: 60px; */
     float: right;
