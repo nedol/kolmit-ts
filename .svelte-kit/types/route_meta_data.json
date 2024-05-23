@@ -32,7 +32,7 @@
 		"src/routes/lesson/+server.js"
 	],
 	"/operator": [
-		"src/routes/operator/+server.ts"
+		"src/routes/operator/+server.js"
 	],
 	"/public": [
 		"src/routes/public/+page.server.ts",
