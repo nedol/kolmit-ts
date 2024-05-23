@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { Speak } from '/src/routes/speech/tts/VoiceRSS';
-  import {Transloc} from '/src/routes/translate/Transloc'
+  import { Transloc } from '/src/routes/translate/Transloc';
 
   import {
     langs,
@@ -51,7 +51,6 @@
   // Function to call ChatGPT
   async function callChat(text) {
     try {
-
       let question = { text: text, lang: $langs, llang: $llang };
 
       const response = await fetch(`./chat`, {
@@ -84,7 +83,9 @@
   }
 
   onMount(() => {
-    SendDC('Test');
+    setTimeout(() => {
+      SendDC('Test');
+    }, 3000);
   });
 
   async function speak(text) {
@@ -137,8 +138,6 @@
     }
   }
 
-
-
   function SendRepeat() {
     variant = 'unelevated';
     setTimeout(() => {
@@ -163,8 +162,8 @@
     <div style="display:inline-flex">
       <div class="userMessage {isQuestion}" key={index}>
         {text[$llang]}
-         {#await Transloc(text[$llang], $llang, $langs) then data}
-        <div class="original">{data}</div>
+        {#await Transloc(text[$llang], $llang, $langs) then data}
+          <div class="original">{data}</div>
         {/await}
       </div>
       <div class="speaker-button">
