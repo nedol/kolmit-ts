@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { Speak } from '/src/routes/speech/tts/VoiceRSS';
-  import {Transloc} from '/src/routes/translate/Translate'
+  import {Transloc} from '/src/routes/translate/Transloc'
 
   import {
     langs,
@@ -54,7 +54,7 @@
 
       let question = { text: text, lang: $langs, llang: $llang };
 
-      const response = await fetch(`./chat`, {
+      const response = await fetch(`/chat`, {
         method: 'POST',
         body: JSON.stringify({ question }),
         headers: { 'Content-Type': 'application/json' },
