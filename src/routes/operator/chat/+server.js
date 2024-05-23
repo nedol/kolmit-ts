@@ -3,8 +3,8 @@ config();
 
 import { prompt_data } from './prompt/prompt_data';
 import translate from 'translate';
-translate.engine = 'deepl'; //'google'
-translate.key = process.env.DEEPL_API_KEY;
+translate.engine = 'google'//'deepl'; 
+// translate.key = process.env.DEEPL_API_KEY;
 
 import Groq from 'groq-sdk';
 
@@ -19,8 +19,9 @@ let messages = [];
 let cnt = 0;
 
 /** @type {import('./$types').RequestHandler} */
-export async function POST({ request, url, fetch, cookies }) {
-  let { question } = await request.json();
+export async function POST({ request }) {
+
+    let { question } = await request.json();
 
   const system = `
   Treat the "Test" as not requiring an answer.
@@ -28,6 +29,8 @@ export async function POST({ request, url, fetch, cookies }) {
   You always starting a conversation suggesting a topic. After answering the question, ask your question.
   Correct my message if you will find grammar mistakes in it.
   Don't be verbose.`;
+
+
 
   const task = await translate(question.text, {
     from: question.lang,
@@ -123,28 +126,5 @@ async function chatTranformers(system, task) {
   // }
 }
 
-async function chatANTHROPIC(system, question, assistant) {
-  messages = [];
-  messages.push({ role: 'user', content: question });
-  if (assistant) messages.push({ role: 'assistant', content: assistant });
-  const msg = await anthropic.messages.create({
-    model: 'claude-3-haiku-20240307',
-    max_tokens: 4096,
-    system: system,
-    messages: messages,
-  });
-  if (msg.content[0]) {
-    resp = msg.content[0].text.trim();
-    resp = resp.replace(/[()]/g, '');
-    resp = resp.replace(/\n/g, '');
-    resp = resp.replace(/\\/g, '');
-    try {
-      JSON.parse(resp);
-    } catch (ex) {
-      question = 'continue';
-      await chatANTHROPIC(system, question, msg.content[0].text.trim());
-    }
-  }
 
-  return `${JSON.stringify(resp)}`;
-}
+

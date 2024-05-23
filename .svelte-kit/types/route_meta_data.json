@@ -21,9 +21,6 @@
 	"/admin/module": [
 		"src/routes/admin/module/+server.js"
 	],
-	"/chat": [
-		"src/routes/chat/+server.js"
-	],
 	"/lesson": [
 		"src/routes/lesson/+page.js",
 		"src/routes/lesson/+page.server.js",
@@ -33,6 +30,9 @@
 	],
 	"/operator": [
 		"src/routes/operator/+server.js"
+	],
+	"/operator/chat": [
+		"src/routes/operator/chat/+server.js"
 	],
 	"/public": [
 		"src/routes/public/+page.server.ts",

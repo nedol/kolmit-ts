@@ -35,7 +35,7 @@
 
   import Module from '../lesson/Module.svelte';
 
-  import Chat from '../chat/Сhat.svelte';
+  import Chat from './chat/Сhat.svelte';
 
   import pkg from 'lodash';
   const { find } = pkg;

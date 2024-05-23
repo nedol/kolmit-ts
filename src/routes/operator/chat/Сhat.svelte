@@ -30,7 +30,7 @@
 
   import Button, { Label } from '@smui/button';
   import IconButton, { Icon } from '@smui/icon-button';
-  import Stt from '../speech/stt/Stt.svelte';
+  import Stt from '../../speech/stt/Stt.svelte';
 
   let userInput = {};
   let messages = [];
@@ -53,9 +53,9 @@
     try {
       let question = { text: text, lang: $langs, llang: $llang };
 
-      const response = await fetch(`./chat`, {
+      const response = await fetch(`./operator/chat`, {
         method: 'POST',
-        body: JSON.stringify({ question }),
+        body: JSON.stringify( {question} ),
         headers: { 'Content-Type': 'application/json' },
       });
 
