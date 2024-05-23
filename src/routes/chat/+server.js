@@ -1,4 +1,5 @@
-
+import { config } from 'dotenv';
+config();
 
 import { prompt_data } from './prompt/prompt_data';
 import translate from 'translate';
