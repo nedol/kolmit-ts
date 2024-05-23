@@ -29,7 +29,7 @@
 		"src/routes/lesson/+page.server.js",
 		"src/routes/+layout.server.js",
 		"src/routes/+layout.server.js",
-		"src/routes/lesson/+server.ts"
+		"src/routes/lesson/+server.js"
 	],
 	"/operator": [
 		"src/routes/operator/+server.ts"
