@@ -51,9 +51,6 @@
   // Function to call ChatGPT
   async function callChat(text) {
     try {
-      // messages = [{ text: userInput, isQuestion: 'question' }, ...messages];
-      // messages.unshift({ text: userInput, isQuestion: 'question' });
-      // messages = messages;
 
       let question = { text: text, lang: $langs, llang: $llang };
 
@@ -70,17 +67,7 @@
       }
 
       const data = await response.json();
-      // const resp = data.response;
-      // console.log('resp', resp);
-      // Переворачиваем массив для обработки с конца
-      // const reversedArray = resp.slice().reverse();
 
-      // Извлекаем значение 'correct' из каждого объекта в перевернутом массиве
-      // const correctValues = resp.map((item) => {
-      // 	if (item.reply) return JSON.parse(item.reply).correct;
-      // });
-
-      // let answer = resp ? resp.correct : 'no answer';
       messages.unshift({ text: data.res, isQuestion: 'answer' });
       messages = messages;
     } catch (error) {
@@ -97,7 +84,7 @@
   }
 
   onMount(() => {
-    SendDC('No answer.');
+    SendDC('Test');
   });
 
   async function speak(text) {
