@@ -54,7 +54,7 @@
 
       let question = { text: text, lang: $langs, llang: $llang };
 
-      const response = await fetch(`/src/routes/chat`, {
+      const response = await fetch(`./chat`, {
         method: 'POST',
         body: JSON.stringify({ question }),
         headers: { 'Content-Type': 'application/json' },
