@@ -66,13 +66,13 @@
 
   let dlg_display = 'none';
 
-  function SetDlgDisplay(val){
-    dlg_display = val;
+  function SetDlgDisplay(){
+    $view='chat'
   }
 
   setContext('SetDlgDisplay',SetDlgDisplay);
 
-  $: if ($view === 'group' && $call_but_status === 'talk')
+  $: if ($view === 'chat')
     dlg_display = 'block';
   else dlg_display = 'none';
 

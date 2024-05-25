@@ -465,6 +465,17 @@ export async function GetLesson(q) {
   }
 }
 
+export async function GetPrompt(name) {
+  try {
+    let res = await sql`SELECT system FROM prompts WHERE name=${name}`;
+    return res[0];
+
+  } catch (ex) {
+     return JSON.stringify({ res: ex });
+  }
+  
+}
+
 export async function UpdateQuizUsers(q) {
   try {
     let res = await sql`SELECT quiz_users FROM users 

@@ -1,7 +1,12 @@
+
+
 import translate from 'translate';
+translate.engine = 'google'//'deepl'; // 
+translate.key = '203cca0d-8540-4d75-8c88-d69ac40b6d57:fx';//process.env.DEEPL_API_KEY;
 export async function Translate(text, from, to) {
   try {
-    
+    if (!text)
+      return;
     translate.from = from;
     text = text.replace(/\r\n/g, '');
 
@@ -22,6 +27,3 @@ export async function Translate(text, from, to) {
     return text; // или другое подходящее значение по умолчанию
   }
 }
-
-
-

@@ -55,7 +55,7 @@
 
       const response = await fetch(`./operator/chat`, {
         method: 'POST',
-        body: JSON.stringify( {question} ),
+        body: JSON.stringify({ question }),
         headers: { 'Content-Type': 'application/json' },
       });
 
@@ -83,9 +83,7 @@
   }
 
   onMount(() => {
-    setTimeout(() => {
-      SendDC('Test');
-    }, 3000);
+    SendDC('Hallo');
   });
 
   async function speak(text) {
@@ -162,9 +160,13 @@
     <div style="display:inline-flex">
       <div class="userMessage {isQuestion}" key={index}>
         {text[$llang]}
-        {#await Transloc(text[$llang], $llang, $langs) then data}
-          <div class="original">{data}</div>
-        {/await}
+        {#if text[$langs]}
+          <div class="original">{text[$langs]}</div>
+        {:else}
+          {#await Transloc(text[$llang], $llang, $langs) then data}
+            <div class="original">{data}</div>
+          {/await}
+        {/if}
       </div>
       <div class="speaker-button">
         <IconButton on:click={speak(text[$llang])}>

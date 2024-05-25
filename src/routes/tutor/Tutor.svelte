@@ -190,7 +190,7 @@
   let SetDlgDisplay = getContext('SetDlgDisplay');
 
   let OnClickCallButton = function (ev, email) {
-    SetDlgDisplay('block');
+    SetDlgDisplay();
   };
 </script>
 

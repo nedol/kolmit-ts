@@ -4,9 +4,9 @@
 
   import { llang } from '$lib/js/stores.js';
   // import words from './80.json';
-  import translate from 'translate';
-  translate.engine = 'google';
-  translate.from = $llang;
+  import { Translate } from '../../../translate/Translate';
+  // translate.engine = 'google';
+  // translate.from = $llang;
 
   import { langs } from '$lib/js/stores.js';
 
@@ -52,7 +52,7 @@
   let errorIndex = 0;
   let showCheckMark = false;
   let showNextButton = false;
-
+ let resultElementWidth = 100;
   let showSpeakerButton = false;
   let focus_pos = 0;
 
@@ -147,7 +147,7 @@
       const regex = new RegExp(word, 'gi');
       return sentence.replace(
         regex,
-        `<span class="sentence_span" style="width:120px"></span>`
+        `<span class="sentence_span" style="position: relative; width: 120px; left: 0px;"></span>`
       );
     } else {
       return sentence;
@@ -156,7 +156,7 @@
 
   $: if (currentWord) {
     (async () => {
-      example = await translate(currentWord['example'], $langs);
+      example = await Translate(currentWord['example'], $llang, $langs);
 
       resultElement = replaceWordWithInput(
         currentWord.example,
@@ -167,6 +167,8 @@
         const spanElement = document.querySelector('.sentence_span');
         if (spanElement) spanElement.appendChild(div_input);
       }, 100);
+
+      resultElementWidth = example.length+100;
 
       // word = currentWord['original'].replace(/(de|het)\s*/gi, '');
       // let filteredExample = currentWord['example'].replace(
@@ -420,7 +422,7 @@
               >
             </button></Section
           >
-          <Section>   <div>{currentWordIndex + 1}/{words.length}</div></Section>
+          <Section><div>{currentWordIndex + 1}/{words.length}</div></Section>
 
           <Section align="end">
             {#if showNextButton}
@@ -437,28 +439,13 @@
       </TopAppBar>
     </div>
 
-    {#await translate('Write translation', $langs) then data}
+    {#await Translate('Write translation', 'en', $langs) then data}
       <div class="title">{data}:</div>
     {/await}
 
     <div class="word">
       {#if example}
         <span class="mdc-typography--headline6">{example}</span>
-      {/if}
-
-      {#if showSpeakerButton}
-        <div class="speaker-button" >
-          <IconButton on:click={onSpeach}>
-            <Icon tag="svg" viewBox="0 0 24 24">
-              <path fill="currentColor" d={mdiVolumeHigh} />
-            </Icon>
-          </IconButton>
-        </div>
-        <!-- <button on:click={onSpeach} class="speaker-button">
-					<span class="material-symbols-outlined" style="font-size: 15px; color: blue; scale:1.5">
-						volume_up
-					</span>
-				</button> -->
       {/if}
     </div>
 
@@ -472,36 +459,43 @@
         on:input={onChangeUserContent}
         bind:this={div_input}
         bind:innerHTML={userContent}
-        style="width: 100px"
+        style="width: {resultElementWidth}px"
       >
         {@html result}
       </div>
     </div>
 
+    {#if showSpeakerButton}
+      <div class="speaker-button">
+        <IconButton on:click={onSpeach}>
+          <Icon tag="svg" viewBox="0 0 24 24">
+            <path fill="currentColor" d={mdiVolumeHigh} />
+          </Icon>
+        </IconButton>
+      </div>
+      <!-- <button on:click={onSpeach} class="speaker-button">
+					<span class="material-symbols-outlined" style="font-size: 15px; color: blue; scale:1.5">
+						volume_up
+					</span>
+				</button> -->
+    {/if}
+
+    <br />
     <!-- {#if hintIndex != 0} -->
     <div class="words_div accordion-container">
       {#if hints}
-        <Accordion>
-          <Panel>
-            <Header>
-              <IconButton class="material-icons">
-                <Icon tag="svg" viewBox="0 0 24 24">
-                  <path fill="currentColor" d={mdiChevronDownCircleOutline} />
-                </Icon>
-              </IconButton>
-            </Header>
-            <Content style="line-height: 2.2; overflow-y:auto; height:70vh !important">
-              {#each hints as hint}
-                <span class="hint_button" on:click={OnClickHint}>
-                  {@html hint.original + '&nbsp;' + '&nbsp;'}
-                </span>
-              {/each}
-            </Content>
-          </Panel>
-        </Accordion>
+        <Content
+          style="line-height: 2.0; overflow-y:auto; height:50vh !important"
+        >
+          {#each hints as hint}
+            <span class="hint_button" on:click={OnClickHint}>
+              {@html hint.original + '&nbsp;' + '&nbsp;'}
+            </span>
+          {/each}
+          <div style="height:50px"></div>
+        </Content>
       {/if}
     </div>
-
   </main>
 {/if}
 
@@ -527,7 +521,7 @@
     color: grey;
     position: relative;
     text-align: center;
-    margin-top: 50px;
+    margin-top: 60px;
   }
 
   .hint_button {
@@ -545,7 +539,7 @@
   .word {
     flex-direction: column;
     align-items: center;
-    margin: 0;
+    margin: 2px;
     text-align: center;
   }
 
@@ -571,45 +565,50 @@
   }
 
   .speaker-button {
-    position: absolute;
+    position: relative;
     /* flex: auto; */
-    top: 210px;
-    right: 30px;
+    top: 0px;
+    right: 10px;
     transform: translate(50%, 0%);
     font-size: large;
     z-index: 1;
   }
 
   .input-container {
+    display: inline-block;
+    font-size: 16px;
     position: relative;
     color: #2196f3;
-    width: 90vw;
+    width: 95vw;
     margin: 0 auto;
-    display: grid; /* Добавлено свойство display: flex; */
-    justify-items: center; /* Добавлено свойство align-items: center; */
+    text-align: center;
   }
 
   .words_div {
     position: relative;
     text-align: center;
     overflow-y: auto;
-    height: 70vh;
   }
 
   .input {
-    display: grid;
-    /* flex: 1; */
-    /* letter-spacing: 2px; */
-    padding: 10px;
-    text-align: center;
-    color: blue;
-    background-color: aliceblue;
+    height: 23px;
+    display: inline-block;
+    outline: none;
     border: none;
-    /* font-size: large; */
+    background: rgba(0, 0, 0, 0.12);
+    text-align: center;
   }
 
   .input:focus {
     outline: none;
+  }
+
+  .sentence_span {
+    display: inline-block;
+    position: relative;
+    width: 100px;
+    height: 20px;
+    border-bottom: 1px solid black;
   }
 
   .next10-button,

@@ -1,10 +1,10 @@
 import { config } from 'dotenv';
 config();
 
-import { prompt_data } from './prompt/prompt_data';
-import translate from 'translate';
-translate.engine = 'google'//'deepl'; 
-// translate.key = process.env.DEEPL_API_KEY;
+import { GetPrompt } from '../../../lib/server/db'
+
+import { Translate } from './../../translate/Translate';
+
 
 import Groq from 'groq-sdk';
 
@@ -21,28 +21,18 @@ let cnt = 0;
 /** @type {import('./$types').RequestHandler} */
 export async function POST({ request }) {
 
-    let { question } = await request.json();
+  let { question } = await request.json();
 
-  const system = `
-  Treat the "Test" as not requiring an answer.
-  My goal is to practice colloquial speech and you could help me with it. My language level is A.1.1.
-  You always starting a conversation suggesting a topic. After answering the question, ask your question.
-  Correct my message if you will find grammar mistakes in it.
-  Don't be verbose.`;
+  const prompt = await GetPrompt('dialog');
 
+  const task = await Translate(question.text, question.lang,'en');
 
-
-  const task = await translate(question.text, {
-    from: question.lang,
-    to: 'en',
-  });
-
-  let answer = await chatGroq(system, task);
+  let answer = await chatGroq(prompt.system, task);
 
   let res = {
-    ['nl']: await translate(answer, { from: 'en', to: question.llang }),
-    ['en']: answer,
-    [question.lang]: await translate(answer, { from: 'en', to: question.lang }),
+    ['nl']: await Translate(answer, question.llang, 'nl'),
+    ['en']: await Translate(answer, question.llang, 'en'),
+    [question.lang]: await Translate(answer, question.llang, question.lang),
   };
 
   // let task2 = `[continue]{dialogue:${JSON.stringify(dialog)}}`;
