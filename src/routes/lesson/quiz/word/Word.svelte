@@ -52,7 +52,7 @@
   let errorIndex = 0;
   let showCheckMark = false;
   let showNextButton = false;
- let resultElementWidth = 100;
+  let resultElementWidth = 100;
   let showSpeakerButton = false;
   let focus_pos = 0;
 
@@ -136,14 +136,15 @@
         sentence.slice(0, lastDotIndex) + sentence.slice(lastDotIndex + 1);
     }
 
-    word = word.replace(/\b(?:the |a |an |het |de )\b/gi, '').trim();
+    word = word.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, '');
+    word = word.replace(/\b(the |a |an |het |de )\b/gi, '').trim();
     const wordLength = word.length;
     const matches = (sentence.match(new RegExp(word, 'i')) || []).length;
 
     const matchPercentage = (matches / wordLength) * 100;
 
     // Если процент совпадения больше или равен 90%, заменяем слово на <input>
-    if (matchPercentage >= 8) {
+    if (matches >= 1) {
       const regex = new RegExp(word, 'gi');
       return sentence.replace(
         regex,
@@ -168,7 +169,7 @@
         if (spanElement) spanElement.appendChild(div_input);
       }, 100);
 
-      resultElementWidth = example.length+100;
+      resultElementWidth = getTextWidth(currentWord.original, '20px Arial');
 
       // word = currentWord['original'].replace(/(de|het)\s*/gi, '');
       // let filteredExample = currentWord['example'].replace(
@@ -178,6 +179,19 @@
     })();
     // Устанавливаем фокус в конец строки
     setFocus();
+  }
+
+  function getTextWidth(text, font) {
+    // Создаем элемент canvas
+    const canvas = document.createElement('canvas');
+    const context = canvas.getContext('2d');
+
+    // Устанавливаем шрифт
+    context.font = font;
+
+    // Измеряем длину текста
+    const metrics = context.measureText(text);
+    return metrics.width + 110;
   }
 
   onMount(async () => {});
@@ -251,7 +265,10 @@
   }
 
   function checkInput() {
-    const targetWord = words[currentWordIndex].original;
+    const targetWord = words[currentWordIndex].original.replace(
+      /[.,\/#!$%\^&\*;:{}=\-_`~()]/g,
+      ''
+    );
     userContent = userContent
       .replace(/&nbsp;/g, '')
       .replace(/<\/?[^>]+(>|$)/g, '');
@@ -285,7 +302,10 @@
         errorIndex = 0;
       }
 
-      userContent = currentWord.original;
+      userContent = currentWord.original.replace(
+        /[.,\/#!$%\^&\*;:{}=\-_`~()]/g,
+        ''
+      );
       highlightWords(userContent);
       // nextWord();
     } else {
@@ -304,7 +324,8 @@
           focus_pos = i + 1;
         } else {
           // Несовпадающие символы
-          result += `<span style="color:red;  ">${trimmedUserContent[i]}</span>`;
+          result += `<span style="color:red;">${trimmedUserContent[i]}</span>`;
+          resultElementWidth = getTextWidth(trimmedUserContent[i], '20px Arial');
           errorIndex++;
         }
 
@@ -327,6 +348,10 @@
 
   function showHint() {
     // wordsString = shuffleWords(wordsString);
+    currentWord.original = currentWord.original.replace(
+      /[.,\/#!$%\^&\*;:{}=\-_`~()]/g,
+      ''
+    );
     if (currentWord && hintIndex < currentWord.original.length) {
       if (hintIndex === 0) {
         userContent = '';
@@ -372,9 +397,11 @@
     setFocus();
   }
 
-  function OnClickHint(ev) {
-    userContent = ev.target.innerHTML;
-    hl_words.push(ev.target.innerHTML);
+  function OnClickHint(word) {
+    word = word.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, '');
+    resultElementWidth = getTextWidth(word, '20px Arial');
+    userContent = word;
+    hl_words.push(word);
   }
 </script>
 
@@ -480,7 +507,7 @@
 				</button> -->
     {/if}
 
-    <br />
+    <!-- <br /> -->
     <!-- {#if hintIndex != 0} -->
     <div class="words_div accordion-container">
       {#if hints}
@@ -488,7 +515,12 @@
           style="line-height: 2.0; overflow-y:auto; height:50vh !important"
         >
           {#each hints as hint}
-            <span class="hint_button" on:click={OnClickHint}>
+            <span
+              class="hint_button"
+              on:click={() => {
+                OnClickHint(hint.original);
+              }}
+            >
               {@html hint.original + '&nbsp;' + '&nbsp;'}
             </span>
           {/each}
@@ -592,7 +624,7 @@
 
   .input {
     height: 23px;
-    display: inline-block;
+    display: inline-table;
     outline: none;
     border: none;
     background: rgba(0, 0, 0, 0.12);
@@ -603,13 +635,6 @@
     outline: none;
   }
 
-  .sentence_span {
-    display: inline-block;
-    position: relative;
-    width: 100px;
-    height: 20px;
-    border-bottom: 1px solid black;
-  }
 
   .next10-button,
   .shuffle-button,

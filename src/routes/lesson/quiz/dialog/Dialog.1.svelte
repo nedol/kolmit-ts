@@ -92,7 +92,7 @@
   } from '$lib/js/stores.js';
 
   $: if ($msg_user) {
-    console.log($msg_user);
+    // console.log($msg_user);
     if ($msg_user.command === 'repeat') {
       isRepeat = true;
       setTimeout(() => {
@@ -102,7 +102,7 @@
   }
 
   $: if ($msg_oper) {
-    console.log($msg_oper);
+    // console.log($msg_oper);
     if ($msg_oper.command === 'repeat') {
       isRepeat = true;
       setTimeout(() => {
@@ -198,6 +198,9 @@
   }
 
   function Dialog() {
+    if(!dialog_data.content){
+
+    }
     if (!dialog_data.content[cur_qa]) {
       cur_qa = 0;
       cur_html++;
@@ -595,9 +598,7 @@
             {@html stt_text}
           </span>
         </div>
-
-
-
+        
         <div
           class="margins"
           style="text-align: center; display: flex; align-items: center; justify-content: space-between;"

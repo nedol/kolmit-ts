@@ -158,3 +158,34 @@ export async function UpdateDialog(q) {
     return JSON.stringify({ func: q.func, res: ex });
   }
 }
+
+export async function UpdateListen(q) {
+  try {
+    let res = await sql`INSERT INTO listen
+			(name , dialog, owner, html)
+			VALUES(${q.new_name},${q.data},${q.owner},${q.data.html || ''} )
+			ON CONFLICT (name, owner)
+			DO UPDATE SET
+			name = EXCLUDED.name,
+      html = EXCLUDED.html,
+			dialog = EXCLUDED.dialog`;
+    return { res };
+  } catch (ex) {
+    return JSON.stringify({ func: q.func, res: ex });
+  }
+}
+
+export async function UpdateWords(q){
+  try {
+    let res = await sql`INSERT INTO words
+			(name , data, owner)
+			VALUES(${q.new_name},${q.data},${q.owner})
+			ON CONFLICT (name, owner)
+			DO UPDATE SET
+			name = EXCLUDED.name,
+			data = EXCLUDED.data`;
+    return { res };
+  } catch (ex) {
+    return JSON.stringify({ func: q.func, res: ex });
+  }
+}

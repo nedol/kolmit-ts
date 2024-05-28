@@ -27,11 +27,15 @@
   const abonent = getContext('abonent');
   let dict = getContext('dict');
 
-  let content = '',
+  let content = '', prompt='', words = '',
     new_content = false,
     num = 5;
   let dialog_data = { lang: '', content: [] };
   const name = data.name;
+
+    let dialog_task, dialog_words, dialog_tmplt;
+
+  let system = ``;
 
   fetch(`./lesson?listen=${data.name}&owner=${abonent}`)
     .then((response) => response.json())
@@ -47,9 +51,7 @@
       dialog_data = { content: [] };
     });
 
-  let words, dialog_task, dialog_words, dialog_tmplt;
 
-  let system = ``;
 
   onMount(() => {
     // const storedData = localStorage.getItem('qaData');
@@ -78,7 +80,7 @@
   }
 
   async function SaveData(name, new_name, data) {
-    const response = await fetch(`/admin`, {
+    const response = await fetch(`/admin/module`, {
       method: 'POST',
       body: JSON.stringify({
         func: 'upd_lstn',
@@ -178,7 +180,7 @@
         type="text"
         class="dialog_name"
         name="dialog_name"
-        bind:value={data.name}
+        bind:value={data.name[$langs]}
       />
     </div>
     {#if data.level}
@@ -212,7 +214,7 @@
 
   <div class="collapsible" in:slide={{ duration: 300 }}>
     <div class="generator_container">
-      <TabBar tabs={['Content']} let:tab bind:active>
+      <TabBar tabs={['Content', 'Words','Prompt']} let:tab bind:active>
         <Tab {tab} minWidth>
           <Label>{tab}</Label>
         </Tab>
@@ -220,8 +222,30 @@
       {#if active === 'Content'}
         <Paper variant="unelevated">
           <Content>
-            <textarea rows="20" name="dialog_words" bind:value={content}
+            <textarea rows="20" name="dialog_content" bind:value={content}
             ></textarea>
+          </Content>
+        </Paper>
+      {:else if active === 'Words'}
+        <Paper variant="unelevated">
+          <Content>
+            <textarea rows="20" name="dialog_words" bind:value={words}
+            ></textarea>
+          </Content>
+        </Paper>
+      {:else if active === 'Prompt'}
+        <Paper variant="unelevated">
+          <Content>
+            <textarea rows="20" name="dialog_task" bind:value={prompt}
+            ></textarea>
+            <!-- <div contenteditable="true" bind:this={dialog_task}>
+                {@html prompt}
+              </div> -->
+            <button class="copy_prompt" on:click={CopyPrompt}>
+              {#await Translate('Copy', 'en', $langs) then data}
+                {data}
+              {/await}
+            </button>
           </Content>
         </Paper>
       {/if}

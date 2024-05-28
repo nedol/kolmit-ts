@@ -26,6 +26,7 @@
     mdiAccountConvertOutline,
     mdiVolumeHigh,
     mdiPlay,
+    mdiHelp
   } from '@mdi/js';
 
   import Button, { Label } from '@smui/button';
@@ -38,6 +39,7 @@
   let display_audio = 'none';
   let stt: Stt;
   let variant = 'outlined';
+  let showHint:number;
 
   $: if ($msg_oper || $msg_user) {
     const msg = $msg_oper || $msg_user;
@@ -153,6 +155,10 @@
       );
     }
   }
+
+  function ShowHint(index){
+    showHint = index;
+  }
 </script>
 
 <div class="chat-container" style="overflow-y: auto;">
@@ -160,12 +166,21 @@
     <div style="display:inline-flex">
       <div class="userMessage {isQuestion}" key={index}>
         {text[$llang]}
-        {#if text[$langs]}
-          <div class="original">{text[$langs]}</div>
-        {:else}
+        {#if text[$langs] && showHint===index}
+
           {#await Transloc(text[$llang], $llang, $langs) then data}
             <div class="original">{data}</div>
-          {/await}
+          {/await} 
+
+          {:else}
+            <button class="hint-button" on:click={()=>{ShowHint(index)}}>
+              <span class="material-symbols-outlined"> ? </span>
+              <!-- <IconButton class="material-icons" on:click={()=>{}}>
+              <Icon tag="svg" viewBox="0 0 24 24">
+                <path fill="currentColor" d={mdiHelp} />
+              </Icon>
+            </IconButton> -->
+            </button>
         {/if}
       </div>
       <div class="speaker-button">
@@ -326,6 +341,13 @@
     border: none;
     font-size: 20px; /* Размер иконки */
     cursor: pointer;
+  }
+
+    .hint-button {
+    color: white;
+    background-color: #2196f3;
+    border-radius: 3px;
+    padding: 8px 20px;
   }
 
   /* Стилизация textarea и кнопки по желанию */

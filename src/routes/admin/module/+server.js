@@ -1,7 +1,12 @@
 import { json } from '@sveltejs/kit';
 import fs from 'fs';
 
-import { UpdateDialog, UpdateLesson } from '$lib/server/db.admin.js';
+import {
+  UpdateDialog,
+  UpdateLesson,
+  UpdateListen,
+  UpdateWords,
+} from '$lib/server/db.admin.js';
 
 /** @type {import('./$types').RequestHandler} */
 export async function POST({ request, url, fetch }) {
@@ -10,10 +15,16 @@ export async function POST({ request, url, fetch }) {
 	const { func, owner, level, name, new_name, data } = await request.json();
 
 	switch (func) {
-		case 'upd_dlg':
-			UpdateDialog({ owner, level, name, new_name, data });
-			break;
-	}
+    case 'upd_dlg':
+      UpdateDialog({ owner, level, name, new_name, data });
+      break;
+    case 'upd_lstn':
+      UpdateListen({ owner, level, name, new_name, data });
+      break;
+    case 'upd_words':
+      UpdateWords({ owner, level, name, new_name, data });
+      break;
+  }
 
 	let response = new Response(JSON.stringify({ resp }));
 	response.headers.append('Access-Control-Allow-Origin', `*`);

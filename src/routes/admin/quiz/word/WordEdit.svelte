@@ -1,7 +1,9 @@
-<script lang='ts'>
+<script lang="ts">
   import { getContext, onMount } from 'svelte';
 
-  import { langs } from '$lib/js/stores.js';
+  import { Translate } from '../../../translate/Translate';
+
+  import { langs, llang } from '$lib/js/stores.js';
 
   import Tab, { Label } from '@smui/tab';
   import TabBar from '@smui/tab-bar';
@@ -17,37 +19,40 @@
     isCollapsed.update((n) => !n);
   }
 
-  export let data:any;
+  export let data: any;
   export let ChangeQuizName: any;
 
   const abonent = getContext('abonent');
+  data = getContext('quiz_data');
 
-
-  let content:any,
+  let content: any,
     new_content = false,
-    words_data = { lang: '', content: []  };
+    words_data: [];
   const name = data.name;
-  const llang = data.llang
+  let words = [],
+    dialog_task: any,
+    dialog_words,
+    dialog_tmplt;
 
-  fetch(`./lesson?words=${data.name}&owner=${abonent}`)
+  
+
+  fetch(`./lesson?words=theme&name=${data.name[$llang]}&owner=${abonent}`)
     .then((response) => response.json())
-    .then((data) => {
-      words_data = data.data.dialog;
-      if (data.data.html) {
-        words_data.html = splitHtmlContent(data.data.html);
+    .then((resp) => {
+      words_data = resp.data;
+      if (words_data) {
+        words_data.map((item) => {
+          words.push(item.original);
+        });
       }
-      words_data.name = name;
     })
     .catch((error) => {
       console.log(error);
-      words_data = { content: [], lang:'' };
+      words_data = { content: [], lang: '' };
     });
 
-  let words:any, dialog_task:any, dialog_words, dialog_tmplt;
-
-  const tmplt = 
-  `'words':{  'nl': '', 'ru': '', 'uk': '', 'fr': '', 'en': '', 'de': ''},
-  'example':{  '${llang}': ''}
+  const tmplt = `
+  {original:'',infinitive:'',translation:{ nl: '', ru: '', uk: '', fr: '', en: '', de: '' }}
   `;
 
   let system = ``;
@@ -59,40 +64,31 @@
     // }
   });
 
-  function splitHtmlContent(inputString:string) {
-    // Регулярное выражение для поиска содержимого внутри тегов <html>...</html>
-    const regex = /<html>(.*?)<\/html>/gs;
-
-    // Используем matchAll для поиска всех совпадений в строке
-    const matches = inputString.matchAll(regex);
-
-    // Преобразуем итератор в массив и извлекаем только содержимое внутри тегов
-    const result = Array.from(matches, (match) => match[1]);
-
-    return result;
-  }
-
   function addEmptyRecord() {
-    const emptyRecord = { nl: '', ru: '', uk: '', fr: '', en: '', de: ''  };
-    words_data.content.push(emptyRecord);
+    const emptyRecord = {
+      original: '',
+      infinitive: '',
+      translation: { nl: '', ru: '', uk: '', fr: '', en: '', de: '' },
+    };
+    words_data.push(emptyRecord);
     words_data = words_data;
   }
 
   // Функция для сохранения текущего состояния в localStorage
-  function saveToLocalStorage() {
+  function OnSave() {
     SaveData(name, data.name, words_data);
-    ChangeQuizName(name, data.name);
+    // ChangeQuizName(name, data.name);
   }
 
-  async function SaveData(name:string, new_name:string, data:any) {
-    const response = await fetch(`/admin`, {
+  async function SaveData(name: string, new_name: string, data: any) {
+    const response = await fetch(`/admin/module`, {
       method: 'POST',
       body: JSON.stringify({
         func: 'upd_words',
         owner: abonent,
         level: '12',
-        name: name,
-        new_name: new_name,
+        name: name[$llang],
+        new_name: new_name[$llang],
         data: data,
       }),
       headers: { 'Content-Type': 'application/json' },
@@ -103,30 +99,9 @@
     }
   }
 
-  async function CreateContent() {
-    const words = words_data.content.map((item:any) => {
-      if (item.user1) return item.user1[$langs] + ' - ' + item.user2[$langs];
-    });
-    const response = await fetch(`/chat`, {
-      method: 'POST',
-      body: JSON.stringify({ topic: name, words: words }),
-      headers: { 'Content-Type': 'application/json' },
-    });
+  async function CreateContent() {}
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
-    }
-    new_content = true;
-    const data = await response.json();
-    // content = data.chat_resp.replace(/\\\'/g, ''');
-    content = JSON.stringify(JSON.parse(data.chat_resp).content[0]);
-    if (content) {
-      words_data.content.push(JSON.parse(data.chat_resp).content[0]);
-      words_data = words_data;
-    }
-  }
-
-  function OnChangeContent(ev:any) {
+  function OnChangeContent(ev: any) {
     // console.log(ev.currentTarget.value)
     try {
       words_data = JSON.parse(ev.currentTarget.value);
@@ -153,54 +128,64 @@
       }
     });
   }
+
+  function remRecord(ev) {}
 </script>
 
-<div class='dialog_container'>
-  <div class='container'>
-    <div class='dialog-field'>
-      <label for='dialog_name'>Название:</label>
+<div class="dialog_container">
+  <div class="container">
+    <div class="dialog-field">
+      {#await Translate('Название', 'ru', $langs) then data}
+        <label for="dialog_name">{data}:</label>
+      {/await}
       <input
-        type='text'
-        class='dialog_name'
-        name='dialog_name'
-        bind:value={data.name}
+        type="text"
+        class="dialog_name"
+        name="dialog_name"
+        bind:value={data.name[$llang]}
       />
     </div>
     {#if data.level}
-      <div class='dialog-field'>
-        <label for='dialog_level'>Уровень:</label>
+      <div class="dialog-field">
+        {#await Translate('Уровень', 'ru', $langs) then data}
+          <label for="dialog_level">{data}:</label>
+        {/await}
         <input
-          type='text'
-          class='dialog_level'
-          name='dialog_level'
+          type="text"
+          class="dialog_level"
+          name="dialog_level"
           bind:value={data.level}
         />
       </div>
     {/if}
 
-    {#if data.llang}
-      <div class='dialog-field'>
-        <label for='dialog_lang'>Язык:</label>
+    {#if $llang}
+      <div class="dialog-field">
+        {#await Translate('Язык', 'ru', $langs) then data}
+          <label for="dialog_lang">{data}:</label>
+        {/await}
         <input
-          type='text'
-          class='dialog_lang'
-          name='dialog_lang'
-          bind:value={data.llang}
+          type="text"
+          class="dialog_lang"
+          name="dialog_lang"
+          bind:value={$llang}
         />
       </div>
     {/if}
   </div>
 
-  <button
-    class='content_generator'
-    on:click={() => (isCollapsed = !isCollapsed)}
-  >
-    {isCollapsed ? 'Контент-генератор' : 'Контент-генератор'}
-  </button>
+  {#await Translate('Контент-генератор', 'ru', $langs) then data}
+    <button
+      class="content_generator"
+      on:click={() => (isCollapsed = !isCollapsed)}
+    >
+      {data}
+    </button>
+  {/await}
 
   {#if !isCollapsed}
-    <div class='collapsible' in:slide={{ duration: 300 }}>
-      <div class='generator_container'>
+    <div class="collapsible" in:slide={{ duration: 300 }}>
+      <div class="generator_container">
         <TabBar
           tabs={['Format', 'Words', 'Prompt', 'Content']}
           let:tab
@@ -211,7 +196,7 @@
           </Tab>
         </TabBar>
         {#if active === 'Format'}
-          <Paper variant='unelevated'>
+          <Paper variant="unelevated">
             <Content>
               <div>
                 {@html tmplt}
@@ -219,46 +204,29 @@
             </Content>
           </Paper>
         {:else if active === 'Words'}
-          <Paper variant='unelevated'>
+          <Paper variant="unelevated">
             <Content>
-              <textarea rows='20' name='dialog_words' bind:value={words}
+              <textarea rows="20" name="dialog_words" bind:value={words}
               ></textarea>
             </Content>
           </Paper>
         {:else if active === 'Prompt'}
-          <Paper variant='unelevated'>
+          <Paper variant="unelevated">
             <Content>
               <!-- <textarea  rows='20' name='dialog_task' bind:value={task}></textarea> -->
-              <div contenteditable='true' bind:this={dialog_task}>
-                <div>
-                  <b>Create a learning dialogue on the topic: {data.name} </b>
-                </div>
-                <div><b>Use System Prompts.</b></div>
-                <div><b>Language learning level:</b>A1.</div>
-                <div>
-                  <b>Make translations into the appropriate languages.</b>
-                </div>
-                <div>
-                  <b
-                    >Without confirmation words transition, comments or
-                    additional content.</b
-                  >
-                </div>
-                <div><b>Output only 1 sentence at time.</b></div>
-              </div>
 
-              <button class='copy_prompt' on:click={() => CopyPrompt()}
+              <button class="copy_prompt" on:click={() => CopyPrompt()}
                 >Copy Prompt</button
               >
             </Content>
           </Paper>
         {:else if active === 'Content'}
-          <Paper variant='unelevated'>
+          <Paper variant="unelevated">
             <Content>
               <textarea
-                id='dialog_content'
-                rows='20'
-                name='dialog_content'
+                id="dialog_content"
+                rows="20"
+                name="dialog_content"
                 on:input={OnChangeContent}>{content}</textarea
               >
             </Content>
@@ -266,43 +234,49 @@
         {/if}
       </div>
 
-      <div class='container'>
-        <button class='save' on:click={() => CreateContent()}>Создать</button>
+      <div class="container">
+        <button class="save" on:click={() => CreateContent()}>Создать</button>
       </div>
     </div>
   {/if}
+  <br /><br />
 
   <table>
     <thead>
       <tr>
-        <th>{llang}</th>
-        <th>{$langs}</th>
+        <th class="col-1">{$llang}</th>
+        <th class="col-2">Example</th>
+        <th class="col-3">{$langs}</th>
       </tr>
     </thead>
     <tbody>
       {#if words_data}
-        {#each words_data.content as item, index}
+        {#each words_data as item, index (index)}
           <tr>
             <td>
-              {#if item.user1 && item.user1[$langs]}
-                <textarea
-                  rows='1'            
-                  bind:value={item.user1[$langs]}
-                />
+              {#if item.original}
+                <textarea rows="1" bind:value={item.original} />
+                {#if item.infinitive !== item.original}
+                  <textarea rows="1" bind:value={item.infinitive}></textarea>
+                {/if}
               {:else}
-                <textarea rows='1'  />
+                <textarea rows="1" />
               {/if}
             </td>
             <td>
-              {#if item.user2 && item.user2[$langs]}
-                <textarea
-                  rows='1'
-              
-                  bind:value={item.user2[$langs]}
-                />
+              {#if item.example}
+                <textarea rows="2" bind:value={item.example} />
               {:else}
-                <textarea rows='1' />
+                <textarea rows="2" />
               {/if}
+            </td>
+            <td>
+              {#if item.translation && item.translation[$langs]}
+              <textarea rows="1" bind:value={item.translation[$langs]} />
+              {/if}
+            </td>
+            <td>
+              <button class="remrec_but" on:click={remRecord} {index}>-</button>
             </td>
           </tr>
         {/each}
@@ -310,10 +284,10 @@
     </tbody>
   </table>
 
-  <div class='container'>
-    <button class='add-record' on:click={addEmptyRecord}>+</button>
-    <div class='container'>
-      <button class='save' on:click={() => saveToLocalStorage()}
+  <div class="container">
+    <button class="add-record" on:click={addEmptyRecord}>+</button>
+    <div class="container">
+      <button class="save" on:click={() => OnSave()}
         >Сохранить</button
       >
     </div>
@@ -339,25 +313,34 @@
     border: 0;
     background-color: lightblue;
   }
+
   table {
     width: 100%;
     border-collapse: collapse;
   }
-
-  th {
-    background-color: #f2f2f2;
-    position: sticky;
-    top: 0;
-    z-index: 2;
-  }
   th,
   td {
-    border: 1px solid #ddd;
-    padding: 3px;
-    text-align: center;
+    border: 0px solid black;
+    padding: 8px;
+    text-align: left;
   }
-  .system_div {
-    margin-left: 10px;
+  .col-1 {
+    width: 20%;
+  }
+  .col-2 {
+    width: 50%;
+  }
+  .col-3 {
+    width: 30%;
+  }
+
+  .remrec_but {
+    scale: 2;
+    width: 25px;
+    border-radius: 35px;
+    border: 0;
+    background-color: transparent;
+    color: blue;
   }
 
   .dialog-field {
@@ -380,7 +363,6 @@
 
   /* Для последнего dialog-field может потребоваться сброс правого отступа */
 
-
   .save {
     margin-top: 10px; /* Отступ для кнопки 'Создать' */
   }
@@ -391,10 +373,10 @@
   }
 
   .add-record {
-    font-size: larger;
-    width: 35px;
     border-radius: 35px;
     border: 0;
+    scale: 2;
+    color: red;
   }
   .dialog_name,
   .dialog_lang,

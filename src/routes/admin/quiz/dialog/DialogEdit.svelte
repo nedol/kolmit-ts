@@ -579,11 +579,11 @@ and answering following $Context.]{10 phrases from each user}
 
   .remrec_but {
     scale: 2;
-
     width: 25px;
     border-radius: 35px;
     border: 0;
     background-color: transparent;
+     color:blue;
   }
   .dialog_name,
   .dialog_lang,

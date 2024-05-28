@@ -52,7 +52,7 @@ body {
 }
 .mdc-icon-button {
   padding: 1px;
-  margin: 3px;
+  margin: 0px;
   width: 25px;
   height: 25px;
 }

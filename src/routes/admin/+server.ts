@@ -19,9 +19,6 @@ export async function POST({ request, url, fetch }) {
 		case 'upd_lesson':
 			UpdateLesson({ owner, level, levels, data, lang });
 			break;
-		case 'upd_dlg':
-			UpdateDialog({ owner, level, name, new_name, data });
-			break;
 	}
 	
 	let response = new Response(JSON.stringify({ resp }));
