@@ -188,4 +188,14 @@ export async function UpdateWords(q){
   } catch (ex) {
     return JSON.stringify({ func: q.func, res: ex });
   }
+
+}
+
+export async function GetPrompt(name) {
+  try {
+    let res = await sql`SELECT system FROM prompts WHERE name=${name}`;
+    return res[0];
+  } catch (ex) {
+    return JSON.stringify({ res: ex });
+  }
 }

@@ -426,11 +426,20 @@ export async function GetDialog(q) {
   try {
     let res = await sql`SELECT dialog, html FROM dialogs
 		WHERE name=${q.name} AND owner=${q.owner}`;
-    //debugger;
+
     return { dialog: res[0].dialog, html: res[0].html || '' };
   } catch (ex) {
     return JSON.stringify({ func: q.func, res: ex });
   }
+}
+
+
+export async function GetPrompt(name) {
+    let prompt = await sql`SELECT system FROM prompts
+		WHERE name=${name}`;
+    return {
+      prompt: prompt[0],
+    };
 }
 
 export async function getLevels(owner) {
@@ -465,16 +474,7 @@ export async function GetLesson(q) {
   }
 }
 
-export async function GetPrompt(name) {
-  try {
-    let res = await sql`SELECT system FROM prompts WHERE name=${name}`;
-    return res[0];
 
-  } catch (ex) {
-     return JSON.stringify({ res: ex });
-  }
-  
-}
 
 export async function UpdateQuizUsers(q) {
   try {

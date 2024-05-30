@@ -1,5 +1,5 @@
 <script lang="ts">
-  import translate from 'translate';
+  import {Translate} from '../../../translate/Translate.js';
 
   import { getContext, onMount } from 'svelte';
 
@@ -22,9 +22,6 @@
     new_content = false,
     num = 10;
 
-  translate.from = 'en';
-  translate.engine = 'google';
-
   let dialog_data = { lang: '', content: [], words: [], html: [''], name: '' };
   const name = data.name;
   let dialog_task: HTMLDivElement, dialog_words, dialog_tmplt;
@@ -41,9 +38,6 @@
 
   let active = 'Prompt';
 
-  $: if (active) {
-    (async () => {})();
-  }
 
   $: if ($langs) {
     (async () => {
@@ -61,31 +55,31 @@
       return JSON.stringify(line);
     });
     let dialog_data_words = dialog_data.words || '';
-    prompt = `
-[Act as a language teaching methodologist]  
-[2 users read  $Context]
-->[[Build users dialogue based in which the users asking each another something about $Context
-and answering following $Context.]{10 phrases from each user}
-{$Context: ${dialog_data.html}}   
-{Use the most commonly used phrases and words in colloquial speech and ${dialog_data_words}}
-{No repetition of lines and phrases from dlg_content in output. Ensure that the conversation flows naturally and smoothly.}
-{Topic="${name[$llang]}"}{Learning language:${$llang} }{ Learning language  level: ${data.level}}
-{participants: user1, user2}]*${num}
-->[Translation to:${$llang} and ${$langs}]
-->[Build webpage $Page based on the Context.]->{Style $Page content for easier reading}{$Page should started <html>}{don't use '\n' or 'n'}]
-->[Output]{output format:json}<output example: 
-  <{
-    content:[    
-      {
-      "user1": { "${$llang}": "{answer. question}" , "${$langs}":"{answer. question}"}, 
-      "user2": { "${$llang}": "{answer. question}" , "${$langs}":"{answer. question}"} 
-      },
-      ...
-    ]
-  }
->
-->[Check output is in JSON and fix it if not]
-`;
+    //     prompt = `
+    // [Act as a language teaching methodologist]
+    // [2 users read  $Context]
+    // ->[[Build users dialogue based in which the users asking each another something about $Context
+    // and answering following $Context.]{10 phrases from each user}
+    // {$Context: ${dialog_data.html}}
+    // {Use the most commonly used phrases and words in colloquial speech and ${dialog_data_words}}
+    // {No repetition of lines and phrases from dlg_content in output. Ensure that the conversation flows naturally and smoothly.}
+    // {Topic="${name[$llang]}"}{Learning language:${$llang} }{ Learning language  level: ${data.level}}
+    // {participants: user1, user2}]*${num}
+    // ->[Word-for-word translation to:${$llang} and ${$langs}] {Word-for-word translation example: Hoeveel broers of zussen heb je? - Сколько братьев или сестер имеешь ты?}
+    // ->[Build webpage $Page based on the Context.]->{Style $Page content for easier reading}{$Page should started <html>}{don't use '\n' or 'n'}]
+    // ->[Output]{output format:json}<output example:
+    //   <{
+    //     content:[
+    //       {
+    //       "user1": { "${$llang}": "{answer. question}" , "${$langs}":"{answer. question}"},
+    //       "user2": { "${$llang}": "{answer. question}" , "${$langs}":"{answer. question}"}
+    //       },
+    //       ...
+    //     ]
+    //   }
+    // >
+    // ->[Check output is in JSON and fix it if not]
+    // `;
   }
 
   $: if (dialog_data && $langs) {
@@ -96,13 +90,28 @@ and answering following $Context.]{10 phrases from each user}
     .then((response) => response.json())
     .then((data) => {
       dialog_data = data.data.dialog;
-      if(!dialog_data)
-       dialog_data = {'content':[]};
+      if (!dialog_data) dialog_data = { content: [] };
       if (data.data.html) {
         dialog_data.html = splitHtmlContent(data.data.html);
       }
       dialog_data.name = name;
-      prompt = prompt;
+      fetch(`./admin?prompt=dialog`)
+        .then((response) => response.json())
+        .then((data) => {
+          prompt = data.resp.system;
+          prompt = prompt.replaceAll('${$llang}', $llang);
+          prompt = prompt.replaceAll('${name[$llang]}', name[$llang]);
+          prompt = prompt.replaceAll('${$langs}', $langs);
+          prompt = prompt.replaceAll('${dialog_data.html}', dialog_data.html);
+          prompt = prompt.replaceAll('${data.level}', data.level);
+          prompt = prompt.replaceAll('${num}', num);
+          prompt = prompt.replaceAll('${dialog_data_words}', dialog_data.words);
+          prompt = prompt;
+        })
+        .catch((error) => {
+          console.log(error);
+          // dialog_data.content = [];
+        });
     })
     .catch((error) => {
       console.log(error);
@@ -111,22 +120,9 @@ and answering following $Context.]{10 phrases from each user}
 
   onMount(() => {});
 
-  async function Translate(text: string, from_lang: string, to_lang: string) {
-    try {
-      translate.from = from_lang;
 
-      return (
-        ($dicts[text] && $dicts[text][to_lang]) ||
-        (await translate(text.trim(), to_lang))
-      );
-    } catch (error) {
-      console.error('Translation error:', error);
-      return text; // или другое подходящее значение по умолчанию
-    }
-  }
 
   async function TranslateContentToCurrentLang() {
-
     await Promise.all(
       dialog_data.content.map(async (item: any) => {
         await Promise.all(
@@ -276,11 +272,9 @@ and answering following $Context.]{10 phrases from each user}
         const parsed = JSON.parse(text);
         const parsed_html = JSON.parse(text).html;
         if (dialog_data && dialog_data.content)
-          dialog_data.content = dialog_data.content.concat(
-            parsed.content
-          );
+          dialog_data.content = dialog_data.content.concat(parsed.content);
         else {
-          dialog_data = { content: parsed};
+          dialog_data = { content: parsed };
         }
         if (dialog_data && parsed_html) {
           dialog_data.html = parsed_html;
@@ -366,7 +360,8 @@ and answering following $Context.]{10 phrases from each user}
                 <!-- <div style="height: 350px; overflow-y:auto">
                   {@html dialog_data.html}
                 </div> -->
-                <iframe srcdoc={dialog_data.html} width="100%" height="350px"></iframe>
+                <iframe srcdoc={dialog_data.html} width="100%" height="350px"
+                ></iframe>
               {:else}
                 <Paper variant="unelevated">
                   <Content>
@@ -419,7 +414,7 @@ and answering following $Context.]{10 phrases from each user}
             {:else if active === content_title}
               <Paper variant="unelevated">
                 <Content>
-                  {#await Translate('Run your favorite AI chat with the copied prompt and paste result here', 'en', $langs) then data}
+                  {#await Translate('Use chatGPT to run the copied prompt and paste result here', 'en', $langs) then data}
                     <textarea
                       id="dialog_content"
                       rows="20"
@@ -583,7 +578,7 @@ and answering following $Context.]{10 phrases from each user}
     border-radius: 35px;
     border: 0;
     background-color: transparent;
-     color:blue;
+    color: blue;
   }
   .dialog_name,
   .dialog_lang,

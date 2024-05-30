@@ -2,6 +2,8 @@
   import Volgorde from './Volgorde.svelte';
   import Dialog from './dialog/Dialog.1.svelte';
   import Listen from './listen/Listen.nl.svelte';
+  import Numbers from './listen/Numbers.svelte';
+  import Time from './listen/Time.svelte';
   import Text from './text/Text.svelte';
   import Word from './word/Word.svelte';
   import WordGame from './word/WordGame.svelte';
@@ -22,7 +24,15 @@
   {:else if quiz.includes('dialog')}
     <Dialog {data} />
   {:else if quiz.includes('listen')}
-    <Listen {data} />
+    {#if data.name === 'Nummers'}
+      <Numbers {data} ></Numbers>
+    {:else if data.name === 'Tijd'}
+      <Time {data} ></Time>
+    {:else}  
+        <Listen {data} />
+    {/if}
+
+
   {:else if quiz === 'text'}
     <Text {data} />
   {:else if quiz === 'word'}

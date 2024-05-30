@@ -23,11 +23,11 @@ export async function POST({ request }) {
 
   let { question } = await request.json();
 
-  const prompt = await GetPrompt('dialog');
+  const prompt = await GetPrompt('chat');
 
   const task = await Translate(question.text, question.lang,'en');
 
-  let answer = await chatGroq(prompt.system, task);
+  let answer = await chatGroq(prompt.prompt.system, task);
 
   let res = {
     ['nl']: await Translate(answer, question.llang, 'nl'),

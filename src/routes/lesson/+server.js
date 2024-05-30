@@ -58,7 +58,11 @@ export async function GET({ url, fetch, cookies }) {
     let theme = url.searchParams.get('theme');
     let name =  url.searchParams.get('name');
     let owner = url.searchParams.get('owner');
-    data = await GetWords({ theme: theme, name:name ,owner: owner });
+    data = await GetWords({ theme: theme, name: name, owner: owner });
+    
+        let response = new Response(JSON.stringify({ data }));
+        response.headers.append('Access-Control-Allow-Origin', `*`);
+        return response;
 
   } else if (dialog) {
     let name = dialog;

@@ -10,7 +10,7 @@
   import Button from '@smui/button';
   import Paper, { Content } from '@smui/paper';
 
-  let active = 'Words';
+  let active = 'Prompt';
 
   import { slide } from 'svelte/transition';
   let isCollapsed = true;
@@ -30,32 +30,50 @@
     words_data: [];
   const name = data.name;
   let words = [],
+    prompt,
     dialog_task: any,
     dialog_words,
     dialog_tmplt;
+  const content_title = 'Content';
 
-  
+  const output = `
+  {original:'',infinitive:'',example:'',translation:{ [${$langs}]: '',  en: '' }}
+  `;
+
+  let system = ``;
+
+  $: if ($langs && prompt) {
+    prompt = prompt.replaceAll('${output}', output);
+    prompt = prompt.replaceAll('${$llang}', $llang);
+    prompt = prompt.replaceAll('${$langs}', $langs);
+    prompt = prompt.replaceAll('${words}', words);
+  }
 
   fetch(`./lesson?words=theme&name=${data.name[$llang]}&owner=${abonent}`)
     .then((response) => response.json())
-    .then((resp) => {
-      words_data = resp.data;
+    .then((data) => {
+      words_data = data.data;
       if (words_data) {
         words_data.map((item) => {
           words.push(item.original);
         });
       }
+
+      fetch(`./admin?prompt=words`)
+        .then((response) => response.json())
+        .then((data) => {
+          prompt = data.resp.system;
+          prompt = prompt;
+        })
+        .catch((error) => {
+          console.log(error);
+          // dialog_data.content = [];
+        });
     })
     .catch((error) => {
       console.log(error);
       words_data = { content: [], lang: '' };
     });
-
-  const tmplt = `
-  {original:'',infinitive:'',translation:{ nl: '', ru: '', uk: '', fr: '', en: '', de: '' }}
-  `;
-
-  let system = ``;
 
   onMount(() => {
     // const storedData = localStorage.getItem('qaData');
@@ -101,24 +119,27 @@
 
   async function CreateContent() {}
 
-  function OnChangeContent(ev: any) {
+  function OnChangeContent(content) {
     // console.log(ev.currentTarget.value)
     try {
-      words_data = JSON.parse(ev.currentTarget.value);
+      words_data = JSON.parse(content);
     } catch (ex) {
       console.log(ex);
     }
   }
 
-  function CopyPrompt() {
-    let dt = dialog_task.innerHTML.replace(/<[^>]+>/gi, '');
-    const stringToCopy = task + system + words;
+  function CopyPrompt(ev: MouseEvent) {
+    // let dt = dialog_task.innerHTML.replace(/<[^>]+>/gi, '');
+    ev.target.focus();
+    const stringToCopy = prompt;
     navigator.permissions.query({ name: 'clipboard-write' }).then((result) => {
       if (result.state == 'granted' || result.state == 'prompt') {
         navigator.clipboard
           .writeText(stringToCopy)
           .then(() => {
             console.log('Строка скопирована в буфер обмена');
+            active = content_title;
+            content = '';
           })
           .catch((err) => {
             console.error('Ошибка при копировании строки: ', err);
@@ -129,12 +150,27 @@
     });
   }
 
+    function PasteContent() {
+    // Вставляем содержимое буфера обмена в <textarea>
+    navigator.clipboard
+      .readText()
+      .then((text) => {
+        content = text;
+        const parsed = JSON.parse(text);
+        words_data = parsed;
+      })
+      .catch((err) => {
+        console.error('Failed to read clipboard contents: ', err);
+      });
+  }
+
+
   function remRecord(ev) {}
 </script>
 
-<div class="dialog_container">
+<div class="word_container">
   <div class="container">
-    <div class="dialog-field">
+    <div class="word_field">
       {#await Translate('Название', 'ru', $langs) then data}
         <label for="dialog_name">{data}:</label>
       {/await}
@@ -146,7 +182,7 @@
       />
     </div>
     {#if data.level}
-      <div class="dialog-field">
+      <div class="word_field">
         {#await Translate('Уровень', 'ru', $langs) then data}
           <label for="dialog_level">{data}:</label>
         {/await}
@@ -160,7 +196,7 @@
     {/if}
 
     {#if $llang}
-      <div class="dialog-field">
+      <div class="word_field">
         {#await Translate('Язык', 'ru', $langs) then data}
           <label for="dialog_lang">{data}:</label>
         {/await}
@@ -186,24 +222,20 @@
   {#if !isCollapsed}
     <div class="collapsible" in:slide={{ duration: 300 }}>
       <div class="generator_container">
-        <TabBar
-          tabs={['Format', 'Words', 'Prompt', 'Content']}
-          let:tab
-          bind:active
-        >
+        <TabBar tabs={['Words', 'Prompt', 'Content']} let:tab bind:active>
           <Tab {tab} minWidth>
             <Label>{tab}</Label>
           </Tab>
         </TabBar>
-        {#if active === 'Format'}
+        <!-- {#if active === 'Format'}
           <Paper variant="unelevated">
             <Content>
               <div>
-                {@html tmplt}
+                {@html output}
               </div>
             </Content>
-          </Paper>
-        {:else if active === 'Words'}
+          </Paper> -->
+        {#if active === 'Words'}
           <Paper variant="unelevated">
             <Content>
               <textarea rows="20" name="dialog_words" bind:value={words}
@@ -213,29 +245,42 @@
         {:else if active === 'Prompt'}
           <Paper variant="unelevated">
             <Content>
-              <!-- <textarea  rows='20' name='dialog_task' bind:value={task}></textarea> -->
-
-              <button class="copy_prompt" on:click={() => CopyPrompt()}
-                >Copy Prompt</button
-              >
+              <textarea rows="20" name="dialog_task" bind:value={prompt}
+              ></textarea>
+              {#await Translate('Копировать промпт', 'ru', $langs) then data}
+                <button class="copy_prompt" on:click={CopyPrompt}>{data}</button
+                >
+              {/await}
             </Content>
           </Paper>
         {:else if active === 'Content'}
           <Paper variant="unelevated">
             <Content>
-              <textarea
-                id="dialog_content"
-                rows="20"
-                name="dialog_content"
-                on:input={OnChangeContent}>{content}</textarea
-              >
+              {#await Translate('Use chatGPT to run copied prompt and paste result here', 'en', $langs) then data}
+                <textarea
+                  id="dialog_content"
+                  rows="20"
+                  name="dialog_content"
+                  placeholder={data}
+                  on:input={OnChangeContent} bind:value={content}></textarea
+                >
+              {/await}
+              <button class="paste_content" on:click={()=>{PasteContent()}}>
+                {#await Translate('Paste Content', 'en', $langs) then data}
+                  {data}
+                {/await}
+              </button>
             </Content>
           </Paper>
         {/if}
       </div>
 
       <div class="container">
-        <button class="save" on:click={() => CreateContent()}>Создать</button>
+        {#await Translate('Создать', 'ru', $langs) then data}
+          <button class="save" on:click={() => CreateContent()} disabled
+            >{data}</button
+          >
+        {/await}
       </div>
     </div>
   {/if}
@@ -256,7 +301,7 @@
             <td>
               {#if item.original}
                 <textarea rows="1" bind:value={item.original} />
-                {#if item.infinitive !== item.original}
+                {#if item.infinitive  && item.infinitive !== item.original}
                   <textarea rows="1" bind:value={item.infinitive}></textarea>
                 {/if}
               {:else}
@@ -272,7 +317,7 @@
             </td>
             <td>
               {#if item.translation && item.translation[$langs]}
-              <textarea rows="1" bind:value={item.translation[$langs]} />
+                <textarea rows="1" bind:value={item.translation[$langs]} />
               {/if}
             </td>
             <td>
@@ -287,15 +332,15 @@
   <div class="container">
     <button class="add-record" on:click={addEmptyRecord}>+</button>
     <div class="container">
-      <button class="save" on:click={() => OnSave()}
-        >Сохранить</button
-      >
+      {#await Translate('Сохранить', 'ru', $langs) then data}
+        <button class="save" on:click={() => OnSave()}>{data}</button>
+      {/await}
     </div>
   </div>
 </div>
 
 <style>
-  .dialog_container {
+  .word_container {
     margin: 10px;
   }
   .content_generator {
@@ -343,25 +388,25 @@
     color: blue;
   }
 
-  .dialog-field {
+  .word_field {
     display: inline-block;
     box-sizing: border-box; /* Учтите ширину и отступы внутри элемента */
     margin-right: 10px; /* Установите нужный вам отступ между полями */
   }
 
-  .dialog-field:first-child {
+  .word_field:first-child {
     width: calc(
       100% - 20% - 10% - 5px
     ); /* 20px - это сумма отступов между полями */
   }
 
-  .dialog-field:nth-last-child(-n + 2) {
+  .word_field:nth-last-child(-n + 2) {
     width: calc(
       20% - 20px
     ); /* 5px - это примерный отступ между последними двумя полями */
   }
 
-  /* Для последнего dialog-field может потребоваться сброс правого отступа */
+  /* Для последнего word_field может потребоваться сброс правого отступа */
 
   .save {
     margin-top: 10px; /* Отступ для кнопки 'Создать' */
@@ -388,13 +433,13 @@
     justify-content: space-between; /* Распределяет контейнеры равномерно по горизонтали */
   }
 
-  .dialog-field {
+  .word_field {
     display: flex;
     flex-direction: column; /* Устанавливает вертикальное направление потока */
     margin-right: 20px; /* Добавляет небольшой отступ справа для каждого поля, кроме последнего */
   }
 
-  .dialog-field:last-child {
+  .word_field:last-child {
     margin-right: 0; /* Убирает отступ справа у последнего поля */
   }
 </style>

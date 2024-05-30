@@ -1,7 +1,7 @@
 <script lang="ts">
   import { setContext, onMount, onDestroy } from 'svelte';
 
-  import translate from 'translate';
+  import {Translate} from '../../translate/Translate';
 
   import pkg, { indexOf } from 'lodash';
   const { find, findKey, mapValues } = pkg;
@@ -76,21 +76,6 @@
 
   // }
 
-  async function Translate(text: string, from_lang: string, to_lang: string) {
-    if (!text || !from_lang || !to_lang) return '';
-
-    try {
-      translate.from = from_lang;
-
-      return (
-        ($dicts[text] && $dicts[text][$langs]) ||
-        (await translate(text.trim(), to_lang))
-      );
-    } catch (error) {
-      console.error('Translation error:', error);
-      return text; // или другое подходящее значение по умолчанию
-    }
-  }
 
   export async function fetchLesson(owner: string, level: string) {
     try {
@@ -128,8 +113,6 @@
   $: if (lesson_data && lesson_data.data) {
     levels = lesson_data.levels;
     $llang = lesson_data.lang.trim();
-
-    translate.engine = 'google';
   }
 
   onDestroy(() => {});

@@ -6,7 +6,7 @@
   // import BottomAppBar, { Section } from '@smui-extra/bottom-app-bar';
   import TopAppBar, { Row, Title, Section } from '@smui/top-app-bar';
   import Button, { Label } from '@smui/button';
-  import translate from 'translate';
+  import {Translate} from '../../../translate/Translate';
 
   // import '$lib/js/talkify.js';
   // import 'talkify-tts/dist/talkify.min.js';
@@ -63,8 +63,8 @@
   let share_mode = false;
   export let data;
 
-  translate.from = $llang;
-  translate.engine = 'google';
+  // translate.from = $llang;
+  // translate.engine = 'google';
 
   // llang = data.llang;
   let showSpeakerButton = false;
@@ -135,19 +135,19 @@
     })();
   }
 
-  async function Translate(text: string, from_lang: string, to_lang: string) {
-    try {
-      translate.from = from_lang;
+  // async function Translate(text: string, from_lang: string, to_lang: string) {
+  //   try {
+  //     translate.from = from_lang;
 
-      return (
-        ($dicts[text] && $dicts[text][$langs]) ||
-        (await translate(text.trim(), to_lang))
-      );
-    } catch (error) {
-      console.error('Translation error:', error);
-      return text; // или другое подходящее значение по умолчанию
-    }
-  }
+  //     return (
+  //       ($dicts[text] && $dicts[text][$langs]) ||
+  //       (await translate(text.trim(), to_lang))
+  //     );
+  //   } catch (error) {
+  //     console.error('Translation error:', error);
+  //     return text; // или другое подходящее значение по умолчанию
+  //   }
+  // }
 
   if (data.func) {
     onChangeClick();
