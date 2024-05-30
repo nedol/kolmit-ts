@@ -1,7 +1,7 @@
 export function NumberString(lang, number) {
   switch (lang) {
     case 'nl':
-      const ones = [
+      let ones = [
         '',
         'een',
         'twee',
@@ -13,7 +13,7 @@ export function NumberString(lang, number) {
         'acht',
         'negen',
       ];
-      const teens = [
+      let teens = [
         'tien',
         'elf',
         'twaalf',
@@ -25,7 +25,7 @@ export function NumberString(lang, number) {
         'achttien',
         'negentien',
       ];
-      const tens = [
+      let tens = [
         '',
         '',
         'twintig',
