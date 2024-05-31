@@ -1,7 +1,7 @@
 <script lang="ts">
   import { getContext, onMount } from 'svelte';
 
-  import { Translate } from '../../../translate/Translate';
+  import { Translate } from '../../../translate/Transloc';
 
   import { langs, llang } from '$lib/js/stores.js';
 

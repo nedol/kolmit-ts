@@ -6,7 +6,7 @@
   // import BottomAppBar, { Section } from '@smui-extra/bottom-app-bar';
   import TopAppBar, { Row, Title, Section } from '@smui/top-app-bar';
   import Button, { Label } from '@smui/button';
-  import {Translate} from '../../../translate/Translate';
+  import { Translate } from '../../../translate/Transloc';
 
   // import '$lib/js/talkify.js';
   // import 'talkify-tts/dist/talkify.min.js';
@@ -198,8 +198,7 @@
   }
 
   function Dialog() {
-    if(!dialog_data.content){
-
+    if (!dialog_data.content) {
     }
     if (!dialog_data.content[cur_qa]) {
       cur_qa = 0;
@@ -354,7 +353,7 @@
       return;
     }
 
-    stt.startAudioMonitoring($llang );
+    stt.startAudioMonitoring($llang);
 
     // const text = dialog_data.content[cur_qa].user1[llang].replace(/[^\w\s]/gi, ''); //.split(' ');
 
@@ -565,7 +564,7 @@
           class="margins"
           style="text-align: center; display: flex; align-items: center; justify-content: space-between;"
         >
-          <br>
+          <br />
           {#if showSpeakerButton}
             <div class="speaker-button">
               <IconButton
@@ -583,7 +582,7 @@
           <div class="title">{data}:</div>
         {/await}
 
-                <div class="user2_tr">
+        <div class="user2_tr">
           {#await Translate(dialog_data.content[cur_qa].user2[$llang], $llang, $langs) then data}
             {data}
           {/await}
@@ -598,7 +597,7 @@
             {@html stt_text}
           </span>
         </div>
-        
+
         <div
           class="margins"
           style="text-align: center; display: flex; align-items: center; justify-content: space-between;"
@@ -633,7 +632,7 @@
             </div>
           {/if}
         </div>
-        <br>
+        <br />
 
         {#if dialog_data.html}
           <ConText data={dialog_data} />
@@ -794,7 +793,7 @@
     width: 100vw;
     text-align: center;
     line-height: normal;
-    font-size: .8em;
+    font-size: 0.8em;
     margin-bottom: 0px;
     color: #333;
   }

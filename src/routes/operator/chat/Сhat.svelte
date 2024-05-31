@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { Speak } from '/src/routes/speech/tts/VoiceRSS';
-  import { Transloc } from '/src/routes/translate/Transloc';
+  import { Translate } from '../../translate/Transloc';
 
   import {
     langs,
@@ -168,7 +168,7 @@
         {text[$llang]}
         {#if text[$langs] && showHint===index}
 
-          {#await Transloc(text[$llang], $llang, $langs) then data}
+          {#await Translate(text[$llang], $llang, $langs) then data}
             <div class="original">{data}</div>
           {/await} 
 
@@ -210,7 +210,7 @@
     </Icon>
   </IconButton>
   <Stt bind:this={stt} bind:display_audio {SttResult} {StopListening}></Stt>
-  {#await Transloc('Отправить', 'ru', $langs) then data}
+  {#await Translate('Отправить', 'ru', $langs) then data}
     <Button
       on:click={() => {
         SendDC(userInput[$llang]);
@@ -220,7 +220,7 @@
 
   {#if dc}
     <div class="repeat_but">
-      {#await Transloc('Повторить', 'ru', $langs) then data}
+      {#await Translate('Повторить', 'ru', $langs) then data}
         <Button on:click={() => SendRepeat()} {variant}>
           <Label>{data}</Label>
         </Button>

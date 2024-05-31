@@ -131,12 +131,12 @@
   function replaceWordWithInput(sentence, word) {
     // Вычисляем количество совпадающих символов
     const lastDotIndex = sentence.lastIndexOf('.');
-    if (lastDotIndex !== -1) {
-      sentence =
-        sentence.slice(0, lastDotIndex) + sentence.slice(lastDotIndex + 1);
-    }
+    // if (lastDotIndex !== -1) {
+    //   sentence =
+    //     sentence.slice(0, lastDotIndex) + sentence.slice(lastDotIndex + 1);
+    // }
 
-    word = word.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, '');
+    word = word.replace(/[.,\/#!$%\^&\*;:{}=_`~()]/g, '');
     word = word.replace(/\b(the |a |an |het |de )\b/gi, '').trim();
     const wordLength = word.length;
     const matches = (sentence.match(new RegExp(word, 'i')) || []).length;
@@ -191,7 +191,7 @@
 
     // Измеряем длину текста
     const metrics = context.measureText(text);
-    return metrics.width + 50;
+    return metrics.width + 10;
   }
 
   onMount(async () => {});
@@ -266,7 +266,7 @@
 
   function checkInput() {
     const targetWord = words[currentWordIndex].original.replace(
-      /[.,\/#!$%\^&\*;:{}=\-_`~()]/g,
+      /[.,\/#!$%\^&\*;:{}=_`~()]/g,
       ''
     );
     userContent = userContent
@@ -303,7 +303,7 @@
       }
 
       userContent = currentWord.original.replace(
-        /[.,\/#!$%\^&\*;:{}=\-_`~()]/g,
+        /[.,\/#!$%\^&\*;:{}=_`~()]/g,
         ''
       );
       highlightWords(userContent);
@@ -317,7 +317,7 @@
       while (i < targetWord.length || i < trimmedUserContent.length) {
         if (!trimmedUserContent[i]) {
           // Недостающие символы выделяются пустым span с красной окантовкой
-          result += `<span class="empty_block" onchage="onChangeUserContent" style="display: inline-block; background-color:rgba(255, 240, 251, 0.9);border:1px solid rgba(255, 240, 251, 0.9); width:15px">&nbsp;</span>`;
+          // result += `<span class="empty_block" onchage="onChangeUserContent" style="display: inline-block; background-color:rgba(255, 240, 251, 0.9);border:1px solid rgba(255, 240, 251, 0.9); width:15px">&nbsp;&nbsp;&nbsp;&nbsp;</span>`;
         } else if (trimmedUserContent[i] === targetWord[i]) {
           // Совпадающие символы
           result += `<span class="correct">${targetWord[i]}</span>`;
@@ -325,7 +325,10 @@
         } else {
           // Несовпадающие символы
           result += `<span style="color:red;">${trimmedUserContent[i]}</span>`;
-          resultElementWidth = getTextWidth(trimmedUserContent[i], '20px Arial');
+          resultElementWidth = getTextWidth(
+            trimmedUserContent[i],
+            '20px Arial'
+          );
           errorIndex++;
         }
 
@@ -349,7 +352,7 @@
   function showHint() {
     // wordsString = shuffleWords(wordsString);
     currentWord.original = currentWord.original.replace(
-      /[.,\/#!$%\^&\*;:{}=\-_`~()]/g,
+      /[.,\/#!$%\^&\*;:{}=_`~()]/g,
       ''
     );
     if (currentWord && hintIndex < currentWord.original.length) {
@@ -398,7 +401,7 @@
   }
 
   function OnClickHint(word) {
-    word = word.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, '');
+    word = word.replace(/[.,\/#!$%\^&\*;:{}=_`~()]/g, '');
     resultElementWidth = getTextWidth(word, '20px Arial');
     userContent = word;
     hl_words.push(word);
@@ -489,6 +492,7 @@
         style="width: {resultElementWidth}px"
       >
         {@html result}
+
       </div>
     </div>
 
@@ -634,7 +638,6 @@
   .input:focus {
     outline: none;
   }
-
 
   .next10-button,
   .shuffle-button,

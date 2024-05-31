@@ -1,5 +1,5 @@
 <script lang="ts">
-  import {Translate} from '../../../translate/Translate.js';
+  import { Translate } from '../../../translate/Transloc.js';
 
   import { getContext, onMount } from 'svelte';
 
@@ -37,7 +37,6 @@
     content_title = 'Content';
 
   let active = 'Prompt';
-
 
   $: if ($langs) {
     (async () => {
@@ -119,8 +118,6 @@
     });
 
   onMount(() => {});
-
-
 
   async function TranslateContentToCurrentLang() {
     await Promise.all(

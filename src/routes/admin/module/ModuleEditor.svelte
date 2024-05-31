@@ -1,7 +1,7 @@
 <script lang="ts">
   import { setContext, onMount, onDestroy } from 'svelte';
 
-  import {Translate} from '../../translate/Translate';
+  import { Translate } from '../../translate/Transloc';
 
   import pkg, { indexOf } from 'lodash';
   const { find, findKey, mapValues } = pkg;
@@ -75,7 +75,6 @@
   //   });
 
   // }
-
 
   export async function fetchLesson(owner: string, level: string) {
     try {
@@ -365,10 +364,9 @@
   //   }
   // }
 
-
   // function OnThemeNameChange(event: Event, t:number) {
   //   let theme = lesson_data.data.module.themes[t];
-  //   theme.name[$llang] = 
+  //   theme.name[$llang] =
   // }
 </script>
 
@@ -538,33 +536,33 @@
                             </div>
                             <!-- svelte-ignore a11y-invalid-attribute -->
                             {#if quiz.type === 'quiz'}
-                            {#await Translate('Quiz Name','en', $langs) then data}
-                              <input
-                                class="quiz_name"
-                                on:click={OnClickQuizName}
-                                autofocus
-                                contenteditable
-                                {t}
-                                placeholder={data}
-                                name={quiz.name[$langs]}
-                                theme={theme.num}
-                                theme_name={theme.name[$llang]}
-                                bind:value={quiz.name[$langs]}
-                              />
+                              {#await Translate('Quiz Name', 'en', $langs) then data}
+                                <input
+                                  class="quiz_name"
+                                  on:click={OnClickQuizName}
+                                  autofocus
+                                  contenteditable
+                                  {t}
+                                  placeholder={data}
+                                  name={quiz.name[$langs]}
+                                  theme={theme.num}
+                                  theme_name={theme.name[$llang]}
+                                  bind:value={quiz.name[$langs]}
+                                />
                               {/await}
                             {:else}
-                            {#await Translate('Quiz Name','en', $langs) then data}
-                              <input
-                                on:click={OnClickQuizName}
-                                style="width:80%"
-                                {t}
-                                placeholder={data}
-                                name={quiz.name[$langs]}
-                                level={lesson_data.data.level}
-                                theme={theme.num}
-                                theme_name={theme.name[$llang]}
-                                bind:value={quiz.name[$langs]}
-                              />
+                              {#await Translate('Quiz Name', 'en', $langs) then data}
+                                <input
+                                  on:click={OnClickQuizName}
+                                  style="width:80%"
+                                  {t}
+                                  placeholder={data}
+                                  name={quiz.name[$langs]}
+                                  level={lesson_data.data.level}
+                                  theme={theme.num}
+                                  theme_name={theme.name[$llang]}
+                                  bind:value={quiz.name[$langs]}
+                                />
                               {/await}
                             {/if}
 

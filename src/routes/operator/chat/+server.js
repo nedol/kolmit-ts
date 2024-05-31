@@ -1,10 +1,9 @@
 import { config } from 'dotenv';
 config();
 
-import { GetPrompt } from '../../../lib/server/db'
+import { GetPrompt } from '../../../lib/server/db';
 
 import { Translate } from './../../translate/Translate';
-
 
 import Groq from 'groq-sdk';
 
@@ -20,12 +19,11 @@ let cnt = 0;
 
 /** @type {import('./$types').RequestHandler} */
 export async function POST({ request }) {
-
   let { question } = await request.json();
 
   const prompt = await GetPrompt('chat');
 
-  const task = await Translate(question.text, question.lang,'en');
+  const task = await Translate(question.text, question.lang, 'en');
 
   let answer = await chatGroq(prompt.prompt.system, task);
 
@@ -115,6 +113,3 @@ async function chatTranformers(system, task) {
   //   const generated_ids = model.generate(input_ids, 256, true);
   // }
 }
-
-
-
