@@ -4,6 +4,7 @@ import translate from 'translate';
 translate.engine = 'deepl'; // 'libre';// 'google'//
 translate.key = '0834516e-29b0-45d1-812e-b903d5962e12:fx'; //'203cca0d-8540-4d75-8c88-d69ac40b6d57:fx';//process.env.DEEPL_API_KEY;
 export async function Translate(text, from, to) {
+  translate.engine = 'deepl'; 
   try {
     if (!text)
       return;

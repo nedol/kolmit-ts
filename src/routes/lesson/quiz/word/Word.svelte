@@ -191,7 +191,7 @@
 
     // Измеряем длину текста
     const metrics = context.measureText(text);
-    return metrics.width + 110;
+    return metrics.width + 50;
   }
 
   onMount(async () => {});
