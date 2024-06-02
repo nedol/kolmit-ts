@@ -34,7 +34,7 @@
     dialog_task: any,
     dialog_words,
     dialog_tmplt;
-  const content_title = 'Content';
+
 
   const output = `
   {original:'',infinitive:'',example:'',translation:{ [${$langs}]: '',  en: '' }}
@@ -47,6 +47,22 @@
     prompt = prompt.replaceAll('${$llang}', $llang);
     prompt = prompt.replaceAll('${$langs}', $langs);
     prompt = prompt.replaceAll('${words}', words);
+  }
+
+  let  grammar_title = 'Grammar',
+    context_title = 'Context',
+    prompt_title = 'Prompt',
+    words_title = 'Words',
+    content_title = 'Content';
+
+   $: if ($langs) {
+    (async () => {
+      grammar_title = await Translate('Grammar', 'en', $langs);
+      context_title = await Translate('Context', 'en', $langs);
+      // prompt_title = await translate('Prompt', $langs);
+      words_title = await Translate('Words', 'en', $langs);
+      content_title = await Translate('Content', 'en', $langs);
+    })();
   }
 
   fetch(`./lesson?words=theme&name=${data.name[$llang]}&owner=${abonent}`)
@@ -222,7 +238,15 @@
   {#if !isCollapsed}
     <div class="collapsible" in:slide={{ duration: 300 }}>
       <div class="generator_container">
-        <TabBar tabs={['Words', 'Prompt', 'Content']} let:tab bind:active>
+           <TabBar
+              tabs={[
+                words_title,
+                prompt_title,
+                content_title,
+              ]}
+              let:tab
+              bind:active
+            >
           <Tab {tab} minWidth>
             <Label>{tab}</Label>
           </Tab>
@@ -418,6 +442,7 @@
   }
 
   .add-record {
+    height:15px;
     border-radius: 35px;
     border: 0;
     scale: 2;

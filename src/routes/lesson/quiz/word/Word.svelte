@@ -139,7 +139,7 @@
     word = word.replace(/[.,\/#!$%\^&\*;:{}=_`~()]/g, '');
     word = word.replace(/\b(the |a |an |het |de )\b/gi, '').trim();
     const wordLength = word.length;
-    const matches = (sentence.match(new RegExp(word, 'i')) || []).length;
+    const matches = sentence.toLowerCase().split(word.toLowerCase()).length - 1;
 
     const matchPercentage = (matches / wordLength) * 100;
 

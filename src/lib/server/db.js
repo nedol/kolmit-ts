@@ -400,12 +400,12 @@ export async function RemoveOperator(q) {
   }
 }
 
-export async function GetText(q) {
+export async function GetListen(q) {
   try {
-    let res = await sql`SELECT text, questions FROM texts
-		WHERE level= ${q.level} AND title=${q.title} AND owner=${q.owner}`;
+    let res = await sql`SELECT data FROM listen
+		WHERE name= ${q.name} AND lang=${q.lang}`;
     //debugger;
-    return { text: res[0].text, questions: res[0].questions };
+    return { data: res[0].data };
   } catch (ex) {
     return JSON.stringify({ func: q.func, res: ex });
   }

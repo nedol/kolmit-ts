@@ -4,7 +4,7 @@ import fs from 'fs';
 import {
   GetLesson,
   GetDialog,
-  GetText,
+  GetListen,
   GetDict,
   GetWords,
   UpdateQuizUsers,
@@ -26,6 +26,7 @@ export async function GET({ url, fetch, cookies }) {
   const words = url.searchParams.get('words');
   const dialog = url.searchParams.get('dialog');
   const lesson = url.searchParams.get('lesson');
+  const listen = url.searchParams.get('listen');
   let data;
   // debugger;
   if (text) {
@@ -40,6 +41,7 @@ export async function GET({ url, fetch, cookies }) {
       theme: theme,
       title: title,
     });
+
   } else if (dict) {
     const level = url.searchParams.get('level');
     const theme = url.searchParams.get('theme');
@@ -56,30 +58,40 @@ export async function GET({ url, fetch, cookies }) {
 
   } else if (words) {
     let theme = url.searchParams.get('theme');
-    let name =  url.searchParams.get('name');
+    let name = url.searchParams.get('name');
     let owner = url.searchParams.get('owner');
     data = await GetWords({ theme: theme, name: name, owner: owner });
     
-        let response = new Response(JSON.stringify({ data }));
-        response.headers.append('Access-Control-Allow-Origin', `*`);
-        return response;
+    let response = new Response(JSON.stringify({ data }));
+    response.headers.append('Access-Control-Allow-Origin', `*`);
+    return response;
 
   } else if (dialog) {
     let name = dialog;
     let owner = url.searchParams.get('owner');
     data = await GetDialog({ name: name, owner: owner });
 
-    let response = new Response(JSON.stringify({ data}));
+    let response = new Response(JSON.stringify({ data }));
     response.headers.append('Access-Control-Allow-Origin', `*`);
     return response;
 
   } else if (lesson) {
     let owner = url.searchParams.get('owner');
-	  let lev = url.searchParams.get('level');
-	  let { data, lang, level, levels } = await GetLesson({ owner: owner, level:lev });
-	  let response = new Response(JSON.stringify({ data, lang, level,levels }));
-      response.headers.append('Access-Control-Allow-Origin', `*`);
-      return response;
+    let lev = url.searchParams.get('level');
+    let { data, lang, level, levels } = await GetLesson({ owner: owner, level: lev });
+    let response = new Response(JSON.stringify({ data, lang, level, levels }));
+    response.headers.append('Access-Control-Allow-Origin', `*`);
+    return response;
+
+  } else if (listen) {
+    let name = url.searchParams.get('listen');
+    let owner = url.searchParams.get('owner');
+    let lang = url.searchParams.get('lang');
+    data = await GetListen({name: name, owner: owner ,lang:lang});
+    
+    let response = new Response(JSON.stringify({ data }));
+    response.headers.append('Access-Control-Allow-Origin', `*`);
+    return response;
   }
   let response = new Response(JSON.stringify({ data }));
   response.headers.append('Access-Control-Allow-Origin', `*`);

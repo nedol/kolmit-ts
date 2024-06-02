@@ -38,6 +38,19 @@ export function NumberString(lang, number) {
         'negentig',
       ];
 
+      if (number < 10) {
+        return ones[number];
+      } else if (number < 20) {
+        return teens[number - 10];
+      } else if (number < 100) {
+        return (
+          tens[Math.floor(number / 10)] +
+          (number % 10 !== 0 ? '-' + ones[number % 10] : '')
+        );
+      } else {
+        return 'Number out of range';
+      }
+
       break;
 
     case 'en':

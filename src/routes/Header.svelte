@@ -6,7 +6,7 @@
 
   import { page, navigating, updated } from '$app/stores';
 
-  import langs_list from '$lib/dict/lang_list.json';
+  import langs_list from '$lib/dict/google_lang_list.json';
 
   import ISO6391 from 'iso-google-locales';
 
@@ -68,8 +68,6 @@
         let ind = langs_list.indexOf(name);
         if (ind !== -1) {
           let ar = langs_list.splice(ind, 1);
-          // localStorage.setItem('langs_list', JSON.stringify(langs_list));
-          // langs_list = langs_list;
           $langs = 'en';
         }
       }

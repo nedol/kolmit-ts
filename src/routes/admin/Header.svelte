@@ -1,7 +1,7 @@
 <script lang="ts">
   import TopAppBar, { Row, Title, Section } from '@smui/top-app-bar';
   import { dicts, langs, view, lesson } from '$lib/js/stores';
-  import langs_list from '$lib/dict/lang_list.json';
+  import google_langs_list from '$lib/dict/google_lang_list.json';
   import ISO6391 from 'iso-google-locales';
   import translate from 'translate';
 
@@ -80,7 +80,7 @@
           >
           {#if lang_menu}
             <div class="lang_list">
-              {#each langs_list as lang}
+              {#each google_langs_list as lang}
                 <div
                   style="color:black; margin:10px;font-size:smaller"
                   on:click={setLang}
