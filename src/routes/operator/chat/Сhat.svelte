@@ -167,7 +167,6 @@
       <div class="userMessage {isQuestion}" key={index}>
         {text[$llang]}
         {#if text[$langs] && showHint===index}
-
           {#await Translate(text[$llang], $llang, $langs) then data}
             <div class="original">{data}</div>
           {/await} 
@@ -207,8 +206,13 @@
       {:else}
         <path fill="currentColor" d={mdiMicrophoneOutline} />
       {/if}
-    </Icon>
+    </Icon>   
   </IconButton>
+   <span style="position: absolute;
+    font-weight: bold;
+    top: 8px;
+    left: 26px;
+    font-size: x-small">{dc?$langs:$llang}</span>
   <Stt bind:this={stt} bind:display_audio {SttResult} {StopListening}></Stt>
   {#await Translate('Отправить', 'ru', $langs) then data}
     <Button

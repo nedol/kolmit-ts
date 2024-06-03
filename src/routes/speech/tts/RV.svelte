@@ -48,7 +48,7 @@
   }
 
   function EndCallback() {
-    // responsiveVoice.cancel();
+    responsiveVoice.cancel();
   }
 
   function StartCallback() {

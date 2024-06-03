@@ -1,3 +1,93 @@
+
+
+	export function numberToDutchString(number) {
+    const ones = [
+      '',
+      'een',
+      'twee',
+      'drie',
+      'vier',
+      'vijf',
+      'zes',
+      'zeven',
+      'acht',
+      'negen',
+    ];
+    const teens = [
+      'tien',
+      'elf',
+      'twaalf',
+      'dertien',
+      'veertien',
+      'vijftien',
+      'zestien',
+      'zeventien',
+      'achttien',
+      'negentien',
+    ];
+    const tens = [
+      '',
+      '',
+      'twintig',
+      'dertig',
+      'veertig',
+      'vijftig',
+      'zestig',
+      'zeventig',
+      'tachtig',
+      'negentig',
+    ];
+
+    function convertToWords(num) {
+      if (num < 10) return ones[num];
+      if (num < 20) return teens[num - 10];
+      const ten = Math.floor(num / 10);
+      const rest = num % 10;
+      return rest === 0 ? tens[ten] : ones[rest] + 'en' + tens[ten];
+    }
+
+    function convertGroup(num, unit) {
+      const hundred = Math.floor(num / 100);
+      const rest = num % 100;
+      let result = '';
+
+      if (hundred > 0) {
+        result += ones[hundred] + 'honderd';
+        if (rest > 0) result += 'en';
+      }
+
+      if (rest > 0) {
+        result += convertToWords(rest);
+      }
+
+      if (unit) {
+        result += unit;
+      }
+
+      return result;
+    }
+
+    if (number === 0) return 'nul';
+
+    let result = '';
+    let unitIndex = 0;
+
+    while (number > 0) {
+      const group = number % 1000;
+      if (group > 0) {
+        const groupResult = convertGroup(
+          group,
+          unitIndex === 1 ? 'duizend' : ''
+        );
+        result = groupResult + (result ? 'en' : '') + result;
+      }
+      number = Math.floor(number / 1000);
+      unitIndex++;
+    }
+
+    return result.trim();
+}
+  
 export function NumberString(lang, number) {
   switch (lang) {
     case 'nl':

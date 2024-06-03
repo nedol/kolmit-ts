@@ -19,7 +19,7 @@
   // let easyspeech;
 
   import RV from '/src/routes/speech/tts/RV.svelte';
-  let voice;
+  let rv;
 
   import { lesson } from '$lib/js/stores.js';
   import { dc_user } from '$lib/js/stores.js';
@@ -112,8 +112,8 @@
 
   fetch(`./lesson?listen=${data.name}&owner=${operator.abonent}&lang=${$llang}`)
     .then((response) => response.json())
-    .then((data) => {
-      listen_data = data.data.data;
+    .then((res) => {
+      listen_data = res.data.data;
     })
     .catch((error) => {
       console.log(error);
@@ -204,7 +204,7 @@
   }
 
   async function speak(text) {
-    voice.Speak(text);
+    rv.Speak(text);
   }
 
   function repeat() {
@@ -291,7 +291,7 @@
 
   onDestroy(() => {
     // easyspeech.Cancel();
-    voice = '';
+    rv = '';
   });
 </script>
 
@@ -301,7 +301,7 @@
 />
 
 <!-- <EasySpeech bind:this={easyspeech}></EasySpeech> -->
-<RV bind:this={voice}></RV>
+<RV bind:this={rv}></RV>
 
 {#if share_button}
   <IconButton class="material-icons" on:click={onShare} style={style_button}>

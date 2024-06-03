@@ -4,7 +4,8 @@ import { fileURLToPath } from 'url';
 import translate from 'translate';
 translate.engine = 'google';
 
-// import { pipeline } from '@xenova/transformers';
+import { pipeline } from '@xenova/transformers';
+import wavefile from 'wavefile';
 
 // Allocate a pipeline for sentiment-analysis
 
@@ -16,10 +17,10 @@ translate.engine = 'google';
 // });
 
 import { HfInference } from '@huggingface/inference';
-const HF_TOKEN = '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';
+const HF_TOKEN = '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';//'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';
 const inference = new HfInference(HF_TOKEN);
-
-
+import { HfAgent, LLMFromHub, defaultTools } from '@huggingface/agents';
+const agent = new HfAgent(HF_TOKEN, LLMFromHub(HF_TOKEN), [...defaultTools]);
 
 /** @type {import('./$types').RequestHandler} */
 export async function POST({ url, fetch, cookies, request }) {
@@ -29,13 +30,17 @@ export async function POST({ url, fetch, cookies, request }) {
   const from_lang = formData.get('from_lang');
   const to_lang = formData.get('to_lang');
 
-
   // Преобразование Blob в Buffer
   const buffer = await fileContent.arrayBuffer();
   const nodeBuffer = Buffer.from(buffer);
   const blob = new Blob([nodeBuffer]);
   const arrayBuffer = await blob.arrayBuffer();
   const audioUrl = await URL.createObjectURL(blob);
+  // let wav = new wavefile.WaveFile(nodeBuffer);
+  // wav.toBitDepth('32f'); // Pipeline expects input as a Float32Array
+  // wav.toSampleRate(16000); // Whisper expects audio with a sampling rate of 16000
+  // let audioData = nodeBuffer; // wav.getSamples(); //
+
   let resp;
 
   // resp = await queryHF(buffer);
@@ -48,17 +53,15 @@ export async function POST({ url, fetch, cookies, request }) {
         [to_lang]: await Translate(resp.text, from_lang, to_lang),
       };
     }
-
   } else if (from_lang == 'nl') {
-    resp = await stt_nl(arrayBuffer);
+    resp = await stt_nl(buffer, from_lang);
     if (resp) {
       resp = {
         [from_lang]: resp.text,
         [to_lang]: await Translate(resp.text, from_lang, to_lang),
       };
     }
-
-  } else  {
+  } else {
     resp = await stt(arrayBuffer, from_lang);
     // resp = await stt_as(audioUrl);
     if (resp) {
@@ -101,7 +104,6 @@ async function stt(arrayBuffer, from_lang) {
     return await inference.automaticSpeechRecognition({
       data: arrayBuffer,
       model: 'openai/whisper-large-v3',
-      language: from_lang,
     });
   } catch (ex) {
     console.log(ex);
@@ -112,8 +114,8 @@ async function stt_nl(arrayBuffer, from_lang) {
   try {
     return await inference.automaticSpeechRecognition({
       data: arrayBuffer,
-      model: 'jonatasgrosman/wav2vec2-large-xlsr-53-dutch',
-      language: 'nl',
+      model: 'hannatoenbreker/whisper-dutch-small-v2',
+      // language: from_lang,
     });
   } catch (ex) {
     console.log(ex);
@@ -124,7 +126,7 @@ async function stt_en(arrayBuffer, from_lang) {
   try {
     return await inference.automaticSpeechRecognition({
       data: arrayBuffer,
-      model: 'hannatoenbreker/whisper-dutch-small-v2',
+      model: 'openai/whisper-large-v3',
       language: from_lang,
     });
   } catch (ex) {
@@ -134,7 +136,7 @@ async function stt_en(arrayBuffer, from_lang) {
 
 async function queryHF(data) {
   const response = await fetch(
-    // 'https://api-inference.huggingface.co/models/openai/whisper-large-v3',//English 5!
+    'https://api-inference.huggingface.co/models/openai/whisper-large-v3', //English 5!
     // 'https://api-inference.huggingface.co/models/hannatoenbreker/whisper-dutch', //0
     // 'https://api-inference.huggingface.co/models/renesteeman/whisper-tiny-dutch',//3
     // 'https://api-inference.huggingface.co/models/nithinholla/wav2vec2-large-xlsr-53-dutch',//3
@@ -150,11 +152,11 @@ async function queryHF(data) {
     // 'https://api-inference.huggingface.co/models/renesteeman/whisper-tiny-dutch-25',//3
     // 'https://api-inference.huggingface.co/models/golesheed/whisper-non-native-children-0-dutch',//0
     // 'https://api-inference.huggingface.co/models/golesheed/whisper-non-native-adult-6-dutch', //English 5!
-    'https://api-inference.huggingface.co/models/golesheed/whisper-9-dutch', // 5!!
+    // 'https://api-inference.huggingface.co/models/golesheed/whisper-9-dutch', // 5!!
 
     {
       headers: {
-        Authorization: 'Bearer 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',
+        Authorization: 'Bearer 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',
         language: 'nl',
       },
       method: 'POST',
@@ -194,4 +196,15 @@ async function queryFF(text) {
   } catch (error) {
     console.error(error);
   }
+}
+
+async function queryT(arrayBuffer) {
+  const float32Array = new Float32Array(arrayBuffer);
+  let transcriber = await pipeline(
+    'automatic-speech-recognition',
+    'Xenova/whisper-tiny.en'
+  );
+  let out = await transcriber(float32Array);
+  console.log(out);
+  return out;
 }
