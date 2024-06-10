@@ -44,6 +44,7 @@
   }
 
   onMount(async () => {
+
     // const script = document.createElement('script');
     // script.src =
     //   'https://code.responsivevoice.org/responsivevoice.js?key=n8TO6XTS';
@@ -59,6 +60,8 @@
     //   voicelist = true; //responsiveVoice.getVoices();
     // };
   });
+
+
 </script>
 
 <Header></Header>

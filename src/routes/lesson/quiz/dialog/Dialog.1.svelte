@@ -354,7 +354,7 @@
       return;
     }
 
-    stt.startAudioMonitoring($llang);
+    stt.startAudioMonitoring($llang,$langs);
 
     // const text = dialog_data.content[cur_qa].user1[llang].replace(/[^\w\s]/gi, ''); //.split(' ');
 

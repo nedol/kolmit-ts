@@ -3,6 +3,7 @@ import { fileURLToPath } from 'url';
 
 import ISO6391 from 'iso-google-locales';
 
+
 const https = require('https');
 const fs = require('fs');
 
@@ -10,10 +11,12 @@ const url_deepgram = 'https://api.deepgram.com/v1/speak?model=aura-asteria-nl';
 
 import { client } from '@gradio/client';
 const HF_TOKEN = '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';
-
+const projectId = 'firebase-infodesk'
 
 // Set your Deepgram API key
 const apiKey_deepgram = 'a9e8cd740788fd5fbee5a56dbb7c16907d65ae8d';
+
+
 
 /** @type {import('./$types').RequestHandler} */
 export async function POST({ url, fetch, cookies, request, response }) {
@@ -24,7 +27,7 @@ export async function POST({ url, fetch, cookies, request, response }) {
 
   switch (q.func) {
     case 'tts':
-      resp = await tts_sm4(q.text, 'nl','nl');
+      resp = await tts_sm4(q.text, 'nl', 'nl');
       break;
   }
 
@@ -52,12 +55,33 @@ async function tts_sm4(text, from_lang, to_lang) {
   );
 }
 
+
+  async function tts_google(text, language) {
+    try {
+      const client = new textToSpeech.TextToSpeechClient();
+
+        // Construct the request
+      const request = {
+        input: {text: text},
+        // Select the language and SSML voice gender (optional)
+        voice: {languageCode: 'en-US', ssmlGender: 'NEUTRAL'},
+        // select the type of audio encoding
+        audioConfig: {audioEncoding: 'MP3'},
+      };
+      const [response] = await client.synthesizeSpeech(request);
+
+      return response;
+    } catch (error) {
+      console.error('Error converting text to speech:', error);
+    }
+  }
+
 async function tts_mms(text) {    
 	const app = await client('https://nedol-mms.hf.space/', { hf_token: HF_TOKEN });  
 	const result = await app.predict('/predict_1', [
 	    text, // string  in 'Input text' Textbox component
 	    'nld (Nederlands)', //
-	    0.7, // number (numeric value between 0.1 and 4.0) in 'Speed' Slider component
+	    1, // number (numeric value between 0.1 and 4.0) in 'Speed' Slider component
 	  ]);
 	  return 'https://nedol-mms.hf.space/file=' + result.data[0].value.name; // await textToSpeechDeepgram(q.text);
 }

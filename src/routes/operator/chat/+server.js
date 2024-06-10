@@ -29,7 +29,7 @@ export async function POST({ request }) {
 
   const task = await Translate(question.text, question.lang, 'en');
 
-  let answer = await chatLlama(prompt.prompt.system, task);
+  let answer = await chatGroq(prompt.prompt.system, task);
 
   let res = {
     ['nl']: await Translate(answer, question.llang, 'nl'),

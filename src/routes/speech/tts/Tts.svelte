@@ -1,44 +1,50 @@
 <script>
-	import { onMount, onDestroy, getContext } from 'svelte';
+  import { onMount, onDestroy, getContext } from 'svelte';
 
-	let audio;
 
-	onMount(() => {});
 
-	export async function Speak(text) {
-		text = text.replace(/<[^>]+>.*?<\/[^>]+>/g, '');
-		const par = {
-			func: 'tts',
-			text: text
-		};
-		const response = await fetch('/speech/tts', {
-			method: 'POST',
-			body: JSON.stringify({ par })
-			// header: { 'Content-Type': 'audio/ogg' }
-		});
+  let audio;
 
-		if (!response.ok) {
-			throw new Error(`Ошибка сервера: ${response.status}`);
-		}
+  onMount(() => {});
 
-		const url = await response.json();//URL.createObjectURL(response);
-		// Пример того, как можно воспроизвести полученный аудиофайл
-		audio = new Audio(url.resp);
-		audio.playbackRate = 0.7;
-		audio.play();
-	}
+  export async function Speak(text) {
+    text = text.replace(/<[^>]+>.*?<\/[^>]+>/g, '');
+    const par = {
+      func: 'tts',
+      text: text,
+    };
 
-	export function CollectGarbage() {}
 
-	export function Cancel() {}
+    const response = await fetch('/speech/tts', {
+      method: 'POST',
+      body: JSON.stringify({ par }),
+      // header: { 'Content-Type': 'audio/ogg' }
+    });
 
-	export function Pause() {}
+    if (!response.ok) {
+      throw new Error(`Ошибка сервера: ${response.status}`);
+    }
 
-	export function Resume() {}
+    const url = await response.json(); //URL.createObjectURL(response);
+    // Пример того, как можно воспроизвести полученный аудиофайл
+    audio = new Audio(url.resp);
+    audio.playbackRate = 0.7;
+    audio.play();
+  }
 
-	export async function initSpeech() {}
 
-	onDestroy(() => {
-		audio = '';
-	});
+
+  export function CollectGarbage() {}
+
+  export function Cancel() {}
+
+  export function Pause() {}
+
+  export function Resume() {}
+
+  export async function initSpeech() {}
+
+  onDestroy(() => {
+    audio = '';
+  });
 </script>

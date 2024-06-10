@@ -67,6 +67,7 @@ export async function POST({ url, fetch, cookies, request }) {
   } else if (from_lang == 'nl') {
 
     const result = await stt_sm4(blob, from_lang, to_lang);
+    // const result = await stt_mms(arrayBuffer, from_lang, to_lang);
 
     if (result) {
       resp = {
@@ -102,14 +103,16 @@ async function stt_sm4(blob, from_lang, to_lang) {
   const result = await app.predict('/s2tt', [
     blob, // blob in 'Input speech' Audio component
     from, // string  in 'Source language' Dropdown component
-    to, // string  in 'Target language' Dropdown component
+    from, // string  in 'Target language' Dropdown component
   ]);
   return result.data[0];
 }
 
 
-async function stt_mms(arrayBuffer, from_lang) {
+async function stt_mms(arrayBuffer,  from_lang, to_lang) {
   const app = await client('https://mms-meta-mms.hf.space/');
+    const from = ISO6391.getName(from_lang);
+    const to = ISO6391.getName(to_lang);
   const result = await app.predict('/predict', [
     'Record from Mic',
     {
@@ -117,10 +120,10 @@ async function stt_mms(arrayBuffer, from_lang) {
       name: 'audio.wav',
     },
     null, // string  in 'Task' Radio component
-    'rus (Russian)',
     'nld (Dutch)',
+    null,
   ]);
-  return result;
+  return result.data[0];
 }
 
 
