@@ -4,7 +4,7 @@
 
   import { llang } from '$lib/js/stores.js';
   // import words from './80.json';
-  import { Translate } from '../../../translate/Translate';
+  import { Translate } from '../../../translate/Transloc';
   // translate.engine = 'google';
   // translate.from = $llang;
 

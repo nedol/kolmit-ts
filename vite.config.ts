@@ -4,9 +4,10 @@ import path from "path";
 import { createProxyMiddleware } from "http-proxy-middleware";
 
 import commonjs from "vite-plugin-commonjs";
+// import nodeGlobals from 'rollup-plugin-node-globals';
 
 export default defineConfig({
-  plugins: [sveltekit(), commonjs()],
+  plugins: [sveltekit(),commonjs()],
   assetsInclude: ["**/*.html"],
 
   resolve: {
@@ -15,6 +16,12 @@ export default defineConfig({
       $src: path.resolve("./src"),
       $assets: path.resolve("./src/routes/assets"),
     },
+  },
+
+    define: {
+    // By default, Vite doesn't include shims for NodeJS/
+    // necessary for segment analytics lib to work
+      global: 'globalThis',
   },
 
   build: {

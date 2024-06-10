@@ -21,9 +21,10 @@
 			throw new Error(`Ошибка сервера: ${response.status}`);
 		}
 
-		const url = URL.createObjectURL(response);
+		const url = await response.json();//URL.createObjectURL(response);
 		// Пример того, как можно воспроизвести полученный аудиофайл
-		audio = new Audio(url);
+		audio = new Audio(url.resp);
+		audio.playbackRate = 0.7;
 		audio.play();
 	}
 

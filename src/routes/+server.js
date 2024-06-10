@@ -58,7 +58,7 @@ export async function GET({ url, fetch, cookies }) {
         cookie = JSON.parse(cookie);
         cookie.lang = lang;
         cookies.set(`kolmit.operator:${abonent}`, JSON.stringify(cookie), {
-          path:'/',
+          path: '/',
           maxAge: 60 * 60 * 24 * 400,
         });
       } catch (ex) {
@@ -123,7 +123,6 @@ export async function POST({ request, url, fetch, cookies }) {
   switch (q.func) {
     case 'operator':
       if (q.email && q.psw) {
-
         const par = await CreateOperator(q);
         if (par) {
           cookies.set(
@@ -138,7 +137,7 @@ export async function POST({ request, url, fetch, cookies }) {
             }),
             {
               path: '/',
-              maxAge: 60 * 60 * 24 * 400
+              maxAge: 60 * 60 * 24 * 400,
             }
           );
 
@@ -181,12 +180,10 @@ export async function POST({ request, url, fetch, cookies }) {
 
         SendOperatorOffer(q);
         return new Response(JSON.stringify({ resp }));
-		
       } else if (q.type === 'operator') {
-
         let res = cookies.get('kolmit.operator:' + q.abonent);
         let kolmit;
-         if (res) {
+        if (res) {
           kolmit = JSON.parse(res);
         }
         q.psw = kolmit.psw;
@@ -200,7 +197,7 @@ export async function POST({ request, url, fetch, cookies }) {
       try {
         SetParams(q);
         BroadcastOperatorStatus(q, 'offer');
-        resp = { result: 'offer'}
+        resp = { result: 'offer' };
       } catch (ex) {
         console.log();
       }
@@ -430,7 +427,10 @@ function SendOperatorOffer(q) {
     global.rtcPool['operator'][q.abonent][q.operator]
   ) {
     for (let uid in global.rtcPool['operator'][q.abonent][q.operator]) {
-      if (global.rtcPool['operator'][q.abonent][q.operator][uid].status === 'offer') {
+      if (
+        global.rtcPool['operator'][q.abonent][q.operator][uid].status ===
+        'offer'
+      ) {
         let operator = {
           abonent: q.abonent,
           operator: q.operator,
@@ -454,7 +454,6 @@ function SendOperatorOffer(q) {
 async function HandleCall(q) {
   let remAr = [];
   if (q.type === 'user') {
-
     if (q.desc || q.cand) {
       remAr.push({
         func: q.func,
@@ -478,9 +477,12 @@ async function HandleCall(q) {
       let item = global.rtcPool['user'][q.abonent][q.user];
 
       if (item) {
-        let oper_check = findKey(global.rtcPool['operator'][q.abonent][q.operator], {
-          status: 'check',
-        });
+        let oper_check = findKey(
+          global.rtcPool['operator'][q.abonent][q.operator],
+          {
+            status: 'check',
+          }
+        );
 
         let oper_offer_key = findKey(
           global.rtcPool['operator'][q.abonent][q.user],

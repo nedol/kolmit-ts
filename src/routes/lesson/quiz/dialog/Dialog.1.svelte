@@ -343,7 +343,8 @@
   }
 
   async function speak(text) {
-    Speak(text);
+    //Speak(text);
+    tts.Speak(text);
   }
 
   function onClickMicrophone() {
@@ -453,7 +454,7 @@
   });
 </script>
 
-<!-- <Tts bind:this={tts}></Tts> -->
+<Tts bind:this={tts}></Tts>
 
 <!-- <RV bind:this={voice}></RV> -->
 

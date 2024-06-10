@@ -1,7 +1,8 @@
 <script lang="ts">
   import { onMount, onDestroy } from 'svelte';
 
-  import Speak from './Speak.svelte';
+  // import Speak from './Speak.svelte';
+   import { Speak } from '/src/routes/speech/tts/VoiceRSS';
   import moment from 'moment';
   moment.locale('nl-be');
   import { DateTime } from 'luxon';
@@ -20,8 +21,8 @@
   // import EasySpeech from '../../../speech/tts/EasySpeech.svelte';
   // let easyspeech;
 
-  import RV from '/src/routes/speech/tts/RV.svelte';
-  let voice;
+  // import RV from '/src/routes/speech/tts/RV.svelte';
+  // let voice;
 
   import { lesson } from '$lib/js/stores.js';
   import { dc_user } from '$lib/js/stores.js';
@@ -406,7 +407,7 @@
   }
 
   async function speak(text) {
-    voice.Speak(text);
+    Speak(text);
   }
 
   function repeat() {
@@ -493,7 +494,7 @@
 
   onDestroy(() => {
     // easyspeech.Cancel();
-    voice = '';
+    // voice = '';
   });
 </script>
 
@@ -503,7 +504,7 @@
 />
 
 <!-- <EasySpeech bind:this={easyspeech}></EasySpeech> -->
-<RV bind:this={voice}></RV>
+<!-- <RV bind:this={voice}></RV> -->
 
 {#if share_button}
   <IconButton class="material-icons" on:click={onShare} style={style_button}>

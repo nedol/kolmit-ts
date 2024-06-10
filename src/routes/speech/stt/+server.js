@@ -1,26 +1,37 @@
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-import translate from 'translate';
-translate.engine = 'google';
+import ISO6391 from 'iso-google-locales';
 
-import { pipeline } from '@xenova/transformers';
-import wavefile from 'wavefile';
+import { Translate } from '../../translate/Translate';
 
-// Allocate a pipeline for sentiment-analysis
+import { client } from '@gradio/client';
 
-// [{'label': 'POSITIVE', 'score': 0.999817686}]
+// const response_0 = await fetch(
+//   'https://github.com/gradio-app/gradio/raw/main/test/test_files/audio_sample.wav'
+// );
+// const exampleAudio = await response_0.blob();
 
-// import { AssemblyAI } from 'assemblyai';
-// const client = new AssemblyAI({
-//   apiKey: '22e188d86e704836ba2592c7a56aa440',
-// });
+let app;
+
 
 import { HfInference } from '@huggingface/inference';
 const HF_TOKEN = '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';//'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';
 const inference = new HfInference(HF_TOKEN);
-import { HfAgent, LLMFromHub, defaultTools } from '@huggingface/agents';
-const agent = new HfAgent(HF_TOKEN, LLMFromHub(HF_TOKEN), [...defaultTools]);
+// import { HfAgent, LLMFromHub, defaultTools } from '@huggingface/agents';
+// const agent = new HfAgent(HF_TOKEN, LLMFromHub(HF_TOKEN), [...defaultTools]);
+
+    async function convertBlobToBase64(arrayBuffer) {
+      const uint8Array = new Uint8Array(arrayBuffer);
+      let binaryString = '';
+
+      for (let i = 0; i < uint8Array.length; i++) {
+        binaryString += String.fromCharCode(uint8Array[i]);
+      }
+
+      return btoa(binaryString);
+    }
+
 
 /** @type {import('./$types').RequestHandler} */
 export async function POST({ url, fetch, cookies, request }) {
@@ -54,20 +65,22 @@ export async function POST({ url, fetch, cookies, request }) {
       };
     }
   } else if (from_lang == 'nl') {
-    resp = await stt_nl(buffer, from_lang);
-    if (resp) {
+
+    const result = await stt_sm4(blob, from_lang, to_lang);
+
+    if (result) {
       resp = {
-        [from_lang]: resp.text,
-        [to_lang]: await Translate(resp.text, from_lang, to_lang),
+        [from_lang]: result,
+        [to_lang]: await Translate(result, from_lang, to_lang),
       };
     }
   } else {
-    resp = await stt(arrayBuffer, from_lang);
+    const result = await stt_sm4(blob, from_lang);
     // resp = await stt_as(audioUrl);
-    if (resp) {
+    if (result) {
       resp = {
-        [from_lang]: resp.text,
-        [to_lang]: await Translate(resp.text, from_lang, to_lang),
+        [from_lang]: result.text,
+        [to_lang]: await Translate(result.text, from_lang, to_lang),
       };
     }
   }
@@ -78,18 +91,39 @@ export async function POST({ url, fetch, cookies, request }) {
   return response;
 }
 
-async function Translate(text, from_lang, to_lang) {
-  if (!text || !from_lang || !to_lang) return '';
 
-  try {
-    translate.from = from_lang;
-
-    return await translate(text.trim(), to_lang);
-  } catch (error) {
-    console.error('Translation error:', error);
-    return text; // или другое подходящее значение по умолчанию
-  }
+async function stt_sm4(blob, from_lang, to_lang) {
+   const app = await client(
+      'https://facebook-seamless-m4t-v2-large.hf.space/--replicas/fxh8b/'
+  );
+  const app_info = await app.view_api();
+  const from = ISO6391.getName(from_lang);
+   const to = ISO6391.getName(to_lang);
+  const result = await app.predict('/s2tt', [
+    blob, // blob in 'Input speech' Audio component
+    from, // string  in 'Source language' Dropdown component
+    to, // string  in 'Target language' Dropdown component
+  ]);
+  return result.data[0];
 }
+
+
+async function stt_mms(arrayBuffer, from_lang) {
+  const app = await client('https://mms-meta-mms.hf.space/');
+  const result = await app.predict('/predict', [
+    'Record from Mic',
+    {
+      data: await convertBlobToBase64(arrayBuffer),
+      name: 'audio.wav',
+    },
+    null, // string  in 'Task' Radio component
+    'rus (Russian)',
+    'nld (Dutch)',
+  ]);
+  return result;
+}
+
+
 
 async function stt_as(audioUrl) {
   const params = {
@@ -112,11 +146,11 @@ async function stt(arrayBuffer, from_lang) {
 
 async function stt_nl(arrayBuffer, from_lang) {
   try {
-    return await inference.automaticSpeechRecognition({
+    const result =  await inference.automaticSpeechRecognition({
       data: arrayBuffer,
-      model: 'hannatoenbreker/whisper-dutch-small-v2',
-      // language: from_lang,
+      model: 'golesheed/whisper-9-dutch',
     });
+    return result.text;
   } catch (ex) {
     console.log(ex);
   }

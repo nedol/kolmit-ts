@@ -1,15 +1,17 @@
 <script lang="ts">
   import { onMount, onDestroy } from 'svelte';
   import { MediaRecorder } from 'extendable-media-recorder';
+  import type { IBlobEvent, IMediaRecorder } from "extendable-media-recorder";
+  // import { CreateMLCEngine } from '@mlc-ai/web-llm';
   // import { connect } from 'extendable-media-recorder-wav-encoder';
   // import { createModel, KaldiRecognizer } from 'vosk-browser';
 
   export let SttResult, StopListening, display_audio;
 
-  let mediaRecorder: any,
+  let mediaRecorder: IMediaRecorder,
     mediaStream: any,
     audioAnalyser: any,
-    audioChunks = [],
+    audioChunks : Array<Blob> =  [],
     audioUrl,
     audioPlayer,
     isRecording = false,
@@ -22,8 +24,19 @@
   let from_lang = 'en';
   let to_lang = 'en';
 
+  // Callback function to update model loading progress
+  // const initProgressCallback = (initProgress) => {
+  //   console.log(initProgress);
+  // };
+  // const selectedModel = 'Llama-3-8B-Instruct-q4f32_1-MLC';
+
   onMount(async () => {
+    // const engine = await CreateMLCEngine(
+    //   selectedModel,
+    //   { initProgressCallback } // engineConfig
+    // );
     // await register(await connect());// не нужно?!
+
     try {
       mediaStream = await navigator.mediaDevices.getUserMedia({
         audio: {
@@ -119,6 +132,11 @@
     checkSilence();
   }
 
+  export function SendRecognition() {
+    const len = audioChunks.length;
+    sendAudioToRecognition(audioChunks[len - 1]);
+  }
+
   export function MediaRecorderStop() {
     isRecording = false;
     silenceTimer = '';
@@ -129,6 +147,11 @@
 
   // Функция для начала записи
   function startRecording() {
+
+    if (Array.isArray(audioChunks) && audioChunks.length > 0) {
+      audioChunks.splice(0, 1);
+    }
+
     mediaRecorder.start();
     isRecording = true;
     checkLoop = true;
@@ -142,10 +165,6 @@
       sendAudioToRecognition(audioChunks[len - 1]);
       audioUrl = URL.createObjectURL(audioChunks[len - 1]);
       display_audio = 'block';
-
-      if (Array.isArray(audioChunks) && audioChunks.length > 0) {
-        audioChunks.splice(0, 1);
-      }
     }
 
     // mediaStream.getTracks().forEach(function (el) {
@@ -154,7 +173,6 @@
   }
 
   export async function sendLoadModel() {
-
     fetch('/speech/stt', {
       method: 'POST',
       // mode: 'no-cors',
@@ -164,11 +182,12 @@
       headers: {
         'Content-Type': 'application/json',
         // Authorization: `Bearer ${token}`
-      }
+      },
     });
   }
 
-  async function sendAudioToRecognition(blob) {
+  export async function sendAudioToRecognition(blob) {
+    //
     try {
       const headers = {
         'Content-Type': 'application/json',
@@ -229,6 +248,6 @@
 <style>
   audio {
     height: 25px;
-    width:30vw
+    width: 30vw;
   }
 </style>

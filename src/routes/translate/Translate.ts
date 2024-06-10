@@ -1,28 +1,36 @@
-
 import pkg from 'lodash';
 const { findIndex } = pkg;
-  
-import translate from 'translate';
-translate.engine = 'deepl'; // 'libre';// 'google'//
-translate.key = '0834516e-29b0-45d1-812e-b903d5962e12:fx'; //'203cca0d-8540-4d75-8c88-d69ac40b6d57:fx';//process.env.DEEPL_API_KEY;
 
+// const translate = require('google-translate-api');
+// import pkg from 'google-translate-api';
+// const translate = require('google-translate-free')
+// import pkg from '@iamtraction/google-translate';
+// const {translate} = pkg;
+
+import translate from 'translate';
+// translate.engine = 'deepl'; // 'libre';// 'google'//
+translate.key = '0834516e-29b0-45d1-812e-b903d5962e12:fx'; //'203cca0d-8540-4d75-8c88-d69ac40b6d57:fx';//process.env.DEEPL_API_KEY;
 
 import deepl_langs_list from '$lib/dict/deepl_lang_list.json';
 
-  
-export async function Translate(text, from, to) {
+export async function Translate_(text, from, to) {
 
+  translate(text, {from: from, to: to})
+    .then((res) => {
+      console.log(res);
+      return res.text;
+    })
+    .catch((err) => {
+      console.error(err);
+    });
+}
+
+export async function Translate(text, from, to) {
   let deepl = deepl_langs_list.indexOf(to);
 
-  if (deepl!=-1) {
-      translate.engine = 'deepl'; 
-  } else {
-      translate.engine = 'google'; 
-  }
 
   try {
-    if (!text)
-      return;
+    if (!text) return;
     translate.from = from;
     text = text.replace(/\r\n/g, '');
 
@@ -33,13 +41,21 @@ export async function Translate(text, from, to) {
     // Перевод каждой части текста (по 2 предложения)
     for (let i = 0; i < sentences.length; i += 2) {
       const chunk = sentences.slice(i, i + 2).join('. '); // Объединение 10 предложений в одну часть
-      const res = await translate(chunk, to);
+      let res;
+      try {
+        translate.engine = 'deepl';
+        res = await translate(chunk, to);
+      } catch (ex) {
+        translate.engine = 'google';
+        res = await translate(chunk, to);
+      }
       translatedText += res + ' '; // Добавление переведенной части к полному тексту
     }
 
     return translatedText.trim(); // Удаление лишних пробелов в конце текста
   } catch (error) {
     console.error('Translation error:', error);
+
     return text; // или другое подходящее значение по умолчанию
   }
 }

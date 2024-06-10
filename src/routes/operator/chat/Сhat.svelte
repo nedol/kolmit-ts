@@ -111,6 +111,7 @@
     display_audio = false;
   }
 
+
   function SttResult(data: {}) {
     if (data[$llang]) userInput = data;
     userInput[$llang] = userInput[$llang].slice(0, 500);
@@ -199,6 +200,11 @@
   style="text-align: center; display: flex; align-items: center; justify-content: space-between;"
 > -->
 <div class="input-container">
+     <span style="position: absolute;
+    font-weight: bold;
+    top: 8px;
+    left: 26px;
+    font-size: x-small">{dc?$langs:$llang}</span>
   <IconButton on:click={micClicked}>
     <Icon tag="svg" viewBox="0 0 24 24">
       {#if isListening}
@@ -208,16 +214,14 @@
       {/if}
     </Icon>   
   </IconButton>
-   <span style="position: absolute;
-    font-weight: bold;
-    top: 8px;
-    left: 26px;
-    font-size: x-small">{dc?$langs:$llang}</span>
+
   <Stt bind:this={stt} bind:display_audio {SttResult} {StopListening}></Stt>
+
   {#await Translate('Отправить', 'ru', $langs) then data}
     <Button
       on:click={() => {
-        SendDC(userInput[$llang]);
+        stt.SendRecognition()
+        // SendDC(userInput[$llang]);
       }}><Label>{data}</Label></Button
     >
   {/await}

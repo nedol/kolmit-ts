@@ -1,11 +1,15 @@
 import { config } from 'dotenv';
 config();
 
+import { Client, client } from '@gradio/client';
+
 import { GetPrompt } from '../../../lib/server/db';
 
 import { Translate } from './../../translate/Translate';
 
 import Groq from 'groq-sdk';
+// import { HF_TOKEN } from '$env/static/private';
+const HF_TOKEN = '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';
 
 const groq = new Groq({
   apiKey: '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',
@@ -25,7 +29,7 @@ export async function POST({ request }) {
 
   const task = await Translate(question.text, question.lang, 'en');
 
-  let answer = await chatGroq(prompt.prompt.system, task);
+  let answer = await chatLlama(prompt.prompt.system, task);
 
   let res = {
     ['nl']: await Translate(answer, question.llang, 'nl'),
@@ -39,6 +43,73 @@ export async function POST({ request }) {
   let response = new Response(JSON.stringify({ res }));
   response.headers.append('Access-Control-Allow-Origin', `*`);
   return response;
+}
+
+
+async function chatLlama(system, task) {
+  const app = await Client.connect('huggingface-projects/llama-2-7b-chat', {
+    hf_token: HF_TOKEN,
+  });
+
+  const result = await app.predict('/chat', {
+    message: task,
+    request: system,
+    param_3: 1024,
+    param_4: 0.6,
+    param_5: 0.9,
+    param_6: 50,
+    param_7: 1,
+  });
+
+  return result.data[0];
+  // async function query(data) {
+  //   const response = await fetch(
+  //     'https://api-inference.huggingface.co/models/meta-llama/Llama-2-70b-chat-hf',
+  //     {
+  //       headers: {
+  //         Authorization: 'Bearer ' + HF_TOKEN,
+  //       },
+  //       method: 'POST',
+  //       body: JSON.stringify(data),
+  //     }
+  //   );
+  //   if (!response.ok) {
+  //     // Read the response as text to log the error message
+  //     const errorText = await response.text();
+  //     throw new Error(
+  //       `HTTP error! status: ${response.status}, message: ${errorText}`
+  //     );
+  //   }
+  //   return await response.text();
+  // }
+
+  // const response = await query({
+  //   inputs: 'Can you please let us know more details about your ',
+  // });
+  // return response.data;
+}
+
+async function chatGPTo(system, task) {
+  const app = await Client.connect('KingNish/OpenGPT-4o', {
+    hf_token: HF_TOKEN,
+  });
+  const app_info = await app.view_api();
+
+  console.log(app_info.named_endpoints['/chat']);
+  const result = await app.predict('/chat', {
+    user_prompt: { text: system, files: [] },
+    model_selector: 'idefics2-8b-chatty',
+    decoding_strategy: 'Top P Sampling',
+    temperature: 0.5,
+    max_new_tokens: 2048,
+    repetition_penalty: 0.01,
+    top_p: 0.9,
+    web_search: true,
+    audio: '', // Add this line to include an audio parameter
+    image3: '',
+  });
+
+  return result.data;
 }
 
 async function chatGroq(system, task) {
