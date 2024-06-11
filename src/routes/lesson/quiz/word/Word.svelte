@@ -12,8 +12,9 @@
 
   import CircularProgress from '@smui/circular-progress';
 
-  import RV from '../../../speech/tts/RV.svelte';
-  let voice;
+  import TTS from '/src/routes/speech/tts/TTS.svelte';
+  let tts;
+
 
   import Accordion, { Panel, Header, Content } from '@smui-extra/accordion';
   import IconButton, { Icon } from '@smui/icon-button';
@@ -391,11 +392,10 @@
   }
 
   function speak(text) {
-    setTimeout(() => {
-      voice.Speak(text);
-    }, 0);
 
-    // }
+      tts.Speak(text);
+  
+
 
     setFocus();
   }
@@ -413,7 +413,7 @@
   href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0"
 />
 
-<RV bind:this={voice}></RV>
+<TTS bind:this={tts}></TTS>
 
 {#if !words[0]}
   <div style="text-align:center">

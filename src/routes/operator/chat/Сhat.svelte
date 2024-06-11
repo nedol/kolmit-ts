@@ -40,6 +40,7 @@
   let stt: Stt;
   let variant = 'outlined';
   let showHint:number;
+  let to;
 
   $: if ($msg_oper || $msg_user) {
     const msg = $msg_oper || $msg_user;
@@ -53,6 +54,10 @@
   // Function to call ChatGPT
   async function callChat(text) {
     try {
+
+      if(to)
+        clearTimeout(to);
+
       let question = { text: text, lang: $langs, llang: $llang };
 
       const response = await fetch(`./operator/chat`, {
@@ -71,10 +76,19 @@
 
       messages.unshift({ text: data.res, isQuestion: 'answer' });
       messages = messages;
+
+      to = setTimeout(()=>{
+        //callChat('?') 
+
+      }, 20000)
+ 
+
     } catch (error) {
       console.error('Произошла ошибка при обращении к серверу:', error);
     }
   }
+
+ 
 
   function handleKeyDown(event) {
     if (event.key === 'Enter' && !event.shiftKey) {

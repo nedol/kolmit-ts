@@ -18,10 +18,9 @@
 
   import { NumberString,numberToDutchString } from './Listen.numbers';
 
-  // import EasySpeech from '../../../speech/tts/EasySpeech.svelte';
-  // let easyspeech;
+  import TTS from '/src/routes/speech/tts/TTS.svelte';
+  let tts;
 
-    import { Speak } from '/src/routes/speech/tts/VoiceRSS';
 
   // import RV from '/src/routes/speech/tts/RV.svelte';
   // let voice;
@@ -106,7 +105,9 @@
   let digit = 10;
   let div_input;
 
-  onMount(async () => {});
+  onMount(async () => {
+
+  });
 
   async function SendToPartner() {
     if (share_mode && ($dc_user || $dc_oper)) {
@@ -264,7 +265,8 @@
   }
 
   async function speak(text) {
-    Speak(text);
+    //Speak(text);
+    tts.Speak(text)
   }
 
   function repeat() {
@@ -358,7 +360,7 @@
   href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0"
 />
 
-<!-- <EasySpeech bind:this={easyspeech}></EasySpeech> -->
+<TTS bind:this={tts}></TTS>
 <!-- <RV bind:this={voice}></RV> -->
 
 {#if share_button}

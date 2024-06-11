@@ -1,13 +1,18 @@
 <script>
   import { onMount, onDestroy, getContext } from 'svelte';
-
+  import EasySpeech from '/src/routes/speech/tts/EasySpeech.svelte';
+  let easyspeech;
 
 
   let audio;
 
-  onMount(() => {});
+  onMount(() => {    easyspeech.initSpeech()});
 
-  export async function Speak(text) {
+  export async function Speak(text){
+     easyspeech.Speak(text)
+  }
+
+  export async function Speak_server(text) {
     text = text.replace(/<[^>]+>.*?<\/[^>]+>/g, '');
     const par = {
       func: 'tts',
@@ -48,3 +53,6 @@
     audio = '';
   });
 </script>
+
+
+<EasySpeech bind:this={easyspeech}></EasySpeech>

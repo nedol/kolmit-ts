@@ -27,7 +27,7 @@ export async function POST({ request }) {
 
   const prompt = await GetPrompt('chat');
 
-  const task = await Translate(question.text, question.lang, 'en');
+  const task = question.text=='?'?'?':await Translate(question.text, question.lang, 'en');
 
   let answer = await chatGroq(prompt.prompt.system, task);
 
