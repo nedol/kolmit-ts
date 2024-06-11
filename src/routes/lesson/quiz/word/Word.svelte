@@ -12,7 +12,7 @@
 
   import CircularProgress from '@smui/circular-progress';
 
-  import TTS from '/src/routes/speech/tts/TTS.svelte';
+  import TTS from '../../../speech/tts/Tts.svelte';
   let tts;
 
 

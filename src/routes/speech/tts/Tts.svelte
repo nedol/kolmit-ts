@@ -6,10 +6,11 @@
 
   let audio;
 
-  onMount(() => {    easyspeech.initSpeech()});
+  onMount(() => { easyspeech.initSpeech()});
 
   export async function Speak(text){
-     easyspeech.Speak(text)
+     easyspeech.Speak(text);
+     easyspeech.Cancel()
   }
 
   export async function Speak_server(text) {

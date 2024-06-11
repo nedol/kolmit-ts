@@ -15,13 +15,13 @@
     mdiShuffle,
   } from '@mdi/js';
 
-  // import EasySpeech from '../../../speech/tts/EasySpeech.svelte';
-  // let easyspeech;
+  import TTS from '../../../speech/tts/Tts.svelte';
+  let tts;
 
   // import RV from '/src/routes/speech/tts/RV.svelte';
   // let rv;
 
-   import { Speak } from '/src/routes/speech/tts/VoiceRSS';
+  //  import { Speak } from '/src/routes/speech/tts/VoiceRSS';
 
   import { lesson } from '$lib/js/stores.js';
   import { dc_user } from '$lib/js/stores.js';
@@ -206,7 +206,7 @@
   }
 
   async function speak(text) {
-    Speak(text);
+    tts.Speak(text);
   }
 
   function repeat() {
@@ -302,7 +302,7 @@
   href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0"
 />
 
-<!-- <EasySpeech bind:this={easyspeech}></EasySpeech> -->
+<TTS bind:this={tts}></TTS>
 <!-- <RV bind:this={rv}></RV> -->
 
 {#if share_button}
