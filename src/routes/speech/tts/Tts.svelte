@@ -9,8 +9,8 @@
   onMount(() => { easyspeech.initSpeech()});
 
   export async function Speak(text){
-     easyspeech.Speak(text);
-     easyspeech.Cancel()
+    //  easyspeech.Speak(text);
+    Speak_server(text)
   }
 
   export async function Speak_server(text) {
