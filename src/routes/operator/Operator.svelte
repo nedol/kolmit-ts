@@ -11,11 +11,15 @@
   import TopAppBar, { Row, Title } from '@smui/top-app-bar';
 
   import { mdiAccountBox, mdiVolumeHigh, mdiVolumeOff } from '@mdi/js';
-  import { muted } from '$lib/js/stores.js';
+  import {
+    muted,
+    user_placeholder,
+    audioCtx,
+    dicts,
+    langs,
+  } from '$lib/js/stores.js';
   import CircularProgress from '@smui/circular-progress';
-  import { dicts } from '$lib/js/stores.js';
-  import { langs } from '$lib/js/stores.js';
-  import { user_placeholder } from '$lib/js/stores.js';
+
   // import {Dict} from '$lib/js/$dicts'
   import Group from './group/Group.svelte';
   let group = getContext('group');
@@ -66,14 +70,13 @@
 
   let dlg_display = 'none';
 
-  function SetDlgDisplay(){
-    $view='chat'
+  function SetDlgDisplay() {
+    $view = 'chat';
   }
 
-  setContext('SetDlgDisplay',SetDlgDisplay);
+  setContext('SetDlgDisplay', SetDlgDisplay);
 
-  $: if ($view === 'chat')
-    dlg_display = 'block';
+  $: if ($view === 'chat') dlg_display = 'block';
   else dlg_display = 'none';
 
   $posterst = '/assets/operator.svg';
@@ -141,8 +144,6 @@
       });
   }
 
-  let audioCtx;
-
   onMount(async () => {
     try {
       rtc = new RTCOperator(operator, uid, $signal);
@@ -154,11 +155,12 @@
         if (!window.AudioContext) {
           window.AudioContext =
             window.AudioContext || window.webkitAudioContext;
-          audioCtx = new AudioContext();
-          rtc.localSoundSrc = audioCtx.createMediaElementSource(
+          $audioCtx = new AudioContext();
+
+          rtc.localSoundSrc = $audioCtx.createMediaElementSource(
             window.user.localSound
           );
-          rtc.localSoundSrc.connect(audioCtx.destination);
+          rtc.localSoundSrc.connect($audioCtx.destination);
         }
       } catch (ex) {
         console.log('Web Audio API is not supported in this browser');
@@ -450,7 +452,7 @@
 <!-- {@debug $view} -->
 
 <!-- {#if $view === 'group'} -->
-  <Group />
+<Group />
 
 {#if $view === 'lesson'}
   <Module data={group} />

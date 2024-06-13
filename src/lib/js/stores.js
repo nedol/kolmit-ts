@@ -59,3 +59,5 @@ export let share_mode = writable(false);
 export let user_placeholder = writable();
 
 export let muted = writable(true);
+
+export let audioCtx = writable();

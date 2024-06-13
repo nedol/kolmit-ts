@@ -1,8 +1,8 @@
 <script lang="ts">
   import { onMount, onDestroy } from 'svelte';
 
-  // import Speak from './Speak.svelte';
-   import { Speak } from '/src/routes/speech/tts/VoiceRSS';
+  import Speak from './Speak.svelte';
+  //  import { Speak } from '/src/routes/speech/tts/VoiceRSS';
   import moment from 'moment';
   moment.locale('nl-be');
   import { DateTime } from 'luxon';
@@ -18,8 +18,8 @@
 
   import { NumberString } from './Listen.numbers';
 
-  // import EasySpeech from '../../../speech/tts/EasySpeech.svelte';
-  // let easyspeech;
+  import TTS from '../../../speech/tts/Tts.svelte';
+  let tts;
 
   // import RV from '/src/routes/speech/tts/RV.svelte';
   // let voice;
@@ -407,7 +407,7 @@
   }
 
   async function speak(text) {
-    Speak(text);
+    tts.Speak(text);
   }
 
   function repeat() {
@@ -503,7 +503,7 @@
   href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0"
 />
 
-<!-- <EasySpeech bind:this={easyspeech}></EasySpeech> -->
+<TTS bind:this={tts}></TTS>
 <!-- <RV bind:this={voice}></RV> -->
 
 {#if share_button}
