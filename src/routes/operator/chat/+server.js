@@ -12,7 +12,7 @@ import Groq from 'groq-sdk';
 const HF_TOKEN = process.env.HF_TOKEN;
 
 const groq = new Groq({
-  apiKey: process.env.GROQ_API_KEY,
+  apiKey: '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', // process.env.GROQ_API_KEY,
 });
 
 // import prompt_data from './prompt/prompt_data.json';
@@ -44,8 +44,6 @@ export async function POST({ request, fetch }) {
   response.headers.append('Access-Control-Allow-Origin', `*`);
   return response;
 }
-
-
 
 async function chatLlama(system, task) {
   const app = await Client.connect('huggingface-projects/llama-2-7b-chat', {
