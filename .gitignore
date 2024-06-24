@@ -10,7 +10,7 @@ vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 .env*
 # tsconfig.json
-Dockerfile
-render.yaml
+./Dockerfile
+./render.yaml
 
 
