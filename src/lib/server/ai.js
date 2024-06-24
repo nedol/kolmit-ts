@@ -7,11 +7,10 @@ import { Client, client } from '@gradio/client';
 
 import Groq from 'groq-sdk';
 const groq = new Groq({
-  apiKey: process.env.GROQ_API_KEY,
+  apiKey: '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', //process.env.GROQ_API_KEY,
 });
 
 export async function CreateContent(par) {
-
   const content = await chatGroq(par.prompt.system, '');
 
   return content;
