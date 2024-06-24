@@ -56,5 +56,3 @@
 
 <EasySpeech bind:this={easyspeech}></EasySpeech>
 
-
-Invoke-RestMethod -Uri "https://kolmit.onrender.com/api/tts" -Method Get -Body @{ text = "Привет, Render!"; voice = "cmu-slt" } -OutFile "output.wav"
