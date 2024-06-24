@@ -1,8 +1,3 @@
-# Используем образ OpenTTS
 FROM synesthesiam/opentts:latest
-
-# Устанавливаем рабочую директорию
-WORKDIR /app
-
-# Команда для запуска OpenTTS
+EXPOSE 5500
 CMD ["python3", "-m", "opentts"]
