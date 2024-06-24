@@ -61,23 +61,23 @@ export function SendEmail(q, new_email) {
   const abonent = q.abonent;
   const mail = q.send_email;
   const hash = getHash(mail);
-  let html = `<a href='https://kolmit.onrender.com/?abonent=${abonent}'>`+
+  let html =
+    `<a href='https://kolmit.onrender.com/?abonent=${abonent}'>` +
     {
-    ru: '<h1>Присоединиться к сети Kolmit:</h1></a>',
-    en: '<h1>Join Kolmit network:</h1></a>',
-    fr: '<h1>Rejoindre le réseau Kolmit:</h1></a>',
-  }[q.lang];
-
+      ru: '<h1>Присоединиться к сети Kolmit:</h1></a>',
+      en: '<h1>Join Kolmit network:</h1></a>',
+      fr: '<h1>Rejoindre le réseau Kolmit:</h1></a>',
+    }[q.lang];
 
   operator.SendMail(
     `nedooleg@gmail.com`,
-     mail,
+    mail,
     {
       ru: 'Новый пользователь сети Колмит',
       en: 'New Kolmit network user',
       fr: 'Le nouvel opérateur de Kolmi',
     }[q.lang],
-     html,
+    html,
     (result) => {
       console.log();
     }
@@ -102,7 +102,7 @@ export async function CreateOperator(par) {
       name: par.name,
       email: par.email,
       psw: md5(par.psw),
-      lang: par.lang
+      lang: par.lang,
     };
   } catch (er) {
     console.log(er);
@@ -131,8 +131,8 @@ async function updateUsers(users, q) {
 }
 
 export async function GetGroup(par) {
-      //всех кто в группе, кроме себя
-      const group = await sql`
+  //всех кто в группе, кроме себя
+  const group = await sql`
 			SELECT "group", abonent, role, operator, picture, lang, name
       	FROM operators
         WHERE operators.abonent=${par.abonent} 
@@ -142,18 +142,24 @@ export async function GetGroup(par) {
         WHERE operators.abonent=${par.abonent} 
         AND operator=${par.operator}
       )`;
-  
-      const oper = await sql`
+
+  const oper = await sql`
 			SELECT 
-			"group", abonent, role, operator, picture, lang, name
+			"group", abonent, role, operator, picture, lang, name, quizes
 			FROM operators
 			WHERE operators.abonent=${par.abonent} AND operator=${par.operator}
       `;
 
-  return { group, oper };
-    
-}
+  const quizes = await sql`
+			SELECT 
+			 quizes
+			FROM operators
+			WHERE operators.abonent=${par.abonent}  AND "group"=${oper[0].group} 
+      AND quizes IS NOT NULL
+      `;
 
+  return { group, oper, quizes };
+}
 
 export async function GetUsers(par) {
   let operators,
@@ -301,9 +307,9 @@ export async function AddDep(q) {
       q.abonent || q.operator
     }) as users
 		FROM  operators as oper
-		WHERE oper.operator=${q.abonent || q.operator}  AND abonent=${q.abonent} AND psw=${
-      q.psw
-    }
+		WHERE oper.operator=${q.abonent || q.operator}  AND abonent=${
+      q.abonent
+    } AND psw=${q.psw}
 		`;
     let users = [];
     if (res[0]) {
@@ -348,9 +354,9 @@ export async function ChangeOperator(q) {
     q.abonent || q.operator
   }) as users 
 		FROM  operators as oper 
-		WHERE oper.operator=${q.abonent || q.operator}  AND abonent=${q.abonent} AND psw=${
-    q.psw
-  }`;
+		WHERE oper.operator=${q.abonent || q.operator}  AND abonent=${
+    q.abonent
+  } AND psw=${q.psw}`;
 
   if (res[0]) {
     try {
@@ -382,9 +388,9 @@ export async function ChangeOperator(q) {
 export async function RemoveOperator(q) {
   const res = sql`SELECT *, (SELECT users FROM users WHERE operator=?) as users ' +
 		'FROM  operators as oper 
-		'WHERE oper.operator=${q.abonent || q.operator}  AND abonent=${q.abonent} AND psw=${
-    q.psw
-  }`;
+		'WHERE oper.operator=${q.abonent || q.operator}  AND abonent=${
+    q.abonent
+  } AND psw=${q.psw}`;
   try {
     let users = [];
     if (res[0]) {
@@ -433,13 +439,12 @@ export async function GetDialog(q) {
   }
 }
 
-
 export async function GetPrompt(name) {
-    let prompt = await sql`SELECT system FROM prompts
+  let prompt = await sql`SELECT system FROM prompts
 		WHERE name=${name}`;
-    return {
-      prompt: prompt[0],
-    };
+  return {
+    prompt: prompt[0],
+  };
 }
 
 export async function getLevels(owner) {
@@ -453,7 +458,15 @@ export async function getLevels(owner) {
 export async function GetLesson(q) {
   try {
     let res = '';
-    if (q.level) {
+    if (q.operator !== q.owner) {
+      res = await sql`
+      SELECT lessons.data, lessons.level, lessons.lang 
+        FROM lessons
+        JOIN operators ON (operators.operator = ${q.operator} and operators.abonent=${q.owner})
+        JOIN groups ON (groups.name = operators.group and groups.level=lessons.level)
+        WHERE  groups.owner=${q.owner} AND lessons.owner=${q.owner}
+        ORDER BY level desc`;
+    } else if (q.level) {
       res =
         await sql`SELECT data, level, lang FROM lessons WHERE owner=${q.owner} AND level=${q.level}  ORDER BY level desc`;
     } else {
@@ -474,14 +487,15 @@ export async function GetLesson(q) {
   }
 }
 
-
-
 export async function UpdateQuizUsers(q) {
   try {
-    let res = await sql`SELECT quiz_users FROM users 
-		WHERE operator=${q.abonent}`;
-    let qu = res[0].quiz_users;
-    if (!qu[q.quiz]) qu[q.quiz] = [];
+    let res = await sql`SELECT quizes FROM operators 
+		WHERE operator=${q.add} AND abonent=${q.abonent}`;
+    let qu = res[0].quizes;
+    if (!qu) {
+      qu = {};
+      qu[q.quiz] = [];
+    }
     if (q.add && !qu[q.quiz].includes(q.add)) {
       qu[q.quiz].push(q.add);
     } else if (q.rem && qu[q.quiz].includes(q.rem)) {
@@ -489,8 +503,8 @@ export async function UpdateQuizUsers(q) {
       qu[q.quiz].splice(1, ind);
     }
 
-    res = await sql`UPDATE users SET quiz_users=${qu}
-		WHERE operator=${q.abonent}`;
+    res = await sql`UPDATE operators SET quizes=${qu}
+		WHERE abonent=${q.abonent} AND operator=${q.add}`;
 
     return qu;
     //debugger;

@@ -128,10 +128,11 @@ export async function UpdateLesson(q) {
     let res = await sql`INSERT INTO lessons
 			(level , owner, data, lang )
 			VALUES(${q.level},${q.owner},${JSON.parse(q.data)}, ${q.lang})
-			ON CONFLICT (level, owner)
+			ON CONFLICT (level, owner, lang)
 			DO UPDATE SET
 			owner = EXCLUDED.owner,
 			level = EXCLUDED.level,
+      lang = EXCLUDED.lang,
 			data = EXCLUDED.data`;
     return { res };
   } catch (ex) {
@@ -162,13 +163,11 @@ export async function UpdateDialog(q) {
 export async function UpdateListen(q) {
   try {
     let res = await sql`INSERT INTO listen
-			(name , dialog, owner, html)
-			VALUES(${q.new_name},${q.data},${q.owner},${q.data.html || ''} )
-			ON CONFLICT (name, owner)
+			(owner, name , data, lang)
+			VALUES(${q.owner},${q.new_name},${q.data},${q.lang} )
+			ON CONFLICT (name, lang, owner)
 			DO UPDATE SET
-			name = EXCLUDED.name,
-      html = EXCLUDED.html,
-			dialog = EXCLUDED.dialog`;
+			data = EXCLUDED.data`
     return { res };
   } catch (ex) {
     return JSON.stringify({ func: q.func, res: ex });

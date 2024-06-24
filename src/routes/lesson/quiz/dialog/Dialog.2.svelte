@@ -160,7 +160,7 @@
       );
   }
 
- async function Translate(text: string, from_lang: string, to_lang: string) {
+  async function Translate(text: string, from_lang: string, to_lang: string) {
     try {
       translate.from = from_lang;
 
@@ -219,8 +219,8 @@
 
 <div class="container">
   <div class="card">
-    {#await Translate('Задай вопрос','ru', $langs) then data}
-    <div class="title">{data}:</div>
+    {#await Translate('Задай вопрос', 'ru', $langs) then data}
+      <div class="title">{data}:</div>
     {/await}
 
     <div class="user1">
@@ -236,16 +236,14 @@
     <div class="user2">
       {#if data.user2}
         {#await Translate(data.user2[$llang], $llang, $langs) then data}
-          <div class="mdc-typography--headline6">{data}</div>
+          {data}
         {/await}
       {/if}
     </div>
 
-    <div class="tip">
+    <div class="tip mdc-typography--headline6">
       {#if data.user2['a_shfl'] && hint_visible}
-        <div class="mdc-typography--headline6">
-          {@html data.user2['a_shfl']}
-        </div>
+        {@html data.user2['a_shfl']}
       {/if}
     </div>
 
@@ -283,9 +281,7 @@
     </div>
 
     {#if data.html}
-
-        <ConText data={ data} />
-
+      <ConText {data} />
     {/if}
   </div>
 </div>
@@ -346,22 +342,22 @@
 
   .user1 {
     color: #2196f3;
-    font-size: 1em;
+    font-size: 0.8em;
     margin-bottom: 10px;
     text-align: center;
   }
 
   .user2 {
     color: #555;
-    font-size: 1em;
+    font-size: 0.8em;
     text-align: center;
     margin-bottom: 10px;
   }
   .tip {
     text-align: center;
+    line-height: normal;
     font-size: 1em;
-    margin-bottom: 10px;
-    margin-left: 20px;
+    margin-bottom: 0px;
     color: #2196f3;
   }
 

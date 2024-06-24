@@ -19,12 +19,7 @@
   import Checkbox from '@smui/checkbox';
   import Quiz from './quiz/Quiz.svelte';
 
-  import { users, langs, llang, dicts } from '$lib/js/stores.js';
-  import { msg_oper } from '$lib/js/stores.js';
-
-  import { quiz_userst } from '$lib/js/stores.js';
-  import { users_status } from '$lib/js/stores.js';
-  import { view } from '$lib/js/stores.js';
+  import { users, langs, llang, dicts , msg_oper,  quiz_userst, users_status} from '$lib/js/stores.js';
 
   // import lesson_data from './lesson.json';
   let lesson_data: any;
@@ -93,7 +88,7 @@
   }
 
   (async () => {
-    const lessonData = await fetchLesson(operator.abonent);
+    const lessonData = await fetchLesson(operator.abonent,operator.operator);
     lesson_data = lessonData.data;
     module = lesson_data.module;
 
@@ -111,24 +106,24 @@
           src: tutor_src,
         },
       ];
-      qu[quiz].map((user) => {
-        if (user === operator.operator) {
-          checked[quiz] = true;
-          return false;
-        }
-        let obj = find(usersPic, { operator: user });
-        let obj_pic = find($users[0].pictures, { operator: user });
-        // obj.src = obj_pic.picture;
-        // console.log(obj);
-        if ($users_status[user] !== 'inactive') quiz_users[quiz].push(obj);
-      });
+      // qu[quiz].quizes.map((user) => {
+      //   if (user === operator.operator) {
+      //     checked[quiz] = true;
+      //     return false;
+      //   }
+      //   let obj = find(usersPic, { operator: user });
+      //   let obj_pic = find($users[0].pictures, { operator: user });
+      //   // obj.src = obj_pic.picture;
+      //   // console.log(obj);
+      //   if ($users_status[user] !== 'inactive') quiz_users[quiz].push(obj);
+      // });
     });
     quiz_users = quiz_users;
   }
 
-  export async function fetchLesson(owner, lesson) {
+  export async function fetchLesson(owner, operator) {
     try {
-      const response = await fetch(`./lesson?lesson=${lesson}&owner=${owner}`);
+      const response = await fetch(`./lesson?lesson=${operator}&owner=${owner}`);
       if (!response.ok) {
         throw new Error('Failed to fetch data');
       }
@@ -195,6 +190,7 @@
         operator: operator.operator,
       });
 
+      if(obj)
       quiz_users[name].push({
         src: obj.src,
         operator: operator.operator,

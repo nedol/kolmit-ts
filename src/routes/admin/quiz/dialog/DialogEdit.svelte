@@ -54,31 +54,7 @@
       return JSON.stringify(line);
     });
     let dialog_data_words = dialog_data.words || '';
-    //     prompt = `
-    // [Act as a language teaching methodologist]
-    // [2 users read  $Context]
-    // ->[[Build users dialogue based in which the users asking each another something about $Context
-    // and answering following $Context.]{10 phrases from each user}
-    // {$Context: ${dialog_data.html}}
-    // {Use the most commonly used phrases and words in colloquial speech and ${dialog_data_words}}
-    // {No repetition of lines and phrases from dlg_content in output. Ensure that the conversation flows naturally and smoothly.}
-    // {Topic="${name[$llang]}"}{Learning language:${$llang} }{ Learning language  level: ${data.level}}
-    // {participants: user1, user2}]*${num}
-    // ->[Word-for-word translation to:${$llang} and ${$langs}] {Word-for-word translation example: Hoeveel broers of zussen heb je? - Сколько братьев или сестер имеешь ты?}
-    // ->[Build webpage $Page based on the Context.]->{Style $Page content for easier reading}{$Page should started <html>}{don't use '\n' or 'n'}]
-    // ->[Output]{output format:json}<output example:
-    //   <{
-    //     content:[
-    //       {
-    //       "user1": { "${$llang}": "{answer. question}" , "${$langs}":"{answer. question}"},
-    //       "user2": { "${$llang}": "{answer. question}" , "${$langs}":"{answer. question}"}
-    //       },
-    //       ...
-    //     ]
-    //   }
-    // >
-    // ->[Check output is in JSON and fix it if not]
-    // `;
+ 
   }
 
   $: if (dialog_data && $langs) {
@@ -87,24 +63,30 @@
 
   fetch(`./lesson?dialog=${data.name[$llang]}&owner=${abonent}`)
     .then((response) => response.json())
-    .then((data) => {
-      dialog_data = data.data.dialog;
+    .then((resp) => {
+      dialog_data = resp.data.dialog;
       if (!dialog_data) dialog_data = { content: [] };
-      if (data.data.html) {
-        dialog_data.html = splitHtmlContent(data.data.html);
+      if (resp.data.html) {
+        dialog_data.html = splitHtmlContent(resp.data.html);
       }
       dialog_data.name = name;
       fetch(`./admin?prompt=dialog`)
         .then((response) => response.json())
-        .then((data) => {
-          prompt = data.resp.system;
+        .then((resp) => {
+          prompt = resp.resp.system;
           prompt = prompt.replaceAll('${$llang}', $llang);
-          prompt = prompt.replaceAll('${name[$llang]}', name[$llang]);
+          prompt = prompt.replaceAll('${name[$llang]}', name[$langs]);
           prompt = prompt.replaceAll('${$langs}', $langs);
           prompt = prompt.replaceAll('${dialog_data.html}', dialog_data.html);
           prompt = prompt.replaceAll('${data.level}', data.level);
           prompt = prompt.replaceAll('${num}', num);
           prompt = prompt.replaceAll('${dialog_data_words}', dialog_data.words);
+          let content = JSON.parse(JSON.stringify(dialog_data.content));
+          content.forEach((item)=>{
+            item['user1'] = item['user1']['nl'];
+            item['user2'] = item['user2']['nl']
+          });
+          prompt = prompt.replaceAll('${dialog_content}', JSON.stringify(content));
           prompt = prompt;
         })
         .catch((error) => {
@@ -124,7 +106,7 @@
       dialog_data.content.map(async (item: any) => {
         await Promise.all(
           Object.keys(item).map(async (key: string) => {
-            console.log(key, item);
+            // console.log(key, item);
             if (item[key][$llang] && !item[key][$langs]) {
               let tr = await Translate(item[key][$llang], $llang, $langs);
               item[key][$langs] = tr;
@@ -179,9 +161,10 @@
         func: 'upd_dlg',
         owner: abonent,
         level: data.level,
-        name: name[llang],
+        name: name[$llang],
         new_name: data.name[$llang],
         data: dialog_data,
+        lang:$llang
       }),
       headers: { 'Content-Type': 'application/json' },
     });
@@ -294,7 +277,7 @@
         type="text"
         class="dialog_name"
         name="dialog_name"
-        bind:value={data.name[$langs]}
+        bind:value={data.name[$llang]}
       />
     </div>
     {#if data.level}

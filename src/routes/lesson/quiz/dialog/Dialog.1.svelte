@@ -8,8 +8,6 @@
   import Button, { Label } from '@smui/button';
   import { Translate } from '../../../translate/Transloc';
 
-
-
   // import '$lib/js/talkify.js';
   // import 'talkify-tts/dist/talkify.min.js';
 
@@ -200,8 +198,7 @@
   }
 
   function Dialog() {
-    if (!dialog_data.content) {
-    }
+
     if (!dialog_data.content[cur_qa]) {
       cur_qa = 0;
       cur_html++;
@@ -356,7 +353,7 @@
       return;
     }
 
-    stt.startAudioMonitoring($llang,$langs);
+    stt.startAudioMonitoring($llang, $langs);
 
     // const text = dialog_data.content[cur_qa].user1[llang].replace(/[^\w\s]/gi, ''); //.split(' ');
 
@@ -551,18 +548,20 @@
         <div class="tip mdc-typography--headline6">
           {q[$llang]}
         </div>
-
-        {#await Translate(dialog_data.content[cur_qa].user1[$llang], $llang, $langs) then data}
-          <div style="text-align: center;">
-            <div
-              class="user1 mdc-typography--headline6"
-              style="visibility:{visibility[1]}"
-            >
-              {data}
-            </div>
+        <div style="text-align: center;">
+          <div
+            class="user1 mdc-typography--headline6"
+            style="visibility:{visibility[1]}"
+          >
+            {#if !dialog_data.content[cur_qa].user1[$langs]}
+              {#await Translate(dialog_data.content[cur_qa].user1[$llang], $llang, $langs) then data}
+                {data}
+              {/await}
+            {:else}
+              {@html dialog_data.content[cur_qa].user1[$langs]}
+            {/if}
           </div>
-        {/await}
-
+        </div>
         <div
           class="margins"
           style="text-align: center; display: flex; align-items: center; justify-content: space-between;"
@@ -586,9 +585,13 @@
         {/await}
 
         <div class="user2_tr">
-          {#await Translate(dialog_data.content[cur_qa].user2[$llang], $llang, $langs) then data}
-            {data}
-          {/await}
+          {#if !dialog_data.content[cur_qa].user2[$langs]}
+            {#await Translate(dialog_data.content[cur_qa].user2[$llang], $llang, $langs) then data}
+              {data}
+            {/await}
+          {:else}
+            {@html dialog_data.content[cur_qa].user2[$langs]}
+          {/if}
         </div>
 
         <div class="user2" style="visibility:{visibility[1]}">

@@ -1,51 +1,21 @@
 import { config } from 'dotenv';
 config();
 
-import { Client, client } from '@gradio/client';
-
-import { GetPrompt } from '../../../lib/server/db';
-
-import { Translate } from './../../translate/Translate';
-
-import Groq from 'groq-sdk';
-
 const HF_TOKEN = process.env.HF_TOKEN;
 
+import { Client, client } from '@gradio/client';
+
+import Groq from 'groq-sdk';
 const groq = new Groq({
   apiKey: process.env.GROQ_API_KEY,
 });
 
-// import prompt_data from './prompt/prompt_data.json';
-let assistant = '';
-let resp = '';
-let messages = [];
-let cnt = 0;
+export async function CreateContent(par) {
 
-/** @type {import('./$types').RequestHandler} */
-export async function POST({ request, fetch }) {
-  let { question } = await request.json();
+  const content = await chatGroq(par.prompt.system, '');
 
-  const prompt = await GetPrompt('chat');
-
-  const task = await Translate(question.text, question.lang, 'en');
-
-  let answer = await chatLlama(prompt.prompt.system, task);
-
-  let res = {
-    ['nl']: await Translate(answer, question.llang, 'nl'),
-    ['en']: await Translate(answer, question.llang, 'en'),
-    [question.lang]: await Translate(answer, question.llang, question.lang),
-  };
-
-  // let task2 = `[continue]{dialogue:${JSON.stringify(dialog)}}`;
-  // let user2 = await chat(chatGroq2, system2, task2);
-
-  let response = new Response(JSON.stringify({ res }));
-  response.headers.append('Access-Control-Allow-Origin', `*`);
-  return response;
+  return content;
 }
-
-
 
 async function chatLlama(system, task) {
   const app = await Client.connect('huggingface-projects/llama-2-7b-chat', {
@@ -148,47 +118,4 @@ async function chatGroq(system, task) {
     console.error('Ошибка при взаимодействии:', error);
     // Возвращаем пустой массив или другое значение, чтобы обработать ошибку на уровне вызова функции
   }
-}
-
-async function chatTranformers(system, task) {
-  const pipe = await pipeline(
-    'text-generation',
-    'Felladrin/onnx-TinyMistral-248M-Chat-v2'
-  );
-
-  const response = await pipe(task, {
-    max_new_tokens: 500,
-    temperature: 0.9,
-  });
-  return response;
-
-  // let model = await AutoModel.from_pretrained(
-  //   'robinsmits/Qwen1.5-7B-Dutch-Chat'
-  // );
-
-  // let model = await AutoModelForCausalLM.from_pretrained(
-  //   'Salesforce/codegen-350M-mono'
-  // );
-
-  // let tokenizer = await AutoTokenizer.from_pretrained(
-  //   'Salesforce/codegen-350M-mono'
-  // );
-
-  // let text = 'def hello_world():';
-  // let input_ids = tokenizer(text, { return_tensors : 'pt' }).input_ids;
-
-  // let generated_ids = model.generate(input_ids, { max_length : 128 });
-
-  //   const messages = [
-  //     {
-  //       role: 'user',
-  //       content: 'Hoi hoe gaat het ermee? Wat kun je me vertellen over appels?',
-  //     },
-  //   ];
-
-  //   const encoded_ids = tokenizer.apply_chat_template(messages, true, 'pt');
-
-  //   const input_ids = encoded_ids.to('cuda');
-  //   const generated_ids = model.generate(input_ids, 256, true);
-  // }
 }

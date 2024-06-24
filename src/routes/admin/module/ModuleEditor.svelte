@@ -109,9 +109,9 @@
     lesson_data = await fetchLesson(abonent, '');
   });
 
-  $: if (lesson_data && lesson_data.data) {
+  $: if (lesson_data.data) {
     levels = lesson_data.levels;
-    $llang = lesson_data.lang.trim();
+    // $llang = lesson_data.lang.trim();
   }
 
   onDestroy(() => {});
@@ -153,7 +153,7 @@
   function onClickQuiz(quiz: any, level) {
     $view = 'quiz';
 
-    saveLessonData();
+    // saveLessonData();
 
     lesson_data.data.llang = lesson_data.data.lang;
     // lesson_data.data.level = level;
@@ -163,6 +163,8 @@
     // 	name: ev.currentTarget.attributes['theme_name'].value
     // })['words'];
     lesson_data.data.quiz = quiz.type;
+
+    // setContext('quiz_data', lesson_data.data);
   }
 
   function disablePanel(node) {
@@ -265,7 +267,7 @@
   async function OnAddQuiz(name, t) {
     lesson_data.data.module.themes[t].lessons[0].quizes.push({
       type: 'quiz',
-      name: { [$langs]: '' },
+      name: { [$llang]: '' },
     });
     lesson_data = lesson_data;
   }
@@ -274,7 +276,7 @@
     const item = find(
       lesson_data.data.module.themes[t].lessons[0].quizes,
       (quiz) => {
-        if (quiz.name[$langs] === name) return quiz;
+        if (quiz.name[$llang] === name) return quiz;
       }
     );
 
@@ -376,13 +378,13 @@
   {:else if lesson_data.data && lesson_data.data.module}
     <!-- svelte-ignore a11y-missing-content -->
 
-    <div style="height:1500px; margin-top:20px                              ">
+    <div style="height:1500px; margin-top:20px">
       <div class="level_container" style="">
-        <button class="save" on:click={saveLessonData}>
-          {#await Translate('Сохранить', 'ru', $langs) then data}
+        {#await Translate('Save', 'en', $langs) then data}
+          <button class="save" on:click={saveLessonData}>
             {data}
-          {/await}
-        </button>
+          </button>
+        {/await}
 
         <div>
           <div class="add_module" style="display:inline-flex">
@@ -450,7 +452,7 @@
                   {#await Translate('Input Theme Name', 'en', $langs) then data}
                     <input
                       placeholder={data}
-                      bind:value={theme.name[$langs]}
+                      bind:value={theme.name[$llang]}
                       style="font-weight: bold; width:90%"
                     />
                     <!-- {@debug theme, $llang} -->
@@ -473,7 +475,6 @@
                       {#if lesson.quizes}
                         {#each lesson.quizes as quiz, q}
                           <!-- {@debug quiz} -->
-
                           <div class="quiz-container">
                             <div
                               on:click={() => {
@@ -483,7 +484,7 @@
                                 );
                               }}
                               type={quiz.type}
-                              name={quiz.name[$langs]}
+                              name={quiz.name[$llang]}
                               level={lesson_data.data.module.level}
                               highlight={quiz.highlight || ''}
                             >
@@ -536,7 +537,7 @@
                             </div>
                             <!-- svelte-ignore a11y-invalid-attribute -->
                             {#if quiz.type === 'quiz'}
-                              {#await Translate('Quiz Name', 'en', $langs) then data}
+                              {#await Translate('Quiz Name', $llang, $langs) then data}
                                 <input
                                   class="quiz_name"
                                   on:click={OnClickQuizName}
@@ -551,17 +552,17 @@
                                 />
                               {/await}
                             {:else}
-                              {#await Translate('Quiz Name', 'en', $langs) then data}
+                              {#await Translate('Quiz Name', $llang, $langs) then data}
                                 <input
                                   on:click={OnClickQuizName}
                                   style="width:80%"
                                   {t}
                                   placeholder={data}
-                                  name={quiz.name[$langs]}
+                                  name={quiz.name[$llang]}
                                   level={lesson_data.data.level}
                                   theme={theme.num}
                                   theme_name={theme.name[$llang]}
-                                  bind:value={quiz.name[$langs]}
+                                  bind:value={quiz.name[$llang]}
                                 />
                               {/await}
                             {/if}
@@ -572,9 +573,9 @@
                                   OnSelectQuiztype(
                                     event.target.value,
                                     t,
-                                    quiz.name[$langs]
+                                    quiz.name[$llang]
                                   )}
-                                name={quiz.name[$langs]}
+                                name={quiz.name[$llang]}
                               >
                                 {#each quizes as quizOption}
                                   <option value={quizOption}
@@ -589,9 +590,9 @@
                                 <IconButton
                                   class="material-icons"
                                   title={data}
-                                  name={quiz.name[$langs]}
+                                  name={quiz.name[$llang]}
                                   on:click={() => {
-                                    OnRemoveItem(quiz.name[$langs], q);
+                                    OnRemoveItem(quiz.name[$llang], q);
                                   }}>remove</IconButton
                                 >
                               {/await}

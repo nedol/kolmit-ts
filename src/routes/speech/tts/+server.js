@@ -1,21 +1,21 @@
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-import ISO6391 from 'iso-google-locales';
+ import axios from 'axios';
 
+import { config } from 'dotenv';
+config();
+
+const HF_TOKEN = process.env.HF_TOKEN;
+
+import ISO6391 from 'iso-google-locales';
 
 const https = require('https');
 const fs = require('fs');
 
-const url_deepgram = 'https://api.deepgram.com/v1/speak?model=aura-asteria-nl';
-
 import { client } from '@gradio/client';
-const HF_TOKEN = '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';
+
 const projectId = 'firebase-infodesk'
-
-// Set your Deepgram API key
-const apiKey_deepgram = 'a9e8cd740788fd5fbee5a56dbb7c16907d65ae8d';
-
 
 
 /** @type {import('./$types').RequestHandler} */
@@ -27,13 +27,35 @@ export async function POST({ url, fetch, cookies, request, response }) {
 
   switch (q.func) {
     case 'tts':
-      resp = await tts_sm4(q.text, 'nl', 'nl');
+      resp = { audio: await tts_sm4(q.text, 'nl', 'nl') };
       break;
   }
 
   response = new Response(JSON.stringify({ resp }));
   response.headers.append('Access-Control-Allow-Origin', `*`);
   return response;
+}
+
+
+async function tts_huggin(text, from, to) {
+  const ttsUrl = 'https://api.dialogflow.com/v1/tts';
+  const ttsHeaders = {
+    'Authorization': 'Bearer ' + HF_TOKEN,
+    'Content-Type': 'application/json',
+  };
+  const ttsData = {
+    text: text,
+    languageCode: 'nl-BE',
+    voice: 'female',
+  };
+
+  try {
+    const ttsRes = await axios.post(ttsUrl, ttsData, { headers: ttsHeaders });
+    ttsResponse = ttsRes.data.audioContent;
+  } catch (error) {
+    console.error(error);
+  }
+  let result;
 }
 
 async function tts_sm4(text, from_lang, to_lang) {

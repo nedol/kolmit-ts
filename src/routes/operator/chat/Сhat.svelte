@@ -234,8 +234,8 @@
   {#await Translate('Отправить', 'ru', $langs) then data}
     <Button
       on:click={() => {
-        stt.SendRecognition()
-        // SendDC(userInput[$llang]);
+        // stt.SendRecognition()
+        SendDC(userInput[$llang]);
       }}><Label>{data}</Label></Button
     >
   {/await}

@@ -7,11 +7,12 @@
 
   import { view, lesson } from '$lib/js/stores.js';
 
+  // @ts-ignore
   let voice, tts;
 
-  onMount(() => {
-    initSpeech();
-  });
+  initSpeech();
+
+  onMount(() => {});
 
   export async function Speak(text) {
     // await EasySpeech.init({
@@ -21,19 +22,19 @@
     //   rate: 0.7,
     // }); // required
 
-    // window.speechSynthesis.speak(text);
+    console.log(
+      'EasySpeech.status before Speak:' + EasySpeech.status()['status']
+    );
 
-
-     await EasySpeech.speak({
-        text: text, //dialog_data.content[cur_qa].question['nl'],
-        voice: tts.voice,
-        volume: 9,
-        rate: 0.6,
-        error: async (e) => {
-          console.log(e);
-        },
-      });
-
+    await EasySpeech.speak({
+      text: text, //dialog_data.content[cur_qa].question['nl'],
+      voice: tts.voice,
+      volume: 9,
+      rate: 0.6,
+      error: async (e) => {
+        console.log(e);
+      },
+    });
   }
 
   export function Cancel() {
@@ -81,30 +82,27 @@
     }
 
     EasySpeech.on('error', () => {
-      //   EasySpeech.reset();
+      console.log(
+        'EasySpeech.status on error:' + EasySpeech.status()['status']
+      );
     });
 
     document.addEventListener('visibilitychange', async () => {
+      await EasySpeech.reset();
       if (document.hidden) {
         // Ваш код, выполняемый при переходе приложения в неактивное состояние
         // await EasySpeech.pause();
         // await EasySpeech.cancel();
         // await EasySpeech.reset();
-        $lesson.data = { quiz: '' };
-        $view = 'lesson';
+
+        // $lesson.data = { quiz: '' };
+        // $view = 'lesson';
         console.log(
           'EasySpeech.status  before hidden:' + EasySpeech.status()['status']
         );
       } else {
-        // await EasySpeech.reset();
+        // initSpeech();
         // await EasySpeech.resume();
-
-        await EasySpeech.init({
-          maxTimeout: 10000,
-          interval: 250,
-          quiet: false,
-          rate: 1,
-        }); // required
 
         console.log(
           'EasySpeech.status  after hidden:' + EasySpeech.status()['status']

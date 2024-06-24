@@ -1,15 +1,17 @@
 <script>
   import { onMount, onDestroy, getContext } from 'svelte';
-  import EasySpeech from '/src/routes/speech/tts/EasySpeech.svelte';
-  let easyspeech;
+  import EasySpeech from '../../speech/tts/EasySpeech.svelte';
 
+  let easyspeech;
 
   let audio;
 
-  onMount(() => { easyspeech.initSpeech()});
+  onMount(async () => {
+    easyspeech.initSpeech();
+  });
 
-  export async function Speak(text){
-    //  easyspeech.Speak(text);
+  export async function Speak(text) {
+    // easyspeech.Speak(text);
     Speak_server(text)
   }
 
@@ -19,7 +21,6 @@
       func: 'tts',
       text: text,
     };
-
 
     const response = await fetch('/speech/tts', {
       method: 'POST',
@@ -33,12 +34,10 @@
 
     const url = await response.json(); //URL.createObjectURL(response);
     // Пример того, как можно воспроизвести полученный аудиофайл
-    audio = new Audio(url.resp);
+    audio = new Audio(url.resp.audio);
     audio.playbackRate = 0.7;
     audio.play();
   }
-
-
 
   export function CollectGarbage() {}
 
@@ -54,6 +53,5 @@
     audio = '';
   });
 </script>
-
 
 <EasySpeech bind:this={easyspeech}></EasySpeech>

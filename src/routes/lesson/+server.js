@@ -27,29 +27,28 @@ export async function GET({ url, fetch, cookies }) {
   const dialog = url.searchParams.get('dialog');
   const lesson = url.searchParams.get('lesson');
   const listen = url.searchParams.get('listen');
+  const lvl = url.searchParams.get('level');
   let data;
   // debugger;
   if (text) {
     // let resp = await fetch('/src/routes/operator/operator/lesson/' + path);
-    const level = url.searchParams.get('level');
     const theme = url.searchParams.get('theme');
     const title = url.searchParams.get('title');
 
     data = await GetText({
       owner: abonent,
-      level: level,
+      level: lvl,
       theme: theme,
       title: title,
     });
 
   } else if (dict) {
-    const level = url.searchParams.get('level');
     const theme = url.searchParams.get('theme');
     // let resp = await fetch('/src/routes/operator/operator/lesson/' + path);
     data = await GetDict({
       owner: abonent,
       type: dict,
-      level: level,
+      level: lvl,
       theme: theme,
     });
     // let data = await resp.text();
@@ -77,8 +76,13 @@ export async function GET({ url, fetch, cookies }) {
 
   } else if (lesson) {
     let owner = url.searchParams.get('owner');
-    let lev = url.searchParams.get('level');
-    let { data, lang, level, levels } = await GetLesson({ owner: owner, level: lev });
+    let operator = lesson;
+    
+    let { data, lang, level, levels } = await GetLesson({
+      owner: owner,
+      operator: operator,
+      level: lvl,
+    });
     let response = new Response(JSON.stringify({ data, lang, level, levels }));
     response.headers.append('Access-Control-Allow-Origin', `*`);
     return response;

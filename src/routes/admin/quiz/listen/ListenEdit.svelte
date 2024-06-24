@@ -17,11 +17,11 @@
     isCollapsed.update((n) => !n);
   }
 
-  export let data: any;
+  // export let data: any;
   export let ChangeQuizName: any;
 
   const abonent = getContext('abonent');
-  data = getContext('quiz_data');
+  const data = getContext('quiz_data');
 
   let content: any,
     new_content = false,
@@ -62,7 +62,7 @@
     prompt = prompt.replaceAll('${words}', words);
   }
 
-  fetch(`./lesson?listen=theme&name=${data.name[$llang]}&owner=${abonent}`)
+  fetch(`./lesson?listen=${data.name[$llang]}&owner=${abonent}&lang=${$llang}`)
     .then((response) => response.json())
     .then((data) => {
       words_data = data.data.data;
@@ -117,9 +117,10 @@
       body: JSON.stringify({
         func: 'upd_listen',
         owner: abonent,
-        level: '12',
+        level: data.level,
         name: name[$llang],
         new_name: new_name[$llang],
+        lang: $llang,
         data: data,
       }),
       headers: { 'Content-Type': 'application/json' },

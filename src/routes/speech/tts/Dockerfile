@@ -1,0 +1,1 @@
+FROM synesthesiam/opentts:latest

@@ -53,6 +53,7 @@ export async function Translate(text, from, to) {
     }
 
     return translatedText.trim(); // Удаление лишних пробелов в конце текста
+    
   } catch (error) {
     console.error('Translation error:', error);
 

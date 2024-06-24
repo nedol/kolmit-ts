@@ -142,7 +142,7 @@
     result = '';
     isCorrect = null;
     div_input.focus();
-    speak(currentWord.example);
+    speak(currentWord.original);
   }
 
   function checkInput() {
@@ -155,8 +155,8 @@
 
     if (isCorrect) {
       inputStyle = isCorrect ? 'color: green;' : 'color: red; ';
-      if (listen_data[currentWordIndex + 1]) currentWordIndex++;
-      else currentWordIndex = 0;
+      // if (listen_data[currentWordIndex + 1]) currentWordIndex++;
+      // else currentWordIndex = 0;
       setTimeout(() => {
         userContent = '';
         Generate();
@@ -213,7 +213,7 @@
     // Реализуйте функцию озвучивания числа, используя доступные средства или библиотеки
     // Например, можно использовать Text-to-Speech API или библиотеку для озвучивания
 
-    speak(currentWord.example);
+    speak(currentWord.original);
 
     div_input.focus();
   }

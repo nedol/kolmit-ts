@@ -31,12 +31,12 @@ declare module '$env/static/private' {
 	export const PGUSER: string;
 	export const PGPASSWORD: string;
 	export const ENDPOINT_ID: string;
-	export const GROQ_API_KEY_1: string;
-	export const GROQ_API_KEY_2: string;
+	export const GROQ_API_KEY: string;
 	export const LANGCHAIN_TRACING_V2: string;
 	export const LANGCHAIN_API_KEY: string;
 	export const ANTHROPIC_API_KEY: string;
 	export const HF_TOKEN: string;
+	export const HF_TOKEN_2: string;
 	export const FOREFRONT_API_KEY: string;
 	export const ASSEMBLY_API_KEY: string;
 	export const DEEPL_API_KEY: string;
@@ -53,6 +53,8 @@ declare module '$env/static/private' {
 	export const ComSpec: string;
 	export const DriverData: string;
 	export const EDITOR: string;
+	export const FPS_BROWSER_APP_PROFILE_STRING: string;
+	export const FPS_BROWSER_USER_PROFILE_STRING: string;
 	export const GIT_ASKPASS: string;
 	export const HOME: string;
 	export const HOMEDRIVE: string;
@@ -166,12 +168,12 @@ declare module '$env/dynamic/private' {
 		PGUSER: string;
 		PGPASSWORD: string;
 		ENDPOINT_ID: string;
-		GROQ_API_KEY_1: string;
-		GROQ_API_KEY_2: string;
+		GROQ_API_KEY: string;
 		LANGCHAIN_TRACING_V2: string;
 		LANGCHAIN_API_KEY: string;
 		ANTHROPIC_API_KEY: string;
 		HF_TOKEN: string;
+		HF_TOKEN_2: string;
 		FOREFRONT_API_KEY: string;
 		ASSEMBLY_API_KEY: string;
 		DEEPL_API_KEY: string;
@@ -188,6 +190,8 @@ declare module '$env/dynamic/private' {
 		ComSpec: string;
 		DriverData: string;
 		EDITOR: string;
+		FPS_BROWSER_APP_PROFILE_STRING: string;
+		FPS_BROWSER_USER_PROFILE_STRING: string;
 		GIT_ASKPASS: string;
 		HOME: string;
 		HOMEDRIVE: string;

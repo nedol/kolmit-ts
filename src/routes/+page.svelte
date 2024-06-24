@@ -34,8 +34,8 @@
 
     $ice_conf = data.ice_conf;
 
-    if (data.quiz_users) {
-      $quiz_userst = data.quiz_users;
+    if (data.quizes) {
+      $quiz_userst = data.quizes;
     }
   }
 

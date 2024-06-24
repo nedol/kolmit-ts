@@ -14,17 +14,17 @@ import {
 export async function POST({ request, url, fetch }) {
 	let resp;
 
-	const { func, owner, level, name, new_name, data } = await request.json();
+	const { func, owner, level, name, new_name, data, lang } = await request.json();
 
 	switch (func) {
     case 'upd_dlg':
-      UpdateDialog({ owner, level, name, new_name, data });
+      UpdateDialog({ owner, level, name, new_name, data, lang });
       break;
-    case 'upd_lstn':
-      UpdateListen({ owner, level, name, new_name, data });
+    case 'upd_listen':
+      UpdateListen({ owner, level, name, new_name, data, lang });
       break;
     case 'upd_words':
-      UpdateWords({ owner, level, name, new_name, data });
+      UpdateWords({ owner, level, name, new_name, data, lang });
       break;
   }
 
