@@ -54,11 +54,23 @@
       return JSON.stringify(line);
     });
     let dialog_data_words = dialog_data.words || '';
- 
   }
 
   $: if (dialog_data && $langs) {
     TranslateContentToCurrentLang();
+  }
+
+  $: if (dialog_data.words) {
+    prompt = prompt.replaceAll('${dialog_data_words}', dialog_data.words);
+  }
+
+  $: if (dialog_data.content) {
+    let content = JSON.parse(JSON.stringify(dialog_data.content));
+    content.forEach((item) => {
+      item['user1'] = item['user1']['nl'];
+      item['user2'] = item['user2']['nl'];
+    });
+    prompt = prompt.replaceAll('${dialog_content}', JSON.stringify(content));
   }
 
   fetch(`./lesson?dialog=${data.name[$llang]}&owner=${abonent}`)
@@ -80,13 +92,7 @@
           prompt = prompt.replaceAll('${dialog_data.html}', dialog_data.html);
           prompt = prompt.replaceAll('${data.level}', data.level);
           prompt = prompt.replaceAll('${num}', num);
-          prompt = prompt.replaceAll('${dialog_data_words}', dialog_data.words);
-          let content = JSON.parse(JSON.stringify(dialog_data.content));
-          content.forEach((item)=>{
-            item['user1'] = item['user1']['nl'];
-            item['user2'] = item['user2']['nl']
-          });
-          prompt = prompt.replaceAll('${dialog_content}', JSON.stringify(content));
+
           prompt = prompt;
         })
         .catch((error) => {
@@ -164,7 +170,7 @@
         name: name[$llang],
         new_name: data.name[$llang],
         data: dialog_data,
-        lang:$llang
+        lang: $llang,
       }),
       headers: { 'Content-Type': 'application/json' },
     });

@@ -15,7 +15,6 @@
   import TTS from '../../../speech/tts/Tts.svelte';
   let tts;
 
-
   import Accordion, { Panel, Header, Content } from '@smui-extra/accordion';
   import IconButton, { Icon } from '@smui/icon-button';
   import {
@@ -98,30 +97,31 @@
   }
 
   function highlightWords() {
-    hl_words.forEach((woord) => {
-      const regex = new RegExp(
-        `\\b[${woord.charAt(0).toUpperCase()}${woord.charAt(0).toLowerCase()}]${woord.slice(1)}\\b`,
-        'g'
-      );
+    const woord = hl_words[hl_words.length - 1].trim();
+    const regex = new RegExp(
+      `\\b[${woord.charAt(0).toUpperCase()}${woord.charAt(0).toLowerCase()}]${woord.slice(1)}\\b`,
+      'g'
+    );
 
-      userContent = userContent.replace(
-        regex,
-        `<span class="highlight" style="color: green;background-color: transparent">${woord}</span>`
-      );
-    });
+    userContent = userContent.replace(/[.\/#!?$%\^&\*;:{}=_`~()]/g, '').trim();
 
-    Object.keys(words).forEach((i) => {
-      const woord = words[i].original;
-      const regex = new RegExp(
-        `\\b[${woord.charAt(0).toUpperCase()}${woord.charAt(0).toLowerCase()}]${woord.slice(1)}\\b`,
-        'g'
-      );
+    userContent = userContent.replace(
+      regex,
+      `<span class="highlight" style="color: green;background-color: transparent">${woord}</span>`
+    );
 
-      userContent = userContent.replace(
-        regex,
-        `<span class="highlight" style="color: green;background-color: transparent">${woord}</span>`
-      );
-    });
+    // Object.keys(words).forEach((i) => {
+    //   const woord = words[i].original;
+    //   const regex = new RegExp(
+    //     `\\b[${woord.charAt(0).toUpperCase()}${woord.charAt(0).toLowerCase()}]${woord.slice(1)}\\b`,
+    //     'g'
+    //   );
+
+    //   userContent = userContent.replace(
+    //     regex,
+    //     `<span class="highlight" style="color: green;background-color: transparent">${woord}</span>`
+    //   );
+    // });
   }
 
   let topAppBar;
@@ -137,8 +137,8 @@
     //     sentence.slice(0, lastDotIndex) + sentence.slice(lastDotIndex + 1);
     // }
 
-    word = word.replace(/[.,\/#!$%\^&\*;:{}=_`~()]/g, '');
-    word = word.replace(/\b(the |a |an |het |de )\b/gi, '').trim();
+    word = word.replace(/[.\/#!?$%\^&\*;:{}=_`~()]/g, '').trim();
+    // word = word.replace(/\b(the |a |an |het |de )\b/gi, '');
     const wordLength = word.length;
     const matches = sentence.toLowerCase().split(word.toLowerCase()).length - 1;
 
@@ -168,9 +168,8 @@
       setTimeout(() => {
         const spanElement = document.querySelector('.sentence_span');
         if (spanElement) spanElement.appendChild(div_input);
+        resultElementWidth = getTextWidth(currentWord.original, '20px Arial');
       }, 100);
-
-      resultElementWidth = getTextWidth(currentWord.original, '20px Arial');
 
       // word = currentWord['original'].replace(/(de|het)\s*/gi, '');
       // let filteredExample = currentWord['example'].replace(
@@ -266,13 +265,12 @@
   }
 
   function checkInput() {
-    const targetWord = words[currentWordIndex].original.replace(
-      /[.,\/#!$%\^&\*;:{}=_`~()]/g,
-      ''
-    );
+    const targetWord = words[currentWordIndex].original
+      .replace(/[.\/#!?$%\^&\*;:{}=_`~()]/g, '')
+      .trim();
     userContent = userContent
       .replace(/&nbsp;/g, '')
-      .replace(/<\/?[^>]+(>|$)/g, '');
+      .replace(/<\/?![^>]+(>|$)/g, '');
     const trimmedUserContent = userContent.trim();
     focus_pos = 0;
 
@@ -304,7 +302,7 @@
       }
 
       userContent = currentWord.original.replace(
-        /[.,\/#!$%\^&\*;:{}=_`~()]/g,
+        /[.\/#!$%\^&\*;:{}=_`~()]/g,
         ''
       );
       highlightWords(userContent);
@@ -324,12 +322,13 @@
           result += `<span class="correct">${targetWord[i]}</span>`;
           focus_pos = i + 1;
         } else {
+          console.log();
           // Несовпадающие символы
           result += `<span style="color:red;">${trimmedUserContent[i]}</span>`;
-          resultElementWidth = getTextWidth(
-            trimmedUserContent[i],
-            '20px Arial'
-          );
+          // resultElementWidth = getTextWidth(
+          //   trimmedUserContent,
+          //   '20px Arial'
+          // );
           errorIndex++;
         }
 
@@ -353,7 +352,7 @@
   function showHint() {
     // wordsString = shuffleWords(wordsString);
     currentWord.original = currentWord.original.replace(
-      /[.,\/#!$%\^&\*;:{}=_`~()]/g,
+      /[.,\/#!?$%\^&\*;:{}=_`~()]/g,
       ''
     );
     if (currentWord && hintIndex < currentWord.original.length) {
@@ -385,6 +384,8 @@
   function onPrev() {
     if (currentWordIndex <= 0) return;
     currentWord = words[--currentWordIndex];
+    result = '';
+    userContent = '';
   }
 
   function onSpeach() {
@@ -392,16 +393,13 @@
   }
 
   function speak(text) {
-
-      tts.Speak(text);
-  
-
+    tts.Speak(text);
 
     setFocus();
   }
 
   function OnClickHint(word) {
-    word = word.replace(/[.,\/#!$%\^&\*;:{}=_`~()]/g, '');
+    word = word.replace(/[.\/#!?$%\^&\*;:{}=_`~()]/g, '');
     resultElementWidth = getTextWidth(word, '20px Arial');
     userContent = word;
     hl_words.push(word);
@@ -492,7 +490,6 @@
         style="width: {resultElementWidth}px"
       >
         {@html result}
-
       </div>
     </div>
 
