@@ -342,7 +342,7 @@
   }
 
   async function speak(text) {
-    //Speak(text);
+    // Speak(text);
     tts.Speak(text);
   }
 

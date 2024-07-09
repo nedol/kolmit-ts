@@ -1,6 +1,7 @@
 <script>
   import { onMount, onDestroy, getContext } from 'svelte';
   import EasySpeech from 'easy-speech';
+
   import bell from '$lib/mp3/bell.mp3';
 
   import { audioCtx } from '$lib/js/stores.js';
@@ -10,18 +11,12 @@
   // @ts-ignore
   let voice, tts;
 
-  initSpeech();
-
-  onMount(() => {});
+  onMount(async() => {
+      console.log(await EasySpeech.detect());
+    initSpeech();
+  });
 
   export async function Speak(text) {
-    // await EasySpeech.init({
-    //   maxTimeout: 10000,
-    //   interval: 250,
-    //   quiet: false,
-    //   rate: 0.7,
-    // }); // required
-
     console.log(
       'EasySpeech.status before Speak:' + EasySpeech.status()['status']
     );
@@ -31,8 +26,11 @@
       voice: tts.voice,
       volume: 9,
       rate: 0.6,
+      pitch: 1,
+      boundary: e => console.debug('boundary reached'),
       error: async (e) => {
         console.log(e);
+        EasySpeech.reset()
       },
     });
   }
@@ -53,15 +51,17 @@
     console.log(
       'EasySpeech.status before initSpeech:' + EasySpeech.status()['status']
     );
-    // console.log(await EasySpeech.detect());
+
     // await EasySpeech.cancel()
-    await EasySpeech.reset();
+    // await EasySpeech.reset();
     // const es_det = EasySpeech.detect();
     //  $audioCtx = new AudioContext();
+    //  await EasySpeech.reset();
+
     await EasySpeech.init({
-      maxTimeout: 10000,
+      maxTimeout: 5000,
       interval: 250,
-      quiet: false,
+      quiet: true,
       rate: 0.7,
     }); // required
 
@@ -80,12 +80,6 @@
         }
       }
     }
-
-    EasySpeech.on('error', () => {
-      console.log(
-        'EasySpeech.status on error:' + EasySpeech.status()['status']
-      );
-    });
 
     document.addEventListener('visibilitychange', async () => {
       await EasySpeech.reset();

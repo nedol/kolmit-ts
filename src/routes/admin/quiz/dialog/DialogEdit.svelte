@@ -85,7 +85,7 @@
       fetch(`./admin?prompt=dialog`)
         .then((response) => response.json())
         .then((resp) => {
-          prompt = resp.resp.system;
+          prompt = resp.resp.system + resp.resp.user;
           prompt = prompt.replaceAll('${$llang}', $llang);
           prompt = prompt.replaceAll('${name[$llang]}', name[$langs]);
           prompt = prompt.replaceAll('${$langs}', $langs);

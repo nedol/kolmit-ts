@@ -6,7 +6,7 @@ import axios from 'axios';
 import { config } from 'dotenv';
 config();
 
-const HF_TOKEN = process.env.HF_TOKEN;
+const HF_TOKEN = process.env.HF_TOKEN_3;
 
 import ISO6391 from 'iso-google-locales';
 
@@ -59,7 +59,7 @@ async function tts_huggin(text, from, to) {
 
 async function tts_sm4(text, from_lang, to_lang) {
   const app = await client(
-    'https://facebook-seamless-m4t-v2-large.hf.space/--replicas/fxh8b/'
+    'https://bluman1-seamless-m4t-v2-large.hf.space/--replicas/y1arv'
   );
   const app_info = await app.view_api();
   const from = ISO6391.getName(from_lang);
@@ -71,7 +71,7 @@ async function tts_sm4(text, from_lang, to_lang) {
   ]);
 
   return (
-    'https://facebook-seamless-m4t-v2-large.hf.space/file=' +
+    'https://bluman1-seamless-m4t-v2-large.hf.space/file=' +
     result.data[0].path
   );
 }

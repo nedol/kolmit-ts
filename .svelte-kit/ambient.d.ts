@@ -37,6 +37,7 @@ declare module '$env/static/private' {
 	export const ANTHROPIC_API_KEY: string;
 	export const HF_TOKEN: string;
 	export const HF_TOKEN_2: string;
+	export const HF_TOKEN_3: string;
 	export const FOREFRONT_API_KEY: string;
 	export const ASSEMBLY_API_KEY: string;
 	export const DEEPL_API_KEY: string;
@@ -172,6 +173,7 @@ declare module '$env/dynamic/private' {
 		ANTHROPIC_API_KEY: string;
 		HF_TOKEN: string;
 		HF_TOKEN_2: string;
+		HF_TOKEN_3: string;
 		FOREFRONT_API_KEY: string;
 		ASSEMBLY_API_KEY: string;
 		DEEPL_API_KEY: string;

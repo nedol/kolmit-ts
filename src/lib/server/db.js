@@ -422,7 +422,7 @@ export async function GetWords(q) {
     let res = await sql`SELECT data FROM words
 		WHERE name=${q.name} AND owner=${q.owner}`;
     //debugger;
-    return res[0].data;
+    return res[0]?.data;
   } catch (ex) {
     return JSON.stringify({ func: q.func, res: ex });
   }
@@ -440,7 +440,7 @@ export async function GetDialog(q) {
 }
 
 export async function GetPrompt(name) {
-  let prompt = await sql`SELECT system FROM prompts
+  let prompt = await sql`SELECT system, user FROM prompts
 		WHERE name=${name}`;
   return {
     prompt: prompt[0],

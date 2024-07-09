@@ -12,6 +12,8 @@
 
   import CircularProgress from '@smui/circular-progress';
 
+   import { Speak } from '/src/routes/speech/tts/VoiceRSS';
+
   import TTS from '../../../speech/tts/Tts.svelte';
   let tts;
 
@@ -97,7 +99,7 @@
   }
 
   function highlightWords() {
-    const woord = hl_words[hl_words.length - 1].trim();
+    const woord = hl_words[hl_words.length - 1]?.trim();
     const regex = new RegExp(
       `\\b[${woord.charAt(0).toUpperCase()}${woord.charAt(0).toLowerCase()}]${woord.slice(1)}\\b`,
       'g'
@@ -139,17 +141,17 @@
 
     word = word.replace(/[.\/#!?$%\^&\*;:{}=_`~()]/g, '').trim();
     // word = word.replace(/\b(the |a |an |het |de )\b/gi, '');
-    const wordLength = word.length;
-    const matches = sentence.toLowerCase().split(word.toLowerCase()).length - 1;
+    // const wordLength = word.length;
+    // const matches = sentence.split(word).length - 1;
 
-    const matchPercentage = (matches / wordLength) * 100;
+    // const matchPercentage = (matches / wordLength) * 100;
 
     // Если процент совпадения больше или равен 90%, заменяем слово на <input>
-    if (matches >= 1) {
-      const regex = new RegExp(word, 'gi');
+    if (true ){//matches >= 1) {
+      const regex = new RegExp('(^|\\s)' + word + '(?=[\\s.,!?]|$)', 'i')
       return sentence.replace(
         regex,
-        `<span class="sentence_span" style="position: relative; width: 120px; left: 0px;"></span>`
+        `$1<span class="sentence_span" style="position: relative; width: 120px; left: 0px;"></span> `
       );
     } else {
       return sentence;
@@ -215,7 +217,8 @@
 
   function onShuffleWords(ev) {
     shuffle(words);
-    currentWord = words[0];
+    currentWordIndex = 0;
+    currentWord = words[currentWordIndex];
   }
 
   function jumpNext10() {
@@ -265,6 +268,11 @@
   }
 
   function checkInput() {
+    if (errorIndex > 0) {
+      errorIndex = 0;
+      userContent = '';
+    }
+
     const targetWord = words[currentWordIndex].original
       .replace(/[.\/#!?$%\^&\*;:{}=_`~()]/g, '')
       .trim();
@@ -310,7 +318,6 @@
     } else {
       showCheckMark = false;
       result = '';
-
       let i = 0;
 
       while (i < targetWord.length || i < trimmedUserContent.length) {
@@ -393,6 +400,7 @@
   }
 
   function speak(text) {
+    //  Speak(text);
     tts.Speak(text);
 
     setFocus();
@@ -403,6 +411,7 @@
     resultElementWidth = getTextWidth(word, '20px Arial');
     userContent = word;
     hl_words.push(word);
+    errorIndex = 0;
   }
 </script>
 
@@ -493,7 +502,7 @@
       </div>
     </div>
 
-    {#if showSpeakerButton}
+    {#if true || showSpeakerButton}
       <div class="speaker-button">
         <IconButton on:click={onSpeach}>
           <Icon tag="svg" viewBox="0 0 24 24">

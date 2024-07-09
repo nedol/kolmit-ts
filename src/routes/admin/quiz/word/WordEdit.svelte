@@ -47,6 +47,7 @@
     prompt = prompt.replaceAll('${$llang}', $llang);
     prompt = prompt.replaceAll('${$langs}', $langs);
     prompt = prompt.replaceAll('${words}', words);
+    prompt = prompt.replaceAll('${topic}', data.name[$llang]);
   }
 
   let  grammar_title = 'Grammar',
@@ -167,21 +168,24 @@
   }
 
     function PasteContent() {
-    // Вставляем содержимое буфера обмена в <textarea>
-    navigator.clipboard
-      .readText()
-      .then((text) => {
-        content = text;
-        const parsed = JSON.parse(text);
-        words_data = parsed;
-      })
-      .catch((err) => {
-        console.error('Failed to read clipboard contents: ', err);
-      });
+      // Вставляем содержимое буфера обмена в <textarea>
+      navigator.clipboard
+        .readText()
+        .then((text) => {
+          content = text;
+          const parsed = JSON.parse(text);
+          words_data = parsed;
+        })
+        .catch((err) => {
+          console.error('Failed to read clipboard contents: ', err);
+        });
   }
 
 
-  function remRecord(ev) {}
+  function remRecord(ind) {
+    words_data.splice(ind, 1);
+    words_data = words_data
+  }
 </script>
 
 <div class="word_container">
@@ -345,7 +349,7 @@
               {/if}
             </td>
             <td>
-              <button class="remrec_but" on:click={remRecord} {index}>-</button>
+              <button class="remrec_but" on:click={remRecord(index)} {index}>-</button>
             </td>
           </tr>
         {/each}

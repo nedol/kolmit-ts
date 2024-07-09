@@ -7,6 +7,11 @@ import { Translate } from '../../translate/Translate';
 
 import { client } from '@gradio/client';
 
+import { config } from 'dotenv';
+config();
+
+const HF_TOKEN = process.env.HF_TOKEN_2;
+
 // const response_0 = await fetch(
 //   'https://github.com/gradio-app/gradio/raw/main/test/test_files/audio_sample.wav'
 // );
@@ -16,7 +21,7 @@ let app;
 
 
 import { HfInference } from '@huggingface/inference';
-const HF_TOKEN = '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';//'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';
+// const HF_TOKEN = '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';//'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';
 const inference = new HfInference(HF_TOKEN);
 // import { HfAgent, LLMFromHub, defaultTools } from '@huggingface/agents';
 // const agent = new HfAgent(HF_TOKEN, LLMFromHub(HF_TOKEN), [...defaultTools]);
@@ -31,6 +36,7 @@ const inference = new HfInference(HF_TOKEN);
 
       return btoa(binaryString);
     }
+
 
 
 /** @type {import('./$types').RequestHandler} */
@@ -66,6 +72,9 @@ export async function POST({ url, fetch, cookies, request }) {
     }
   } else if (from_lang == 'nl') {
 
+    // const result = await queryHF(buffer);
+    // const result = await stt_nl(arrayBuffer, from_lang);
+
     const result = await stt_sm4(blob, from_lang, to_lang);
     // const result = await stt_mms(arrayBuffer, from_lang, to_lang);
 
@@ -95,8 +104,8 @@ export async function POST({ url, fetch, cookies, request }) {
 
 async function stt_sm4(blob, from_lang, to_lang) {
    const app = await client(
-      'https://facebook-seamless-m4t-v2-large.hf.space/--replicas/fxh8b/'
-  );
+     'https://bluman1-seamless-m4t-v2-large.hf.space/--replicas/y1arv'
+   );
   const app_info = await app.view_api();
   const from = ISO6391.getName(from_lang);
    const to = ISO6391.getName(to_lang);
@@ -173,7 +182,8 @@ async function stt_en(arrayBuffer, from_lang) {
 
 async function queryHF(data) {
   const response = await fetch(
-    'https://api-inference.huggingface.co/models/openai/whisper-large-v3', //English 5!
+    'https://api-inference.huggingface.co/models/GerwinVanGiessen/whisper-base-nl-1',//3
+    // 'https://api-inference.huggingface.co/models/openai/whisper-large-v3', //English 5!
     // 'https://api-inference.huggingface.co/models/hannatoenbreker/whisper-dutch', //0
     // 'https://api-inference.huggingface.co/models/renesteeman/whisper-tiny-dutch',//3
     // 'https://api-inference.huggingface.co/models/nithinholla/wav2vec2-large-xlsr-53-dutch',//3
@@ -190,10 +200,11 @@ async function queryHF(data) {
     // 'https://api-inference.huggingface.co/models/golesheed/whisper-non-native-children-0-dutch',//0
     // 'https://api-inference.huggingface.co/models/golesheed/whisper-non-native-adult-6-dutch', //English 5!
     // 'https://api-inference.huggingface.co/models/golesheed/whisper-9-dutch', // 5!!
+    
 
     {
       headers: {
-        Authorization: 'Bearer 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',
+        Authorization: 'Bearer '+ HF_TOKEN,
         language: 'nl',
       },
       method: 'POST',
@@ -201,7 +212,7 @@ async function queryHF(data) {
     }
   );
   const result = await response.json();
-  return result;
+  return result.text;
 }
 
 async function queryFF(text) {

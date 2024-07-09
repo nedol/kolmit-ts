@@ -118,7 +118,6 @@ export async function AddUser(q) {
 }
 
 export async function UpdateLesson(q) {
-
   try {
     let levels = await getLevels(q.owner);
     levels.map((item) => {
@@ -167,14 +166,14 @@ export async function UpdateListen(q) {
 			VALUES(${q.owner},${q.new_name},${q.data},${q.lang} )
 			ON CONFLICT (name, lang, owner)
 			DO UPDATE SET
-			data = EXCLUDED.data`
+			data = EXCLUDED.data`;
     return { res };
   } catch (ex) {
     return JSON.stringify({ func: q.func, res: ex });
   }
 }
 
-export async function UpdateWords(q){
+export async function UpdateWords(q) {
   try {
     let res = await sql`INSERT INTO words
 			(name , data, owner)
@@ -187,12 +186,11 @@ export async function UpdateWords(q){
   } catch (ex) {
     return JSON.stringify({ func: q.func, res: ex });
   }
-
 }
 
 export async function GetPrompt(name) {
   try {
-    let res = await sql`SELECT system FROM prompts WHERE name=${name}`;
+    let res = await sql`SELECT * FROM prompts WHERE name=${name}`;
     return res[0];
   } catch (ex) {
     return JSON.stringify({ res: ex });

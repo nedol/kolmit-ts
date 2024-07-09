@@ -6,12 +6,12 @@
 
   let audio;
 
-  onMount(async () => {
-    easyspeech.initSpeech();
-  });
+  onMount(async () => {});
 
   export async function Speak(text) {
-    // easyspeech.Speak(text);
+    // await easyspeech.initSpeech();
+    // await easyspeech.Speak(text);
+
     Speak_server(text);
   }
 
@@ -54,6 +54,7 @@
 
   onDestroy(() => {
     audio = '';
+    easyspeech = ''
   });
 </script>
 

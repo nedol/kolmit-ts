@@ -1,12 +1,22 @@
 <script lang="ts">
+  import {
+    onMount /*, onDestroy, getContext, setContext*/,
+    setContext,
+  } from 'svelte';
   import TopAppBar, { Row, Title, Section } from '@smui/top-app-bar';
   import { dicts, langs, view, lesson } from '$lib/js/stores';
   import google_langs_list from '$lib/dict/google_lang_list.json';
   import ISO6391 from 'iso-google-locales';
   import translate from 'translate';
 
-  let topAppBar,
-    lang_menu = false;
+  let topAppBar;
+  let abonent;
+  let  lang_menu = false;
+
+  onMount(async () => {
+    let params = new URL(document.location).searchParams;
+    abonent = params.get('abonent');
+  });
 
   function setLang(ev) {
     let lang = ev.currentTarget.outerText;
@@ -17,12 +27,12 @@
     // console.log($langs);
     lang_menu = false;
 
-    // TODO:
-    // fetch(`./?func=cookie&abonent=${abonent}&lang=${lang}`)
-    //   .then(() => console.log())
-    //   .catch((error) => {
-    //     console.log(error);
-    //   });
+
+     fetch(`./?func=cookie&abonent=${abonent}&admin==${abonent}&lang=${$langs}`)
+      .then(() => console.log())
+      .catch((error) => {
+        console.log(error);
+      });
   }
   async function Translate(text: string, from_lang: string, to_lang: string) {
     try {

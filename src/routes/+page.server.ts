@@ -86,6 +86,7 @@ export async function load({ fetch, cookies, route, url, stuff }) {
 		check: true,
 		host: host,
 		// url: decodeURIComponent(url.toString()),
+		cookies:cookies.get('kolmit.operator:'+abonent),
 		operator: oper,
 		abonent: abonent,
 		dict: dict,

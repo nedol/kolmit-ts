@@ -84,8 +84,11 @@
       );
       if (!response.ok) {
         throw new Error('Failed to fetch data');
-      }
-      return await response.json();
+      }  
+      const resp = await response.json();
+      $llang = resp.lang
+      return resp;
+    
     } catch (error) {
       console.error(error);
       return [];
@@ -150,7 +153,7 @@
     }
   }
 
-  function onClickQuiz(quiz: any, level) {
+  function onClickQuiz(quiz: any, level, theme) {
     $view = 'quiz';
 
     // saveLessonData();
@@ -158,7 +161,7 @@
     lesson_data.data.llang = lesson_data.data.lang;
     // lesson_data.data.level = level;
     lesson_data.data.name = quiz.name;
-    // data.theme = ev.currentTarget.attributes['theme'].value;
+    lesson_data.data.theme = theme;
     // data.words = find(lesson_data.module.themes, {
     // 	name: ev.currentTarget.attributes['theme_name'].value
     // })['words'];
@@ -236,13 +239,18 @@
   }
 
   function OnRemoveItem(name, t) {
-    let quiz = find(
-      lesson_data.data.module.themes[t].lessons[0].quizes,
-      (q) => {
-        return (q[$langs] = name);
+    // let quiz = find(
+    //   lesson_data.data.module.themes[t].lessons[0].quizes,
+    //   (q) => {
+    //     return (q[$langs] = name);
+    //   }
+    // );
+    let ind = lesson_data.data.module.themes[t].lessons[0].quizes.findIndex(
+      q => { 
+        return q.name[$llang] === name 
       }
+
     );
-    let ind = lesson_data.data.module.themes[t].lessons[0].quizes.indexOf(quiz);
     lesson_data.data.module.themes[t].lessons[0].quizes.splice(ind, 1);
     lesson_data = lesson_data;
   }
@@ -306,6 +314,7 @@
   async function ChangeLevel(ev: any) {
     lesson_data.data.module.level = ev.target.attributes['level'].nodeValue;
     lesson_data = await fetchLesson(abonent, lesson_data.data.module.level);
+ 
     menu.setOpen(false);
   }
 
@@ -480,7 +489,8 @@
                               on:click={() => {
                                 onClickQuiz(
                                   quiz,
-                                  lesson_data.data.module.level
+                                  lesson_data.data.module.level,
+                                  theme.name[$llang]
                                 );
                               }}
                               type={quiz.type}
@@ -592,7 +602,7 @@
                                   title={data}
                                   name={quiz.name[$llang]}
                                   on:click={() => {
-                                    OnRemoveItem(quiz.name[$llang], q);
+                                    OnRemoveItem(quiz.name[$llang], t);
                                   }}>remove</IconButton
                                 >
                               {/await}

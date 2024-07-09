@@ -42,6 +42,7 @@ global.loop();
 export async function GET({ url, fetch, cookies }) {
   // let global.rtcPool = get('global.rtcPool');
   const abonent = url.searchParams.get('abonent');
+  const admin = url.searchParams.get('admin');
   const text = url.searchParams.get('text');
   const dict = url.searchParams.get('dict');
   const key = url.searchParams.get('key');
@@ -57,12 +58,13 @@ export async function GET({ url, fetch, cookies }) {
         let cookie = cookies.get(`kolmit.operator:${abonent}`);
         cookie = JSON.parse(cookie);
         cookie.lang = lang;
-        cookies.set(`kolmit.operator:${abonent}`, JSON.stringify(cookie), {
+        const oper = admin ? 'admin' : 'operator';          
+        cookies.set(`kolmit.${oper}:${abonent}`, JSON.stringify(cookie), {
           path: '/',
           maxAge: 60 * 60 * 24 * 400,
         });
       } catch (ex) {
-        // console.log(ex);
+        console.log(ex);
       }
     }
     let response = new Response();

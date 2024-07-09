@@ -97,12 +97,12 @@
     // console.log($langs);
     lang_menu = false;
 
-    // TODO:
-    // fetch(`./?func=cookie&abonent=${abonent}&lang=${lang}`)
-    //   .then(() => console.log())
-    //   .catch((error) => {
-    //     console.log(error);
-    //   });
+
+    fetch(`./?func=cookie&abonent=${abonent}&lang=${$langs}`)
+      .then(() => console.log())
+      .catch((error) => {
+        console.log(error);
+      });
   }
 </script>
 
