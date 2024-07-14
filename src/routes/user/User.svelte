@@ -113,8 +113,10 @@
     type: 'user',
   };
 
+  let oper = getContext('operator')
+
   onMount(async () => {
-    rtc = new RTCUser(user, uid, $signal);
+    rtc = new RTCUser(user, uid, $signal, oper);
     rtc.SendCheck();
 
     rtc.OnOpenDataChannel = () => {

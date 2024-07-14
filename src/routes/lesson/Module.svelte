@@ -19,7 +19,15 @@
   import Checkbox from '@smui/checkbox';
   import Quiz from './quiz/Quiz.svelte';
 
-  import { users, langs, llang, dicts , msg_oper,  quiz_userst, users_status} from '$lib/js/stores.js';
+  import {
+    users,
+    langs,
+    llang,
+    dicts,
+    msg_oper,
+    quiz_userst,
+    users_status,
+  } from '$lib/js/stores.js';
 
   // import lesson_data from './lesson.json';
   let lesson_data: any;
@@ -88,7 +96,7 @@
   }
 
   (async () => {
-    const lessonData = await fetchLesson(operator.abonent,operator.operator);
+    const lessonData = await fetchLesson(operator.abonent, operator.operator);
     lesson_data = lessonData.data;
     module = lesson_data.module;
 
@@ -123,7 +131,9 @@
 
   export async function fetchLesson(owner, operator) {
     try {
-      const response = await fetch(`./lesson?lesson=${operator}&owner=${owner}`);
+      const response = await fetch(
+        `./lesson?lesson=${operator}&owner=${owner}`
+      );
       if (!response.ok) {
         throw new Error('Failed to fetch data');
       }
@@ -190,12 +200,12 @@
         operator: operator.operator,
       });
 
-      if(obj)
-      quiz_users[name].push({
-        src: obj.src,
-        operator: operator.operator,
-        name: obj.name,
-      });
+      if (obj)
+        quiz_users[name].push({
+          src: obj.src,
+          operator: operator.operator,
+          name: obj.name,
+        });
 
       par.add = operator.operator;
     } else {
@@ -263,6 +273,10 @@
     theme.name = await Translate(theme.name[$llang], $llang, $langs);
     module = module;
   }
+
+  async function OnMouseUp(el) {
+    alarm(el);
+  }
 </script>
 
 <main>
@@ -276,7 +290,7 @@
 
       {#each module.themes as theme, t}
         <br />
-        <div class="accordion-container">
+        <div class="accordion-container" on:mouseup={OnMouseUp}>
           <Accordion multiple>
             <Panel class="panel" disabled={disabled[parseInt(t)]}>
               {#await Translate(theme.name[$llang], $llang, $langs) then data}
@@ -301,6 +315,7 @@
                         {#if quiz.name[$llang]}
                           <div
                             class="quiz-container mdc-typography--caption"
+                            on:mouseup={OnMouseUp}
                             use:AddCheck
                             name={quiz.name[$llang]}
                           >

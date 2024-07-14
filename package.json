@@ -13,6 +13,7 @@
   },
   "devDependencies": {
     "@gradio/client": "^0.20.1",
+    "@jhubbardsf/svelte-sortablejs": "^1.1.0",
     "@material/typography": "^14.0.0",
     "@rollup/plugin-commonjs": "^25.0.8",
     "@smui/chips": "^7.0.0-beta.18",
@@ -95,6 +96,7 @@
     "nodemailer": "^6.9.13",
     "postgres": "^3.4.4",
     "scss": "^0.2.4",
+    "svelte-dnd-action": "^0.9.49",
     "translate": "^3.0.0",
     "translate-google": "^1.5.0",
     "translatte": "^3.0.1",

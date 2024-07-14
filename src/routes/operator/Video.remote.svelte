@@ -15,12 +15,14 @@
   export let srcObject;
   export let operator;
   export let name;
+  export let poster;
 
   import { posterst } from '$lib/js/stores.js';
 
   let rv, video;
   onMount(async () => {
     rv = video;
+     rv.poster = poster;
   });
 
   $: if (rv && srcObject) {
@@ -31,6 +33,8 @@
       rv.srcObject.removeTrack(track);
     });
     rv.src = '';
+  }else if(rv && poster){
+    rv.poster = poster;
   }
 
   $: if (status === 'talk' && !isRemoteAudioMute) {

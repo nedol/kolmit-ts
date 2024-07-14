@@ -112,6 +112,7 @@
   const abonent = operator.abonent;
   const name = operator.name;
 
+
   const uid = md5(operator);
 
   let container;
@@ -379,15 +380,15 @@
       remote.text.display = 'block';
       video_button_display = false;
 
-      // if (data.profile) {
-      //   let profile = data.profile;
-      //   let avatar = profile.img;
-      //   remote.video.poster = avatar;
-      //   if (avatar) remote.video.display = 'block';
+      if (data.profile) {
+        let profile = data.profile;
+        let avatar = profile.img;
+        remote.video.poster = avatar;
+        if (avatar) remote.video.display = 'block';
 
-      //   remote.text.name = profile.name;
-      //   remote.text.email = profile.email;
-      // }
+        remote.text.name = profile.name;
+        remote.text.email = profile.email;
+      }
     }
     if (data.func === 'talk') {
       $call_but_status = 'talk';

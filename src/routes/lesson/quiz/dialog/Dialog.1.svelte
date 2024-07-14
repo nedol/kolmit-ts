@@ -3,6 +3,8 @@
 
   import ConText from './Dialog.Context.svelte';
 
+  import { Number2Words } from '$lib/tts/convert.nl.js';
+  import { NumberString, numberToDutchString } from '$lib/tts/Listen.numbers';
   // import BottomAppBar, { Section } from '@smui-extra/bottom-app-bar';
   import TopAppBar, { Row, Title, Section } from '@smui/top-app-bar';
   import Button, { Label } from '@smui/button';
@@ -198,7 +200,6 @@
   }
 
   function Dialog() {
-
     if (!dialog_data.content[cur_qa]) {
       cur_qa = 0;
       cur_html++;
@@ -210,6 +211,12 @@
       }, 0);
     }
     q = dialog_data.content[cur_qa].user1;
+
+    q[$llang] = q[$llang].replace('${user1_name}', $dc_user?'user_name':'Kolmit');
+    q[$langs] = q[$langs].replace('${user1_name}', $dc_user?'user_name' : 'Kolmit');
+    q[$llang] = q[$llang].replace('${user2_name}', operator.name);
+    q[$langs] = q[$langs].replace('${user2_name}', operator.name);
+
     q_shfl = q[$llang].slice(0);
 
     speak(q[$llang]);
@@ -221,6 +228,12 @@
       .split(' ');
     // q_shfl = shuffle(ar).toString().replaceAll(',', ' ');
     a = dialog_data.content[cur_qa].user2;
+    a[$llang] = a[$llang].replace('${user2_name}', operator.name);
+    a[$langs] = a[$langs].replace('${user2_name}', operator.name);
+    a[$llang] = a[$llang].replace('${user1_name}', $dc_user?'user_name':'Kolmit');
+    a[$langs] = a[$langs].replace('${user1_name}', $dc_user?'user_name' : 'Kolmit');
+    
+
     a_shfl = a[$llang].slice(0);
     ar = a_shfl
       .toLowerCase()
@@ -343,6 +356,7 @@
 
   async function speak(text) {
     // Speak(text);
+    if(text)
     tts.Speak(text);
   }
 
@@ -367,6 +381,12 @@
   function SttResult(text) {
     stt_text = text[$llang];
 
+    const numbers = dialog_data.content[cur_qa].user2[$llang].match(/\b\d+\b/g);
+    if (numbers)
+      dialog_data.content[cur_qa].user2[$llang] = dialog_data.content[
+        cur_qa
+      ].user2[$llang].replace(/\b\d+\b/g, numberToDutchString(numbers[0]));
+
     if (stt_text) {
       const similarity = compareStrings(
         dialog_data.content[cur_qa].user2[$llang]
@@ -381,7 +401,7 @@
       stt_text += ` (${similarity.toFixed(0)}%)`;
       if (similarity > 75) {
         setTimeout(() => {
-          onNextQA();
+          // onNextQA();
         }, 3000);
       }
     }
@@ -389,6 +409,7 @@
 
   function compareStrings(str1, str2) {
     // Используем алгоритм Левенштейна для вычисления расстояния между строками
+
     function levenshteinDistance(s, t) {
       const d = []; // Массив для хранения результатов вычислений
 
@@ -418,6 +439,9 @@
       // Расстояние Левенштейна между строками находится в d[s.length][t.length]
       return d[s.length][t.length];
     }
+
+    str1 = str1.replace('...','')
+    str2 = str2.replace('...','')
 
     // Вычисляем длины строк
     const len1 = str1.length;

@@ -1,6 +1,8 @@
 import path from 'path';
 import { fileURLToPath } from 'url';
 
+import { json } from '@sveltejs/kit';
+
 import axios from 'axios';
 
 import { config } from 'dotenv';
@@ -26,6 +28,7 @@ export async function POST({ url, fetch, cookies, request, response }) {
 
   switch (q.func) {
     case 'tts':
+      
       resp = { audio: await tts_sm4(q.text, 'nl', 'nl') };
       break;
   }

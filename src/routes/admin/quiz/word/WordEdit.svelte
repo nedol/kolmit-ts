@@ -56,7 +56,7 @@
     words_title = 'Words',
     content_title = 'Content';
 
-   $: if ($langs) {
+   $: if (false && $langs) {//не работает
     (async () => {
       grammar_title = await Translate('Grammar', 'en', $langs);
       context_title = await Translate('Context', 'en', $langs);

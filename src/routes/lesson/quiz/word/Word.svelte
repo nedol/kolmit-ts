@@ -153,6 +153,7 @@
         regex,
         `$1<span class="sentence_span" style="position: relative; width: 120px; left: 0px;"></span> `
       );
+
     } else {
       return sentence;
     }
@@ -171,7 +172,7 @@
         const spanElement = document.querySelector('.sentence_span');
         if (spanElement) spanElement.appendChild(div_input);
         resultElementWidth = getTextWidth(currentWord.original, '20px Arial');
-      }, 100);
+      }, 0);
 
       // word = currentWord['original'].replace(/(de|het)\s*/gi, '');
       // let filteredExample = currentWord['example'].replace(
@@ -520,18 +521,18 @@
     <!-- <br /> -->
     <!-- {#if hintIndex != 0} -->
     <div class="words_div accordion-container">
-      {#if hints}
+      {#if hints?.length >0}
         <Content
           style="line-height: 2.0; overflow-y:auto; height:50vh !important"
         >
-          {#each hints as hint}
+          {#each hints as hint, i}
             <span
               class="hint_button"
               on:click={() => {
                 OnClickHint(hint.original);
               }}
             >
-              {@html hint.original + '&nbsp;' + '&nbsp;'}
+              {@html hint?.original + '&nbsp;' + '&nbsp;'}
             </span>
           {/each}
           <div style="height:50px"></div>

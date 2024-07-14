@@ -45,6 +45,7 @@
       // prompt_title = await translate('Prompt', $langs);
       words_title = await Translate('Words', 'en', $langs);
       content_title = await Translate('Content', 'en', $langs);
+
     })();
   }
 
@@ -87,7 +88,7 @@
         .then((resp) => {
           prompt = resp.resp.system + resp.resp.user;
           prompt = prompt.replaceAll('${$llang}', $llang);
-          prompt = prompt.replaceAll('${name[$llang]}', name[$langs]);
+          prompt = prompt.replaceAll('${name[$llang]}', name[$llang]);
           prompt = prompt.replaceAll('${$langs}', $langs);
           prompt = prompt.replaceAll('${dialog_data.html}', dialog_data.html);
           prompt = prompt.replaceAll('${data.level}', data.level);

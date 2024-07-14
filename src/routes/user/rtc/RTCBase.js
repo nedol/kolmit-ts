@@ -11,7 +11,9 @@ import { call_but_status } from '$lib/js/stores.js';
 // let host_ws ='ws://localhost:3000/server/';// //
 
 export class RTCBase {
-	constructor(user, uid, signal) {
+	constructor(user, uid, signal, oper) {
+
+		this.oper = oper;
 		
 		this.type = user.type;
 		this.abonent = user.abonent;

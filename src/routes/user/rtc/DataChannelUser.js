@@ -18,6 +18,8 @@ posterst.subscribe((data) => {
 	poster = data;
 });
 
+
+
 export class DataChannelUser {
 	constructor(rtc, pc) {
 		this.rtc = rtc;
@@ -186,7 +188,7 @@ export class DataChannelUser {
 		par.call = that.rtc.call_num;
 		par.type = that.rtc.type;
 		par.email = that.rtc.email.from;
-		// par.profile = { email: oper.operator, name: oper.name, img: poster };
+		par.profile = { email: that.rtc.oper.operator, name: that.rtc.oper.name, img: that.rtc.oper.picture };
 
 		if (that.dc.readyState === 'open') {
 			that.SendData(par);

@@ -12,8 +12,8 @@ import { msg_user } from '$lib/js/stores.js';
 // export const msg = writable('');
 
 export default class RTCUser extends RTCBase {
-	constructor(user, uid, signal) {
-		super(user, uid, signal);
+	constructor(user, uid, signal, oper) {
+		super(user, uid, signal, oper);
 
 		this.redirected = false;
 
@@ -63,6 +63,7 @@ export default class RTCUser extends RTCBase {
 				par.abonent = this.abonent.toLowerCase();
 				par.user = this.operator.toLowerCase();
 				par.uid = this.uid;
+				par.name = 'user';
 				this.signal.SendMessage(par, () => {
 					this.status = 'call';
 				});
