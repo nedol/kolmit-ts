@@ -120,7 +120,6 @@
     // $llang = lesson_data.lang.trim();
   }
 
-
   onDestroy(() => {});
 
   async function saveLessonData() {
@@ -364,11 +363,9 @@
     lesson_data.data.module.level = lesson_data.levels[0];
   }
 
-
-
   function handleSort(event, items) {
     const { oldIndex, newIndex } = event;
-     // Array move function (included here)
+    // Array move function (included here)
     function arrayMove(arr, fromIndex, toIndex) {
       const element = arr.splice(fromIndex, 1)[0];
       arr.splice(toIndex, 0, element);
@@ -377,7 +374,6 @@
 
     // Update your lesson.quizes array based on the new order
     items = arrayMove(items, oldIndex, newIndex); // Assuming you have an arrayMove function (see below)
-
   }
   // async function OnThemeNameInput(t) {
   //   // console.log(theme)
@@ -503,12 +499,19 @@
                       <!-- <div>{lesson.num}.{lesson.title}</div> -->
                       {#if lesson.quizes}
                         <SortableList
-                          onSort = {(ev)=>{handleSort(ev,lesson.quizes)}}
+                          onSort={(ev) => {
+                            handleSort(ev, lesson.quizes);
+                          }}
                           bind:this={sort_list}
                         >
                           {#each lesson.quizes as quiz, q}
                             <!-- {@debug quiz} -->
-                            <div class="quiz-container">
+                            <div
+                              class="quiz-container"
+                              on:dragend={(ev) => {
+                                handleSort(ev, lesson.quizes);
+                              }}
+                            >
                               <div
                                 on:click={() => {
                                   onClickQuiz(

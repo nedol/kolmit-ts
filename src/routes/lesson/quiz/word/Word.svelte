@@ -12,7 +12,7 @@
 
   import CircularProgress from '@smui/circular-progress';
 
-   import { Speak } from '/src/routes/speech/tts/VoiceRSS';
+  import { Speak } from '/src/routes/speech/tts/VoiceRSS';
 
   import TTS from '../../../speech/tts/Tts.svelte';
   let tts;
@@ -87,15 +87,16 @@
         hints = [...words];
         shuffle(hints);
         currentWord = words[currentWordIndex];
-        words.map((word) => {
-          // if (word.original)
-          // 	wordsString +=
-        });
+        makeExample();
       })
       .catch((error) => {
         console.log(error);
         return [];
       });
+  }
+
+  $: if($langs){
+    makeExample()
   }
 
   function highlightWords() {
@@ -147,25 +148,38 @@
     // const matchPercentage = (matches / wordLength) * 100;
 
     // Если процент совпадения больше или равен 90%, заменяем слово на <input>
-    if (true ){//matches >= 1) {
-      const regex = new RegExp('(^|\\s)' + word + '(?=[\\s.,!?]|$)', 'i')
+    if (true) {
+      //matches >= 1) {
+      const regex = new RegExp('(^|\\s)' + word + '(?=[\\s.,!?]|$)', 'i');
       return sentence.replace(
         regex,
         `$1<span class="sentence_span" style="position: relative; width: 120px; left: 0px;"></span> `
       );
-
     } else {
       return sentence;
     }
   }
 
-  $: if (currentWord) {
-    (async () => {
-      example = await Translate(currentWord['example'], $llang, $langs);
+  async function makeExample(){
+
+      if (currentWord['example'][$langs]) {
+        example = currentWord['example'][$langs];
+      } else {
+        example = await Translate(
+          currentWord['example'][$llang],
+          $llang,
+          $langs
+        );
+      }
+
+      example = example.replace(
+        /<<([^<>]+)>>/gu,
+        '<span style="color:green"><b>$1</b></span>'
+      );
 
       resultElement = replaceWordWithInput(
-        currentWord.example,
-        currentWord.original
+        currentWord.example[$llang],
+        `<<${currentWord.original}>>`
       );
 
       setTimeout(() => {
@@ -179,7 +193,7 @@
       //    new RegExp(`\\b(de |het )?(?=\\b${word}\\b)`, 'gi'), '');
       // resultElement = filteredExample.split(new RegExp(word, 'i'));
       // console.log(resultElement)
-    })();
+
     // Устанавливаем фокус в конец строки
     setFocus();
   }
@@ -220,13 +234,14 @@
     shuffle(words);
     currentWordIndex = 0;
     currentWord = words[currentWordIndex];
+    makeExample()
   }
 
   function jumpNext10() {
     const nextIndex = (parseInt(currentWordIndex / 10) + 1) * 10;
     currentWordIndex = nextIndex;
     currentWord = words[currentWordIndex];
-    div_input.focus();
+    makeExample()
     userContent = '';
     hintIndex = 0;
     result = '';
@@ -286,7 +301,7 @@
     if (trimmedUserContent.toLowerCase() === targetWord.toLowerCase()) {
       showCheckMark = true; // Показываем галочку
       showNextButton = true;
-      speak(currentWord.example);
+      speak(currentWord.example[$llang]);
 
       if (hintIndex != 0 || errorIndex != 0) {
         // Перемещаем текущее слово в конец своей "десятки" в words
@@ -380,7 +395,8 @@
     currentWordIndex = currentWordIndex + 1;
     if (currentWordIndex >= words.length) currentWordIndex = 0;
     currentWord = words[currentWordIndex];
-    div_input.focus();
+    makeExample();
+
     userContent = '';
     hintIndex = 0;
     result = '';
@@ -483,7 +499,7 @@
 
     <div class="word">
       {#if example}
-        <span class="mdc-typography--headline6">{example}</span>
+        {@html example}
       {/if}
     </div>
 
@@ -521,7 +537,7 @@
     <!-- <br /> -->
     <!-- {#if hintIndex != 0} -->
     <div class="words_div accordion-container">
-      {#if hints?.length >0}
+      {#if hints?.length > 0}
         <Content
           style="line-height: 2.0; overflow-y:auto; height:50vh !important"
         >
@@ -550,7 +566,7 @@
     /* width: 98%; */
     margin: 0 auto;
     position: relative;
-    transform-style: preserve-3d;
+    /* transform-style: preserve-3d; */
     transition: transform 0.5s;
     height: 80vh;
     margin-top: 30px;

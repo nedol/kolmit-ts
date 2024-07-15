@@ -94,7 +94,7 @@
   } from '$lib/js/stores.js';
 
   $: if ($msg_user) {
-    // console.log($msg_user);
+    console.log($msg_user);
     if ($msg_user.command === 'repeat') {
       isRepeat = true;
       setTimeout(() => {

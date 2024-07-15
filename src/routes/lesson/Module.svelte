@@ -274,9 +274,7 @@
     module = module;
   }
 
-  async function OnMouseUp(el) {
-    alarm(el);
-  }
+
 </script>
 
 <main>
@@ -290,7 +288,7 @@
 
       {#each module.themes as theme, t}
         <br />
-        <div class="accordion-container" on:mouseup={OnMouseUp}>
+        <div class="accordion-container">
           <Accordion multiple>
             <Panel class="panel" disabled={disabled[parseInt(t)]}>
               {#await Translate(theme.name[$llang], $llang, $langs) then data}
@@ -315,7 +313,6 @@
                         {#if quiz.name[$llang]}
                           <div
                             class="quiz-container mdc-typography--caption"
-                            on:mouseup={OnMouseUp}
                             use:AddCheck
                             name={quiz.name[$llang]}
                           >

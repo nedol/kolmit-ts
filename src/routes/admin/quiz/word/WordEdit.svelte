@@ -338,7 +338,7 @@
             </td>
             <td>
               {#if item.example}
-                <textarea rows="2" bind:value={item.example} />
+                <textarea rows="2" bind:value={item.example[$langs]} />
               {:else}
                 <textarea rows="2" />
               {/if}

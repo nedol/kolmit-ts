@@ -55,10 +55,10 @@
   import { dc_oper_state } from '$lib/js/stores.js';
   import { dc_user_state } from '$lib/js/stores.js';
 
-  // import { msg_user } from '$lib/js/stores.js';
-  // $: if ($msg_user) {
-  // OnMessage($msg_user, null);
-  // }
+  import { msg_user } from '$lib/js/stores.js';
+  $: if ($msg_user) {
+  OnMessage($msg_user, null);
+  }
 
   import { msg_oper } from '$lib/js/stores.js';
   $: if ($msg_oper) {
