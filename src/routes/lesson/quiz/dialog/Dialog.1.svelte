@@ -212,10 +212,16 @@
     }
     q = dialog_data.content[cur_qa].user1;
 
-    q[$llang] = q[$llang].replace('${user1_name}', $dc_user?'user_name':'Kolmit');
-    q[$langs] = q[$langs].replace('${user1_name}', $dc_user?'user_name' : 'Kolmit');
-    q[$llang] = q[$llang].replace('${user2_name}', operator.name);
-    q[$langs] = q[$langs].replace('${user2_name}', operator.name);
+    q[$llang] = q[$llang]?.replace(
+      '${user1_name}',
+      $dc_user ? 'user_name' : 'Kolmit'
+    );
+    q[$langs] = q[$langs]?.replace(
+      '${user1_name}',
+      $dc_user ? 'user_name' : 'Kolmit'
+    );
+    q[$llang] = q[$llang]?.replace('${user2_name}', operator.name);
+    q[$langs] = q[$langs]?.replace('${user2_name}', operator.name);
 
     q_shfl = q[$llang].slice(0);
 
@@ -228,11 +234,16 @@
       .split(' ');
     // q_shfl = shuffle(ar).toString().replaceAll(',', ' ');
     a = dialog_data.content[cur_qa].user2;
-    a[$llang] = a[$llang].replace('${user2_name}', operator.name);
-    a[$langs] = a[$langs].replace('${user2_name}', operator.name);
-    a[$llang] = a[$llang].replace('${user1_name}', $dc_user?'user_name':'Kolmit');
-    a[$langs] = a[$langs].replace('${user1_name}', $dc_user?'user_name' : 'Kolmit');
-    
+    a[$llang] = a[$llang]?.replace('${user2_name}', operator.name);
+    a[$langs] = a[$langs]?.replace('${user2_name}', operator.name);
+    a[$llang] = a[$llang]?.replace(
+      '${user1_name}',
+      $dc_user ? 'user_name' : 'Kolmit'
+    );
+    a[$langs] = a[$langs]?.replace(
+      '${user1_name}',
+      $dc_user ? 'user_name' : 'Kolmit'
+    );
 
     a_shfl = a[$llang].slice(0);
     ar = a_shfl
@@ -356,8 +367,7 @@
 
   async function speak(text) {
     // Speak(text);
-    if(text)
-    tts.Speak(text);
+    if (text) tts.Speak(text);
   }
 
   function onClickMicrophone() {
@@ -440,8 +450,8 @@
       return d[s.length][t.length];
     }
 
-    str1 = str1.replace('...','')
-    str2 = str2.replace('...','')
+    str1 = str1.replace('...', '');
+    str2 = str2.replace('...', '');
 
     // Вычисляем длины строк
     const len1 = str1.length;
@@ -591,7 +601,7 @@
           style="text-align: center; display: flex; align-items: center; justify-content: space-between;"
         >
           <br />
-          {#if showSpeakerButton}
+          <!-- {#if showSpeakerButton} -->
             <div class="speaker-button">
               <IconButton
                 on:click={speak(dialog_data.content[cur_qa].user1[$llang])}
@@ -601,7 +611,7 @@
                 </Icon>
               </IconButton>
             </div>
-          {/if}
+          <!-- {/if} -->
         </div>
 
         {#await Translate('Переведи и ответь', 'ru', $langs) then data}
@@ -650,7 +660,7 @@
           <Stt bind:this={stt} {SttResult} {StopListening} bind:display_audio
           ></Stt>
 
-          {#if showSpeakerButton}
+          <!-- {#if showSpeakerButton} -->
             <div class="speaker-button">
               <IconButton
                 on:click={speak(dialog_data.content[cur_qa].user2[$llang])}
@@ -660,7 +670,7 @@
                 </Icon>
               </IconButton>
             </div>
-          {/if}
+          <!-- {/if} -->
         </div>
         <br />
 

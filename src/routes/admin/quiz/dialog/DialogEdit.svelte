@@ -38,14 +38,13 @@
 
   let active = 'Prompt';
 
-  $: if ($langs) {
+  $: if (false && $langs) {
     (async () => {
       grammar_title = await Translate('Grammar', 'en', $langs);
       context_title = await Translate('Context', 'en', $langs);
       // prompt_title = await translate('Prompt', $langs);
       words_title = await Translate('Words', 'en', $langs);
       content_title = await Translate('Content', 'en', $langs);
-
     })();
   }
 
@@ -215,6 +214,14 @@
     // }
   }
 
+  function OnContextChange() {
+    prompt = prompt.replace(
+      /<<(\w+)>>/g,
+      `<<${dialog_data.html}>>`
+    );
+    console.log()
+  }
+
   function OnChangeContent(ev: Event) {
     // console.log(ev.currentTarget.value)
     try {
@@ -347,7 +354,11 @@
                 <!-- <div style="height: 350px; overflow-y:auto">
                   {@html dialog_data.html}
                 </div> -->
-                <iframe srcdoc={dialog_data.html} width="100%" height="350px"
+                <iframe
+                  srcdoc={dialog_data.html}
+                  width="100%"
+                  height="350px"
+                  
                 ></iframe>
               {:else}
                 <Paper variant="unelevated">
@@ -356,6 +367,7 @@
                       rows="20"
                       name="dialog_context"
                       bind:value={dialog_data.html}
+                      on:change={OnContextChange}
                     ></textarea>
                   </Content>
                 </Paper>

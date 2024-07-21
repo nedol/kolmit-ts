@@ -1,6 +1,8 @@
 <script lang="ts">
   import { getContext, onMount } from 'svelte';
 
+  import { SortableList } from '@jhubbardsf/svelte-sortablejs';
+
   import { Translate } from '../../../translate/Transloc';
 
   import { langs, llang } from '$lib/js/stores.js';
@@ -35,7 +37,6 @@
     dialog_words,
     dialog_tmplt;
 
-
   const output = `
   {original:'',infinitive:'',example:'',translation:{ [${$langs}]: '',  en: '' }}
   `;
@@ -44,19 +45,20 @@
 
   $: if ($langs && prompt) {
     prompt = prompt.replaceAll('${output}', output);
-    prompt = prompt.replaceAll('${$llang}', $llang);
-    prompt = prompt.replaceAll('${$langs}', $langs);
+    prompt = prompt.replaceAll('${llang}', $llang);
+    prompt = prompt.replaceAll('${langs}', $langs);
     prompt = prompt.replaceAll('${words}', words);
     prompt = prompt.replaceAll('${topic}', data.name[$llang]);
   }
 
-  let  grammar_title = 'Grammar',
+  let grammar_title = 'Grammar',
     context_title = 'Context',
     prompt_title = 'Prompt',
     words_title = 'Words',
     content_title = 'Content';
 
-   $: if (false && $langs) {//не работает
+  $: if (false && $langs) {
+    //не работает
     (async () => {
       grammar_title = await Translate('Grammar', 'en', $langs);
       context_title = await Translate('Context', 'en', $langs);
@@ -70,8 +72,9 @@
     .then((response) => response.json())
     .then((data) => {
       words_data = data.data;
+
       if (words_data) {
-        words_data.map((item) => {
+        words_data.map(async (item) => {
           words.push(item.original);
         });
       }
@@ -167,24 +170,36 @@
     });
   }
 
-    function PasteContent() {
-      // Вставляем содержимое буфера обмена в <textarea>
-      navigator.clipboard
-        .readText()
-        .then((text) => {
-          content = text;
-          const parsed = JSON.parse(text);
-          words_data = parsed;
-        })
-        .catch((err) => {
-          console.error('Failed to read clipboard contents: ', err);
-        });
+  function PasteContent() {
+    // Вставляем содержимое буфера обмена в <textarea>
+    navigator.clipboard
+      .readText()
+      .then((text) => {
+        content = text;
+        const parsed = JSON.parse(text);
+        words_data = parsed;
+      })
+      .catch((err) => {
+        console.error('Failed to read clipboard contents: ', err);
+      });
   }
-
 
   function remRecord(ind) {
     words_data.splice(ind, 1);
-    words_data = words_data
+    words_data = words_data;
+  }
+
+  function handleSort(event, items) {
+    const { oldIndex, newIndex } = event;
+    // Array move function (included here)
+    function arrayMove(arr, fromIndex, toIndex) {
+      const element = arr.splice(fromIndex, 1)[0];
+      arr.splice(toIndex, 0, element);
+      return arr;
+    }
+
+    // Update your lesson.quizes array based on the new order
+    items = arrayMove(items, oldIndex, newIndex); // Assuming you have an arrayMove function (see below)
   }
 </script>
 
@@ -242,15 +257,11 @@
   {#if !isCollapsed}
     <div class="collapsible" in:slide={{ duration: 300 }}>
       <div class="generator_container">
-           <TabBar
-              tabs={[
-                words_title,
-                prompt_title,
-                content_title,
-              ]}
-              let:tab
-              bind:active
-            >
+        <TabBar
+          tabs={[words_title, prompt_title, content_title]}
+          let:tab
+          bind:active
+        >
           <Tab {tab} minWidth>
             <Label>{tab}</Label>
           </Tab>
@@ -290,10 +301,16 @@
                   rows="20"
                   name="dialog_content"
                   placeholder={data}
-                  on:input={OnChangeContent} bind:value={content}></textarea
-                >
+                  on:input={OnChangeContent}
+                  bind:value={content}
+                ></textarea>
               {/await}
-              <button class="paste_content" on:click={()=>{PasteContent()}}>
+              <button
+                class="paste_content"
+                on:click={() => {
+                  PasteContent();
+                }}
+              >
                 {#await Translate('Paste Content', 'en', $langs) then data}
                   {data}
                 {/await}
@@ -322,40 +339,37 @@
         <th class="col-3">{$langs}</th>
       </tr>
     </thead>
-    <tbody>
-      {#if words_data}
-        {#each words_data as item, index (index)}
-          <tr>
-            <td>
-              {#if item.original}
-                <textarea rows="1" bind:value={item.original} />
-                {#if item.infinitive  && item.infinitive !== item.original}
-                  <textarea rows="1" bind:value={item.infinitive}></textarea>
-                {/if}
-              {:else}
-                <textarea rows="1" />
-              {/if}
-            </td>
-            <td>
-              {#if item.example}
-                <textarea rows="2" bind:value={item.example[$langs]} />
-              {:else}
-                <textarea rows="2" />
-              {/if}
-            </td>
-            <td>
-              {#if item.translation && item.translation[$langs]}
-                <textarea rows="1" bind:value={item.translation[$langs]} />
-              {/if}
-            </td>
-            <td>
-              <button class="remrec_but" on:click={remRecord(index)} {index}>-</button>
-            </td>
-          </tr>
-        {/each}
-      {/if}
-    </tbody>
   </table>
+
+  {#if words_data}
+    <SortableList
+      onSort={(ev) => {
+        handleSort(ev, words_data);
+      }}
+    >
+      {#each words_data as item, index (index)}
+        <div class="row">
+          {#if item.original}
+            <textarea rows="2" bind:value={item.original} />
+            {#if item.infinitive && item.infinitive !== item.original}
+              <textarea rows="2" bind:value={item.infinitive}></textarea>
+            {/if}
+          {:else}
+            <textarea rows="2" />
+          {/if}
+
+          <textarea rows="2" bind:value={item.example[$langs]} />
+
+          <textarea rows="2" bind:value={item.translation[$langs]} />
+
+          <button class="remrec_but" on:click={remRecord(index)} {index}
+            >-</button
+          >
+          <br />
+        </div>
+      {/each}
+    </SortableList>
+  {/if}
 
   <div class="container">
     <button class="add-record" on:click={addEmptyRecord}>+</button>
@@ -368,6 +382,11 @@
 </div>
 
 <style>
+  .row {
+    display: flex;
+    align-items: center;
+    gap: 20px; /* Задайте нужное расстояние между элементами */
+  }
   .word_container {
     margin: 10px;
   }
@@ -398,10 +417,10 @@
     text-align: left;
   }
   .col-1 {
-    width: 20%;
+    width: 30%;
   }
   .col-2 {
-    width: 50%;
+    width: 30%;
   }
   .col-3 {
     width: 30%;
@@ -446,7 +465,7 @@
   }
 
   .add-record {
-    height:15px;
+    height: 15px;
     border-radius: 35px;
     border: 0;
     scale: 2;

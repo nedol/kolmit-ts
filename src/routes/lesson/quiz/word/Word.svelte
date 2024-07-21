@@ -134,7 +134,7 @@
 
   function replaceWordWithInput(sentence, word) {
     // Вычисляем количество совпадающих символов
-    const lastDotIndex = sentence.lastIndexOf('.');
+    const lastDotIndex = sentence?.lastIndexOf('.');
     // if (lastDotIndex !== -1) {
     //   sentence =
     //     sentence.slice(0, lastDotIndex) + sentence.slice(lastDotIndex + 1);
@@ -151,7 +151,7 @@
     if (true) {
       //matches >= 1) {
       const regex = new RegExp('(^|\\s)' + word + '(?=[\\s.,!?]|$)', 'i');
-      return sentence.replace(
+      return sentence?.replace(
         regex,
         `$1<span class="sentence_span" style="position: relative; width: 120px; left: 0px;"></span> `
       );
@@ -162,7 +162,8 @@
 
   async function makeExample(){
 
-      if (currentWord['example'][$langs]) {
+      if (currentWord)
+      if(currentWord?.example[$langs]) {
         example = currentWord['example'][$langs];
       } else {
         example = await Translate(
@@ -172,20 +173,20 @@
         );
       }
 
-      example = example.replace(
+      example = example?.replace(
         /<<([^<>]+)>>/gu,
         '<span style="color:green"><b>$1</b></span>'
       );
 
       resultElement = replaceWordWithInput(
-        currentWord.example[$llang],
-        `<<${currentWord.original}>>`
+        currentWord?.example[$llang],
+        `<<${currentWord?.original}>>`
       );
 
       setTimeout(() => {
         const spanElement = document.querySelector('.sentence_span');
         if (spanElement) spanElement.appendChild(div_input);
-        resultElementWidth = getTextWidth(currentWord.original, '20px Arial');
+        resultElementWidth = getTextWidth(currentWord?.original, '20px Arial');
       }, 0);
 
       // word = currentWord['original'].replace(/(de|het)\s*/gi, '');
@@ -498,9 +499,9 @@
     {/await}
 
     <div class="word">
-      {#if example}
-        {@html example}
-      {/if}
+      {#await Translate(example, 'en', $langs) then data}
+        {@html data}
+      {/await}
     </div>
 
     <div class="input-container">
