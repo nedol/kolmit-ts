@@ -40,3 +40,4 @@ export async function POST({ request, url, fetch }) {
 	response.headers.append('Access-Control-Allow-Origin', `*`);
 	return response;
 }
+

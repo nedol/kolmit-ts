@@ -146,9 +146,9 @@ async function removeModule(item) {
 export async function UpdateDialog(q) {
   try {
     let res = await sql`INSERT INTO dialogs
-			(name , dialog, owner, html)
-			VALUES(${q.new_name},${q.data},${q.owner},${q.data.html || ''} )
-			ON CONFLICT (name, owner)
+			(name , dialog, owner, html, level)
+			VALUES(${q.new_name},${q.data},${q.owner},${q.data.html || ''}, ${q.level}  )
+			ON CONFLICT (name, owner, level)
 			DO UPDATE SET
 			name = EXCLUDED.name,
       html = EXCLUDED.html,
@@ -176,11 +176,12 @@ export async function UpdateListen(q) {
 export async function UpdateWords(q) {
   try {
     let res = await sql`INSERT INTO words
-			(name , data, owner)
-			VALUES(${q.new_name},${q.data},${q.owner})
-			ON CONFLICT (name, owner)
+			(name , data, owner, level)
+			VALUES(${q.new_name},${q.data},${q.owner}, ${q.level})
+			ON CONFLICT (name, owner, level)
 			DO UPDATE SET
 			name = EXCLUDED.name,
+      level = EXCLUDED.level,
 			data = EXCLUDED.data`;
     return { res };
   } catch (ex) {

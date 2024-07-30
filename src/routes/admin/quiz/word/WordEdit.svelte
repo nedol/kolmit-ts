@@ -21,18 +21,18 @@
     isCollapsed.update((n) => !n);
   }
 
-  export let data: any;
+
   export let ChangeQuizName: any;
 
   const abonent = getContext('abonent');
-  data = getContext('quiz_data');
+  const data = getContext('quiz_data');
 
   let content: any,
     new_content = false,
     words_data: [];
   const name = data.name;
-  let words = [],
-    prompt,
+  let words = data.module.themes[0].words,
+    prompt:string,
     dialog_task: any,
     dialog_words,
     dialog_tmplt;
@@ -49,6 +49,8 @@
     prompt = prompt.replaceAll('${langs}', $langs);
     prompt = prompt.replaceAll('${words}', words);
     prompt = prompt.replaceAll('${topic}', data.name[$llang]);
+    prompt = prompt.replaceAll('${level}', data.level);
+     
   }
 
   let grammar_title = 'Grammar',
@@ -68,7 +70,11 @@
     })();
   }
 
-  fetch(`./lesson?words=theme&name=${data.name[$llang]}&owner=${abonent}`)
+   $: if (words) {
+    prompt = prompt.replaceAll('${data_words}', words);
+  }
+
+  fetch(`./lesson?words=theme&name=${data.name[$llang]}&owner=${abonent}&level=${data.level}`)
     .then((response) => response.json())
     .then((data) => {
       words_data = data.data;
@@ -114,17 +120,17 @@
 
   // Функция для сохранения текущего состояния в localStorage
   function OnSave() {
-    SaveData(name, data.name, words_data);
+    SaveData(name, data.name, words_data, data.level);
     // ChangeQuizName(name, data.name);
   }
 
-  async function SaveData(name: string, new_name: string, data: any) {
+  async function SaveData(name: string, new_name: string, data: any, level:string) {
     const response = await fetch(`/admin/module`, {
       method: 'POST',
       body: JSON.stringify({
         func: 'upd_words',
         owner: abonent,
-        level: '12',
+        level: level,
         name: name[$llang],
         new_name: new_name[$llang],
         data: data,

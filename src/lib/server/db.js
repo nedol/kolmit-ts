@@ -420,7 +420,7 @@ export async function GetListen(q) {
 export async function GetWords(q) {
   try {
     let res = await sql`SELECT data FROM words
-		WHERE name=${q.name} AND owner=${q.owner}`;
+		WHERE name=${q.name} AND owner=${q.owner} AND level=${q.level}`;
     //debugger;
     return res[0]?.data;
   } catch (ex) {
@@ -431,7 +431,7 @@ export async function GetWords(q) {
 export async function GetDialog(q) {
   try {
     let res = await sql`SELECT dialog, html FROM dialogs
-		WHERE name=${q.name} AND owner=${q.owner}`;
+		WHERE name=${q.name} AND owner=${q.owner} AND level=${q.level}`;
 
     return { dialog: res[0].dialog, html: res[0].html || '' };
   } catch (ex) {

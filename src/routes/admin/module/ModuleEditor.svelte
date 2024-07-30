@@ -228,14 +228,35 @@
   }
 
   function OnAddTheme() {
-    lesson_data.data.module.themes.push({
-      name: {
-        [$langs]: '',
-      },
-      lessons: [{ quizes: [] }],
-    });
-    console.log(lesson_data.data.module.level);
-    lesson_data = lesson_data;
+    navigator.clipboard
+      .readText()
+      .then((text) => {
+        const quiz_data = JSON.parse(text);
+        pushTheme(quiz_data);
+      })
+      .catch((err) => {
+        // console.error('Failed to read clipboard contents: ', err);
+        pushTheme({ theme: { name: '' } });
+      });
+
+    function pushTheme(quiz_data) {
+      lesson_data.data.module.themes.push({
+        name: {
+          [$llang]: quiz_data.theme.name,
+        },
+        words:
+          quiz_data.words instanceof String
+            ? quiz_data.words.split(', ')
+            : quiz_data.words,
+        grammar:
+          quiz_data.grammar instanceof String
+            ? quiz_data.grammar.split(', ')
+            : quiz_data.grammar,
+        lessons: [{ quizes: [] }],
+      });
+
+      lesson_data = lesson_data;
+    }
   }
 
   function OnRemoveThemeItem(t) {
@@ -514,10 +535,7 @@
                           >
                             {#each lesson.quizes as quiz, q}
                               <!-- {@debug quiz} -->
-                              <div
-                                class="quiz-container"
-                               
-                              >
+                              <div class="quiz-container">
                                 <div
                                   on:click={() => {
                                     onClickQuiz(
@@ -574,14 +592,21 @@
                                       <path fill="grey" d={mdiEarHearing} />
                                     </Icon>
                                   {:else if quiz.type === 'quiz'}
-                                    <Icon
-                                      tag="svg"
-                                      viewBox="0 0 24 24"
-                                      width="30px"
-                                      height="30px"
+                                    <select
+                                      on:change={(event) =>
+                                        OnSelectQuiztype(
+                                          event.target.value,
+                                          t,
+                                          quiz.name[$llang]
+                                        )}
+                                      name={quiz.name[$llang]}
                                     >
-                                      <path fill="grey" d={mdiHelp} />
-                                    </Icon>
+                                      {#each quizes as quizOption}
+                                        <option value={quizOption}
+                                          >{quizOption}</option
+                                        >
+                                      {/each}
+                                    </select>
                                   {/if}
                                 </div>
                                 <!-- svelte-ignore a11y-invalid-attribute -->
@@ -614,24 +639,6 @@
                                       bind:value={quiz.name[$llang]}
                                     />
                                   {/await}
-                                {/if}
-
-                                {#if quiz.type === 'quiz'}
-                                  <select
-                                    on:change={(event) =>
-                                      OnSelectQuiztype(
-                                        event.target.value,
-                                        t,
-                                        quiz.name[$llang]
-                                      )}
-                                    name={quiz.name[$llang]}
-                                  >
-                                    {#each quizes as quizOption}
-                                      <option value={quizOption}
-                                        >{quizOption}</option
-                                      >
-                                    {/each}
-                                  </select>
                                 {/if}
 
                                 <div class="rem_quiz">

@@ -64,16 +64,16 @@
     prompt = prompt.replaceAll('${dialog_data_words}', dialog_data.words);
   }
 
-  $: if (dialog_data.content) {
+  $: if (dialog_data.content.length>0 && prompt) {
     let content = JSON.parse(JSON.stringify(dialog_data.content));
-    content.forEach((item) => {
-      item['user1'] = item['user1']['nl'];
-      item['user2'] = item['user2']['nl'];
+    content?.forEach((item) => {
+      item['user1'] = item['user1'][$llang];
+      item['user2'] = item['user2'][$llang];
     });
     prompt = prompt.replaceAll('${dialog_content}', JSON.stringify(content));
   }
 
-  fetch(`./lesson?dialog=${data.name[$llang]}&owner=${abonent}`)
+  fetch(`./lesson?dialog=${data.name[$llang]}&owner=${abonent}&level=${data.level}`)
     .then((response) => response.json())
     .then((resp) => {
       dialog_data = resp.data.dialog;
@@ -268,7 +268,7 @@
         if (dialog_data && dialog_data.content)
           dialog_data.content = dialog_data.content.concat(parsed.content);
         else {
-          dialog_data = { content: parsed };
+          dialog_data.content = parsed ;
         }
         if (dialog_data && parsed_html) {
           dialog_data.html = parsed_html;

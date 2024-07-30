@@ -69,7 +69,7 @@
     // Создаем массив промисов для каждого запроса
     const fetchPromises = names.map((name) => {
       return fetch(
-        `./lesson?words=theme&theme=${data.theme}&name=${name}&owner=${abonent}`
+        `./lesson?words=theme&theme=${data.theme}&name=${name}&owner=${abonent}&level=${data.level}`
       )
         .then((response) => response.json())
         .then((data) => data.data)

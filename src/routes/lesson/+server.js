@@ -56,10 +56,11 @@ export async function GET({ url, fetch, cookies }) {
     //debugger;
 
   } else if (words) {
-    let theme = url.searchParams.get('theme');
-    let name = url.searchParams.get('name');
-    let owner = url.searchParams.get('owner');
-    data = await GetWords({ theme: theme, name: name, owner: owner });
+    const theme = url.searchParams.get('theme');
+    const name = url.searchParams.get('name');
+    const owner = url.searchParams.get('owner');
+    const level = url.searchParams.get('level');
+    data = await GetWords({ theme: theme, name: name, owner: owner, level: level });
     
     let response = new Response(JSON.stringify({ data }));
     response.headers.append('Access-Control-Allow-Origin', `*`);
@@ -68,7 +69,8 @@ export async function GET({ url, fetch, cookies }) {
   } else if (dialog) {
     let name = dialog;
     let owner = url.searchParams.get('owner');
-    data = await GetDialog({ name: name, owner: owner });
+    let level = url.searchParams.get('level');
+    data = await GetDialog({ name: name, owner: owner, level:level });
 
     let response = new Response(JSON.stringify({ data }));
     response.headers.append('Access-Control-Allow-Origin', `*`);

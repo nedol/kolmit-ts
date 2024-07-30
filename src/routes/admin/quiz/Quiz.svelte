@@ -29,7 +29,7 @@
     {#if dc && $call_but_status === 'talk'}
       <WordGameEdit {data} />
     {:else}
-      <WordEdit {data} />
+      <WordEdit />
     {/if}
   {/if}
 {/if}

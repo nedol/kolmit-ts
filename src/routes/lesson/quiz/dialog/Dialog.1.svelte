@@ -181,7 +181,7 @@
     }
 
     const name = data.name;
-    fetch(`./lesson?dialog=${data.name}&owner=${operator.abonent}`)
+    fetch(`./lesson?dialog=${data.name}&owner=${operator.abonent}&level=${data.level}`)
       .then((response) => response.json())
       .then((data) => {
         dialog_data = data.data.dialog;

@@ -103,7 +103,7 @@
     $llang = lesson_data.lang;
 
     translate.from = lesson_data.lang;
-    translate.engine = 'google';
+
   })();
 
   function BuildQuizUsers(qu) {
@@ -320,8 +320,8 @@
                               <Icon
                                 tag="svg"
                                 viewBox="0 0 24 24"
-                                width="50px"
-                                height="50px"
+                                width="30px"
+                                height="30px"
                               >
                                 <path fill="grey" d={mdiAccountMultiple} />
                               </Icon>
@@ -361,7 +361,7 @@
                               on:click={() => {
                                 onClickQuiz(
                                   quiz.type,
-                                  module.level,
+                                  lesson_data.level,
                                   theme.name[$llang],
                                   quiz.name[$llang]
                                 );
@@ -473,7 +473,8 @@
   }
   .module_level {
     position: fixed;
-    /* background-color: rgba(255, 255, 255, 0.8); */
+    color: white;
+    background-color: rgba(225, 55, 55, 0.8);
     top: 60px;
     right: 0px;
     transform: translate(-50%, -50%);
@@ -506,7 +507,7 @@
     display: flex;
     justify-content: flex-end;
     align-items: right;
-    width: 100%; /* Занимать всю доступную ширину */
+    /*width: 100%;  /*Занимать всю доступную ширину */
     z-index: 2;
   }
 </style>
