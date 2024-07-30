@@ -15,10 +15,10 @@
 
 	let width, height, value, abonent;
 	let formData = {
-		name: 'Test',//'WH',//
-		email: 'test@test.com',//,'white@house.usa'
-		psw: 'test',//'test',
-		confirmPassword: 'test',//'test',
+		name: '',//'WH',//
+		email: '',//,'white@house.usa'
+		psw: '',//'test',
+		confirmPassword: '',//'test',
 		picture: '',
 		lang: 'ru',//'en'
 	};
