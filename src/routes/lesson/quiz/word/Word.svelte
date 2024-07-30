@@ -414,7 +414,7 @@
   }
 
   function onSpeach() {
-    speak(currentWord.original);
+    speak(!showNextButton?currentWord.original:currentWord.example[$llang]);
   }
 
   function speak(text) {
@@ -597,6 +597,7 @@
 
   /* Стилизуйте компонент по вашему усмотрению */
   .word {
+    font-size:larger;
     flex-direction: column;
     align-items: center;
     margin: 2px;
@@ -636,7 +637,7 @@
 
   .input-container {
     display: inline-block;
-    font-size: 16px;
+    font-size: larger;
     position: relative;
     color: #2196f3;
     width: 95vw;
