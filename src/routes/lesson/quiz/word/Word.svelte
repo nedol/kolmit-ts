@@ -162,7 +162,6 @@
 
   async function makeExample(){
 
-      if (currentWord)
       if(currentWord?.example[$langs]) {
         example = currentWord['example'][$langs];
       } else {
@@ -379,7 +378,7 @@
       /[.,\/#!?$%\^&\*;:{}=_`~()]/g,
       ''
     );
-    if (currentWord && hintIndex < currentWord.original.length) {
+    if (hintIndex < currentWord?.original.length) {
       if (hintIndex === 0) {
         userContent = '';
       }
@@ -418,8 +417,8 @@
   }
 
   function speak(text) {
-    //  Speak(text);
-    tts.Speak(text);
+    Speak(text.replace(/<<|>>/g, ""));
+    //tts.Speak(text);
 
     setFocus();
   }
