@@ -60,16 +60,17 @@
     TranslateContentToCurrentLang();
   }
 
-  $: if (dialog_data.words) {
-    prompt = prompt.replaceAll('${dialog_data_words}', dialog_data.words);
-  }
 
   $: if (dialog_data.content.length>0 && prompt) {
     let content = JSON.parse(JSON.stringify(dialog_data.content));
+    try{
     content?.forEach((item) => {
-      item['user1'] = item['user1'][$llang];
-      item['user2'] = item['user2'][$llang];
+      item['user1'] = item['user1'][$llang]?item['user1'][$llang]:item['user1'];
+      item['user2'] = item['user2'][$llang]?item['user2'][$llang]:item['user2'];
     });
+    }catch(ex){
+
+    }
     prompt = prompt.replaceAll('${dialog_content}', JSON.stringify(content));
   }
 
@@ -82,16 +83,21 @@
         dialog_data.html = splitHtmlContent(resp.data.html);
       }
       dialog_data.name = name;
-      fetch(`./admin?prompt=dialog`)
+      fetch(`./admin?prompt=dialog&quiz_name=${data.name[$llang]}`)
         .then((response) => response.json())
         .then((resp) => {
-          prompt = resp.resp.system + resp.resp.user;
+          prompt = resp.resp.prompt.system + resp.resp.prompt.user;
           prompt = prompt.replaceAll('${$llang}', $llang);
           prompt = prompt.replaceAll('${name[$llang]}', name[$llang]);
           prompt = prompt.replaceAll('${$langs}', $langs);
           prompt = prompt.replaceAll('${dialog_data.html}', dialog_data.html);
           prompt = prompt.replaceAll('${data.level}', data.level);
           prompt = prompt.replaceAll('${num}', num);
+
+
+          dialog_data.words  = JSON.stringify(resp.resp.words.data.map(item => item.original));
+
+          prompt = prompt.replaceAll('[${dialog_data_words}]', dialog_data.words);
 
           prompt = prompt;
         })
@@ -220,6 +226,10 @@
       `<<${dialog_data.html}>>`
     );
     console.log()
+  }
+
+  function OnWordsChange(){
+      prompt = prompt.replaceAll('${dialog_data_words}', dialog_data.words);
   }
 
   function OnChangeContent(ev: Event) {
@@ -389,6 +399,7 @@
               <Paper variant="unelevated">
                 <Content>
                   <textarea
+                    on:change = {()=>OnWordsChange()}
                     rows="20"
                     name="dialog_words"
                     bind:value={dialog_data.words}

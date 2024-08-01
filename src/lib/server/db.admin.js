@@ -189,10 +189,12 @@ export async function UpdateWords(q) {
   }
 }
 
-export async function GetPrompt(name) {
+export async function GetPrompt(prompt,quiz_name) {
   try {
-    let res = await sql`SELECT * FROM prompts WHERE name=${name}`;
-    return res[0];
+    let prompt_res = await sql`SELECT * FROM prompts WHERE name=${prompt}`;
+     let words_res = await sql`SELECT * FROM words WHERE name=${quiz_name}`;
+
+    return { prompt: prompt_res[0], words: words_res[0] };
   } catch (ex) {
     return JSON.stringify({ res: ex });
   }

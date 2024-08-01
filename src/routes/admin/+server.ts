@@ -9,12 +9,13 @@ import {
 export async function GET({ url, fetch, cookies }) {
   let resp;
   const prompt = url.searchParams.get('prompt');
+   const quiz_name = url.searchParams.get('quiz_name');
   
   if (prompt) {
-   resp = await GetPrompt(prompt);
+   resp = await GetPrompt(prompt, quiz_name);
   }
 
-  	let response = new Response(JSON.stringify({ resp }));
+	let response = new Response(JSON.stringify({ resp } ));
     response.headers.append('Access-Control-Allow-Origin', `*`);
     return response;
 

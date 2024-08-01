@@ -159,6 +159,7 @@
   }
 
   function onClickQuiz(quiz: any, level, theme) {
+
     $view = 'quiz';
 
     // saveLessonData();
@@ -537,7 +538,8 @@
                               <!-- {@debug quiz} -->
                               <div class="quiz-container">
                                 <div
-                                  on:click={() => {
+
+                                  on:click ={() => {
                                     onClickQuiz(
                                       quiz,
                                       lesson_data.data.module.level,
@@ -593,7 +595,8 @@
                                     </Icon>
                                   {:else if quiz.type === 'quiz'}
                                     <select
-                                      on:change={(event) =>
+                                      on:click|preventDefault|once|stopPropagation= {()=>{}}
+                                      on:change ={(event) =>
                                         OnSelectQuiztype(
                                           event.target.value,
                                           t,
