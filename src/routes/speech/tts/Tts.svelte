@@ -11,10 +11,10 @@
   });
 
   export async function Speak(text) {
-    await easyspeech.initSpeech();
-    await easyspeech.Speak(text);
+    // await easyspeech.initSpeech();
+    // await easyspeech.Speak(text);
 
-    // Speak_server(text);
+    Speak_server(text);
   }
 
   export async function Speak_server(text) {
