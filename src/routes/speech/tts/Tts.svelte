@@ -7,11 +7,11 @@
   let audio;
 
   onMount(async () => {   
-    await easyspeech.initSpeech();
+   
   });
 
   export async function Speak(text) {
- 
+    await easyspeech.initSpeech();
     await easyspeech.Speak(text);
 
     // Speak_server(text);
@@ -37,7 +37,7 @@
 
       const url = await response.json(); //URL.createObjectURL(response);
       // Пример того, как можно воспроизвести полученный аудиофайл
-      if(!audio)
+
       audio = new Audio(url.resp.audio);
       audio.text = text;
       audio.playbackRate = 0.7;
