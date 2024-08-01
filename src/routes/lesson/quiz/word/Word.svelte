@@ -414,10 +414,12 @@
 
   function onSpeach() {
     speak(!showNextButton?currentWord.original:currentWord.example[$llang]);
+    hintIndex++;
   }
 
   function speak(text) {
-    Speak(text.replace(/<<|>>/g, ""));
+    text = text.replace(/<<|>>/g, "")
+    Speak(text);
     //tts.Speak(text);
 
     setFocus();
