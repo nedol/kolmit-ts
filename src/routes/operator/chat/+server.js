@@ -66,7 +66,7 @@ async function chatLlama(system, task) {
     });
   } catch (ex) {}
 
-  return result.data[0];
+  return result?.data[0];
 
   // async function query(data) {
   //   const response = await fetch(

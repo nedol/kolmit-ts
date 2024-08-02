@@ -16,19 +16,32 @@
   onMount(() => {});
 
   export async function Speak(text) {
+    console.log(
+      'EasySpeech.status before Speak:' + EasySpeech.status()['status']
+    );
+
+    // await EasySpeech.speak({
+    //   text: text, //dialog_data.content[cur_qa].question['nl'],
+    //   voice: tts.voice,
+    //   volume: 1,
+    //   rate: 0.6,
+    //   pitch: 1,
+    //   boundary: e => console.debug('boundary reached'),
+    //   error: async (e) => {
+    //     console.log(e);
+    //     EasySpeech.reset()
+    //   },
+    // });
     if ('speechSynthesis' in window) {
       let utterance = new SpeechSynthesisUtterance(text);
       utterance.voice = tts.voice;
       // utterance.volume = parseFloat(volumeInput.value);
-      utterance.rate = parseFloat(.6);
+      utterance.rate = parseFloat(0.6);
       // utterance.pitch = parseFloat(pitchInput.value);
-      utterance.onend = ()=>{
-         window.speechSynthesis.cancel()
-       }
-      window.speechSynthesis.speak(
-        utterance
-      )
-
+      utterance.onend = () => {
+        window.speechSynthesis.cancel();
+      };
+      window.speechSynthesis.speak(utterance);
     }
   }
 
@@ -62,7 +75,7 @@
       rate: 0.7,
     }); // required
 
-    let voices = EasySpeech.voices();
+    let voices = window.speechSynthesis.getVoices();
 
     for (let v in voices) {
       tts = { voice: voices[v] };
@@ -79,18 +92,10 @@
     }
 
     document.addEventListener('visibilitychange', async () => {
-      await EasySpeech.reset();
+      // await EasySpeech.reset();
       if (document.hidden) {
         // Ваш код, выполняемый при переходе приложения в неактивное состояние
-        // await EasySpeech.pause();
-        // await EasySpeech.cancel();
-        // await EasySpeech.reset();
-
-        // $lesson.data = { quiz: '' };
-        // $view = 'lesson';
-        console.log(
-          'EasySpeech.status  before hidden:' + EasySpeech.status()['status']
-        );
+        window.speechSynthesis.cancel();
       } else {
         // initSpeech();
         // await EasySpeech.resume();
