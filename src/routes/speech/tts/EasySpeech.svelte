@@ -1,6 +1,6 @@
 <script>
   import { onMount, onDestroy, getContext } from 'svelte';
-  import EasySpeech from 'easy-speech';
+  // import EasySpeech from 'easy-speech';
 
   import bell from '$lib/mp3/bell.mp3';
 
@@ -11,61 +11,53 @@
   // @ts-ignore
   let voice, tts;
 
-  onMount(async() => {
-      console.log(await EasySpeech.detect());
+  onMount(async () => {
+    // console.log(await EasySpeech.detect());
     initSpeech();
   });
 
   export async function Speak(text) {
-    console.log(
-      'EasySpeech.status before Speak:' + EasySpeech.status()['status']
-    );
+    // console.log(
+    //   'EasySpeech.status before Speak:' + EasySpeech.status()['status']
+    // );
 
-    await EasySpeech.speak({
-      text: text, //dialog_data.content[cur_qa].question['nl'],
-      voice: tts.voice,
-      volume: 9,
-      rate: 0.6,
-      pitch: 1,
-      boundary: e => console.debug('boundary reached'),
-      error: async (e) => {
-        console.log(e);
-        EasySpeech.reset()
-      },
-    });
+    if ('speechSynthesis' in window) {
+      let utterance = new SpeechSynthesisUtterance(text);
+      utterance.voice = tts.voice;
+      // utterance.volume = parseFloat(volumeInput.value);
+      utterance.rate = parseFloat(.6);
+      // utterance.pitch = parseFloat(pitchInput.value);
+      utterance.onend = ()=>{
+         window.speechSynthesis.cancel()
+       }
+      window.speechSynthesis.speak(
+        utterance
+      )
+
+    }
+
+
+
+    // EasySpeech.speak({
+    //   text: text, //dialog_data.content[cur_qa].question['nl'],
+    //   voice: tts.voice,
+    //   volume: 9,
+    //   rate: 0.6,
+    //   pitch: 1,
+    //   boundary: (e) => console.debug('boundary reached'),
+    //   error: async (e) => {
+    //     console.log(e);
+    //     EasySpeech.reset();
+    //   },
+    // });
+
+    // EasySpeech.reset();
   }
 
-  export function Cancel() {
-    EasySpeech.cancel();
-  }
-
-  export function Pause() {
-    EasySpeech.pause();
-  }
-
-  export function Resume() {
-    EasySpeech.resume();
-  }
 
   export async function initSpeech() {
-    console.log(
-      'EasySpeech.status before initSpeech:' + EasySpeech.status()['status']
-    );
 
-    // await EasySpeech.cancel()
-    // await EasySpeech.reset();
-    // const es_det = EasySpeech.detect();
-    //  $audioCtx = new AudioContext();
-    //  await EasySpeech.reset();
-
-    await EasySpeech.init({
-      maxTimeout: 5000,
-      interval: 250,
-      quiet: true,
-      rate: 0.7,
-    }); // required
-
-    let voices = EasySpeech.voices();
+    const voices =  window.speechSynthesis.getVoices()
 
     for (let v in voices) {
       tts = { voice: voices[v] };
@@ -82,25 +74,11 @@
     }
 
     document.addEventListener('visibilitychange', async () => {
-      await EasySpeech.reset();
+      // await EasySpeech.reset();
       if (document.hidden) {
-        // Ваш код, выполняемый при переходе приложения в неактивное состояние
-        // await EasySpeech.pause();
-        // await EasySpeech.cancel();
-        // await EasySpeech.reset();
 
-        // $lesson.data = { quiz: '' };
-        // $view = 'lesson';
-        console.log(
-          'EasySpeech.status  before hidden:' + EasySpeech.status()['status']
-        );
       } else {
-        // initSpeech();
-        // await EasySpeech.resume();
 
-        console.log(
-          'EasySpeech.status  after hidden:' + EasySpeech.status()['status']
-        );
 
         console.log('Приложение активно');
       }
@@ -108,9 +86,7 @@
   }
 
   onDestroy(() => {
-    // EasySpeech.cancel();
-    console.log(
-      'EasySpeech.status before destroy:' + EasySpeech.status()['status']
-    );
+
+
   });
 </script>

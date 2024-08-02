@@ -166,7 +166,7 @@
 
       if(currentWord?.example[$langs]) {
         example = currentWord['example'][$langs];
-      } else {
+      } else if(currentWord?.example[$llang]){
         example = await Translate(
           currentWord['example'][$llang],
           $llang,
@@ -421,8 +421,8 @@
 
   function speak(text) {
     text = text.replace(/<<|>>/g, "")
-    // Speak(text);
-    tts.Speak(text);
+    Speak(text);
+    // tts.Speak(text);
 
     setFocus();
   }
