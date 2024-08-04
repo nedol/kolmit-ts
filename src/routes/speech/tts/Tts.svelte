@@ -6,14 +6,11 @@
 
   let audio;
 
-  onMount(async () => {   
-   
-  });
+  onMount(async () => {});
 
-  export async function Speak(text) {
-    await easyspeech.Speak(text);
-
-    // Speak_server(text);
+  export async function Speak(lang,text) {
+    if ('speechSynthesis' in window) await easyspeech.Speak(lang,text);
+    else Speak_server(text);
   }
 
   export async function Speak_server(text) {
@@ -56,7 +53,7 @@
 
   onDestroy(() => {
     audio = '';
-    easyspeech = ''
+    easyspeech = '';
   });
 </script>
 

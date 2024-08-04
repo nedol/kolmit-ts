@@ -15,7 +15,7 @@
   let width, height, value, abonent;
   let formData = {
     name: '', //'WH',//
-    email: '', //,'white@house.usa'
+    email: 'email', //,'white@house.usa'
     psw: '', //'test',
     confirmPassword: '', //'test',
     picture: '',
@@ -38,6 +38,7 @@
   onMount(async () => {
     let url = new URL(window.location.href);
     abonent = url.searchParams.get('abonent');
+    // formData.email = url.searchParams.get('user');
     // console.log(abonent);
     // if (url.searchParams.get('psw')) {
     // 	formData.name = url.searchParams.get('name');

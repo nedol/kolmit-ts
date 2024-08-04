@@ -1,38 +1,55 @@
 <script>
   import { onMount, onDestroy, getContext } from 'svelte';
   import EasySpeech from 'easy-speech';
+  EasySpeech.init({
+    maxTimeout: 5000,
+    interval: 250,
+    quiet: true,
+    rate: 0.7,
+  }); // required
 
   import bell from '$lib/mp3/bell.mp3';
 
-  import { audioCtx } from '$lib/js/stores.js';
+  import { convertTimeToWords } from './time.convert.js';
 
   import { view, lesson } from '$lib/js/stores.js';
 
   // @ts-ignore
   let voice, tts;
 
-  initSpeech();
+  onMount(() => {
+    document.addEventListener('visibilitychange', async () => {
+      // await EasySpeech.reset();
+      if (document.hidden) {
+        await window.speechSynthesis.cancel();
+        // location.reload();
+      } else {
+        console.log('Приложение активно');
+      }
+    });
+  });
 
-  onMount(() => {});
-
-  export async function Speak(text) {
+  export async function Speak(lang, text) {
     console.log(
       'EasySpeech.status before Speak:' + EasySpeech.status()['status']
     );
 
-    await EasySpeech.speak({
-      text: text, //dialog_data.content[cur_qa].question['nl'],
-      voice: tts.voice,
-      volume: 1,
-      rate: 0.6,
-      pitch: 1,
-      boundary: e => console.debug('boundary reached'),
-      end: e=>{ window.speechSynthesis.cancel();console.debug('speech end')},
-      error: async (e) => {
-        console.log(e);
-        EasySpeech.reset()
-      },
-    });
+    let voices = EasySpeech.voices();
+
+    for (let v in voices) {
+      tts = { voice: voices[v] };
+
+      if (voices[v].lang.includes('nl')) {
+        tts = { voice: voices[v] };
+
+        if (voices[v].lang.includes('BE')) {
+          // utterance.voice = voices[index]; //'Microsoft Bart - Dutch (Belgium)';
+          tts = { voice: voices[v] };
+          break;
+        }
+      }
+    }
+
     // if ('speechSynthesis' in window) {
     //   let utterance = new SpeechSynthesisUtterance(text);
     //   utterance.voice = tts.voice;
@@ -42,8 +59,34 @@
     //   utterance.onend = () => {
     //     window.speechSynthesis.cancel();
     //   };
+    //   utterance.onerror = (event) => {
+    //     console.log(
+    //       `An error has occurred with the speech synthesis: ${event.error}`
+    //     );
+    //   };
     //   window.speechSynthesis.speak(utterance);
     // }
+
+    text = convertTimeToWords(lang, text);
+
+    // setTimeout(() => {
+    EasySpeech.speak({
+      text: text, //dialog_data.content[cur_qa].question['nl'],
+      voice: tts.voice,
+      volume: 1,
+      rate: 0.8,
+      pitch: 1.2,
+      boundary: (e) => console.debug('boundary reached'),
+      end: (e) => {
+        window.speechSynthesis.cancel();
+        console.debug('speech end');
+      },
+      error: async (e) => {
+        console.log(e);
+        EasySpeech.reset();
+      },
+    });
+    // }, 0);
   }
 
   export function Cancel() {
@@ -69,31 +112,7 @@
     //  $audioCtx = new AudioContext();
     //  await EasySpeech.reset();
 
-    await EasySpeech.init({
-      maxTimeout: 5000,
-      interval: 250,
-      quiet: true,
-      rate: 0.7,
-    }); // required
-
-    let voices = EasySpeech.voices();
-
-    for (let v in voices) {
-      tts = { voice: voices[v] };
-
-      if (voices[v].lang.includes('nl')) {
-        tts = { voice: voices[v] };
-
-        if (voices[v].lang.includes('BE')) {
-          // utterance.voice = voices[index]; //'Microsoft Bart - Dutch (Belgium)';
-          tts = { voice: voices[v] };
-          break;
-        }
-      }
-    }
-
     document.addEventListener('visibilitychange', async () => {
-      
       if (document.hidden) {
         // Ваш код, выполняемый при переходе приложения в неактивное состояние
         // await EasySpeech.pause();
@@ -106,11 +125,6 @@
           'EasySpeech.status  before hidden:' + EasySpeech.status()['status']
         );
       } else {
-        // initSpeech();
-        // await EasySpeech.resume();
-
-        await EasySpeech.reset();
-
         console.log('Приложение активно');
       }
     });

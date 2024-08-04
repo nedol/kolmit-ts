@@ -30,7 +30,7 @@
   let content: any,
     new_content = false,
     words_data: [];
-  const name = data.name;
+  const name = data.name[$llang];
   let words = data.module.themes[0].words,
     prompt:string,
     dialog_task: any,
@@ -48,7 +48,7 @@
     prompt = prompt.replaceAll('${llang}', $llang);
     prompt = prompt.replaceAll('${langs}', $langs);
     prompt = prompt.replaceAll('${words}', words);
-    prompt = prompt.replaceAll('${topic}', data.name[$llang]);
+    prompt = prompt.replaceAll('${topic}', data.theme+'.' + data.name[$llang] );
     prompt = prompt.replaceAll('${level}', data.level);
      
   }
@@ -88,7 +88,7 @@
       fetch(`./admin?prompt=words`)
         .then((response) => response.json())
         .then((data) => {
-          prompt = data.resp.system;
+          prompt = data.resp.prompt.system;
           prompt = prompt;
         })
         .catch((error) => {

@@ -80,7 +80,7 @@
     margin-right: auto;
     margin-left: auto;
     margin-top: auto;
-    max-height: 60px;
+    max-height: 70%;
   }
   [status='call'] {
     opacity: 1;

@@ -62,7 +62,7 @@ export function SendEmail(q, new_email) {
   const mail = q.send_email;
   const hash = getHash(mail);
   let html =
-    `<a href='https://kolmit.onrender.com/?abonent=${abonent}'>` +
+    `<a href='https://kolmit.onrender.com/?abonent=${abonent}&user=${mail}'>` +
     {
       ru: '<h1>Присоединиться к сети Kolmit:</h1></a>',
       en: '<h1>Join Kolmit network:</h1></a>',

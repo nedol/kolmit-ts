@@ -421,8 +421,8 @@
 
   function speak(text) {
     text = text.replace(/<<|>>/g, "")
-    Speak(text);
-    // tts.Speak(text);
+    // Speak(text);
+    tts.Speak($llang,text);
 
     setFocus();
   }

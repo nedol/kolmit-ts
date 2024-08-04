@@ -50,6 +50,28 @@
     };
   }
 
+    $: if ($msg_user) {
+    console.log($msg_user);
+    if ($msg_user.command === 'repeat') {
+      isRepeat = true;
+      setTimeout(() => {
+        isRepeat = false;
+      }, 2000);
+    }
+  }
+
+  $: if ($msg_oper) {
+    // console.log($msg_oper);
+    if ($msg_oper.command === 'repeat') {
+      isRepeat = true;
+      setTimeout(() => {
+        isRepeat = false;
+      }, 2000);
+    }
+  }
+
+  let isRepeat = false;
+
   let dict = $dicts;
 
   import pkg from 'lodash';
@@ -116,7 +138,7 @@
   }
 
   async function speak() {
-    Speak(data.user2['a_shfl']);
+    Speak($llang,data.user2['a_shfl']);
   }
 
   function SttResult(text) {
@@ -181,6 +203,13 @@
 
 <!-- <EasySpeech bind:this={easyspeech}></EasySpeech> -->
 <Tts bind:this={tts}></Tts>
+{#if isRepeat}
+  <div class="repeat_alert">
+    <Button>
+      <Label>{dict['Repeat'][$langs]}</Label>
+    </Button>
+  </div>
+{/if}
 <div class="top-app-bar-container flexor">
   <TopAppBar bind:this={bottomAppBar} variant="fixed">
     <Row>
@@ -204,21 +233,20 @@
       </Section>
       <Section></Section>
 
-      <Section align="end">
-        {#if dc}
-          <div class="repeat_but">
-            <Button on:click={() => SendRepeat()} {variant}>
-              <Label>{dict['Repeat'][$langs]}</Label>
-            </Button>
-          </div>
-        {/if}
-      </Section>
+      <Section align="end"></Section>
     </Row>
   </TopAppBar>
 </div>
 
 <div class="container">
   <div class="card">
+    {#if dc}
+      <div class="repeat_but">
+        <Button color="secondary" on:click={() => SendRepeat()} {variant}>
+          <Label>{dict['Repeat'][$langs]}</Label>
+        </Button>
+      </div>
+    {/if}
     {#await Translate('Задай вопрос', 'ru', $langs) then data}
       <div class="title">{data}:</div>
     {/await}
@@ -310,16 +338,21 @@
     /* border: 1px solid #ccc; */
     /* border-radius: 5px; */
   }
+  .repeat_alert {
+    position: absolute;
+    top: 85px;
+    right: 0px;
+    scale: 0.7;
+  }
 
   .repeat_but {
     position: absolute;
-    right: 0;
-    font-size: small;
-    right: 5px;
-
+    font-size: smaller;
+    left: 0px;
+    top: -15px;
     z-index: 2;
+    scale: 0.7;
   }
-
   .card {
     transition: transform 0.3s ease-in-out;
     width: 100%;

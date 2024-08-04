@@ -84,6 +84,8 @@
   let share_button = false;
   let share_button_class = 'button_shared_false';
 
+  let variant = 'outlined';
+
   import {
     lesson,
     dc_oper,
@@ -92,6 +94,8 @@
     msg_oper,
     call_but_status,
   } from '$lib/js/stores.js';
+
+  let dc = $dc_oper || $dc_user;
 
   $: if ($msg_user) {
     console.log($msg_user);
@@ -181,7 +185,9 @@
     }
 
     const name = data.name;
-    fetch(`./lesson?dialog=${data.name}&owner=${operator.abonent}&level=${data.level}`)
+    fetch(
+      `./lesson?dialog=${data.name}&owner=${operator.abonent}&level=${data.level}`
+    )
       .then((response) => response.json())
       .then((data) => {
         dialog_data = data.data.dialog;
@@ -367,7 +373,7 @@
 
   async function speak(text) {
     // Speak(text);
-    if (text) tts.Speak(text);
+    if (text) tts.Speak($llang,text);
   }
 
   function onClickMicrophone() {
@@ -476,6 +482,23 @@
     // style_button = style_button_non_shared;
   });
 
+  function SendRepeat() {
+    variant = 'unelevated';
+    setTimeout(() => {
+      variant = 'outlined';
+    }, 1000);
+
+    if (dc)
+      dc.SendData(
+        {
+          command: 'repeat',
+        },
+        () => {
+          console.log();
+        }
+      );
+  }
+
   onDestroy(() => {
     // share_button = false;
     // voice.Cancel();
@@ -493,15 +516,14 @@
 
 <!-- <VoiceRSS bind:this={voice}></VoiceRSS> -->
 <main>
-  {#if isRepeat}
-    <div class="repeat_but">
-      <Button>
-        <Label>{dict['Repeat'][$langs]}</Label>
-      </Button>
-    </div>
-  {/if}
-
   {#if data.quiz == 'dialog'}
+    {#if isRepeat}
+      <div class="repeat_alert">
+        <Button>
+          <Label>{dict['Repeat'][$langs]}</Label>
+        </Button>
+      </div>
+    {/if}
     <div class="top-app-bar-container flexor">
       <TopAppBar bind:this={bottomAppBar} variant="fixed">
         <Row>
@@ -573,6 +595,18 @@
     </div>
     <!-- Ваш контент для лицевой стороны -->
     <div class="card">
+      {#if dc}
+        <div class="repeat_but">
+          <Button
+            class="button-shaped-round"
+            color="secondary"
+            on:click={() => SendRepeat()}
+            {variant}
+          >
+            <Label>{dict['Repeat'][$langs]}</Label>
+          </Button>
+        </div>
+      {/if}
       {#if q || a}
         <!-- <div class="cnt">{cur_qa + 1}</div> -->
         {#await Translate('Послушай вопрос', 'ru', $langs) then data}
@@ -602,15 +636,15 @@
         >
           <br />
           <!-- {#if showSpeakerButton} -->
-            <div class="speaker-button">
-              <IconButton
-                on:click={speak(dialog_data.content[cur_qa].user1[$llang])}
-              >
-                <Icon tag="svg" viewBox="0 0 24 24">
-                  <path fill="currentColor" d={mdiPlay} />
-                </Icon>
-              </IconButton>
-            </div>
+          <div class="speaker-button">
+            <IconButton
+              on:click={speak(dialog_data.content[cur_qa].user1[$llang])}
+            >
+              <Icon tag="svg" viewBox="0 0 24 24">
+                <path fill="currentColor" d={mdiPlay} />
+              </Icon>
+            </IconButton>
+          </div>
           <!-- {/if} -->
         </div>
 
@@ -661,15 +695,15 @@
           ></Stt>
 
           <!-- {#if showSpeakerButton} -->
-            <div class="speaker-button">
-              <IconButton
-                on:click={speak(dialog_data.content[cur_qa].user2[$llang])}
-              >
-                <Icon tag="svg" viewBox="0 0 24 24">
-                  <path fill="currentColor" d={mdiPlay} />
-                </Icon>
-              </IconButton>
-            </div>
+          <div class="speaker-button">
+            <IconButton
+              on:click={speak(dialog_data.content[cur_qa].user2[$llang])}
+            >
+              <Icon tag="svg" viewBox="0 0 24 24">
+                <path fill="currentColor" d={mdiPlay} />
+              </Icon>
+            </IconButton>
+          </div>
           <!-- {/if} -->
         </div>
         <br />
@@ -712,10 +746,20 @@
     height: 90vh;
   }
 
-  .repeat_but {
+  .repeat_alert {
     position: absolute;
     top: 85px;
     right: 0px;
+    scale: 0.7;
+  }
+
+  .repeat_but {
+    position: absolute;
+    font-size: smaller;
+    left: 0px;
+    top: -15px;
+    z-index: 2;
+    scale: 0.7;
   }
   .top-app-bar-container {
     /* display: inline-block; */

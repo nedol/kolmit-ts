@@ -39,6 +39,7 @@
 	onMount(async () => {
 		let url = new URL(window.location.href);
 		abonent = url.searchParams.get('abonent');
+		formData.email = url.searchParams.get('user');
 		// console.log(abonent);
 		// if (url.searchParams.get('psw')) {
 		// 	formData.name = url.searchParams.get('name');
