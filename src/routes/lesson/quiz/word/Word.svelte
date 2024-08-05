@@ -1,5 +1,5 @@
 <script>
-// @ts-nocheck
+  // @ts-nocheck
 
   import { onMount, onDestroy, getContext } from 'svelte';
   import TopAppBar, { Row, Title, Section } from '@smui/top-app-bar';
@@ -97,8 +97,8 @@
       });
   }
 
-  $: if($langs){
-    makeExample()
+  $: if ($langs) {
+    makeExample();
   }
 
   function highlightWords() {
@@ -134,7 +134,58 @@
 
   $: if (div_input) div_input.focus();
 
-  function replaceWordWithInput(sentence, word) {
+  function similarity(s1, s2) {
+    let longer = s1;
+    let shorter = s2;
+    if (s1.length < s2.length) {
+        longer = s2;
+        shorter = s1;
+    }
+    const longerLength = longer.length;
+    if (longerLength === 0) {
+        return 1.0;
+    }
+    return (longerLength - editDistance(longer, shorter)) / parseFloat(longerLength);
+}
+
+function editDistance(s1, s2) {
+    s1 = s1.toLowerCase();
+    s2 = s2.toLowerCase();
+
+    const costs = [];
+    for (let i = 0; i <= s1.length; i++) {
+        let lastValue = i;
+        for (let j = 0; j <= s2.length; j++) {
+            if (i === 0)
+                costs[j] = j;
+            else {
+                if (j > 0) {
+                    let newValue = costs[j - 1];
+                    if (s1.charAt(i - 1) !== s2.charAt(j - 1))
+                        newValue = Math.min(Math.min(newValue, lastValue), costs[j]) + 1;
+                    costs[j - 1] = lastValue;
+                    lastValue = newValue;
+                }
+            }
+        }
+        if (i > 0)
+            costs[s2.length] = lastValue;
+    }
+    return costs[s2.length];
+}
+
+function (text, targetWord) {
+    const words = text.split(' ');
+    const threshold = 0.8; // 90% порог
+    for (let i = 0; i < words.length; i++) {
+        if (similarity(words[i], targetWord) >= threshold) {
+            words[i] =  `<span class="sentence_span" style="position: relative; width: 120px; left: 0px;"></span> `;
+        }
+    }
+    return words.join(' ');
+}
+
+  function replaceWordWithInput_(sentence, word) {
     // Вычисляем количество совпадающих символов
     const lastDotIndex = sentence?.lastIndexOf('.');
     // if (lastDotIndex !== -1) {
@@ -143,14 +194,14 @@
     // }
 
     word = word.replace(/[.\/#!?$%\^&\*;:{}=_`~()]/g, '').trim();
-    // word = word.replace(/\b(the |a |an |het |de )\b/gi, '');
-    // const wordLength = word.length;
-    // const matches = sentence.split(word).length - 1;
+    word = word.replace(/\b(the |a |an |het |de )\b/gi, '');
+    const wordLength = word.length;
+    const matches = sentence.split(word).length - 1;
 
-    // const matchPercentage = (matches / wordLength) * 100;
+    const matchPercentage = (matches / wordLength) * 100;
 
     // Если процент совпадения больше или равен 90%, заменяем слово на <input>
-    if (true) {
+    if (matchPercentage > 90) {
       //matches >= 1) {
       const regex = new RegExp('(^|\\s)' + word + '(?=[\\s.,!?]|$)', 'i');
       return sentence?.replace(
@@ -162,39 +213,36 @@
     }
   }
 
-  async function makeExample(){
+  async function makeExample() {
+    if (!currentWord) return;
 
-      if(currentWord?.example[$langs]) {
-        example = currentWord['example'][$langs];
-      } else if(currentWord?.example[$llang]){
-        example = await Translate(
-          currentWord['example'][$llang],
-          $llang,
-          $langs
-        );
-      }
+    if (currentWord.example[$langs]) {
+      example = currentWord['example'][$langs];
+    } else if (currentWord.example[$llang]) {
+      example = await Translate(currentWord['example'][$llang], $llang, $langs);
+    }
 
-      example = example?.replace(
-        /<<([^<>]+)>>/gu,
-        '<span style="color:green"><b>$1</b></span>'
-      );
+    example = example?.replace(
+      /<<([^<>]+)>>/gu,
+      '<span style="color:green"><b>$1</b></span>'
+    );
 
-      resultElement = replaceWordWithInput(
-        currentWord?.example[$llang],
-        `<<${currentWord?.original}>>`
-      );
+    resultElement = replaceWordWithInput(
+      currentWord?.example[$llang],
+      `<<${currentWord?.original}>>`
+    );
 
-      setTimeout(() => {
-        const spanElement = document.querySelector('.sentence_span');
-        if (spanElement) spanElement.appendChild(div_input);
-        resultElementWidth = getTextWidth(currentWord?.original, '20px Arial');
-      }, 0);
+    setTimeout(() => {
+      const spanElement = document.querySelector('.sentence_span');
+      if (spanElement) spanElement.appendChild(div_input);
+      resultElementWidth = getTextWidth(currentWord?.original, '20px Arial');
+    }, 0);
 
-      // word = currentWord['original'].replace(/(de|het)\s*/gi, '');
-      // let filteredExample = currentWord['example'].replace(
-      //    new RegExp(`\\b(de |het )?(?=\\b${word}\\b)`, 'gi'), '');
-      // resultElement = filteredExample.split(new RegExp(word, 'i'));
-      // console.log(resultElement)
+    // word = currentWord['original'].replace(/(de|het)\s*/gi, '');
+    // let filteredExample = currentWord['example'].replace(
+    //    new RegExp(`\\b(de |het )?(?=\\b${word}\\b)`, 'gi'), '');
+    // resultElement = filteredExample.split(new RegExp(word, 'i'));
+    // console.log(resultElement)
 
     // Устанавливаем фокус в конец строки
     setFocus();
@@ -236,16 +284,16 @@
     shuffle(words);
     currentWordIndex = 0;
     currentWord = words[currentWordIndex];
-    makeExample()
+    makeExample();
     userContent = '';
-    result = ''
+    result = '';
   }
 
   function jumpNext10() {
     const nextIndex = (parseInt(currentWordIndex / 10) + 1) * 10;
     currentWordIndex = nextIndex;
     currentWord = words[currentWordIndex];
-    makeExample()
+    makeExample();
     userContent = '';
     hintIndex = 0;
     result = '';
@@ -423,14 +471,14 @@
   }
 
   function onSpeach() {
-    speak(!showNextButton?currentWord.original:currentWord.example[$llang]);
+    speak(!showNextButton ? currentWord.original : currentWord.example[$llang]);
     hintIndex++;
   }
 
   function speak(text) {
-    text = text.replace(/<<|>>/g, "")
+    text = text.replace(/<<|>>/g, '');
     // Speak(text);
-    tts.Speak($llang,text);
+    tts.Speak($llang, text);
 
     setFocus();
   }
@@ -608,7 +656,7 @@
 
   /* Стилизуйте компонент по вашему усмотрению */
   .word {
-    font-size:larger;
+    font-size: larger;
     flex-direction: column;
     align-items: center;
     margin: 2px;
