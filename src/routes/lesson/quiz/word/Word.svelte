@@ -237,6 +237,8 @@
     currentWordIndex = 0;
     currentWord = words[currentWordIndex];
     makeExample()
+    userContent = '';
+    result = ''
   }
 
   function jumpNext10() {
@@ -410,8 +412,14 @@
   function onPrev() {
     if (currentWordIndex <= 0) return;
     currentWord = words[--currentWordIndex];
-    result = '';
+    makeExample();
+
     userContent = '';
+    hintIndex = 0;
+    result = '';
+    showCheckMark = false;
+    showNextButton = false;
+    showSpeakerButton = false;
   }
 
   function onSpeach() {
