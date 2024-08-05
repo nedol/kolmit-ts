@@ -174,7 +174,7 @@ function editDistance(s1, s2) {
     return costs[s2.length];
 }
 
-function (text, targetWord) {
+function replaceWordWithInput(text, targetWord) {
     const words = text.split(' ');
     const threshold = 0.8; // 90% порог
     for (let i = 0; i < words.length; i++) {
@@ -184,6 +184,34 @@ function (text, targetWord) {
     }
     return words.join(' ');
 }
+
+  function replaceWordWithInput_(sentence, word) {
+    // Вычисляем количество совпадающих символов
+    const lastDotIndex = sentence?.lastIndexOf('.');
+    // if (lastDotIndex !== -1) {
+    //   sentence =
+    //     sentence.slice(0, lastDotIndex) + sentence.slice(lastDotIndex + 1);
+    // }
+
+    word = word.replace(/[.\/#!?$%\^&\*;:{}=_`~()]/g, '').trim();
+    word = word.replace(/\b(the |a |an |het |de )\b/gi, '');
+    const wordLength = word.length;
+    const matches = sentence.split(word).length - 1;
+
+    const matchPercentage = (matches / wordLength) * 100;
+
+    // Если процент совпадения больше или равен 90%, заменяем слово на <input>
+    if (matchPercentage > 90) {
+      //matches >= 1) {
+      const regex = new RegExp('(^|\\s)' + word + '(?=[\\s.,!?]|$)', 'i');
+      return sentence?.replace(
+        regex,
+        `$1<span class="sentence_span" style="position: relative; width: 120px; left: 0px;"></span> `
+      );
+    } else {
+      return sentence;
+    }
+  }
 
   async function makeExample() {
     if (!currentWord) return;
