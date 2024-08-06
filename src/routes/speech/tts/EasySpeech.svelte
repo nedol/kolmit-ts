@@ -74,7 +74,7 @@
       text: text, //dialog_data.content[cur_qa].question['nl'],
       voice: tts.voice,
       volume: 1,
-      rate: 0.8,
+      rate: 0.6,
       pitch: 1.2,
       boundary: (e) => console.debug('boundary reached'),
       end: (e) => {

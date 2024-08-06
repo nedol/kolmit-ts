@@ -8,11 +8,11 @@ export function convertTimeToWords(lang, input) {
     // Преобразование часов и минут в текст
     let hours = parseInt(p1);
     let minutes = parseInt(p2);
-      if (p2 !== '00') {        
+      // if (p2 !== '00') {        
         return formatTime(lang,{hours:hours,minutes:minutes});
-    } else {
-        return `${hours}`;
-    }
+    // } else {
+    //     return `${hours}`;
+    // }
   });
 }
 
@@ -23,7 +23,7 @@ export function convertTimeToWords(lang, input) {
     switch (lang) {
       case 'nl':
         if (minutes === 0) {
-          return `${hours} uur`;
+          return `${hours>12?hours-12:hours} uur`;
         } else if (minutes < 15) {
           return `${minutes} over ${hours}`;
         } else if (minutes === 15) {

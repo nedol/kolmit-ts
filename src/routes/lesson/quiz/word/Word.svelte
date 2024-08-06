@@ -67,35 +67,24 @@
 
   let names = data.name.split(',');
 
-  for (let n in names) {
-    // Создаем массив промисов для каждого запроса
-    const fetchPromises = names.map((name) => {
-      return fetch(
-        `./lesson?words=theme&theme=${data.theme}&name=${name}&owner=${abonent}&level=${data.level}`
-      )
-        .then((response) => response.json())
-        .then((data) => data.data)
-        .catch((error) => {
-          console.log(error);
-          return [];
-        });
+  // Создаем массив промисов для каждого запроса
+
+  fetch(
+    `./lesson?words=theme&theme=${data.theme}&name=${data.name}&owner=${abonent}&level=${data.level}`
+  )
+    .then((response) => response.json())
+    .then((data) => {
+      words = data.data;
+
+      hints = [...words];
+      shuffle(hints);
+      currentWord = words[currentWordIndex];
+      makeExample();
+    })
+    .catch((error) => {
+      console.log(error);
+      return [];
     });
-    // Ждем завершения всех запросов
-    Promise.all(fetchPromises)
-      .then((allData) => {
-        // allData - это массив результатов каждого запроса
-        words = [].concat(...allData); // Объединяем массивы в один
-        // console.log(words);
-        hints = [...words];
-        shuffle(hints);
-        currentWord = words[currentWordIndex];
-        makeExample();
-      })
-      .catch((error) => {
-        console.log(error);
-        return [];
-      });
-  }
 
   $: if ($langs) {
     makeExample();
@@ -114,19 +103,6 @@
       regex,
       `<span class="highlight" style="color: green;background-color: transparent">${woord}</span>`
     );
-
-    // Object.keys(words).forEach((i) => {
-    //   const woord = words[i].original;
-    //   const regex = new RegExp(
-    //     `\\b[${woord.charAt(0).toUpperCase()}${woord.charAt(0).toLowerCase()}]${woord.slice(1)}\\b`,
-    //     'g'
-    //   );
-
-    //   userContent = userContent.replace(
-    //     regex,
-    //     `<span class="highlight" style="color: green;background-color: transparent">${woord}</span>`
-    //   );
-    // });
   }
 
   let topAppBar;
@@ -138,79 +114,52 @@
     let longer = s1;
     let shorter = s2;
     if (s1.length < s2.length) {
-        longer = s2;
-        shorter = s1;
+      longer = s2;
+      shorter = s1;
     }
     const longerLength = longer.length;
     if (longerLength === 0) {
-        return 1.0;
+      return 1.0;
     }
-    return (longerLength - editDistance(longer, shorter)) / parseFloat(longerLength);
-}
+    return (
+      (longerLength - editDistance(longer, shorter)) / parseFloat(longerLength)
+    );
+  }
 
-function editDistance(s1, s2) {
+  function editDistance(s1, s2) {
     s1 = s1.toLowerCase();
     s2 = s2.toLowerCase();
 
     const costs = [];
     for (let i = 0; i <= s1.length; i++) {
-        let lastValue = i;
-        for (let j = 0; j <= s2.length; j++) {
-            if (i === 0)
-                costs[j] = j;
-            else {
-                if (j > 0) {
-                    let newValue = costs[j - 1];
-                    if (s1.charAt(i - 1) !== s2.charAt(j - 1))
-                        newValue = Math.min(Math.min(newValue, lastValue), costs[j]) + 1;
-                    costs[j - 1] = lastValue;
-                    lastValue = newValue;
-                }
-            }
+      let lastValue = i;
+      for (let j = 0; j <= s2.length; j++) {
+        if (i === 0) costs[j] = j;
+        else {
+          if (j > 0) {
+            let newValue = costs[j - 1];
+            if (s1.charAt(i - 1) !== s2.charAt(j - 1))
+              newValue = Math.min(Math.min(newValue, lastValue), costs[j]) + 1;
+            costs[j - 1] = lastValue;
+            lastValue = newValue;
+          }
         }
-        if (i > 0)
-            costs[s2.length] = lastValue;
+      }
+      if (i > 0) costs[s2.length] = lastValue;
     }
     return costs[s2.length];
-}
+  }
 
-function replaceWordWithInput(text, targetWord) {
+  function replaceWordWithInput(text, targetWord) {
     const words = text.split(' ');
     const threshold = 0.8; // 90% порог
     for (let i = 0; i < words.length; i++) {
-        if (similarity(words[i], targetWord) >= threshold) {
-            words[i] =  `<span class="sentence_span" style="position: relative; width: 120px; left: 0px;"></span> `;
-        }
+      if (similarity(words[i], targetWord) >= threshold) {
+        words[i] =
+          `<span class="sentence_span" style="position: relative; width: 120px; left: 0px;"></span> `;
+      }
     }
     return words.join(' ');
-}
-
-  function replaceWordWithInput_(sentence, word) {
-    // Вычисляем количество совпадающих символов
-    const lastDotIndex = sentence?.lastIndexOf('.');
-    // if (lastDotIndex !== -1) {
-    //   sentence =
-    //     sentence.slice(0, lastDotIndex) + sentence.slice(lastDotIndex + 1);
-    // }
-
-    word = word.replace(/[.\/#!?$%\^&\*;:{}=_`~()]/g, '').trim();
-    word = word.replace(/\b(the |a |an |het |de )\b/gi, '');
-    const wordLength = word.length;
-    const matches = sentence.split(word).length - 1;
-
-    const matchPercentage = (matches / wordLength) * 100;
-
-    // Если процент совпадения больше или равен 90%, заменяем слово на <input>
-    if (matchPercentage > 90) {
-      //matches >= 1) {
-      const regex = new RegExp('(^|\\s)' + word + '(?=[\\s.,!?]|$)', 'i');
-      return sentence?.replace(
-        regex,
-        `$1<span class="sentence_span" style="position: relative; width: 120px; left: 0px;"></span> `
-      );
-    } else {
-      return sentence;
-    }
   }
 
   async function makeExample() {
