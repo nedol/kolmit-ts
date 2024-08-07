@@ -68,21 +68,22 @@
 </script>
 
 <!-- <main> -->
-  <!-- <Paper> -->
-    <!-- <Title></Title>
+<!-- <Paper> -->
+<!-- <Title></Title>
     <Subtitle></Subtitle> -->
-    <!-- <Content> -->
-      <iframe srcdoc={data.html} class="html_data" width="100%" height="100vh"></iframe>
- 
-      <!-- <div
+<!-- <Content> -->
+<iframe srcdoc={data.html} class="html_data" width="100%" height="100vh"
+></iframe>
+
+<!-- <div
         
         on:touchend={onSelectionEnd}
         on:mouseup={onSelectionEnd}
       >
         {@html data.html}
       </div> -->
-    <!-- </Content> -->
-  <!-- </Paper> -->
+<!-- </Content> -->
+<!-- </Paper> -->
 <!-- </main> -->
 
 <style>
@@ -146,4 +147,6 @@
     /* color: rgb(27, 155, 49); */
     background: rgb(190, 201, 205);
   }
+
+
 </style>

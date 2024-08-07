@@ -1,12 +1,6 @@
 <script>
   import { onMount, onDestroy, getContext } from 'svelte';
   import EasySpeech from 'easy-speech';
-  EasySpeech.init({
-    maxTimeout: 5000,
-    interval: 250,
-    quiet: true,
-    rate: 0.7,
-  }); // required
 
   import bell from '$lib/mp3/bell.mp3';
 
@@ -33,6 +27,13 @@
     console.log(
       'EasySpeech.status before Speak:' + EasySpeech.status()['status']
     );
+
+    EasySpeech.init({
+      maxTimeout: 5000,
+      interval: 250,
+      quiet: true,
+      rate: 0.7,
+    }); // required
 
     let voices = EasySpeech.voices();
 
@@ -78,7 +79,7 @@
       pitch: 1.2,
       boundary: (e) => console.debug('boundary reached'),
       end: (e) => {
-        window.speechSynthesis.cancel();
+        // window.speechSynthesis.cancel();
         console.debug('speech end');
       },
       error: async (e) => {

@@ -9,6 +9,8 @@
 
   import ConText from './Dialog.Context.svelte';
 
+  import Accordion, { Panel, Header, Content } from '@smui-extra/accordion';
+
   let stt, tts;
   import { onMount, onDestroy, getContext } from 'svelte';
   import TopAppBar, { Row, Title, Section } from '@smui/top-app-bar';
@@ -50,7 +52,7 @@
     };
   }
 
-    $: if ($msg_user) {
+  $: if ($msg_user) {
     console.log($msg_user);
     if ($msg_user.command === 'repeat') {
       isRepeat = true;
@@ -92,14 +94,10 @@
 
   export let data;
 
-  // $: if($lesson.data) {
-  // 	console.log($lesson);
-  // 	data = $lesson.data;
-  // }
-
   export let onChangeClick;
   // import pair_data from './pair_data.json';
-  let hint_visible;
+  let hint_visible,
+    hints = ['test'];
 
   let style_button = `
 		z-index:2;
@@ -138,7 +136,7 @@
   }
 
   async function speak() {
-    Speak($llang,data.user2['a_shfl']);
+    Speak($llang, data.user2['a_shfl']);
   }
 
   function SttResult(text) {
@@ -253,7 +251,9 @@
 
     <div class="user1">
       {#if data.user1}
-        <div class="">{@html data.user1[$llang]}</div>
+       {#await Translate(data.user1[$llang], $llang, $langs) then data}
+        <div class="">{data}</div>
+        {/await}
       {/if}
     </div>
 
@@ -263,9 +263,7 @@
 
     <div class="user2">
       {#if data.user2}
-        {#await Translate(data.user2[$llang], $llang, $langs) then data}
-          {data}
-        {/await}
+          {data.user2[$llang]}
       {/if}
     </div>
 
@@ -312,7 +310,23 @@
       <ConText {data} />
     {/if}
   </div>
+
 </div>
+
+  <div class="words_div accordion-container">
+    {#if data.user1.hints?.length > 0}
+      <Content
+        style="line-height: 2.0; overflow-y:auto; height:50vh !important"
+      >
+        {#each data.user1.hints as hint, i}
+          <span class="hint_button">
+            {@html hint + '&nbsp;' + '&nbsp;'}
+          </span>
+        {/each}
+        <div style="height:50px"></div>
+      </Content>
+    {/if}
+  </div>
 
 <style>
   .top-app-bar-container {
@@ -429,5 +443,21 @@
     top: -5px;
     float: right;
     right: 30px;
+  }
+
+  .words_div {
+    position: relative;
+    text-align: center;
+    overflow-y: auto;
+  }
+  .hint_button {
+    display: inline-block;
+    border: solid 0.1em #9f3f3f;
+    border-radius: 5px;
+    text-align: center;
+    width: auto;
+    padding-left: 8px;
+    margin: 5px;
+    background-color: transparent;
   }
 </style>

@@ -3,6 +3,8 @@
 
   import ConText from './Dialog.Context.svelte';
 
+  import Accordion, { Panel, Header, Content } from '@smui-extra/accordion';
+
   import { Number2Words } from '$lib/tts/convert.nl.js';
   import { NumberString, numberToDutchString } from '$lib/tts/Listen.numbers';
   // import BottomAppBar, { Section } from '@smui-extra/bottom-app-bar';
@@ -18,7 +20,7 @@
   import Chip, { Set, LeadingIcon, TrailingIcon, Text } from '@smui/chips';
   import '$lib/css/Typography.scss';
 
-  import { langs, dicts, llang } from '$lib/js/stores.js';
+  import { langs, dicts, llang, view } from '$lib/js/stores.js';
   const dict = $dicts;
 
   import {
@@ -35,7 +37,7 @@
   import pkg from 'lodash';
   const { maxBy } = pkg;
 
-  import Dialog2 from './Dialog.2.svelte';
+  // import Dialog2 from './Dialog.2.svelte';
   // import RV from '/src/routes/speech/tts/RV.svelte';
   // import { Speak } from '../../../speech/tts/RV.svelte';
   import { Speak } from '/src/routes/speech/tts/VoiceRSS';
@@ -55,6 +57,7 @@
 
   function flipCard() {
     isFlipped = !isFlipped;
+    Dialog();
   }
 
   const visibility = ['visible', 'hidden', 'hidden'];
@@ -65,19 +68,28 @@
   let share_mode = false;
   export let data;
 
+  if (data.name) {
+    console.log('data:',data)
+    if(data.quiz !== 'dialog.client')
+      init();
+  }
+
+
   // translate.from = $llang;
   // translate.engine = 'google';
 
   // llang = data.llang;
   let showSpeakerButton = false;
 
+  let this_user;
   let cur_html = 0;
   let cur_qa = 0;
   let q, q_shfl, a_shfl, a, d;
 
   let display_audio = 'none';
 
-  let stt_text = '';
+  let stt_text = '',
+    hints = ['test'];
 
   let isListening = false;
 
@@ -98,7 +110,15 @@
   let dc = $dc_oper || $dc_user;
 
   $: if ($msg_user) {
-    console.log($msg_user);
+   
+    if($msg_user.lesson){   
+
+      dialog_data = $msg_user.lesson.dialog_data;
+      isFlipped =  !dialog_data.isFlipped
+      cur_qa = $msg_user.lesson.cur_qa;
+      Dialog();
+
+    }
     if ($msg_user.command === 'repeat') {
       isRepeat = true;
       setTimeout(() => {
@@ -109,6 +129,14 @@
 
   $: if ($msg_oper) {
     // console.log($msg_oper);
+    if($msg_oper.lesson){
+
+      dialog_data = $msg_oper.lesson.dialog_data;
+      isFlipped =  !dialog_data.isFlipped;
+      cur_qa = $msg_oper.lesson.cur_qa;
+      Dialog();
+
+    }
     if ($msg_oper.command === 'repeat') {
       isRepeat = true;
       setTimeout(() => {
@@ -117,9 +145,6 @@
     }
   }
 
-  $: if (data.name) {
-    init();
-  }
 
   $: if (data.html) {
     share_mode = true;
@@ -156,7 +181,7 @@
   // }
 
   if (data.func) {
-    onChangeClick();
+    onChangeUserClick();
   }
 
   $: switch ($call_but_status) {
@@ -206,7 +231,8 @@
   }
 
   function Dialog() {
-    if (!dialog_data.content[cur_qa]) {
+    const qa = dialog_data.content[cur_qa];
+    if (!qa) {
       cur_qa = 0;
       cur_html++;
       if (dialog_data.html && !dialog_data.html[cur_html]) {
@@ -216,7 +242,8 @@
         // onChangeClick();
       }, 0);
     }
-    q = dialog_data.content[cur_qa].user1;
+
+    q = isFlipped ? qa.user2 : qa.user1;
 
     q[$llang] = q[$llang]?.replace(
       '${user1_name}',
@@ -239,7 +266,7 @@
       .replaceAll(',', ' ')
       .split(' ');
     // q_shfl = shuffle(ar).toString().replaceAll(',', ' ');
-    a = dialog_data.content[cur_qa].user2;
+    a = isFlipped ? qa.user1 : qa.user2;
     a[$llang] = a[$llang]?.replace('${user2_name}', operator.name);
     a[$langs] = a[$langs]?.replace('${user2_name}', operator.name);
     a[$llang] = a[$llang]?.replace(
@@ -250,6 +277,9 @@
       '${user1_name}',
       $dc_user ? 'user_name' : 'Kolmit'
     );
+
+    hints = a.hints;
+    dialog_data.hints = a.hints;
 
     a_shfl = a[$llang].slice(0);
     ar = a_shfl
@@ -307,12 +337,11 @@
         {
           lesson: {
             llang: $llang,
-            quiz: 'dialog.client',
             name: dialog_data.name,
             html: dialog_data.html ? dialog_data.html[cur_html] : null,
-            user1: dialog_data.content[cur_qa].user1,
-            user2: dialog_data.content[cur_qa].user2,
+            dialog_data: dialog_data,
             cur_qa: cur_qa,
+            isFlipped: isFlipped
           },
         },
         (ex) => {
@@ -322,7 +351,9 @@
     }
   }
 
-  function onChangeClick() {
+  function onChangeUserClick() {
+    flipCard();
+
     data = {
       llang: $llang,
       html: dialog_data.html ? dialog_data.html[cur_html] : '',
@@ -354,8 +385,6 @@
           console.log();
         }
       );
-
-    flipCard();
   }
 
   function onClickQ() {
@@ -372,8 +401,8 @@
   }
 
   async function speak(text) {
-    // Speak(text);
-    if (text) tts.Speak($llang,text);
+
+    if (text) isFlipped ? Speak($llang, text) : tts.Speak($llang, text);
   }
 
   function onClickMicrophone() {
@@ -480,6 +509,7 @@
 
   onMount(async () => {
     // style_button = style_button_non_shared;
+     
   });
 
   function SendRepeat() {
@@ -499,6 +529,7 @@
       );
   }
 
+
   onDestroy(() => {
     // share_button = false;
     // voice.Cancel();
@@ -516,7 +547,7 @@
 
 <!-- <VoiceRSS bind:this={voice}></VoiceRSS> -->
 <main>
-  {#if data.quiz == 'dialog'}
+
     {#if isRepeat}
       <div class="repeat_alert">
         <Button>
@@ -561,7 +592,7 @@
           </Section>
 
           <Section>
-            <div class="flip_button" on:click={onChangeClick}>
+            <div class="flip_button" on:click={onChangeUserClick}>
               <IconButton>
                 <Icon tag="svg" viewBox="0 0 24 24">
                   <path fill="currentColor" d={mdiAccountConvertOutline} />
@@ -622,11 +653,11 @@
             style="visibility:{visibility[1]}"
           >
             {#if !dialog_data.content[cur_qa].user1[$langs]}
-              {#await Translate(dialog_data.content[cur_qa].user1[$llang], $llang, $langs) then data}
+              {#await Translate(q[$llang], $llang, $langs) then data}
                 {data}
               {/await}
             {:else}
-              {@html dialog_data.content[cur_qa].user1[$langs]}
+              {@html q[$langs]}
             {/if}
           </div>
         </div>
@@ -637,9 +668,7 @@
           <br />
           <!-- {#if showSpeakerButton} -->
           <div class="speaker-button">
-            <IconButton
-              on:click={speak(dialog_data.content[cur_qa].user1[$llang])}
-            >
+            <IconButton on:click={speak(q[$llang])}>
               <Icon tag="svg" viewBox="0 0 24 24">
                 <path fill="currentColor" d={mdiPlay} />
               </Icon>
@@ -653,17 +682,17 @@
         {/await}
 
         <div class="user2_tr">
-          {#if !dialog_data.content[cur_qa].user2[$langs]}
-            {#await Translate(dialog_data.content[cur_qa].user2[$llang], $llang, $langs) then data}
+          {#if !a[$langs]}
+            {#await Translate(a[$llang], $llang, $langs) then data}
               {data}
             {/await}
           {:else}
-            {@html dialog_data.content[cur_qa].user2[$langs]}
+            {@html a[$langs]}
           {/if}
         </div>
 
         <div class="user2" style="visibility:{visibility[1]}">
-          {@html dialog_data.content[cur_qa].user2[$llang]}
+          {@html a[$llang]}
         </div>
 
         <div style="text-align: center">
@@ -696,9 +725,7 @@
 
           <!-- {#if showSpeakerButton} -->
           <div class="speaker-button">
-            <IconButton
-              on:click={speak(dialog_data.content[cur_qa].user2[$llang])}
-            >
+            <IconButton on:click={speak(a[$llang])}>
               <Icon tag="svg" viewBox="0 0 24 24">
                 <path fill="currentColor" d={mdiPlay} />
               </Icon>
@@ -707,6 +734,21 @@
           <!-- {/if} -->
         </div>
         <br />
+
+        <div class="words_div accordion-container">
+          {#if hints?.length > 0}
+            <Content
+              style="line-height: 2.0; overflow-y:auto; height:50vh !important"
+            >
+              {#each hints as hint, i}
+                <span class="hint_button">
+                  {@html hint + '&nbsp;' + '&nbsp;'}
+                </span>
+              {/each}
+              <div style="height:50px"></div>
+            </Content>
+          {/if}
+        </div>
 
         {#if dialog_data.html}
           <ConText data={dialog_data} />
@@ -727,11 +769,6 @@
         </div>
       {/if}
     </div>
-  {/if}
-
-  {#if data.quiz == 'dialog.client'}
-    <Dialog2 {data} {onChangeClick} />
-  {/if}
 </main>
 
 <style>
@@ -869,8 +906,9 @@
     position: relative;
     line-height: normal;
     text-align: center;
-    margin: 0px;
-    font-size: 0.8em;
+    margin: 5px;
+    font-size: 0.8em;    
+    background-color: ghostwhite;
   }
 
   .user1 {
@@ -885,15 +923,15 @@
   .user2 {
     text-align: center;
     line-height: normal;
-    font-size: 0.8em;
+    font-size: 1em;
+    margin-bottom: 0px;
     color: #2196f3;
-    text-align: center;
   }
 
   .user2_tr {
     text-align: center;
     line-height: normal;
-    font-size: 0.8em;
+    font-size: 1em;
     margin-bottom: 0px;
     color: #333;
   }
@@ -950,5 +988,21 @@
     transform-style: preserve-3d;
     transition: transform 0.5s;
     height: calc(100vh - 23vh);
+  }
+
+  .words_div {
+    position: relative;
+    text-align: center;
+    overflow-y: auto;
+  }
+  .hint_button {
+    display: inline-block;
+    border: solid 0.1em #9f3f3f;
+    border-radius: 5px;
+    text-align: center;
+    width: auto;
+    padding-left: 8px;
+    margin: 5px;
+    background-color: transparent;
   }
 </style>
