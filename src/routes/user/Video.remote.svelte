@@ -79,7 +79,7 @@
     display: block;
     margin-right: auto;
     margin-left: auto;
-    margin-top: auto;
+    margin-top: 5px;
     max-height: 70%;
   }
   [status='call'] {

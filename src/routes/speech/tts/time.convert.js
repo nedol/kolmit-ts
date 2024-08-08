@@ -23,7 +23,7 @@ export function convertTimeToWords(lang, input) {
     switch (lang) {
       case 'nl':
         if (minutes === 0) {
-          return `${hours>12?hours-12:hours} uur`;
+          return `${hours>12?hours-12:hours}`;
         } else if (minutes < 15) {
           return `${minutes} over ${hours}`;
         } else if (minutes === 15) {

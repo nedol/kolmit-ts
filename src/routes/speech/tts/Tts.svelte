@@ -1,6 +1,8 @@
 <script>
   import { onMount, onDestroy, getContext } from 'svelte';
   import EasySpeech from '../../speech/tts/EasySpeech.svelte';
+  
+  import { convertTimeToWords } from './time.convert.js';
 
   let easyspeech;
 
@@ -9,8 +11,15 @@
   onMount(async () => {});
 
   export async function Speak(lang,text) {
-    if ('speechSynthesis' in window) await easyspeech.Speak(lang,text);
-    else Speak_server(text);
+
+    text = convertTimeToWords(lang, text);
+
+    // if ('speechSynthesis' in window) 
+    try{
+      await easyspeech.Speak(lang,text);
+    }catch(ex){    
+      Speak_server(text);
+    }
   }
 
   export async function Speak_server(text) {

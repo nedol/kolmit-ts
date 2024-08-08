@@ -4,7 +4,6 @@
 
   import bell from '$lib/mp3/bell.mp3';
 
-  import { convertTimeToWords } from './time.convert.js';
 
   import { view, lesson } from '$lib/js/stores.js';
 
@@ -67,8 +66,6 @@
     //   };
     //   window.speechSynthesis.speak(utterance);
     // }
-
-    text = convertTimeToWords(lang, text);
 
     // setTimeout(() => {
     EasySpeech.speak({

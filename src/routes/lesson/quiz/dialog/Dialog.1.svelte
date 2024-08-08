@@ -69,11 +69,9 @@
   export let data;
 
   if (data.name) {
-    console.log('data:',data)
-    if(data.quiz !== 'dialog.client')
-      init();
+    console.log('data:', data);
+    if (data.quiz !== 'dialog.client') init();
   }
-
 
   // translate.from = $llang;
   // translate.engine = 'google';
@@ -110,14 +108,11 @@
   let dc = $dc_oper || $dc_user;
 
   $: if ($msg_user) {
-   
-    if($msg_user.lesson){   
-
+    if ($msg_user.lesson) {
       dialog_data = $msg_user.lesson.dialog_data;
-      isFlipped =  !dialog_data.isFlipped
+      isFlipped = !dialog_data.isFlipped;
       cur_qa = $msg_user.lesson.cur_qa;
       Dialog();
-
     }
     if ($msg_user.command === 'repeat') {
       isRepeat = true;
@@ -129,13 +124,11 @@
 
   $: if ($msg_oper) {
     // console.log($msg_oper);
-    if($msg_oper.lesson){
-
+    if ($msg_oper.lesson) {
       dialog_data = $msg_oper.lesson.dialog_data;
-      isFlipped =  !dialog_data.isFlipped;
+      isFlipped = !dialog_data.isFlipped;
       cur_qa = $msg_oper.lesson.cur_qa;
       Dialog();
-
     }
     if ($msg_oper.command === 'repeat') {
       isRepeat = true;
@@ -144,7 +137,6 @@
       }, 2000);
     }
   }
-
 
   $: if (data.html) {
     share_mode = true;
@@ -341,7 +333,7 @@
             html: dialog_data.html ? dialog_data.html[cur_html] : null,
             dialog_data: dialog_data,
             cur_qa: cur_qa,
-            isFlipped: isFlipped
+            isFlipped: isFlipped,
           },
         },
         (ex) => {
@@ -401,7 +393,6 @@
   }
 
   async function speak(text) {
-
     if (text) isFlipped ? Speak($llang, text) : tts.Speak($llang, text);
   }
 
@@ -509,7 +500,6 @@
 
   onMount(async () => {
     // style_button = style_button_non_shared;
-     
   });
 
   function SendRepeat() {
@@ -529,7 +519,6 @@
       );
   }
 
-
   onDestroy(() => {
     // share_button = false;
     // voice.Cancel();
@@ -547,228 +536,226 @@
 
 <!-- <VoiceRSS bind:this={voice}></VoiceRSS> -->
 <main>
+  {#if isRepeat}
+    <div class="repeat_alert">
+      <Button>
+        <Label>{dict['Repeat'][$langs]}</Label>
+      </Button>
+    </div>
+  {/if}
+  <div class="top-app-bar-container flexor">
+    <TopAppBar bind:this={bottomAppBar} variant="fixed">
+      <Row>
+        <Section>
+          {#if cur_qa > 0}
+            <Icon
+              tag="svg"
+              on:click={onBackQA}
+              viewBox="0 0 24 24"
+              style="margin-top:0px; scale:.5;width:50px"
+            >
+              <path fill="white" d={mdiArrowLeft} />
+            </Icon>
+          {:else}
+            <Icon
+              tag="svg"
+              on:click={onBackQA}
+              viewBox="0 0 24 24"
+              style="visibility:hidden;margin-top:0px; scale:.5;width:50px"
+            >
+              <path fill="" d={mdiArrowLeft} />
+            </Icon>
+          {/if}
+        </Section>
+        <Section>
+          {#if share_button && $call_but_status === 'talk'}
+            <div class={share_button_class} on:click={onShare}>
+              <IconButton>
+                <Icon tag="svg" viewBox="0 0 24 24">
+                  <path fill="currentColor" d={mdiShareVariant} />
+                </Icon>
+              </IconButton>
+            </div>
+          {/if}
+        </Section>
 
-    {#if isRepeat}
-      <div class="repeat_alert">
-        <Button>
+        <Section>
+          <div class="flip_button" on:click={onChangeUserClick}>
+            <IconButton>
+              <Icon tag="svg" viewBox="0 0 24 24">
+                <path fill="currentColor" d={mdiAccountConvertOutline} />
+              </Icon>
+            </IconButton>
+          </div>
+        </Section>
+        <Section>
+          <div class="counter">
+            <p><span class="mdc-typography--overline">{cur_qa + 1}</span></p>
+          </div>
+        </Section>
+        <Section>
+          <button on:click={onClickQ} class="toggleButton">
+            <span class="material-symbols-outlined"> ? </span>
+          </button>
+        </Section>
+
+        <Section align="end">
+          <Icon
+            tag="svg"
+            on:click={onNextQA}
+            viewBox="0 0 24 24"
+            style="margin-top:0px; scale:.5; width:50px"
+          >
+            <path fill="white" d={mdiArrowRight} />
+          </Icon>
+        </Section>
+      </Row>
+    </TopAppBar>
+  </div>
+  <!-- Ваш контент для лицевой стороны -->
+  <div class="card">
+    {#if dc}
+      <div class="repeat_but">
+        <Button
+          class="button-shaped-round"
+          color="secondary"
+          on:click={() => SendRepeat()}
+          {variant}
+        >
           <Label>{dict['Repeat'][$langs]}</Label>
         </Button>
       </div>
     {/if}
-    <div class="top-app-bar-container flexor">
-      <TopAppBar bind:this={bottomAppBar} variant="fixed">
-        <Row>
-          <Section>
-            {#if cur_qa > 0}
-              <Icon
-                tag="svg"
-                on:click={onBackQA}
-                viewBox="0 0 24 24"
-                style="margin-top:0px; scale:.5;width:50px"
-              >
-                <path fill="white" d={mdiArrowLeft} />
-              </Icon>
-            {:else}
-              <Icon
-                tag="svg"
-                on:click={onBackQA}
-                viewBox="0 0 24 24"
-                style="visibility:hidden;margin-top:0px; scale:.5;width:50px"
-              >
-                <path fill="" d={mdiArrowLeft} />
-              </Icon>
-            {/if}
-          </Section>
-          <Section>
-            {#if share_button && $call_but_status === 'talk'}
-              <div class={share_button_class} on:click={onShare}>
-                <IconButton>
-                  <Icon tag="svg" viewBox="0 0 24 24">
-                    <path fill="currentColor" d={mdiShareVariant} />
-                  </Icon>
-                </IconButton>
-              </div>
-            {/if}
-          </Section>
+    {#if q || a}
+      <!-- <div class="cnt">{cur_qa + 1}</div> -->
+      {#await Translate('Послушай вопрос', 'ru', $langs) then data}
+        <div class="title">{data}:</div>
+      {/await}
 
-          <Section>
-            <div class="flip_button" on:click={onChangeUserClick}>
-              <IconButton>
-                <Icon tag="svg" viewBox="0 0 24 24">
-                  <path fill="currentColor" d={mdiAccountConvertOutline} />
-                </Icon>
-              </IconButton>
-            </div>
-          </Section>
-          <Section>
-            <div class="counter">
-              <p><span class="mdc-typography--overline">{cur_qa + 1}</span></p>
-            </div>
-          </Section>
-          <Section>
-            <button on:click={onClickQ} class="toggleButton">
-              <span class="material-symbols-outlined"> ? </span>
-            </button>
-          </Section>
-
-          <Section align="end">
-            <Icon
-              tag="svg"
-              on:click={onNextQA}
-              viewBox="0 0 24 24"
-              style="margin-top:0px; scale:.5; width:50px"
-            >
-              <path fill="white" d={mdiArrowRight} />
-            </Icon>
-          </Section>
-        </Row>
-      </TopAppBar>
-    </div>
-    <!-- Ваш контент для лицевой стороны -->
-    <div class="card">
-      {#if dc}
-        <div class="repeat_but">
-          <Button
-            class="button-shaped-round"
-            color="secondary"
-            on:click={() => SendRepeat()}
-            {variant}
-          >
-            <Label>{dict['Repeat'][$langs]}</Label>
-          </Button>
-        </div>
-      {/if}
-      {#if q || a}
-        <!-- <div class="cnt">{cur_qa + 1}</div> -->
-        {#await Translate('Послушай вопрос', 'ru', $langs) then data}
-          <div class="title">{data}:</div>
-        {/await}
-
-        <div class="tip mdc-typography--headline6">
-          {q[$llang]}
-        </div>
-        <div style="text-align: center;">
-          <div
-            class="user1 mdc-typography--headline6"
-            style="visibility:{visibility[1]}"
-          >
-            {#if !dialog_data.content[cur_qa].user1[$langs]}
-              {#await Translate(q[$llang], $llang, $langs) then data}
-                {data}
-              {/await}
-            {:else}
-              {@html q[$langs]}
-            {/if}
-          </div>
-        </div>
+      <div style="text-align: center;">
         <div
-          class="margins"
-          style="text-align: center; display: flex; align-items: center; justify-content: space-between;"
+          class="user1"
+          style="visibility:{visibility[1]}"
         >
-          <br />
-          <!-- {#if showSpeakerButton} -->
-          <div class="speaker-button">
-            <IconButton on:click={speak(q[$llang])}>
-              <Icon tag="svg" viewBox="0 0 24 24">
-                <path fill="currentColor" d={mdiPlay} />
-              </Icon>
-            </IconButton>
-          </div>
-          <!-- {/if} -->
-        </div>
-
-        {#await Translate('Переведи и ответь', 'ru', $langs) then data}
-          <div class="title">{data}:</div>
-        {/await}
-
-        <div class="user2_tr">
-          {#if !a[$langs]}
-            {#await Translate(a[$llang], $llang, $langs) then data}
+          {#if !dialog_data.content[cur_qa].user1[$langs]}
+            {#await Translate(q[$llang], $llang, $langs) then data}
               {data}
             {/await}
           {:else}
-            {@html a[$langs]}
+            {@html q[$langs]}
           {/if}
         </div>
+      </div>
 
-        <div class="user2" style="visibility:{visibility[1]}">
-          {@html a[$llang]}
-        </div>
+      <div class="tip mdc-typography--headline6">
+        {q[$llang]}
+      </div>
 
-        <div style="text-align: center">
-          <span style="color: darkgreen;">
-            {@html stt_text}
-          </span>
-        </div>
-
-        <div
-          class="margins"
-          style="text-align: center; display: flex; align-items: center; justify-content: space-between;"
-        >
-          <div>
-            <IconButton
-              class="material-icons"
-              aria-label="Back"
-              on:click={onClickMicrophone}
-            >
-              <Icon tag="svg" viewBox="0 0 24 24">
-                {#if isListening}
-                  <path fill="currentColor" d={mdiMicrophone} />
-                {:else}
-                  <path fill="currentColor" d={mdiMicrophoneOutline} />
-                {/if}
-              </Icon>
-            </IconButton>
-          </div>
-          <Stt bind:this={stt} {SttResult} {StopListening} bind:display_audio
-          ></Stt>
-
-          <!-- {#if showSpeakerButton} -->
-          <div class="speaker-button">
-            <IconButton on:click={speak(a[$llang])}>
-              <Icon tag="svg" viewBox="0 0 24 24">
-                <path fill="currentColor" d={mdiPlay} />
-              </Icon>
-            </IconButton>
-          </div>
-          <!-- {/if} -->
-        </div>
+      <div
+        class="margins"
+        style="text-align: center; display: flex; align-items: center; justify-content: space-between;"
+      >
         <br />
-
-        <div class="words_div accordion-container">
-          {#if hints?.length > 0}
-            <Content
-              style="line-height: 2.0; overflow-y:auto; height:50vh !important"
-            >
-              {#each hints as hint, i}
-                <span class="hint_button">
-                  {@html hint + '&nbsp;' + '&nbsp;'}
-                </span>
-              {/each}
-              <div style="height:50px"></div>
-            </Content>
-          {/if}
+        <!-- {#if showSpeakerButton} -->
+        <div class="speaker-button">
+          <IconButton on:click={speak(q[$llang])}>
+            <Icon tag="svg" viewBox="0 0 24 24">
+              <path fill="currentColor" d={mdiPlay} />
+            </Icon>
+          </IconButton>
         </div>
+        <!-- {/if} -->
+      </div>
 
-        {#if dialog_data.html}
-          <ConText data={dialog_data} />
-          <!-- <div class="html_data">{@html dialog_data.html[cur_html]}</div> -->
-          <!-- <iframe srcdoc={dialog_data.html[cur_html]} class="html_data" width="100%" height="700vh"></iframe> -->
+      {#await Translate('Переведи и ответь', 'ru', $langs) then data}
+        <div class="title">{data}:</div>
+      {/await}
+
+      <div class="user2_tr">
+        {#if !a[$langs]}
+          {#await Translate(a[$llang], $llang, $langs) then data}
+            {data}
+          {/await}
+        {:else}
+          {@html a[$langs]}
         {/if}
-      {:else}
-        <div style="text-align:center">
-          <span
-            class="material-symbols-outlined"
-            style="font-size: 20px; color: blue; scale:1.5;"
+      </div>
+
+      <div class="user2" style="visibility:{visibility[1]}">
+        {@html a[$llang]}
+      </div>
+
+      <div style="text-align: center">
+        <span style="color: darkgreen;">
+          {@html stt_text}
+        </span>
+      </div>
+
+      <div
+        class="margins"
+        style="text-align: center; display: flex; align-items: center; justify-content: space-between;"
+      >
+        <div>
+          <IconButton
+            class="material-icons"
+            aria-label="Back"
+            on:click={onClickMicrophone}
           >
-            <CircularProgress
-              style="height: 50px; width: 50px;"
-              indeterminate
-            />
-          </span>
+            <Icon tag="svg" viewBox="0 0 24 24">
+              {#if isListening}
+                <path fill="currentColor" d={mdiMicrophone} />
+              {:else}
+                <path fill="currentColor" d={mdiMicrophoneOutline} />
+              {/if}
+            </Icon>
+          </IconButton>
         </div>
+        <Stt bind:this={stt} {SttResult} {StopListening} bind:display_audio
+        ></Stt>
+
+        <!-- {#if showSpeakerButton} -->
+        <div class="speaker-button">
+          <IconButton on:click={speak(a[$llang])}>
+            <Icon tag="svg" viewBox="0 0 24 24">
+              <path fill="currentColor" d={mdiPlay} />
+            </Icon>
+          </IconButton>
+        </div>
+        <!-- {/if} -->
+      </div>
+      <br />
+
+      <div class="words_div accordion-container">
+        {#if hints?.length > 0}
+          <Content
+            style="line-height: 2.0; overflow-y:auto; height:50vh !important"
+          >
+            {#each hints as hint, i}
+              <span class="hint_button">
+                {@html hint + '&nbsp;' + '&nbsp;'}
+              </span>
+            {/each}
+            <div style="height:50px"></div>
+          </Content>
+        {/if}
+      </div>
+
+      {#if dialog_data.html}
+        <ConText data={dialog_data} />
+        <!-- <div class="html_data">{@html dialog_data.html[cur_html]}</div> -->
+        <!-- <iframe srcdoc={dialog_data.html[cur_html]} class="html_data" width="100%" height="700vh"></iframe> -->
       {/if}
-    </div>
+    {:else}
+      <div style="text-align:center">
+        <span
+          class="material-symbols-outlined"
+          style="font-size: 20px; color: blue; scale:1.5;"
+        >
+          <CircularProgress style="height: 50px; width: 50px;" indeterminate />
+        </span>
+      </div>
+    {/if}
+  </div>
 </main>
 
 <style>
@@ -907,12 +894,12 @@
     line-height: normal;
     text-align: center;
     margin: 5px;
-    font-size: 0.8em;    
+    font-size: 0.8em;
     background-color: ghostwhite;
   }
 
   .user1 {
-    width: 100vw;
+    /* width: 100vw;*/
     text-align: center;
     line-height: normal;
     font-size: 0.8em;
