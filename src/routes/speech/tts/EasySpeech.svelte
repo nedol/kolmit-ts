@@ -76,7 +76,7 @@
       pitch: 1.2,
       boundary: (e) => console.debug('boundary reached'),
       end: (e) => {
-        // window.speechSynthesis.cancel();
+        window.speechSynthesis.cancel();
         console.debug('speech end');
       },
       error: async (e) => {

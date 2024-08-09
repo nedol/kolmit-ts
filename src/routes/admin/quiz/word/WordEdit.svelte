@@ -357,7 +357,7 @@
         <div class="row">
           {#if item.original}
             <textarea rows="2" bind:value={item.original} />
-            {#if item.infinitive && item.infinitive !== item.original}
+            {#if false && item.infinitive && item.infinitive !== item.original}
               <textarea rows="2" bind:value={item.infinitive}></textarea>
             {/if}
           {:else}
