@@ -60,21 +60,24 @@
     TranslateContentToCurrentLang();
   }
 
-
-  $: if (dialog_data.content.length>0 && prompt) {
+  $: if (dialog_data.content.length > 0 && prompt) {
     let content = JSON.parse(JSON.stringify(dialog_data.content));
-    try{
-    content?.forEach((item) => {
-      item['user1'] = item['user1'][$llang]?item['user1'][$llang]:item['user1'];
-      item['user2'] = item['user2'][$llang]?item['user2'][$llang]:item['user2'];
-    });
-    }catch(ex){
-
-    }
+    try {
+      content?.forEach((item) => {
+        item['user1'] = item['user1'][$llang]
+          ? item['user1'][$llang]
+          : item['user1'];
+        item['user2'] = item['user2'][$llang]
+          ? item['user2'][$llang]
+          : item['user2'];
+      });
+    } catch (ex) {}
     prompt = prompt.replaceAll('${dialog_content}', JSON.stringify(content));
   }
 
-  fetch(`./lesson?dialog=${data.name[$llang]}&owner=${abonent}&level=${data.level}`)
+  fetch(
+    `./lesson?dialog=${data.name[$llang]}&owner=${abonent}&level=${data.level}`
+  )
     .then((response) => response.json())
     .then((resp) => {
       dialog_data = resp.data.dialog;
@@ -83,21 +86,31 @@
         dialog_data.html = splitHtmlContent(resp.data.html);
       }
       dialog_data.name = name;
-      fetch(`./admin?prompt=dialog&quiz_name=${data.name[$llang]}`)
+      fetch(
+        `./admin?prompt=dialog&quiz_name=${data.name[$llang]}&prompt_owner=${abonent}&prompt_level=${data.level}&prompt_theme=${data.theme}`
+      )
         .then((response) => response.json())
         .then((resp) => {
           prompt = resp.resp.prompt.system + resp.resp.prompt.user;
-          prompt = prompt.replaceAll('${$llang}', $llang);
+          prompt = prompt.replaceAll('${llang}', $llang);
           prompt = prompt.replaceAll('${name[$llang]}', name[$llang]);
-          prompt = prompt.replaceAll('${$langs}', $langs);
+          prompt = prompt.replaceAll('${langs}', $langs);
           prompt = prompt.replaceAll('${dialog_data.html}', dialog_data.html);
           prompt = prompt.replaceAll('${data.level}', data.level);
           prompt = prompt.replaceAll('${num}', num);
 
+          dialog_data.words = JSON.stringify(
+            resp.resp.words.data.map((item) => item.original)
+          );
 
-          dialog_data.words  = JSON.stringify(resp.resp.words.data.map(item => item.original));
+          prompt = prompt.replaceAll(
+            '[${dialog_data_words}]',
+            dialog_data.words
+          );
 
-          prompt = prompt.replaceAll('[${dialog_data_words}]', dialog_data.words);
+          grammar = resp.resp.grammar;
+
+          prompt = prompt.replaceAll('${grammar}', grammar);
 
           prompt = prompt;
         })
@@ -148,7 +161,7 @@
       num: (dialog_data.content.length + 1).toString(), // Пример создания уникального номера записи
       user1: { nl: '', ru: '', uk: '', fr: '', en: '', de: '' },
       user2: { nl: '', ru: '', uk: '', fr: '', en: '', de: '' },
-      language: 'nl', // Пример начального выбранного языка
+      language: $llang, // Пример начального выбранного языка
     };
     dialog_data.content.push(emptyRecord);
     dialog_data = dialog_data;
@@ -221,15 +234,12 @@
   }
 
   function OnContextChange() {
-    prompt = prompt.replace(
-      /<<(\w+)>>/g,
-      `<<${dialog_data.html}>>`
-    );
-    console.log()
+    prompt = prompt.replace(/<<(\w+)>>/g, `<<${dialog_data.html}>>`);
+    console.log();
   }
 
-  function OnWordsChange(){
-      prompt = prompt.replaceAll('${dialog_data_words}', dialog_data.words);
+  function OnWordsChange() {
+    prompt = prompt.replaceAll('${dialog_data_words}', dialog_data.words);
   }
 
   function OnChangeContent(ev: Event) {
@@ -278,7 +288,7 @@
         if (dialog_data && dialog_data.content)
           dialog_data.content = dialog_data.content.concat(parsed.content);
         else {
-          dialog_data.content = parsed ;
+          dialog_data.content = parsed;
         }
         if (dialog_data && parsed_html) {
           dialog_data.html = parsed_html;
@@ -364,11 +374,7 @@
                 <!-- <div style="height: 350px; overflow-y:auto">
                   {@html dialog_data.html}
                 </div> -->
-                <iframe
-                  srcdoc={dialog_data.html}
-                  width="100%"
-                  height="350px"
-                  
+                <iframe srcdoc={dialog_data.html} width="100%" height="350px"
                 ></iframe>
               {:else}
                 <Paper variant="unelevated">
@@ -399,7 +405,7 @@
               <Paper variant="unelevated">
                 <Content>
                   <textarea
-                    on:change = {()=>OnWordsChange()}
+                    on:change={() => OnWordsChange()}
                     rows="20"
                     name="dialog_words"
                     bind:value={dialog_data.words}

@@ -21,7 +21,6 @@
     isCollapsed.update((n) => !n);
   }
 
-
   export let ChangeQuizName: any;
 
   const abonent = getContext('abonent');
@@ -30,9 +29,9 @@
   let content: any,
     new_content = false,
     words_data: [];
-  const name = data.name[$llang];
-  let words = data.module.themes[0].words,
-    prompt:string,
+  const name = data?.name[$llang];
+  let words = data?.module.themes[0].words,
+    prompt: string,
     dialog_task: any,
     dialog_words,
     dialog_tmplt;
@@ -48,9 +47,11 @@
     prompt = prompt.replaceAll('${llang}', $llang);
     prompt = prompt.replaceAll('${langs}', $langs);
     prompt = prompt.replaceAll('${words}', words);
-    prompt = prompt.replaceAll('${topic}', data.theme+'.' + data.name[$llang] );
+    prompt = prompt.replaceAll(
+      '${topic}',
+      data.theme + '.' + data.name[$llang]
+    );
     prompt = prompt.replaceAll('${level}', data.level);
-     
   }
 
   let grammar_title = 'Grammar',
@@ -70,14 +71,17 @@
     })();
   }
 
-   $: if (words) {
+  $: if (words) {
     prompt = prompt.replaceAll('${data_words}', words);
   }
 
-  fetch(`./lesson?words=theme&name=${data.name[$llang]}&owner=${abonent}&level=${data.level}`)
+  fetch(
+    `./lesson?words=theme&name=${data.name[$llang]}&owner=${abonent}&level=${data.level}`
+  )
     .then((response) => response.json())
     .then((data) => {
-      words_data = data.data;
+
+      words_data = data?.data;
 
       if (words_data) {
         words_data.map(async (item) => {
@@ -124,7 +128,12 @@
     // ChangeQuizName(name, data.name);
   }
 
-  async function SaveData(name: string, new_name: string, data: any, level:string) {
+  async function SaveData(
+    name: string,
+    new_name: string,
+    data: any,
+    level: string
+  ) {
     const response = await fetch(`/admin/module`, {
       method: 'POST',
       body: JSON.stringify({
@@ -183,7 +192,7 @@
       .then((text) => {
         content = text;
         const parsed = JSON.parse(text);
-        words_data = parsed;
+        words_data = words_data.concat(parsed);
       })
       .catch((err) => {
         console.error('Failed to read clipboard contents: ', err);
@@ -347,13 +356,14 @@
     </thead>
   </table>
 
-  {#if words_data}
+  {#if words_data && words_data[0]}
     <SortableList
       onSort={(ev) => {
         handleSort(ev, words_data);
       }}
     >
       {#each words_data as item, index (index)}
+        <!-- {@debug item} -->
         <div class="row">
           {#if item.original}
             <textarea rows="2" bind:value={item.original} />

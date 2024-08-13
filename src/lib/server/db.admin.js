@@ -3,6 +3,9 @@ import { getLevels } from './db';
 import postgres from 'postgres';
 import { SendEmail } from './db';
 
+import pkg_l from 'lodash';
+const { find, remove, findIndex, difference } = pkg_l;
+
 let sql;
 
 let conStr = {
@@ -81,7 +84,7 @@ export async function GetGroups(par) {
     groups = await sql`
      SELECT groups.name  FROM groups
      INNER JOIN operators ON (operators.abonent = groups.owner)
-     WHERE operators.operator=${par.abonent} AND operators.psw = ${par.psw}
+     WHERE operators.operator=${par.abonent} AND operators.role='admin' AND operators.psw = ${par.psw}
      `;
   } catch (ex) {
     console.log(ex);
@@ -189,13 +192,20 @@ export async function UpdateWords(q) {
   }
 }
 
-export async function GetPrompt(prompt,quiz_name) {
+export async function GetPrompt(prompt, quiz_name, owner, level, theme) {
+  let prompt_res, words_res, gram_res, gram;
   try {
-    let prompt_res = await sql`SELECT * FROM prompts WHERE name=${prompt}`;
-     let words_res = await sql`SELECT * FROM words WHERE name=${quiz_name}`;
-
-    return { prompt: prompt_res[0], words: words_res[0] };
+    prompt_res = await sql`SELECT * FROM prompts WHERE name=${prompt}`;
+    words_res = await sql`SELECT * FROM words WHERE name=${quiz_name}`;
+    gram_res =
+      await sql`SELECT * FROM grammar WHERE owner=${owner} AND level=${level}`;
+    gram = find(gram_res[0].data, { theme: theme });
   } catch (ex) {
-    return JSON.stringify({ res: ex });
+    // return JSON.stringify({ res: ex });
   }
+  return {
+    prompt: prompt_res[0],
+    words: words_res[0],
+    grammar: gram?.grammar,
+  };
 }

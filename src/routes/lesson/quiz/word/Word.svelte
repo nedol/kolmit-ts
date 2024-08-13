@@ -48,8 +48,8 @@
   let hl_words = data.highlight ? data.highlight.split(',') : [];
 
   let arrayOfArrays;
-  let userContent = '';
-  let div_input;
+  let userContent = [];
+  let div_input = [];
   let result = '';
   let resultElement;
   let hintIndex = 0;
@@ -91,24 +91,45 @@
   }
 
   function highlightWords() {
-    const woord = hl_words[hl_words.length - 1]?.trim();
-    const regex = new RegExp(
-      `\\b[${woord.charAt(0).toUpperCase()}${woord.charAt(0).toLowerCase()}]${woord.slice(1)}\\b`,
+
+    userContent[0] = userContent[0]
+      .replace(/[.\/#!?$%\^&\*;:{}=_`~()]/g, '')
+      .trim();
+          
+    let woord = hl_words[0]?.trim();
+    let regex = new RegExp(
+      `\\b[${woord?.charAt(0).toUpperCase()}${woord?.charAt(0).toLowerCase()}]${woord?.slice(1)}\\b`,
       'g'
     );
 
-    userContent = userContent.replace(/[.\/#!?$%\^&\*;:{}=_`~()]/g, '').trim();
-
-    userContent = userContent.replace(
+    userContent[0] = userContent[0].replace(
       regex,
       `<span class="highlight" style="color: green;background-color: transparent">${woord}</span>`
     );
+
+    userContent[1] = userContent[1]
+      .replace(/[.\/#!?$%\^&\*;:{}=_`~()]/g, '')
+      .trim();
+
+                
+    woord = hl_words[1]?.trim();
+    regex = new RegExp(
+      `\\b[${woord?.charAt(0).toUpperCase()}${woord?.charAt(0).toLowerCase()}]${woord?.slice(1)}\\b`,
+      'g'
+    );
+
+    userContent[1] = userContent[1].replace(
+      regex,
+      `<span class="highlight" style="color: green;background-color: transparent">${woord}</span>`
+    );
+
+    hl_words = [];
   }
 
   let topAppBar;
   let sentence_span;
 
-  $: if (div_input) div_input.focus();
+  $: if (div_input[0]) div_input[0].focus();
 
   function similarity(s1, s2) {
     let longer = s1;
@@ -151,15 +172,29 @@
   }
 
   function replaceWordWithInput(text, targetWord) {
-    const words = text.split(' ');
     const threshold = 0.8; // 90% порог
-    for (let i = 0; i < words.length; i++) {
-      if (similarity(words[i], targetWord) >= threshold) {
-        words[i] =
-          `<span class="sentence_span" style="position: relative; width: 120px; left: 0px;"></span> `;
+
+    if (text.includes(targetWord)) {
+      const regex = new RegExp(`\\b${targetWord}\\b`, 'gi');
+
+      return text.replace(
+        regex,
+        '<span class="sentence_span" style="position: relative; width: 120px; left: 0px;"></span>'
+      );
+    } else {
+      const targetWords = targetWord.split(' ');
+      const words = text.split(' ');
+
+      for (let i = 0; i < words.length; i++) {
+        for (let t in targetWords) {
+          if (similarity(words[i], targetWords[t]) >= threshold) {
+            words[i] =
+              `<span class="sentence_span" style="position: relative; width: 120px; left: 0px;"></span> `;
+          }
+        }
       }
+      return words.join(' ');
     }
-    return words.join(' ');
   }
 
   async function makeExample() {
@@ -176,14 +211,24 @@
       '<span style="color:green"><b>$1</b></span>'
     );
 
+    const regex = /(<<\w+>>)\s+(<<\w+>>)/;
+    const match = currentWord?.original.match(regex);
+    let original = currentWord.original;
+    if (match) {
+      original = `${match[0]} ${match[1]}`;
+    } else original = `${currentWord.original}`;
+
     resultElement = replaceWordWithInput(
       currentWord?.example[$llang],
-      `<<${currentWord?.original}>>`
+      `${original}`
     );
 
     setTimeout(() => {
-      const spanElement = document.querySelector('.sentence_span');
-      if (spanElement) spanElement.appendChild(div_input);
+      const spanElements = document.querySelectorAll('.sentence_span');
+      spanElements.forEach((spanElement, i) => {
+        div_input[i].style.display = '';
+        spanElement.appendChild(div_input[i]); // Используем cloneNode, чтобы не удалить div_input из DOM
+      });
       resultElementWidth = getTextWidth(currentWord?.original, '20px Arial');
     }, 0);
 
@@ -207,7 +252,7 @@
 
     // Измеряем длину текста
     const metrics = context.measureText(text);
-    return metrics.width + 10;
+    return metrics.width + 20;
   }
 
   onMount(async () => {});
@@ -234,7 +279,8 @@
     currentWordIndex = 0;
     currentWord = words[currentWordIndex];
     makeExample();
-    userContent = '';
+    userContent[0] = '';
+    userContent[1] = '';
     result = '';
   }
 
@@ -243,7 +289,8 @@
     currentWordIndex = nextIndex;
     currentWord = words[currentWordIndex];
     makeExample();
-    userContent = '';
+    userContent[0] = '';
+    userContent[1] = '';
     hintIndex = 0;
     result = '';
     showCheckMark = false;
@@ -277,29 +324,56 @@
     setTimeout(() => {
       const range = document.createRange();
       const selection = window.getSelection();
-      range.selectNodeContents(div_input);
+      range.selectNodeContents(div_input[0]);
       range.collapse(false);
       selection.removeAllRanges();
       selection.addRange(range);
-    });
+    }, 100);
   }
 
   function checkInput() {
+
+    if(userContent.length < 1 || !userContent[0])
+      return;
+
     if (errorIndex > 0) {
       errorIndex = 0;
-      userContent = '';
+      userContent = [];
     }
 
-    const targetWord = words[currentWordIndex].original
-      .replace(/[.\/#!?$%\^&\*;:{}=_`~()]/g, '')
-      .trim();
-    userContent = userContent
-      .replace(/&nbsp;/g, '')
-      .replace(/<\/?![^>]+(>|$)/g, '');
-    const trimmedUserContent = userContent.trim();
-    focus_pos = 0;
+    const targetWords = currentWord.original
+      .replace(/[.\/#!?$%\^&\*;:{}=`~()]/g, '')
+      .trim()
+      .split(' ');
 
-    if (trimmedUserContent.toLowerCase() === targetWord.toLowerCase()) {
+    let correctCount = 0;
+    result = [];
+
+    userContent.forEach((userInput, i) => {       
+      // userContent[i] = '';
+      if (!userInput) userInput = userContent[0];
+      userInput = userInput
+        .replace(/&nbsp;/g, '')
+        .replace(/<\/?![^>]+(>|$)/g, '')
+        .trim();
+
+      if( targetWords[i] && userInput)
+      if (userInput?.toLowerCase().includes(targetWords[i].toLowerCase().replace('_',' '))) {
+        // result[i] = `<span class="correct">${targetWords[i]}</span>`;
+                if(div_input[i])
+        div_input[i].style.color= 'green'
+        correctCount++;
+      } else {   
+        if(div_input[i])
+        div_input[i].style.color= 'red'
+        
+        errorIndex++;        
+      }
+    });
+
+    // console.log(targetWords.length)
+
+    if (errorIndex<1) {
       showCheckMark = true; // Показываем галочку
       showNextButton = true;
       speak(currentWord.example[$llang]);
@@ -308,59 +382,27 @@
         // Перемещаем текущее слово в конец своей "десятки" в words
         words.splice(currentWordIndex, 1);
         words.splice(parseInt(currentWordIndex / 10) * 10 + 9, 0, currentWord);
-        // Создаем клон текущего слова
         const currentWordClone = { ...currentWord };
-        // Проверяем, достаточно ли элементов в массиве words для добавления в следующую "двадцатку"
+
         if (currentWordIndex + 20 < words.length) {
-          // Вычисляем индекс конечного элемента в следующей "двадцатке"
-          const nextTwentyIndex = currentWordIndex + 20;
-          // Вставляем клон currentWord в конец следующей "двадцатки"
-          words.splice(nextTwentyIndex, 0, currentWordClone);
+          words.splice(currentWordIndex + 20, 0, currentWordClone);
         } else {
-          // Если условие не выполняется, вставляем клон currentWord в конец массива words
           words.push(currentWordClone);
         }
 
         words = words;
-        currentWordIndex = currentWordIndex - 1;
+        currentWordIndex--;
         errorIndex = 0;
       }
 
-      userContent = currentWord.original.replace(
-        /[.\/#!$%\^&\*;:{}=_`~()]/g,
-        ''
-      );
-      highlightWords(userContent);
-      // nextWord();
+      // if (countWordOccurrences(resultElement, '<span') < 2)
+      //   userContent[0] = currentWord.original.replace('_',' ');
+      // else userContent = targetWords;
+
+      // highlightWords(userContent.join(' '));
     } else {
       showCheckMark = false;
-      result = '';
-      let i = 0;
-
-      while (i < targetWord.length || i < trimmedUserContent.length) {
-        if (!trimmedUserContent[i]) {
-          // Недостающие символы выделяются пустым span с красной окантовкой
-          // result += `<span class="empty_block" onchage="onChangeUserContent" style="display: inline-block; background-color:rgba(255, 240, 251, 0.9);border:1px solid rgba(255, 240, 251, 0.9); width:15px">&nbsp;&nbsp;&nbsp;&nbsp;</span>`;
-        } else if (trimmedUserContent[i] === targetWord[i]) {
-          // Совпадающие символы
-          result += `<span class="correct">${targetWord[i]}</span>`;
-          focus_pos = i + 1;
-        } else {
-          console.log();
-          // Несовпадающие символы
-          result += `<span style="color:red;">${trimmedUserContent[i]}</span>`;
-          // resultElementWidth = getTextWidth(
-          //   trimmedUserContent,
-          //   '20px Arial'
-          // );
-          errorIndex++;
-        }
-
-        i++;
-      }
-
-      userContent = result;
-      // Устанавливаем фокус в конец строки в div_input
+      focus_pos = 0;
       setFocus();
     }
   }
@@ -374,6 +416,7 @@
   }
 
   function showHint() {
+
     // wordsString = shuffleWords(wordsString);
     currentWord.original = currentWord.original.replace(
       /[.,\/#!?$%\^&\*;:{}=_`~()]/g,
@@ -398,7 +441,8 @@
     currentWord = words[currentWordIndex];
     makeExample();
 
-    userContent = '';
+    userContent[0] = '';
+    userContent[1] = '';
     hintIndex = 0;
     result = '';
     showCheckMark = false;
@@ -411,7 +455,8 @@
     currentWord = words[--currentWordIndex];
     makeExample();
 
-    userContent = '';
+    userContent[0] = '';
+    userContent[1] = '';
     hintIndex = 0;
     result = '';
     showCheckMark = false;
@@ -432,12 +477,47 @@
     setFocus();
   }
 
+  function countWordOccurrences(sentence, word) {
+    // Приводим предложение и слово к нижнему регистру для нечувствительности к регистру
+    const lowerSentence = sentence.toLowerCase();
+    const lowerWord = word.toLowerCase();
+
+    // Разбиваем предложение на массив слов
+    const words = lowerSentence.split(/\s+/);
+
+    // Считаем количество вхождений слова
+    let count = 0;
+    words.forEach(function (w) {
+      if (w === lowerWord) {
+        count++;
+      }
+    });
+
+    return count;
+  }
+
   function OnClickHint(word) {
-    word = word.replace(/[.\/#!?$%\^&\*;:{}=_`~()]/g, '');
-    resultElementWidth = getTextWidth(word, '20px Arial');
-    userContent = word;
-    hl_words.push(word);
-    errorIndex = 0;
+        div_input.forEach((di)=>{
+      di.style.color= ''
+    });
+    const span_cnt = countWordOccurrences(resultElement, '<span');
+
+    if (span_cnt > 1) {
+      word = word.split(' ');
+      word.forEach((w, i) => {
+        w = w.replace(/[.\/#!?$%\^&\*;:{}=`~()]/g, '');
+        resultElementWidth = getTextWidth(w, '20px Arial');
+        userContent[i] = w.replace('_',' ');
+        hl_words.push(w);
+        errorIndex = 0;
+      });
+    } else {
+      word = word.replace(/[.\/#!?$%\^&\*;:{}=`~()]/g, '');      
+      resultElementWidth = getTextWidth(word, '20px Arial');
+      userContent[0] = word
+      hl_words.push(word);
+      errorIndex = 0;
+    }
   }
 </script>
 
@@ -516,13 +596,24 @@
       {#if resultElement}
         {@html resultElement}
       {/if}
+
       <div
         class="input"
         contenteditable="true"
         on:input={onChangeUserContent}
-        bind:this={div_input}
-        bind:innerHTML={userContent}
-        style="width: {resultElementWidth}px"
+        bind:this={div_input[0]}
+        bind:innerHTML={userContent[0]}
+        style="display:none;width: {resultElementWidth}px"
+      >
+        {@html result}
+      </div>
+      <div
+        class="input"
+        contenteditable="true"
+        on:input={onChangeUserContent}
+        bind:this={div_input[1]}
+        bind:innerHTML={userContent[1]}
+        style="display:none;width: {resultElementWidth}px"
       >
         {@html result}
       </div>
@@ -557,7 +648,7 @@
                 OnClickHint(hint.original);
               }}
             >
-              {@html hint?.original + '&nbsp;' + '&nbsp;'}
+              {@html hint?.original.replace('_',' ') + '&nbsp;' + '&nbsp;'}
             </span>
           {/each}
           <div style="height:50px"></div>

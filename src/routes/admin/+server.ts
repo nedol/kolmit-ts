@@ -10,9 +10,12 @@ export async function GET({ url, fetch, cookies }) {
   let resp;
   const prompt = url.searchParams.get('prompt');
    const quiz_name = url.searchParams.get('quiz_name');
-  
+	const quiz_level = url.searchParams.get('prompt_level');
+	const quiz_owner = url.searchParams.get('prompt_owner');
+	const quiz_theme = url.searchParams.get('prompt_theme');
+	
   if (prompt) {
-   resp = await GetPrompt(prompt, quiz_name);
+   resp = await GetPrompt(prompt, quiz_name,quiz_owner, quiz_level,quiz_theme);
   }
 
 	let response = new Response(JSON.stringify({ resp } ));
