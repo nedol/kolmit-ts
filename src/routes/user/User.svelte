@@ -50,10 +50,22 @@
   }
 
   let dc = false;
-  // import { dc_msg } from '$lib/js/stores.js';
-  // $: if ($dc_msg) {
-  // 	OnMessage($dc_msg);
-  // }
+
+  import { dc_user_state } from '$lib/js/stores.js';
+  $:if($dc_user_state){
+    switch($dc_user_state){
+    case 'open':
+      break;
+    case 'close':
+      OnMessage({data:{call:{func:'mute'}}}, null);
+      break;    
+    
+    case 'mute':
+      OnMessage({data:{call:{func:'mute'}}}, null);
+      break;    
+    }
+  }
+
 
   let checked = false;
 

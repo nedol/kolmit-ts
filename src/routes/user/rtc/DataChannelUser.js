@@ -51,16 +51,15 @@ export class DataChannelUser {
 					console.log(that.pc.pc_key + ' datachannel open');
 
 				}
-
-				that.SendDCCall();		
-
-				that.dc.onclose = () => {
-					msg_user.set({ func: 'mute' });
-					dc_user_state.set(that.dc.readyState);
-				};
+				that.SendDCCall();	
 			};
 
-			dc_user_state.set(that.dc.readyState);
+			
+			this.dc.onclose = () => {
+				msg_user.set({ func: 'mute' });
+				dc_user_state.set("close");
+			};
+			
 		};
 
 		let data = '';

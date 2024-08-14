@@ -100,6 +100,8 @@
     lesson,
     dc_oper,
     dc_user,
+    dc_oper_state,
+    dc_user_state,
     msg_user,
     msg_oper,
     call_but_status,
@@ -250,7 +252,9 @@
 
     q_shfl = q[$llang].slice(0);
 
-    speak(q[$llang]);
+    const dc = $dc_user || $dc_oper;
+
+    if (!dc) speak(q[$llang]);
 
     let ar = q_shfl
       .toLowerCase()
@@ -314,7 +318,7 @@
 
   function onShare() {
     // Обработчик нажатия на кнопку "share"
-    share_mode = !share_mode;
+    share_mode = true;
     share_button_class = `button_shared_${share_mode}`;
     Dialog();
     SendData();
@@ -329,6 +333,7 @@
         {
           lesson: {
             llang: $llang,
+            level: data.level,
             name: dialog_data.name,
             html: dialog_data.html ? dialog_data.html[cur_html] : null,
             dialog_data: dialog_data,
@@ -633,10 +638,7 @@
       {/await}
 
       <div style="text-align: center;">
-        <div
-          class="user1"
-          style="visibility:{visibility[1]}"
-        >
+        <div class="user1" style="visibility:{visibility[1]}">
           {#if !dialog_data.content[cur_qa].user1[$langs]}
             {#await Translate(q[$llang], $llang, $langs) then data}
               {data}
@@ -672,17 +674,21 @@
       {/await}
 
       <div class="user2_tr">
-        {#if !a[$langs]}
-          {#await Translate(a[$llang], $llang, $langs) then data}
-            {data}
-          {/await}
-        {:else}
-          {@html a[$langs]}
+        {#if a}
+          {#if !a[$langs]}
+            {#await Translate(a[$llang], $llang, $langs) then data}
+              {data}
+            {/await}
+          {:else}
+            {@html a[$langs]}
+          {/if}
         {/if}
       </div>
 
       <div class="user2" style="visibility:{visibility[1]}">
+        {#if a}
         {@html a[$llang]}
+        {/if}
       </div>
 
       <div style="text-align: center">

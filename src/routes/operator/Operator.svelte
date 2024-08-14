@@ -53,11 +53,23 @@
   import { click_call_func } from '$lib/js/stores.js';
 
   import { dc_oper_state } from '$lib/js/stores.js';
-  import { dc_user_state } from '$lib/js/stores.js';
+  $:if($dc_oper_state){
+    switch($dc_oper_state){
+    case 'open':
+      break;
+    case 'close':
+      OnMessage({data:{call:{func:'mute'}}}, null);
+      break;    
+    
+    case 'mute':
+      OnMessage({data:{call:{func:'mute'}}}, null);
+      break;    
+    }
+  }
 
   import { msg_user } from '$lib/js/stores.js';
   $: if ($msg_user) {
-  OnMessage($msg_user, null);
+    OnMessage($msg_user, null);
   }
 
   import { msg_oper } from '$lib/js/stores.js';
@@ -433,10 +445,7 @@
 
     if (data.lesson) {
       $view = 'lesson';
-
-      if (data.lesson) {
-        $lesson.data = data.lesson;
-      }
+      $lesson.data = data.lesson;      
     }
   }
 

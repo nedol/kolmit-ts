@@ -23,18 +23,18 @@ export class DataChannelOperator extends DataChannel {
 				dc_oper_state.set(that.dc.readyState);
 			}
 
-			this.dc.onclose = () => {
-				msg_oper.set({ func: 'mute' });
-				dc_oper_state.set(that.dc.readyState);
-			};
-
-			this.dc.onerror = () => {
-				msg_oper.set({ func: 'mute' });
-				dc_oper_state.set(that.dc.readyState);
-			};
+		};
+		
+		this.dc.onclose = () => {
+			msg_oper.set({ func: 'mute' });
+			dc_oper_state.set("close");
 		};
 
-		dc_oper_state.set(that.dc.readyState);
+		this.dc.onerror = () => {
+			msg_oper.set({ func: 'mute' });
+			dc_oper_state.set("mute");
+		};
+
 
 		pc.StartEvents();
 

@@ -90,9 +90,14 @@
 
   BuildQuizUsers($quiz_userst);
 
-  $: if ($msg_oper && $msg_oper['quiz_users']) {
+  $: if ($msg_oper)
+    if($msg_oper['quiz_users']) {
     // console.log($msg_oper['quiz_users']);
     BuildQuizUsers($msg_oper.quiz_users);
+  }else if ($msg_oper['lesson']){
+    console.log($msg_oper['lesson']);
+    
+    onClickQuiz("dialog",  $msg_oper['lesson'].level, $msg_oper['lesson'].name,$msg_oper['lesson'].dialog_data.name);
   }
 
   (async () => {

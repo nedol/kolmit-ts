@@ -56,7 +56,7 @@
   let errorIndex = 0;
   let showCheckMark = false;
   let showNextButton = false;
-  let resultElementWidth = 100;
+  let resultElementWidth = [];
   let showSpeakerButton = false;
   let focus_pos = 0;
 
@@ -174,27 +174,10 @@
   function replaceWordWithInput(text, targetWord) {
     const threshold = 0.8; // 90% порог
 
-    if (text.includes(targetWord)) {
-      const regex = new RegExp(`\\b${targetWord}\\b`, 'gi');
-
-      return text.replace(
-        regex,
-        '<span class="sentence_span" style="position: relative; width: 120px; left: 0px;"></span>'
-      );
-    } else {
-      const targetWords = targetWord.split(' ');
-      const words = text.split(' ');
-
-      for (let i = 0; i < words.length; i++) {
-        for (let t in targetWords) {
-          if (similarity(words[i], targetWords[t]) >= threshold) {
-            words[i] =
-              `<span class="sentence_span" style="position: relative; width: 120px; left: 0px;"></span> `;
-          }
-        }
-      }
-      return words.join(' ');
-    }
+    return text.replace(/<<([^>]*)>>/g, 
+      `<span  value="$1" class="sentence_span" style="position: relative;  left: 0px;"></span>`
+    );
+    
   }
 
   async function makeExample() {
@@ -223,13 +206,32 @@
       `${original}`
     );
 
+    function extractWords(text) {
+    // Регулярное выражение для поиска слов в угловых скобках
+    const regex = /<<(.*?)>>/g;
+    // Массив для хранения найденных слов
+    let result = [];
+    let match;
+    
+    // Поиск всех совпадений и добавление их в массив
+    while ((match = regex.exec(text)) !== null) {
+        result.push(match[1]);
+    }
+    
+    return result;
+}
+
     setTimeout(() => {
+      const wAr = extractWords(currentWord?.example[$llang])
       const spanElements = document.querySelectorAll('.sentence_span');
       spanElements.forEach((spanElement, i) => {
         div_input[i].style.display = '';
         spanElement.appendChild(div_input[i]); // Используем cloneNode, чтобы не удалить div_input из DOM
+        // spanElement.style.width = "50px";
+        resultElementWidth[i] = getTextWidth(wAr[i], '20px Arial');
+        console.log(spanElement.style.width )
       });
-      resultElementWidth = getTextWidth(currentWord?.original, '20px Arial');
+
     }, 0);
 
     // word = currentWord['original'].replace(/(de|het)\s*/gi, '');
@@ -252,7 +254,37 @@
 
     // Измеряем длину текста
     const metrics = context.measureText(text);
-    return metrics.width + 20;
+    return metrics.width + 5;
+  }
+
+    function OnClickHint(word) {
+        
+    div_input.forEach((di)=>{
+      di.style.color= ''
+    });
+    const span_cnt = countWordOccurrences(resultElement, '<span');
+    function extractSpans(htmlString) {
+        // Создаем новый DOMParser
+        const parser = new DOMParser();
+        // Парсим HTML-строку в документ
+        const doc = parser.parseFromString(htmlString, 'text/html');
+        // Находим все элементы <span> в документе
+        const spans = doc.querySelectorAll('span');
+        // Преобразуем NodeList в массив
+        return Array.from(spans);
+    }
+
+    const arSpan = extractSpans(resultElement);
+    const words = word.split(' ')
+
+    arSpan.forEach((el, i)=>{
+      if(word.includes(el.attributes.value.textContent)){
+         userContent[i] = el.attributes.value.textContent;
+      }else{
+         userContent[i] = words[i]
+      }
+    })
+
   }
 
   onMount(async () => {});
@@ -338,7 +370,7 @@
 
     if (errorIndex > 0) {
       errorIndex = 0;
-      userContent = [];
+      // userContent = [];
     }
 
     const targetWords = currentWord.original
@@ -424,9 +456,9 @@
     );
     if (hintIndex < currentWord?.original.length) {
       if (hintIndex === 0) {
-        userContent = '';
+        userContent[0] = '';
       }
-      userContent += currentWord.original[hintIndex];
+      userContent[0] += currentWord.original[hintIndex];
       hintIndex++;
 
       result = ''; // Очистим результат при каждой новой подсказке
@@ -471,6 +503,7 @@
 
   function speak(text) {
     text = text.replace(/<<|>>/g, '');
+    text = text.replace(/_/g, ' ');
     // Speak(text);
     tts.Speak($llang, text);
 
@@ -496,29 +529,7 @@
     return count;
   }
 
-  function OnClickHint(word) {
-        div_input.forEach((di)=>{
-      di.style.color= ''
-    });
-    const span_cnt = countWordOccurrences(resultElement, '<span');
 
-    if (span_cnt > 1) {
-      word = word.split(' ');
-      word.forEach((w, i) => {
-        w = w.replace(/[.\/#!?$%\^&\*;:{}=`~()]/g, '');
-        resultElementWidth = getTextWidth(w, '20px Arial');
-        userContent[i] = w.replace('_',' ');
-        hl_words.push(w);
-        errorIndex = 0;
-      });
-    } else {
-      word = word.replace(/[.\/#!?$%\^&\*;:{}=`~()]/g, '');      
-      resultElementWidth = getTextWidth(word, '20px Arial');
-      userContent[0] = word
-      hl_words.push(word);
-      errorIndex = 0;
-    }
-  }
 </script>
 
 <link
@@ -603,7 +614,7 @@
         on:input={onChangeUserContent}
         bind:this={div_input[0]}
         bind:innerHTML={userContent[0]}
-        style="display:none;width: {resultElementWidth}px"
+        style="display:none;width: {resultElementWidth[0]}px"
       >
         {@html result}
       </div>
@@ -613,7 +624,7 @@
         on:input={onChangeUserContent}
         bind:this={div_input[1]}
         bind:innerHTML={userContent[1]}
-        style="display:none;width: {resultElementWidth}px"
+        style="display:none;width: {resultElementWidth[1]}px"
       >
         {@html result}
       </div>
