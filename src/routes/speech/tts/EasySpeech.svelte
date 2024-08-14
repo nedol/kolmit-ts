@@ -30,7 +30,7 @@
     EasySpeech.init({
       maxTimeout: 5000,
       interval: 250,
-      quiet: true,
+      quiet: false,
       rate: 0.7,
     }); // required
 

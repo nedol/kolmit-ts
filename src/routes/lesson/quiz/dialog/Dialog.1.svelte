@@ -254,7 +254,7 @@
 
     const dc = $dc_user || $dc_oper;
 
-    if (!dc) speak(q[$llang]);
+    if (!dc && !isFlipped) speak(q[$llang]);
 
     let ar = q_shfl
       .toLowerCase()
@@ -632,103 +632,203 @@
       </div>
     {/if}
     {#if q || a}
-      <!-- <div class="cnt">{cur_qa + 1}</div> -->
-      {#await Translate('Послушай вопрос', 'ru', $langs) then data}
-        <div class="title">{data}:</div>
-      {/await}
+      {#if !isFlipped}
+        <!-- <div class="cnt">{cur_qa + 1}</div> -->
+        {#await Translate('Послушай вопрос', 'ru', $langs) then data}
+          <div class="title">{data}:</div>
+        {/await}
 
-      <div style="text-align: center;">
-        <div class="user1" style="visibility:{visibility[1]}">
-          {#if !dialog_data.content[cur_qa].user1[$langs]}
-            {#await Translate(q[$llang], $llang, $langs) then data}
-              {data}
-            {/await}
-          {:else}
-            {@html q[$langs]}
+        <div style="text-align: center;">
+          <div class="user1" style="visibility:{visibility[1]}">
+            {#if !dialog_data.content[cur_qa].user1[$langs]}
+              {#await Translate(q[$llang], $llang, $langs) then data}
+                {data}
+              {/await}
+            {:else}
+              {@html q[$langs]}
+            {/if}
+          </div>
+        </div>
+
+        <div class="tip mdc-typography--headline6">
+          {q[$llang]}
+        </div>
+
+        <div
+          class="margins"
+          style="text-align: center; display: flex; align-items: center; justify-content: space-between;"
+        >
+          <br />
+          <!-- {#if showSpeakerButton} -->
+          <div class="speaker-button">
+            <IconButton on:click={speak(q[$llang])}>
+              <Icon tag="svg" viewBox="0 0 24 24">
+                <path fill="currentColor" d={mdiPlay} />
+              </Icon>
+            </IconButton>
+          </div>
+          <!-- {/if} -->
+        </div>
+
+        {#await Translate('Переведи и ответь', 'ru', $langs) then data}
+          <div class="title">{data}:</div>
+        {/await}
+
+        <div class="user2_tr">
+          {#if a}
+            {#if !a[$langs]}
+              {#await Translate(a[$llang], $llang, $langs) then data}
+                {data}
+              {/await}
+            {:else}
+              {@html a[$langs]}
+            {/if}
           {/if}
         </div>
-      </div>
 
-      <div class="tip mdc-typography--headline6">
-        {q[$llang]}
-      </div>
-
-      <div
-        class="margins"
-        style="text-align: center; display: flex; align-items: center; justify-content: space-between;"
-      >
-        <br />
-        <!-- {#if showSpeakerButton} -->
-        <div class="speaker-button">
-          <IconButton on:click={speak(q[$llang])}>
-            <Icon tag="svg" viewBox="0 0 24 24">
-              <path fill="currentColor" d={mdiPlay} />
-            </Icon>
-          </IconButton>
-        </div>
-        <!-- {/if} -->
-      </div>
-
-      {#await Translate('Переведи и ответь', 'ru', $langs) then data}
-        <div class="title">{data}:</div>
-      {/await}
-
-      <div class="user2_tr">
-        {#if a}
-          {#if !a[$langs]}
-            {#await Translate(a[$llang], $llang, $langs) then data}
-              {data}
-            {/await}
-          {:else}
-            {@html a[$langs]}
+        <div class="user2" style="visibility:{visibility[1]}">
+          {#if a}
+            {@html a[$llang]}
           {/if}
-        {/if}
-      </div>
-
-      <div class="user2" style="visibility:{visibility[1]}">
-        {#if a}
-        {@html a[$llang]}
-        {/if}
-      </div>
-
-      <div style="text-align: center">
-        <span style="color: darkgreen;">
-          {@html stt_text}
-        </span>
-      </div>
-
-      <div
-        class="margins"
-        style="text-align: center; display: flex; align-items: center; justify-content: space-between;"
-      >
-        <div>
-          <IconButton
-            class="material-icons"
-            aria-label="Back"
-            on:click={onClickMicrophone}
-          >
-            <Icon tag="svg" viewBox="0 0 24 24">
-              {#if isListening}
-                <path fill="currentColor" d={mdiMicrophone} />
-              {:else}
-                <path fill="currentColor" d={mdiMicrophoneOutline} />
-              {/if}
-            </Icon>
-          </IconButton>
         </div>
-        <Stt bind:this={stt} {SttResult} {StopListening} bind:display_audio
-        ></Stt>
 
-        <!-- {#if showSpeakerButton} -->
-        <div class="speaker-button">
-          <IconButton on:click={speak(a[$llang])}>
-            <Icon tag="svg" viewBox="0 0 24 24">
-              <path fill="currentColor" d={mdiPlay} />
-            </Icon>
-          </IconButton>
+        <div style="text-align: center">
+          <span style="color: darkgreen;">
+            {@html stt_text}
+          </span>
         </div>
-        <!-- {/if} -->
-      </div>
+
+        <div
+          class="margins"
+          style="text-align: center; display: flex; align-items: center; justify-content: space-between;"
+        >
+          <div>
+            <IconButton
+              class="material-icons"
+              aria-label="Back"
+              on:click={onClickMicrophone}
+            >
+              <Icon tag="svg" viewBox="0 0 24 24">
+                {#if isListening}
+                  <path fill="currentColor" d={mdiMicrophone} />
+                {:else}
+                  <path fill="currentColor" d={mdiMicrophoneOutline} />
+                {/if}
+              </Icon>
+            </IconButton>
+          </div>
+          <Stt bind:this={stt} {SttResult} {StopListening} bind:display_audio
+          ></Stt>
+
+          <!-- {#if showSpeakerButton} -->
+          <div class="speaker-button">
+            <IconButton on:click={speak(a[$llang])}>
+              <Icon tag="svg" viewBox="0 0 24 24">
+                <path fill="currentColor" d={mdiPlay} />
+              </Icon>
+            </IconButton>
+          </div>
+          <!-- {/if} -->
+        </div>
+      {:else}
+        {#await Translate('Спроси:', 'ru', $langs) then data}
+          <div class="title">{data}:</div>
+        {/await}
+
+        <div class="user2_tr">
+          {#if a}
+            {#if !a[$langs]}
+              {#await Translate(a[$llang], $llang, $langs) then data}
+                {data}
+              {/await}
+            {:else}
+              {@html a[$langs]}
+            {/if}
+          {/if}
+        </div>
+
+        <div class="user2" style="visibility:{visibility[1]}">
+          {#if a}
+            {@html a[$llang]}
+          {/if}
+        </div>
+
+        <div style="text-align: center">
+          <span style="color: darkgreen;">
+            {@html stt_text}
+          </span>
+        </div>
+
+        <div
+          class="margins"
+          style="text-align: center; display: flex; align-items: center; justify-content: space-between;"
+        >
+          <div>
+            <IconButton
+              class="material-icons"
+              aria-label="Back"
+              on:click={onClickMicrophone}
+            >
+              <Icon tag="svg" viewBox="0 0 24 24">
+                {#if isListening}
+                  <path fill="currentColor" d={mdiMicrophone} />
+                {:else}
+                  <path fill="currentColor" d={mdiMicrophoneOutline} />
+                {/if}
+              </Icon>
+            </IconButton>
+          </div>
+          <Stt bind:this={stt} {SttResult} {StopListening} bind:display_audio
+          ></Stt>
+
+          <!-- {#if showSpeakerButton} -->
+          <div class="speaker-button">
+            <IconButton on:click={speak(a[$llang])}>
+              <Icon tag="svg" viewBox="0 0 24 24">
+                <path fill="currentColor" d={mdiPlay} />
+              </Icon>
+            </IconButton>
+          </div>
+          <!-- {/if} -->
+        </div>
+
+        {#await Translate('Послушай ответ:', 'ru', $langs) then data}
+          <div class="title">{data}:</div>
+        {/await}
+
+        <div style="text-align: center;">
+          <div class="user1" style="visibility:{visibility[1]}">
+            {#if !dialog_data.content[cur_qa].user1[$langs]}
+              {#await Translate(q[$llang], $llang, $langs) then data}
+                {data}
+              {/await}
+            {:else}
+              {@html q[$langs]}
+            {/if}
+          </div>
+        </div>
+
+        <div class="tip mdc-typography--headline6">
+          {q[$llang]}
+        </div>
+
+        <div
+          class="margins"
+          style="text-align: center; display: flex; align-items: center; justify-content: space-between;"
+        >
+          <br />
+          <!-- {#if showSpeakerButton} -->
+          <div class="speaker-button">
+            <IconButton on:click={speak(q[$llang])}>
+              <Icon tag="svg" viewBox="0 0 24 24">
+                <path fill="currentColor" d={mdiPlay} />
+              </Icon>
+            </IconButton>
+          </div>
+          <!-- {/if} -->
+        </div>
+      {/if}
+
       <br />
 
       <div class="words_div accordion-container">
