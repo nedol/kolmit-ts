@@ -50,7 +50,7 @@
   let arrayOfArrays;
   let userContent = [];
   let div_input = [];
-  let result = '';
+  let result = "&nbsp;";
   let resultElement;
   let hintIndex = 0;
   let errorIndex = 0;
@@ -75,6 +75,8 @@
     .then((response) => response.json())
     .then((data) => {
       words = data.data;
+      if(!words[0])
+      return;
 
       hints = [...words];
       shuffle(hints);
@@ -90,46 +92,10 @@
     makeExample();
   }
 
-  function highlightWords() {
-
-    userContent[0] = userContent[0]
-      .replace(/[.\/#!?$%\^&\*;:{}=_`~()]/g, '')
-      .trim();
-          
-    let woord = hl_words[0]?.trim();
-    let regex = new RegExp(
-      `\\b[${woord?.charAt(0).toUpperCase()}${woord?.charAt(0).toLowerCase()}]${woord?.slice(1)}\\b`,
-      'g'
-    );
-
-    userContent[0] = userContent[0].replace(
-      regex,
-      `<span class="highlight" style="color: green;background-color: transparent">${woord}</span>`
-    );
-
-    userContent[1] = userContent[1]
-      .replace(/[.\/#!?$%\^&\*;:{}=_`~()]/g, '')
-      .trim();
-
-                
-    woord = hl_words[1]?.trim();
-    regex = new RegExp(
-      `\\b[${woord?.charAt(0).toUpperCase()}${woord?.charAt(0).toLowerCase()}]${woord?.slice(1)}\\b`,
-      'g'
-    );
-
-    userContent[1] = userContent[1].replace(
-      regex,
-      `<span class="highlight" style="color: green;background-color: transparent">${woord}</span>`
-    );
-
-    hl_words = [];
-  }
-
+ 
   let topAppBar;
   let sentence_span;
 
-  $: if (div_input[0]) div_input[0].focus();
 
   function similarity(s1, s2) {
     let longer = s1;
@@ -175,9 +141,8 @@
     const threshold = 0.8; // 90% порог
 
     return text.replace(/<<([^>]*)>>/g, 
-      `<span  value="$1" class="sentence_span" style="position: relative;  left: 0px;"></span>`
-    );
-    
+      `<span  value="$1" class="sentence_span" style="position: relative;width:20px;  left: 0px;" onclick=OnClickInput></span>`
+    );    
   }
 
   async function makeExample() {
@@ -191,7 +156,7 @@
 
     example = example?.replace(
       /<<([^<>]+)>>/gu,
-      '<span style="color:green"><b>$1</b></span>'
+      '<span style="color:green" onclick=OnClickInput><b>$1</b></span>'
     );
 
     const regex = /(<<\w+>>)\s+(<<\w+>>)/;
@@ -229,7 +194,6 @@
         spanElement.appendChild(div_input[i]); // Используем cloneNode, чтобы не удалить div_input из DOM
         // spanElement.style.width = "50px";
         resultElementWidth[i] = getTextWidth(wAr[i], '20px Arial');
-        console.log(spanElement.style.width )
       });
 
     }, 0);
@@ -241,7 +205,7 @@
     // console.log(resultElement)
 
     // Устанавливаем фокус в конец строки
-    setFocus();
+    // setFocus();
   }
 
   function getTextWidth(text, font) {
@@ -289,11 +253,7 @@
 
   onMount(async () => {});
 
-  onDestroy(() => {
-    // Очищаем интервал при размонтировании компонента
 
-    console.log('Компонент размонтирован');
-  });
 
   function handleBackClick() {
     $lesson.data = { quiz: '' }; // При клике на "Back" показываем компонент Lesson
@@ -311,9 +271,9 @@
     currentWordIndex = 0;
     currentWord = words[currentWordIndex];
     makeExample();
-    userContent[0] = '';
-    userContent[1] = '';
-    result = '';
+    userContent[0] = '&nbsp;';
+    userContent[1] = '&nbsp;';
+    result = "&nbsp;";
   }
 
   function jumpNext10() {
@@ -321,10 +281,10 @@
     currentWordIndex = nextIndex;
     currentWord = words[currentWordIndex];
     makeExample();
-    userContent[0] = '';
-    userContent[1] = '';
+   userContent[0] = '&nbsp;';
+    userContent[1] = '&nbsp;';
     hintIndex = 0;
-    result = '';
+    result = "";
     showCheckMark = false;
     showSpeakerButton = false;
   }
@@ -353,7 +313,8 @@
   }
 
   function setFocus() {
-    setTimeout(() => {
+   
+   setTimeout(() => {
       const range = document.createRange();
       const selection = window.getSelection();
       range.selectNodeContents(div_input[0]);
@@ -379,7 +340,7 @@
       .split(' ');
 
     let correctCount = 0;
-    result = [];
+    result = "";
 
     userContent.forEach((userInput, i) => {       
       // userContent[i] = '';
@@ -392,7 +353,7 @@
       if( targetWords[i] && userInput)
       if (userInput?.toLowerCase().includes(targetWords[i].toLowerCase().replace('_',' '))) {
         // result[i] = `<span class="correct">${targetWords[i]}</span>`;
-                if(div_input[i])
+      if(div_input[i])
         div_input[i].style.color= 'green'
         correctCount++;
       } else {   
@@ -461,7 +422,7 @@
       userContent[0] += currentWord.original[hintIndex];
       hintIndex++;
 
-      result = ''; // Очистим результат при каждой новой подсказке
+      result = ""; // Очистим результат при каждой новой подсказке
       showSpeakerButton = true; // Устанавливаем видимость кнопки
       setFocus();
     }
@@ -473,10 +434,10 @@
     currentWord = words[currentWordIndex];
     makeExample();
 
-    userContent[0] = '';
-    userContent[1] = '';
+   userContent[0] = '&nbsp;';
+    userContent[1] = '&nbsp;';
     hintIndex = 0;
-    result = '';
+    result = "&nbsp;";
     showCheckMark = false;
     showNextButton = false;
     showSpeakerButton = false;
@@ -487,10 +448,10 @@
     currentWord = words[--currentWordIndex];
     makeExample();
 
-    userContent[0] = '';
-    userContent[1] = '';
+   userContent[0] = '&nbsp;';
+    userContent[1] = '&nbsp;';
     hintIndex = 0;
-    result = '';
+    result = "";
     showCheckMark = false;
     showNextButton = false;
     showSpeakerButton = false;
@@ -507,7 +468,7 @@
     // Speak(text);
     tts.Speak($llang, text);
 
-    setFocus();
+    // setFocus();
   }
 
   function countWordOccurrences(sentence, word) {
@@ -528,6 +489,19 @@
 
     return count;
   }
+
+  function OnClickInput(el){
+    // div_input[0].innerHTML = "    "
+    div_input[0].focus();
+    // setFocus()
+  }
+
+
+  onDestroy(() => {
+    // Очищаем интервал при размонтировании компонента
+
+    console.log('Компонент размонтирован');
+  });
 
 
 </script>
@@ -611,6 +585,7 @@
       <div
         class="input"
         contenteditable="true"
+        on:click={OnClickInput}
         on:input={onChangeUserContent}
         bind:this={div_input[0]}
         bind:innerHTML={userContent[0]}
@@ -762,7 +737,9 @@
   }
 
   .input {
-    height: 23px;
+    position: relative;
+      /* top:3px; */
+    height: 18px;
     display: inline-table;
     outline: none;
     border: none;
