@@ -97,7 +97,7 @@
   }else if ($msg_oper['lesson']){
     console.log($msg_oper['lesson']);
     
-    onClickQuiz("dialog",  $msg_oper['lesson'].level, $msg_oper['lesson'].name,$msg_oper['lesson'].dialog_data.name);
+    onClickQuiz("dialog",  $msg_oper['lesson']?.level, $msg_oper['lesson']?.name, $msg_oper['lesson'].dialog_data?.name);
   }
 
   (async () => {

@@ -112,7 +112,7 @@
   $: if ($msg_user) {
     if ($msg_user.lesson) {
       dialog_data = $msg_user.lesson.dialog_data;
-      isFlipped = !dialog_data.isFlipped;
+      isFlipped = !$msg_user.lesson.isFlipped;
       cur_qa = $msg_user.lesson.cur_qa;
       Dialog();
     }
@@ -128,7 +128,7 @@
     // console.log($msg_oper);
     if ($msg_oper.lesson) {
       dialog_data = $msg_oper.lesson.dialog_data;
-      isFlipped = !dialog_data.isFlipped;
+      isFlipped = !$msg_oper.lesson.isFlipped;
       cur_qa = $msg_oper.lesson.cur_qa;
       Dialog();
     }
@@ -366,22 +366,7 @@
 
     dialog_data.content[cur_qa].user2['a_shfl'] = a_shfl;
     if (dc && share_mode)
-      dc.SendData(
-        {
-          lesson: {
-            llang: $llang,
-            quiz: client_quiz,
-            name: dialog_data.name,
-            html: dialog_data.html ? dialog_data.html[cur_html] : '',
-            user1: dialog_data.content[cur_qa].user1,
-            user2: dialog_data.content[cur_qa].user2,
-            cur_qa: cur_qa,
-          },
-        },
-        () => {
-          console.log();
-        }
-      );
+      SendData();
   }
 
   function onClickQ() {
@@ -881,6 +866,7 @@
     top: 85px;
     right: 0px;
     scale: 0.7;
+    z-index:2;
   }
 
   .repeat_but {

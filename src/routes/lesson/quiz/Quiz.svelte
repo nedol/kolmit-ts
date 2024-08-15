@@ -1,6 +1,6 @@
 <script>
   import Volgorde from './Volgorde.svelte';
-  import Dialog from './dialog/Dialog.1.svelte';
+  import Dialog from './dialog/Dialog.svelte';
   import Listen from './listen/Listen.svelte';
   import Numbers from './listen/Numbers.svelte';
   import Time from './listen/Time.svelte';
