@@ -6,7 +6,7 @@
   import Time from './listen/Time.svelte';
   import Text from './text/Text.svelte';
   import Word from './word/Word.svelte';
-  import WordGame from './word/WordGame.svelte';
+  // import WordGame from './word/WordGame.svelte';
   import { dc_oper } from '$lib/js/stores.js';
   import { dc_user } from '$lib/js/stores.js';
   import { call_but_status } from '$lib/js/stores.js';
@@ -36,10 +36,10 @@
   {:else if quiz === 'text'}
     <Text {data} />
   {:else if quiz === 'word'}
-    {#if dc && $call_but_status === 'talk'}
+    <!-- {#if dc && $call_but_status === 'talk'}
       <WordGame {data} />
-    {:else}
+    {:else} -->
       <Word {data} />
-    {/if}
+    <!-- {/if} -->
   {/if}
 {/if}

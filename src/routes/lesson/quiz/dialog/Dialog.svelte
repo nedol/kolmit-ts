@@ -365,8 +365,7 @@
     const dc = $dc_user || $dc_oper;
 
     dialog_data.content[cur_qa].user2['a_shfl'] = a_shfl;
-    if (dc && share_mode)
-      SendData();
+    if (dc && share_mode) SendData();
   }
 
   function onClickQ() {
@@ -604,24 +603,28 @@
   </div>
   <!-- Ваш контент для лицевой стороны -->
   <div class="card">
-    {#if dc}
-      <div class="repeat_but">
-        <Button
-          class="button-shaped-round"
-          color="secondary"
-          on:click={() => SendRepeat()}
-          {variant}
-        >
-          <Label>{dict['Repeat'][$langs]}</Label>
-        </Button>
-      </div>
-    {/if}
     {#if q || a}
       {#if !isFlipped}
+
+      <div class="container">
+        {#if dc}
+          <div class="repeat_but">
+            <Button
+              class="button-shaped-round"
+              color="secondary"
+              on:click={() => SendRepeat()}
+              {variant}
+            >
+              <Label>{dict['Repeat'][$langs]}</Label>
+            </Button>
+          </div>
+        {/if}
         <!-- <div class="cnt">{cur_qa + 1}</div> -->
         {#await Translate('Послушай вопрос', 'ru', $langs) then data}
           <div class="title">{data}:</div>
         {/await}
+
+        </div>
 
         <div style="text-align: center;">
           <div class="user1" style="visibility:{visibility[1]}">
@@ -716,7 +719,7 @@
           <!-- {/if} -->
         </div>
       {:else}
-        {#await Translate('Спроси:', 'ru', $langs) then data}
+        {#await Translate('Спроси', 'ru', $langs) then data}
           <div class="title">{data}:</div>
         {/await}
 
@@ -777,9 +780,26 @@
           <!-- {/if} -->
         </div>
 
-        {#await Translate('Послушай ответ:', 'ru', $langs) then data}
-          <div class="title">{data}:</div>
-        {/await}
+        <div class="container">
+
+          {#if dc}
+            <div class="repeat_but">
+              <Button
+                class="button-shaped-round"
+                color="secondary"
+                on:click={() => SendRepeat()}
+                {variant}
+              >
+                <Label>{dict['Repeat'][$langs]}</Label>
+              </Button>
+            </div>
+          {/if}
+
+          {#await Translate('Послушай ответ', 'ru', $langs) then data}
+            <div class="title">{data}:</div>
+          {/await}
+
+        </div>
 
         <div style="text-align: center;">
           <div class="user1" style="visibility:{visibility[1]}">
@@ -866,14 +886,24 @@
     top: 85px;
     right: 0px;
     scale: 0.7;
-    z-index:2;
+    z-index: 2;
   }
 
+  .container {
+    display: flex;
+        top: 10px;
+        margin-bottom: 20px;
+    position:relative;
+    justify-content: space-between;
+    align-items: center;
+}
+
   .repeat_but {
-    position: absolute;
+    position:absolute;
+    margin-right: auto; /* Сдвиг первого элемента к левому краю */
     font-size: smaller;
     left: 0px;
-    top: -15px;
+    top: -5px;
     z-index: 2;
     scale: 0.7;
   }
@@ -981,11 +1011,12 @@
   }
 
   .title {
+
+    margin: 10px auto; /* Центрирование второго элемента */
     color: grey;
-    position: relative;
     line-height: normal;
     text-align: center;
-    margin: 5px;
+
     font-size: 0.8em;
     background-color: ghostwhite;
   }
