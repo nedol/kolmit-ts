@@ -83,9 +83,9 @@
 
       words_data = data?.data;
 
-      if (words_data) {
-        words_data.map(async (item) => {
-          words.push(item.original);
+      if (words && words_data) {
+        words = words_data.map(async (item) => {
+         return item.original
         });
       }
 

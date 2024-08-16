@@ -626,6 +626,10 @@
 
         </div>
 
+        <div class="tip mdc-typography--headline6">
+          {q[$llang]}
+        </div>
+
         <div style="text-align: center;">
           <div class="user1" style="visibility:{visibility[1]}">
             {#if !dialog_data.content[cur_qa].user1[$langs]}
@@ -636,10 +640,6 @@
               {@html q[$langs]}
             {/if}
           </div>
-        </div>
-
-        <div class="tip mdc-typography--headline6">
-          {q[$llang]}
         </div>
 
         <div
@@ -839,7 +839,7 @@
       <div class="words_div accordion-container">
         {#if hints?.length > 0}
           <Content
-            style="line-height: 2.0; overflow-y:auto; height:50vh !important"
+            style="line-height: 2.0; overflow-y:auto;"
           >
             {#each hints as hint, i}
               <span class="hint_button">
@@ -891,8 +891,8 @@
 
   .container {
     display: flex;
-        top: 10px;
-        margin-bottom: 20px;
+    top: 10px;
+    margin-bottom: 20px;
     position:relative;
     justify-content: space-between;
     align-items: center;
@@ -1011,12 +1011,11 @@
   }
 
   .title {
-
+    width:fit-content;
     margin: 10px auto; /* Центрирование второго элемента */
     color: grey;
     line-height: normal;
     text-align: center;
-
     font-size: 0.8em;
     background-color: ghostwhite;
   }
