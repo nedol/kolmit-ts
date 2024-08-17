@@ -106,6 +106,11 @@
           prompt = prompt.replaceAll('${data.level}', data.level);
           prompt = prompt.replaceAll('${num}', num);
 
+          
+          dialog_data.words = JSON.stringify(
+            resp.resp.words.data.map((item) => item.original)
+          );
+
 
           prompt = prompt.replaceAll(
             '[${dialog_data_words}]',

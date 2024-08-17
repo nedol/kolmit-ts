@@ -144,9 +144,6 @@
     share_mode = true;
   }
 
-  $: if (data.cur_qa) {
-    cur_qa = data.cur_qa;
-  }
 
   $: if (q && !q[$langs]) {
     (async () => {
@@ -159,20 +156,6 @@
       a[$langs] = await Translate(a[$llang], $llang, $langs);
     })();
   }
-
-  // async function Translate(text: string, from_lang: string, to_lang: string) {
-  //   try {
-  //     translate.from = from_lang;
-
-  //     return (
-  //       ($dicts[text] && $dicts[text][$langs]) ||
-  //       (await translate(text.trim(), to_lang))
-  //     );
-  //   } catch (error) {
-  //     console.error('Translation error:', error);
-  //     return text; // или другое подходящее значение по умолчанию
-  //   }
-  // }
 
   if (data.func) {
     onChangeUserClick();
@@ -225,16 +208,19 @@
   }
 
   function Dialog() {
-    const qa = dialog_data.content[cur_qa];
+    let qa = dialog_data.content[cur_qa];
     if (!qa) {
       cur_qa = 0;
+      qa = dialog_data.content[cur_qa];
       cur_html++;
       if (dialog_data.html && !dialog_data.html[cur_html]) {
         cur_html = 0;
       }
       setTimeout(() => {
-        // onChangeClick();
+        onChangeUserClick() 
       }, 0);
+
+      return;
     }
 
     q = isFlipped ? qa.user2 : qa.user1;
@@ -474,8 +460,8 @@
       return d[s.length][t.length];
     }
 
-    str1 = str1.replace('...', '');
-    str2 = str2.replace('...', '');
+    // str1 = str1.replace('...', '');
+    // str2 = str2.replace('...', '');
 
     // Вычисляем длины строк
     const len1 = str1.length;
@@ -747,11 +733,23 @@
           {/if}
         </div>
 
-        <div class="user2" style="visibility:{visibility[1]}">
+        <!-- <div class="user2" style="visibility:{visibility[1]}">
           {#if a}
             {@html a[$llang]}
           {/if}
+        </div> -->
+
+        <div class="user2">
+          {#if a &&  visibility[1]==='hidden'}
+            {@html a[$llang].replace(/(?<!")\b\w+\b(?!")/g,(match)=> {
+                return `<span class="span_hidden" onclick="(this.style.color='#2196f3')" style="display:block;border:1px;border-style:groove;border-color:light-blue;color:transparent;">${match}</span>`;
+            })}
+
+            {:else if  visibility[2]==='visible'}
+            {@html a[$llang].replace(/"([^"]*)"/g, '$1')}
+          {/if}
         </div>
+
 
         <div style="text-align: center">
           <span style="color: darkgreen;">
@@ -811,8 +809,12 @@
           {/await}
         </div>
 
+        <div class="tip mdc-typography--headline6">
+          {@html q[$llang]}
+        </div>
+
         <div style="text-align: center;">
-          <div class="user1" style="visibility:{visibility[1]}">
+          <div class="user1" style="visibility:{visibility[2]}">
             {#if !dialog_data.content[cur_qa].user1[$langs]}
               {#await Translate(q[$llang], $llang, $langs) then data}
                 {data}
@@ -823,9 +825,7 @@
           </div>
         </div>
 
-        <div class="tip mdc-typography--headline6">
-          {q[$llang]}
-        </div>
+
 
         <div
           class="margins"

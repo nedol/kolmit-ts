@@ -1,4 +1,4 @@
-v.1.2
+v.1.3
 {Выступай в роли методиста по созданию контента для приложения Kolmit по разговорной практике ${llang} языка}
 {Kolmit позволяет пользователям удаленно общаться друг с другом, выполняя специально подготовленные задания (диалоги).
 Пользователи строят разговор переводя текст диалога с родного языка ${langs} на изучаемый ${llang}}
@@ -60,32 +60,29 @@ v.1.2
     
 html:[$Page]
 
-->[В ${llang} выделить "<<>>" слова-подсказки, которые помогут пользователю правильно составить предложение ]
- 
-
 Пример диалога и $Page: 
  {
     content:[    
             {
                 "user1":{
-                    "${llang}": "Ik <<vlieg>> aan in Brussel op 31 December om 12:00 uur <<'s middags>>",
+                    "${llang}": "Ik vlieg aan in Brussel op 31 December om 12:00 uur 's middags",
                     "${langs}": "Я прилетаю в Brussel, 31 December , в 12:00 часов дня.",
                     "hints":[vlieg,'s middags]
                 },
                 "user2":{
-                    "${llang}": "Wat is je <<vluchtnummer>>?",
+                    "${llang}": "Wat is je vluchtnummer?",
                     "${langs}": "Какой номер твоего рейса?",
                     "hints":[vluchtnummer]
                 }
             },
             {
                 "user1": {
-                    "${llang}": "Mijn <<vluchtnummer>> is BE12345",
+                    "${llang}": "Mijn vluchtnummer is BE12345",
                     "${langs}": "Номер моего рейса - BE12345",
                     "hints":[vluchtnummer]
                 },
                 "user2": {
-                    "${llang}": "Oké, ik <<probeer>> je te <<ontmoeten>>.",
+                    "${llang}": "Oké, ik probeer je te ontmoeten.",
                     "${langs}": "Хорошо, я постараюсь тебя встретить.",
                     "hints":[ontmoeten]
                 }
