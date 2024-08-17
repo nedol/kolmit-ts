@@ -79,19 +79,26 @@
     `./lesson?dialog=${data.name[$llang]}&owner=${abonent}&level=${data.level}`
   )
     .then((response) => response.json())
-    .then((resp) => {
+    .then(async (resp) => {
       dialog_data = resp.data.dialog;
       if (!dialog_data) dialog_data = { content: [] };
       if (resp.data.html) {
         dialog_data.html = splitHtmlContent(resp.data.html);
       }
       dialog_data.name = name;
+      //DB
       fetch(
         `./admin?prompt=dialog&quiz_name=${data.name[$llang]}&prompt_owner=${abonent}&prompt_level=${data.level}&prompt_theme=${data.theme}`
       )
-        .then((response) => response.json())
-        .then((resp) => {
+       .then((response) => response.json())
+      .then((resp) => {
+
           prompt = resp.resp.prompt.system + resp.resp.prompt.user;
+      
+      // fetch('./src/routes/admin/quiz/prompts/dialog.ru.txt')
+      //   .then((response) => response.text())
+      //   .then((resp) => {
+          // prompt = resp;
           prompt = prompt.replaceAll('${llang}', $llang);
           prompt = prompt.replaceAll('${name[$llang]}', name[$llang]);
           prompt = prompt.replaceAll('${langs}', $langs);
@@ -99,9 +106,6 @@
           prompt = prompt.replaceAll('${data.level}', data.level);
           prompt = prompt.replaceAll('${num}', num);
 
-          dialog_data.words = JSON.stringify(
-            resp.resp.words.data.map((item) => item.original)
-          );
 
           prompt = prompt.replaceAll(
             '[${dialog_data_words}]',
@@ -113,10 +117,6 @@
           prompt = prompt.replaceAll('${grammar}', grammar);
 
           prompt = prompt;
-        })
-        .catch((error) => {
-          console.log(error);
-          // dialog_data.content = [];
         });
     })
     .catch((error) => {
@@ -124,7 +124,7 @@
       // dialog_data.content = [];
     });
 
-  onMount(() => {});
+  onMount(async () => {});
 
   async function TranslateContentToCurrentLang() {
     await Promise.all(
@@ -344,7 +344,7 @@
     <Panel>
       <Header
         ><b>
-          {#await Translate('content_builder', 'en', $langs) then data}
+          {#await Translate('Content Builder', 'en', $langs) then data}
             {data}
           {/await}
         </b></Header

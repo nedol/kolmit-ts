@@ -202,31 +202,6 @@
     return null;
   }
 
-  function deleteObjectByName(obj, name) {
-    Object.keys(obj).forEach((key) => {
-      if (Array.isArray(obj[key][$langs])) {
-        // Удаление объектов с заданным id
-        obj[key] = obj[key].filter(
-          (item) => !(item.name && item.name === name)
-        );
-        // Продолжаем поиск внутри каждого элемента массива
-        obj[key].forEach((item) => deleteObjectByName(item, name));
-
-        // Преобразование после удаления
-        if (obj[key].length === 0) {
-          // delete obj[key]; // Удаляем пустой массив
-        } else if (obj[key].length === 1) {
-          obj[key] = [obj[key][0]]; // Преобразуем массив с одним элементом в этот элемент
-        }
-      } else if (typeof obj[key] === 'object' && obj[key] !== null) {
-        if ('name' in obj[key] && obj[key].name === name) {
-          delete obj[key]; // Удаляем объект, если найден id
-        } else {
-          deleteObjectByName(obj[key], name); // Продолжаем поиск, если это объект
-        }
-      }
-    });
-  }
 
   function OnAddTheme() {
     navigator.clipboard

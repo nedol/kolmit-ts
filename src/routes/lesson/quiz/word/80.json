@@ -1,290 +1,322 @@
-[
-  {
-    "infinitive": "de armband",
-    "original": "de armband",
-    "translation": {
-      "ru": "браслет",
-      "fr": "le bracelet",
-      "en": "the bracelet",
-      "de": "das Armband",
-      "uk": "браслет"
+{
+  "content": [
+    {
+      "user1": {
+        "nl": "Mijn familie woont in Brussel. We hebben een groot gezin.",
+        "ru": "Моя семья живет в Брюсселе. У нас большая семья.",
+        "hints": [
+          "familie",
+          "gezin",
+          "wonen"
+        ]
+      },
+      "user2": {
+        "nl": "Hoeveel mensen zijn er in je gezin?",
+        "ru": "Сколько человек в твоей семье?",
+        "hints": [
+          "gezin",
+          "hoeveel"
+        ]
+      }
     },
-    "example": "Zij draagt een mooie armband om haar pols."
+    {
+      "user1": {
+        "nl": "We zijn met z'n zessen: mijn moeder, vader, broer, zus, en ik.",
+        "ru": "Нас шесть человек: моя мама, папа, брат, сестра и я.",
+        "hints": [
+          "moeder",
+          "vader",
+          "broer",
+          "zus",
+          "gezin"
+        ]
+      },
+      "user2": {
+        "nl": "Werk je \"\"vader\"\"?",
+        "ru": "Твой отец работает?",
+        "hints": [
+          "werkt",
+          "vader"
+        ]
+      }
+    },
+    {
+      "user1": {
+        "nl": "Ja, mijn \"\"vader\"\" werkt als \"\"ingenieur\"\".",
+        "ru": "Да, мой отец работает инженером.",
+        "hints": [
+          "vader",
+          "werkt"
+        ]
+      },
+      "user2": {
+        "nl": "\"\"Helpt\"\" je moeder ook in huis?",
+        "ru": "Мама тоже помогает по дому?",
+        "hints": [
+          "moeder",
+          "helpen"
+        ]
+      }
+    },
+    {
+      "user1": {
+        "nl": "Ja, mijn moeder \"\"kookt\"\" en \"\"zorgt voor de kinderen\"\".",
+        "ru": "Да, моя мама готовит и заботится о детях.",
+        "hints": [
+          "moeder",
+          "koken",
+          "kind"
+        ]
+      },
+      "user2": {
+        "nl": "Heb je \"\"grootouders\"\"?",
+        "ru": "У тебя есть бабушка и дедушка?",
+        "hints": [
+          "grootouders",
+          "oma",
+          "opa"
+        ]
+      }
+    },
+    {
+      "user1": {
+        "nl": "Ja, mijn opa en \"\"oma\"\" wonen bij ons.",
+        "ru": "Да, мой дедушка и бабушка живут с нами.",
+        "hints": [
+          "opa",
+          "oma",
+          "wonen"
+        ]
+      },
+      "user2": {
+        "nl": "Speel je vaak met je \"\"broer\"\" en zus?",
+        "ru": "Ты часто играешь с братом и сестрой?",
+        "hints": [
+          "spelen",
+          "broer",
+          "zus"
+        ]
+      }
+    },
+    {
+      "user1": {
+        "nl": "Ja, we spelen samen in de tuin.",
+        "ru": "Да, мы вместе играем в саду.",
+        "hints": [
+          "spelen",
+          "tuin",
+          "broer",
+          "zus"
+        ]
+      },
+      "user2": {
+        "nl": "Hoe oud is je \"\"neef\"\"?",
+        "ru": "Сколько лет твоему двоюродному брату?",
+        "hints": [
+          "neef",
+          "hoe oud"
+        ]
+      }
+    },
+    {
+      "user1": {
+        "nl": "Mijn \"\"neef\"\" is twaalf jaar oud.",
+        "ru": "Моему двоюродному брату двенадцать лет.",
+        "hints": [
+          "neef",
+          "jaar",
+          "oud"
+        ]
+      },
+      "user2": {
+        "nl": "En je nicht? \"\"Hoe oud\"\" is ze?",
+        "ru": "А твоей двоюродной сестре? Сколько ей лет?",
+        "hints": [
+          "nicht",
+          "hoe oud"
+        ]
+      }
+    },
+    {
+      "user1": {
+        "nl": "Mijn \"\"nicht\"\" is acht jaar oud.",
+        "ru": "Моей двоюродной сестре восемь лет.",
+        "hints": [
+          "nicht",
+          "jaar",
+          "oud"
+        ]
+      },
+      "user2": {
+        "nl": "Wie helpt je met je \"\"huiswerk\"\"?",
+        "ru": "Кто помогает тебе с домашними заданиями?",
+        "hints": [
+          "helpen",
+          "huiswerk"
+        ]
+      }
+    },
+    {
+      "user1": {
+        "nl": "Mijn \"\"zus\"\" helpt me vaak.",
+        "ru": "Моя сестра часто мне помогает.",
+        "hints": [
+          "zus",
+          "helpen"
+        ]
+      },
+      "user2": {
+        "nl": "Hou je van je gezin?",
+        "ru": "Ты любишь свою семью?",
+        "hints": [
+          "hou",
+          "gezin"
+        ]
+      }
+    },
+    {
+      "user1": {
+        "nl": "Ja, ik hou heel veel van mijn familie.",
+        "ru": "Да, я очень люблю свою семью.",
+        "hints": [
+          "hou",
+          "familie"
+        ]
+      },
+      "user2": {
+        "nl": "Dat is mooi om te horen.",
+        "ru": "Рад это слышать.",
+        "hints": [
+          "mooi",
+          "horen"
+        ]
+      }
+    },
+    {
+      "user1": {
+        "nl": "Mijn \"\"familie\"\" is groot. \"\"Hoeveel leden\"\" heeft jouw gezin?",
+        "ru": "Моя семья большая. Сколько человек в твоей семье?",
+        "hints": [
+          "familie",
+          "Hoeveel"
+        ]
+      },
+      "user2": {
+        "nl": "Mijn gezin heeft vier \"\"leden\"\". Wie is de jongste in jouw familie?",
+        "ru": "В моей семье четыре человека. Кто самый младший в твоей семье?",
+        "hints": [
+          "leden",
+          "Wie"
+        ]
+      }
+    },
+    {
+      "user1": {
+        "nl": "De \"\"jongste\"\" is mijn \"zus\". Zij is een baby.",
+        "ru": "Самая младшая — моя сестра. Она младенец.",
+        "hints": [
+          "zus",
+          "baby"
+        ]
+      },
+      "user2": {
+        "nl": "\"\"Hoe oud\"\" is jouw zus?",
+        "ru": "Сколько лет твоей сестре?",
+        "hints": [
+          "oud"
+        ]
+      }
+    },
+    {
+      "user1": {
+        "nl": "Ze is \"\"twee\"\" jaar oud. Heb je een \"\"broer\"\" of zus?",
+        "ru": "Ей два года. У тебя есть брат или сестра?",
+        "hints": [
+          "twee",
+          "broer"
+        ]
+      },
+      "user2": {
+        "nl": "Ja, ik heb een broer en een zus. Mijn broer \"\"werkt\"\" in Amsterdam.",
+        "ru": "Да, у меня есть брат и сестра. Мой брат работает в Амстердаме.",
+        "hints": [
+          "werkt"
+        ]
+      }
+    },
+    {
+      "user1": {
+        "nl": "Waar \"\"werkt\"\" hij?",
+        "ru": "Где он работает?",
+        "hints": [
+          "werkt"
+        ]
+      },
+      "user2": {
+        "nl": "Hij werkt in een \"\"ziekenhuis\"\".",
+        "ru": "Он работает в больнице.",
+        "hints": [
+          "ziekenhuis"
+        ]
+      }
+    },
+    {
+      "user1": {
+        "nl": "En jouw zus, wat doet zij?",
+        "ru": "А твоя сестра, что она делает?",
+        "hints": [
+          "doet"
+        ]
+      },
+      "user2": {
+        "nl": "Mijn zus studeert aan de \"\"universiteit\"\".",
+        "ru": "Моя сестра учится в университете.",
+        "hints": [
+          "universiteit"
+        ]
+      }
+    },
+    {
+      "user1": {
+        "nl": "Dat is interessant! Wat \"\"studeert\"\" zij?",
+        "ru": "Это интересно! Что она изучает?",
+        "hints": [
+          "studeert"
+        ]
+      },
+      "user2": {
+        "nl": "Ze studeert \"\"geneeskunde\"\". \"\"Hou\"\" jij van je familie?",
+        "ru": "Она изучает медицину. Ты любишь свою семью?",
+        "hints": [
+          "geneeskunde",
+          "Hou"
+        ]
+      }
+    },
+    {
+      "user1": {
+        "nl": "Ja, ik hou veel van mijn familie. \"\"Help\"\" jij vaak je ouders?",
+        "ru": "Да, я очень люблю свою семью. Ты часто помогаешь своим родителям?",
+        "hints": [
+          "Ja",
+          "Help"
+        ]
+      },
+      "user2": {
+        "nl": "Ja, ik help vaak mijn moeder met \"\"koken\"\".",
+        "ru": "Да, я часто помогаю маме с готовкой.",
+        "hints": [
+          "koken"
+        ]
+      }
+    }
+  ],
+  "name": {
+    "nl": "Gezin",
+    "ru": "Gezin"
   },
-  {
-    "infinitive": "de bloes",
-    "original": "de bloes",
-    "translation": {
-      "ru": "блузка",
-      "fr": "la blouse",
-      "en": "the blouse",
-      "de": "die Bluse",
-      "uk": "блузка"
-    },
-    "example": "Ze droeg een elegante bloes met bloemenmotieven."
-  },
-  {
-    "infinitive": "de bh/beha",
-    "original": "de bh/beha",
-    "translation": {
-      "ru": "бюстгальтер",
-      "fr": "le soutien-gorge",
-      "en": "the bra",
-      "de": "der BH",
-      "uk": "бюстгальтер"
-    },
-    "example": "Ze kocht een nieuwe bh in de lingeriewinkel."
-  },
-  {
-    "infinitive": "de bril",
-    "original": "de bril",
-    "translation": {
-      "ru": "очки",
-      "fr": "les lunettes",
-      "en": "the glasses",
-      "de": "die Brille",
-      "uk": "окуляри"
-    },
-    "example": "Hij zet zijn bril op om beter te kunnen lezen."
-  },
-  {
-    "infinitive": "het badpak",
-    "original": "het badpak",
-    "translation": {
-      "ru": "купальник",
-      "fr": "le maillot de bain",
-      "en": "the swimsuit",
-      "de": "der Badeanzug",
-      "uk": "купальник"
-    },
-    "example": "Ze trok haar badpak aan en ging naar het zwembad."
-  },
-  {
-    "infinitive": "de bikini",
-    "original": "de bikini",
-    "translation": {
-      "ru": "бикини",
-      "fr": "le bikini",
-      "en": "the bikini",
-      "de": "der Bikini",
-      "uk": "бікіні"
-    },
-    "example": "Ze genoot van de zon in haar nieuwe bikini."
-  },
-  {
-    "infinitive": "de broek",
-    "original": "de broek",
-    "translation": {
-      "ru": "брюки",
-      "fr": "le pantalon",
-      "en": "the pants",
-      "de": "die Hose",
-      "uk": "штани"
-    },
-    "example": "Hij droeg een nette broek naar het kantoor."
-  },
-  {
-    "infinitive": "de boxershort",
-    "original": "de boxershort",
-    "translation": {
-      "ru": "боксеры",
-      "fr": "le caleçon",
-      "en": "the boxershort",
-      "de": "die Boxershorts",
-      "uk": "боксери"
-    },
-    "example": "Hij kocht een paar comfortabele boxershorts."
-  },
-  {
-    "infinitive": "de boekentas",
-    "original": "de boekentas",
-    "translation": {
-      "ru": "школьная сумка",
-      "fr": "le cartable",
-      "en": "the school bag",
-      "de": "die Schultasche",
-      "uk": "шкільна сумка"
-    },
-    "example": "Ze pakte haar boeken in haar boekentas voor school."
-  },
-  {
-    "infinitive": "de das",
-    "original": "de das",
-    "translation": {
-      "ru": "галстук",
-      "fr": "la cravate",
-      "en": "the tie",
-      "de": "die Krawatte",
-      "uk": "галстук"
-    },
-    "example": "Hij droeg een elegante das bij zijn kostuum."
-  },
-  {
-    "infinitive": "de handschoenen",
-    "original": "de handschoenen",
-    "translation": {
-      "ru": "перчатки",
-      "fr": "les gants",
-      "en": "the gloves",
-      "de": "die Handschuhe",
-      "uk": "рукавички"
-    },
-    "example": "In de winter draagt ze warme handschoenen."
-  },
-  {
-    "infinitive": "het hemd",
-    "original": "het hemd",
-    "translation": {
-      "ru": "рубашка",
-      "fr": "la chemise",
-      "en": "the shirt",
-      "de": "das Hemd",
-      "uk": "сорочка"
-    },
-    "example": "Hij strijkt zijn hemd voordat hij naar een feest gaat."
-  },
-  {
-    "infinitive": "het hoed",
-    "original": "het hoed",
-    "translation": {
-      "ru": "шляпа",
-      "fr": "le chapeau",
-      "en": "the hat",
-      "de": "der Hut",
-      "uk": "капелюх"
-    },
-    "example": "Ze droeg een elegante hoed op de bruiloft."
-  },
-  {
-    "infinitive": "het horloge",
-    "original": "het horloge",
-    "translation": {
-      "ru": "часы",
-      "fr": "la montre",
-      "en": "the watch",
-      "de": "die Uhr",
-      "uk": "годинник"
-    },
-    "example": "Hij kreeg een luxe horloge voor zijn verjaardag."
-  },
-  {
-    "infinitive": "het handtas",
-    "original": "het handtas",
-    "translation": {
-      "ru": "женская сумка",
-      "fr": "le sac à main",
-      "en": "the handbag",
-      "de": "die Handtasche",
-      "uk": "жіноча сумка"
-    },
-    "example": "Ze nam haar handtas mee naar het restaurant."
-  },
-  {
-    "infinitive": "de halsketting/het halssnoer",
-    "original": "de halsketting/het halssnoer",
-    "translation": {
-      "ru": "ожерелье",
-      "fr": "le collier",
-      "en": "the necklace",
-      "de": "die Halskette",
-      "uk": "намисто"
-    },
-    "example": "Ze kreeg een prachtige halsketting als cadeau."
-  },
-  {
-    "infinitive": "de helm",
-    "original": "de helm",
-    "translation": {
-      "ru": "шлем",
-      "fr": "le casque",
-      "en": "the helmet",
-      "de": "der Helm",
-      "uk": "шолом"
-    },
-    "example": "Hij droeg een helm tijdens het fietsen."
-  },
-  {
-    "infinitive": "de hoefddoek",
-    "original": "de hoefddoek",
-    "translation": {
-      "ru": "головной платок",
-      "fr": "le foulard",
-      "en": "the headscarf",
-      "de": "das Kopftuch",
-      "uk": "головний платок"
-    },
-    "example": "Ze droeg een kleurrijke hoefddoek om haar haar te bedekken."
-  },
-  {
-    "infinitive": "de jeansbroek",
-    "original": "de jeansbroek",
-    "translation": {
-      "ru": "джинсы",
-      "fr": "le jean",
-      "en": "the jeans",
-      "de": "die Jeans",
-      "uk": "джинси"
-    },
-    "example": "Ze combineerde haar jeansbroek met een casual shirt."
-  },
-  {
-    "infinitive": "de jas",
-    "original": "de jas",
-    "translation": {
-      "ru": "пальто",
-      "fr": "le manteau",
-      "en": "the coat",
-      "de": "die Jacke",
-      "uk": "пальто"
-    },
-    "example": "In de winter draagt hij een warme jas."
-  },
-  {
-    "infinitive": "de jurk",
-    "original": "de jurk",
-    "translation": {
-      "ru": "платье",
-      "fr": "la robe",
-      "en": "the dress",
-      "de": "das Kleid",
-      "uk": "сукня"
-    },
-    "example": "Ze droeg een elegante jurk naar het feest."
-  },
-  {
-    "infinitive": "de kleedje",
-    "original": "de kleedje",
-    "translation": {
-      "ru": "платье (диалектное)",
-      "fr": "la robe (dialecte)",
-      "en": "the dress (dialect)",
-      "de": "das Kleid (Dialekt)",
-      "uk": "сукня (діалект)"
-    },
-    "example": "In sommige regio's gebruiken mensen het woord 'kleedje' in plaats van 'jurk'."
-  },
-  {
-    "infinitive": "de knoop/de knopen",
-    "original": "de knoop/de knopen",
-    "translation": {
-      "ru": "пуговица/пуговицы",
-      "fr": "le bouton/les boutons",
-      "en": "the button/the buttons",
-      "de": "der Knopf/die Knöpfe",
-      "uk": "ґудзик/ґудзики"
-    },
-    "example": "Ze naaide een nieuwe knoop aan haar jas."
-  },
-  {
-    "infinitive": "het kostuum",
-    "original": "het kostuum",
-    "translation": {
-      "ru": "костюм",
-      "fr": "le costume",
-      "en": "the suit",
-      "de": "der Anzug",
-      "uk": "костюм"
-    },
-    "example": "Hij droeg een elegant kostuum naar de bruiloft."
-  }
-]
+  "words": "[\"familie\",\"moeder\",\"vader\",\"broer\",\"zus\",\"oma\",\"opa\",\"neef\",\"nicht\",\"oom\",\"tante\",\"kind\",\"baby\",\"gezin\",\"hou\",\"helpen\",\"spelen\",\"wonen\",\"werkt\"]",
+  "html": [
+    "<html><body><div class='header'>Familie informatie</div><div class='dialog_data'><table><tr><th>Name</th><td>John</td></tr><tr><th>Familienaam</th><td>Doe</td></tr><tr><th>Leeftijd</th><td>40</td></tr><tr><th>Moeder</th><td>Anna</td></tr><tr><th>Vader</th><td>Peter</td></tr><tr><th>Broer</th><td>Mark</td></tr><tr><th>Zus</th><td>Sophie</td></tr><tr><th>Woonplaats</th><td>Utrecht</td></tr><tr><th>Beroep</th><td>Arts</td></tr></table></div></body></html>"
+  ]
+}

@@ -79,7 +79,7 @@
   // llang = data.llang;
   let showSpeakerButton = false;
 
-  let this_user;
+  let tip_hidden_text = 'hidden-text';
   let cur_html = 0;
   let cur_qa = 0;
   let q, q_shfl, a_shfl, a, d;
@@ -296,12 +296,18 @@
     cur_qa++;
     visibility[1] = 'hidden';
     visibility[2] = 'hidden';
+    visibility_cnt = 1;
     display_audio = 'none';
+    tip_hidden_text = '';
+    setTimeout(() => {
+      tip_hidden_text = 'hidden-text';
+    }, 50);
 
     Dialog();
     SendData();
     stt_text = '';
     showSpeakerButton = false;
+
 
     // speak(q[$llang])
   }
@@ -309,6 +315,9 @@
   function onBackQA() {
     // voice.Cancel();
     cur_qa--;
+    visibility[1] = 'hidden';
+    visibility[2] = 'hidden';
+    visibility_cnt = 1;
     Dialog();
     SendData();
     stt_text = '';
@@ -369,7 +378,7 @@
   }
 
   function onClickQ() {
-    visibility[1] = 'visible';
+    visibility[visibility_cnt++] = 'visible';
     showSpeakerButton = true;
   }
 
@@ -605,39 +614,37 @@
   <div class="card">
     {#if q || a}
       {#if !isFlipped}
-
-      <div class="container">
-        {#if dc}
-          <div class="repeat_but">
-            <Button
-              class="button-shaped-round"
-              color="secondary"
-              on:click={() => SendRepeat()}
-              {variant}
-            >
-              <Label>{dict['Repeat'][$langs]}</Label>
-            </Button>
-          </div>
-        {/if}
-        <!-- <div class="cnt">{cur_qa + 1}</div> -->
-        {#await Translate('Послушай вопрос', 'ru', $langs) then data}
-          <div class="title">{data}:</div>
-        {/await}
-
+        <div class="container">
+          {#if dc}
+            <div class="repeat_but">
+              <Button
+                class="button-shaped-round"
+                color="secondary"
+                on:click={() => SendRepeat()}
+                {variant}
+              >
+                <Label>{dict['Repeat'][$langs]}</Label>
+              </Button>
+            </div>
+          {/if}
+          <!-- <div class="cnt">{cur_qa + 1}</div> -->
+          {#await Translate('Послушай вопрос', 'ru', $langs) then data}
+            <div class="title">{data}:</div>
+          {/await}
         </div>
 
-        <div class="tip mdc-typography--headline6">
-          {q[$llang]}
+        <div class="tip mdc-typography--headline6 {tip_hidden_text}">
+          {@html q[$llang].replace(/"([^"]*)"/g, '$1')}
         </div>
 
         <div style="text-align: center;">
           <div class="user1" style="visibility:{visibility[1]}">
             {#if !dialog_data.content[cur_qa].user1[$langs]}
-              {#await Translate(q[$llang], $llang, $langs) then data}
-                {data}
+              {#await Translate(q[$llang].replace(/"([^"]*)"/g, '$1'), $llang, $langs) then data}
+                {@html data}
               {/await}
             {:else}
-              {@html q[$langs]}
+              {@html q[$langs].replace(/"([^"]*)"/g, '$1')}
             {/if}
           </div>
         </div>
@@ -665,18 +672,23 @@
         <div class="user2_tr">
           {#if a}
             {#if !a[$langs]}
-              {#await Translate(a[$llang], $llang, $langs) then data}
+              {#await Translate(a[$llang].replace(/"([^"]*)"/g, '$1'), $llang, $langs) then data}
                 {data}
               {/await}
             {:else}
-              {@html a[$langs]}
+              {@html a[$langs].replace(/"([^"]*)"/g, '$1')}
             {/if}
           {/if}
         </div>
 
-        <div class="user2" style="visibility:{visibility[1]}">
-          {#if a}
-            {@html a[$llang]}
+        <div class="user2">
+          {#if a &&  visibility[2]==='hidden'}
+            {@html a[$llang].replace(/(?<!")\b\w+\b(?!")/g,(match)=> {
+                return `<span class="span_hidden" onclick="(this.style.color='#2196f3')" style="display:block;border:1px;border-style:groove;border-color:light-blue;color:transparent;">${match}</span>`;
+            })}
+
+            {:else if  visibility[2]==='visible'}
+            {@html a[$llang].replace(/"([^"]*)"/g, '$1')}
           {/if}
         </div>
 
@@ -781,7 +793,6 @@
         </div>
 
         <div class="container">
-
           {#if dc}
             <div class="repeat_but">
               <Button
@@ -798,7 +809,6 @@
           {#await Translate('Послушай ответ', 'ru', $langs) then data}
             <div class="title">{data}:</div>
           {/await}
-
         </div>
 
         <div style="text-align: center;">
@@ -836,25 +846,21 @@
 
       <br />
 
-      <div class="words_div accordion-container">
-        {#if hints?.length > 0}
-          <Content
-            style="line-height: 2.0; overflow-y:auto;"
-          >
+      <!-- <div class="words_div accordion-container">
+        {#if !dialog_data.html && hints?.length > 0}
+          <Content style="line-height: 2.0; overflow-y:auto;">
             {#each hints as hint, i}
               <span class="hint_button">
                 {@html hint + '&nbsp;' + '&nbsp;'}
               </span>
             {/each}
-            <div style="height:50px"></div>
+            <div style="height:0px"></div>
           </Content>
         {/if}
-      </div>
+      </div> -->
 
       {#if dialog_data.html}
         <ConText data={dialog_data} />
-        <!-- <div class="html_data">{@html dialog_data.html[cur_html]}</div> -->
-        <!-- <iframe srcdoc={dialog_data.html[cur_html]} class="html_data" width="100%" height="700vh"></iframe> -->
       {/if}
     {:else}
       <div style="text-align:center">
@@ -891,15 +897,15 @@
 
   .container {
     display: flex;
-    top: 10px;
-    margin-bottom: 20px;
-    position:relative;
+    top: 0px;
+    margin-bottom: 7px;
+    position: relative;
     justify-content: space-between;
     align-items: center;
-}
+  }
 
   .repeat_but {
-    position:absolute;
+    position: absolute;
     margin-right: auto; /* Сдвиг первого элемента к левому краю */
     font-size: smaller;
     left: 0px;
@@ -969,7 +975,7 @@
     display: grid;
     position: relative;
     overflow-y: auto;
-    height: 60vh;
+    height: 50%;
     margin: 0 auto;
     margin-top: 10px;
     border: 0;
@@ -1011,9 +1017,9 @@
   }
 
   .title {
-    width:fit-content;
+    width: fit-content;
     margin: 10px auto; /* Центрирование второго элемента */
-    color: grey;
+    color: #b06db7;
     line-height: normal;
     text-align: center;
     font-size: 0.8em;
@@ -1030,6 +1036,7 @@
   }
 
   .user2 {
+    display: ruby-text;
     text-align: center;
     line-height: normal;
     font-size: 1em;
@@ -1089,7 +1096,7 @@
   .card {
     transition: transform 0.3s ease-in-out;
     width: 100%;
-    top: 85px;
+    top: 80px;
     /* border: grey solid 1px; */
     border-radius: 5px;
     margin: 0 auto;
@@ -1113,5 +1120,17 @@
     padding-left: 8px;
     margin: 5px;
     background-color: transparent;
+  }
+
+  .hidden-text {
+    opacity: 0;
+    animation: fadeIn 2s ease-in forwards;
+    animation-delay: 2s;
+  }
+
+  @keyframes fadeIn {
+    to {
+      opacity: 1;
+    }
   }
 </style>
