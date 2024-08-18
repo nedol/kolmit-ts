@@ -3,13 +3,18 @@
 
   import ConText from './Dialog.Context.svelte';
 
-  import Accordion, { Panel, Header, Content } from '@smui-extra/accordion';
-
+ 
   import { Number2Words } from '$lib/tts/convert.nl.js';
   import { NumberString, numberToDutchString } from '$lib/tts/Listen.numbers';
   // import BottomAppBar, { Section } from '@smui-extra/bottom-app-bar';
+
+  //  import '$lib/css/_Colored.scss';
+
   import TopAppBar, { Row, Title, Section } from '@smui/top-app-bar';
   import Button, { Label } from '@smui/button';
+  import Badge from '@smui-extra/badge';
+
+
   import { Translate } from '../../../translate/Transloc';
 
   // import '$lib/js/talkify.js';
@@ -567,6 +572,11 @@
               <Icon tag="svg" viewBox="0 0 24 24">
                 <path fill="currentColor" d={mdiAccountConvertOutline} />
               </Icon>
+              {#if !isFlipped}
+               <Badge  position='middle' align="bottom-end - bottom-middle" aria-label="unread count">1</Badge>
+               {:else}
+              <Badge  color="secondary" position='middle' align="bottom-end - bottom-middle" aria-label="unread count">2</Badge>
+              {/if}
             </IconButton>
           </div>
         </Section>
@@ -920,10 +930,11 @@
   }
 
   .margins {
-    display: flex;
+
+    top: 10px;
     position: relative;
-    justify-content: start; /* Распределяет пространство между элементами равномерно */
-    height: 30px;
+
+    height: 25px;
     margin-right: 10px;
     margin-left: 10px;
   }
@@ -1015,7 +1026,7 @@
 
   .title {
     width: fit-content;
-    margin: 10px auto; /* Центрирование второго элемента */
+    margin: 5px auto; /* Центрирование второго элемента */
     color: #b06db7;
     line-height: normal;
     text-align: center;
@@ -1037,6 +1048,9 @@
     top: 10px;
     text-align: center;
     color: #2196f3;
+    margin-left: 10px;
+    margin-right: 10px;
+
   }
 
   .user2_tr {

@@ -16,6 +16,7 @@
     "@jhubbardsf/svelte-sortablejs": "^1.1.0",
     "@material/typography": "^14.0.0",
     "@rollup/plugin-commonjs": "^25.0.8",
+    "@smui-extra/badge": "^7.0.0",
     "@smui/chips": "^7.0.0-beta.18",
     "@smui/dialog": "^7.0.0",
     "@smui/fab": "^7.0.0-beta.18",

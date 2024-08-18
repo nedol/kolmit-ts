@@ -31,7 +31,7 @@
       maxTimeout: 5000,
       interval: 250,
       quiet: false,
-      rate: 0.7,
+      rate: 0.8,
     }); // required
 
     let voices = EasySpeech.voices();
@@ -72,7 +72,7 @@
       text: text, //dialog_data.content[cur_qa].question['nl'],
       voice: tts.voice,
       volume: 1,
-      rate: 0.6,
+      rate: 0.8,
       pitch: 1.2,
       boundary: (e) => console.debug('boundary reached'),
       end: (e) => {
