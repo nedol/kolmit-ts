@@ -144,7 +144,6 @@
     share_mode = true;
   }
 
-
   $: if (q && !q[$langs]) {
     (async () => {
       q[$langs] = await Translate(q[$llang], $llang, $langs);
@@ -217,7 +216,7 @@
         cur_html = 0;
       }
       setTimeout(() => {
-        onChangeUserClick() 
+        onChangeUserClick();
       }, 0);
 
       return;
@@ -293,7 +292,6 @@
     SendData();
     stt_text = '';
     showSpeakerButton = false;
-
 
     // speak(q[$llang])
   }
@@ -668,12 +666,12 @@
         </div>
 
         <div class="user2">
-          {#if a &&  visibility[2]==='hidden'}
-            {@html a[$llang].replace(/(?<!")\b\w+\b(?!")/g,(match)=> {
-                return `<span class="span_hidden" onclick="(this.style.color='#2196f3')" style="display:block;border:1px;border-style:groove;border-color:light-blue;color:transparent;">${match}</span>`;
+          {#if a && visibility[2] === 'hidden'}
+            {@html a[$llang].replace(/(?<!")\b\w+\b(?!")/g, (match) => {
+              return `<span class="span_hidden" onclick="(this.style.color='#2196f3')" 
+                style="display:inline-block; margin: 5px 0px; padding: 1px 5px;border:1px;border-style:groove;border-color:lightblue;color:transparent;">${match}</span>`;
             })}
-
-            {:else if  visibility[2]==='visible'}
+          {:else if visibility[2] === 'visible'}
             {@html a[$llang].replace(/"([^"]*)"/g, '$1')}
           {/if}
         </div>
@@ -740,16 +738,15 @@
         </div> -->
 
         <div class="user2">
-          {#if a &&  visibility[1]==='hidden'}
-            {@html a[$llang].replace(/(?<!")\b\w+\b(?!")/g,(match)=> {
-                return `<span class="span_hidden" onclick="(this.style.color='#2196f3')" style="display:block;border:1px;border-style:groove;border-color:light-blue;color:transparent;">${match}</span>`;
+          {#if a && visibility[1] === 'hidden'}
+            {@html a[$llang].replace(/(?<!")\b\w+\b(?!")/g, (match) => {
+              return `<span class="span_hidden" onclick="(this.style.color='#2196f3')" 
+                style="display:inline-block;margin: 5px 0px;border:1px;border-style:groove;border-color:light-blue;color:transparent;">${match}</span>`;
             })}
-
-            {:else if  visibility[2]==='visible'}
+          {:else if visibility[2] === 'visible'}
             {@html a[$llang].replace(/"([^"]*)"/g, '$1')}
           {/if}
         </div>
-
 
         <div style="text-align: center">
           <span style="color: darkgreen;">
@@ -824,8 +821,6 @@
             {/if}
           </div>
         </div>
-
-
 
         <div
           class="margins"
@@ -929,6 +924,8 @@
     position: relative;
     justify-content: start; /* Распределяет пространство между элементами равномерно */
     height: 30px;
+    margin-right: 10px;
+    margin-left: 10px;
   }
 
   /* Если вы хотите добавить пространство между элементами, вы можете использовать margin */
@@ -1036,11 +1033,9 @@
   }
 
   .user2 {
-    display: ruby-text;
+    position: relative;
+    top: 10px;
     text-align: center;
-    line-height: normal;
-    font-size: 1em;
-    margin-bottom: 0px;
     color: #2196f3;
   }
 
@@ -1116,7 +1111,7 @@
     border: solid 0.1em #9f3f3f;
     border-radius: 5px;
     text-align: center;
-    width: auto;
+    width: 50px;
     padding-left: 8px;
     margin: 5px;
     background-color: transparent;
