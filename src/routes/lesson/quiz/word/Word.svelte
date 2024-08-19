@@ -155,12 +155,12 @@
     if (example.includes('<<') && example.includes('>>')) {
       example = example?.replace(
         /<<([^<>]+)>>/gu,
-        '<span style="color:green" onclick=OnClickInput><b>$1</b></span>'
+        data.level.includes('A1')?'<span style="color:green" onclick=OnClickInput><b>$1</b></span>':'$1'
       );
     } else if (example.includes('"')) {
       example = example?.replace(
         /"([^"]+)"/gu,
-        '<span style="color:green" onclick=OnClickInput><b>$1</b></span>'
+        data.level.includes('A1')?'<span style="color:green" onclick=OnClickInput><b>$1</b></span>':'$1'
       );
     }
 
@@ -324,7 +324,8 @@
   }
 
   function checkInput() {
-    if (userContent.length < 1 || !userContent[0]) return;
+
+    if (userContent.length < 1 || !userContent[0].replace(/&nbsp;/g, '')) return;
 
     if (errorIndex > 0) {
       errorIndex = 0;

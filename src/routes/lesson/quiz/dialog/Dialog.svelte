@@ -95,6 +95,7 @@
     hints = ['test'];
 
   let isListening = false;
+  let total_cnt = 0;
 
   let share_button = false;
   let share_button_class = 'button_shared_false';
@@ -197,6 +198,7 @@
       .then((response) => response.json())
       .then((data) => {
         dialog_data = data.data.dialog;
+        total_cnt = dialog_data.content.length
         if (data.data.html) {
           dialog_data.html = splitHtmlContent(data.data.html);
         }
@@ -573,16 +575,18 @@
                 <path fill="currentColor" d={mdiAccountConvertOutline} />
               </Icon>
               {#if !isFlipped}
-               <Badge  position='middle' align="bottom-end - bottom-middle" aria-label="unread count">1</Badge>
+               <Badge  position='middle' align="bottom-end - bottom-middle" aria-label="unread count" style="scale:.8">A</Badge>
                {:else}
-              <Badge  color="secondary" position='middle' align="bottom-end - bottom-middle" aria-label="unread count">2</Badge>
+              <Badge  color="secondary" position='middle' align="bottom-end - bottom-middle" aria-label="unread count" style="scale:.8">B</Badge>
               {/if}
             </IconButton>
           </div>
         </Section>
         <Section>
           <div class="counter">
-            <p><span class="mdc-typography--overline">{cur_qa + 1}</span></p>
+            <p><span class="mdc-typography--overline" style="position:relative">{cur_qa + 1}
+             <Badge  position='middle' align="bottom-end - bottom-middle" aria-label="unread count" style="margin-right:-10px;scale:.8">{total_cnt}</Badge>
+             </span></p>
           </div>
         </Section>
         <Section>
@@ -981,6 +985,7 @@
 
   .html_data {
     display: grid;
+    width: 70vh;
     position: relative;
     overflow-y: auto;
     height: 50%;
@@ -1092,12 +1097,10 @@
 
   .toggleButton {
     position: relative;
-    /* margin: 40px auto 0; */
-    /* left: 50%; */
+    height: -webkit-fill-available;
     background-color: #2196f3;
     color: #fff;
     border: none;
-
     border-radius: 5px;
     cursor: pointer;
   }
