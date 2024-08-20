@@ -519,6 +519,12 @@
   });
 </script>
 
+
+<link
+  rel="stylesheet"
+  href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0"
+/>
+
 <Tts bind:this={tts}></Tts>
 
 <!-- <RV bind:this={voice}></RV> -->
@@ -590,11 +596,10 @@
           </div>
         </Section>
         <Section>
-          <button on:click={onClickQ} class="toggleButton">
-            <span class="material-symbols-outlined"> ? </span>
+          <button  class="hint-button" on:click={onClickQ}>
+            <span class="material-symbols-outlined">?</span>
           </button>
         </Section>
-
         <Section align="end">
           <Icon
             tag="svg"
@@ -985,7 +990,7 @@
 
   .html_data {
     display: grid;
-    width: 70vh;
+    width: 50vh;
     position: relative;
     overflow-y: auto;
     height: 50%;
@@ -1095,14 +1100,11 @@
     transform: translateY(-50%);
   }
 
-  .toggleButton {
-    position: relative;
-    height: -webkit-fill-available;
+  .hint-button {
+    color: white;
     background-color: #2196f3;
-    color: #fff;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
+    border-radius: 3px;
+    padding: 2px 10px;
   }
 
   .card {
@@ -1133,6 +1135,7 @@
     margin: 5px;
     background-color: transparent;
   }
+
 
   .hidden-text {
     opacity: 0;

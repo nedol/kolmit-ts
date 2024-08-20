@@ -192,7 +192,12 @@
       .then((text) => {
         content = text;
         const parsed = JSON.parse(text);
+        if(words_data){
         words_data = words_data.concat(parsed);
+        }else{
+          words_data = parsed
+        }
+
       })
       .catch((err) => {
         console.error('Failed to read clipboard contents: ', err);

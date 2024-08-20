@@ -1,322 +1,574 @@
-{
-  "content": [
-    {
-      "user1": {
-        "nl": "Mijn familie woont in Brussel. We hebben een groot gezin.",
-        "ru": "Моя семья живет в Брюсселе. У нас большая семья.",
-        "hints": [
-          "familie",
-          "gezin",
-          "wonen"
-        ]
-      },
-      "user2": {
-        "nl": "Hoeveel mensen zijn er in je gezin?",
-        "ru": "Сколько человек в твоей семье?",
-        "hints": [
-          "gezin",
-          "hoeveel"
-        ]
-      }
+[
+  {
+    "original": "de winkel",
+    "infinitive": "",
+    "example": {
+      "nl": "Ik ga naar <<de winkel>>.",
+      "ru": "Я иду в магазин.",
+      "en": "I am going to the store."
     },
-    {
-      "user1": {
-        "nl": "We zijn met z'n zessen: mijn moeder, vader, broer, zus, en ik.",
-        "ru": "Нас шесть человек: моя мама, папа, брат, сестра и я.",
-        "hints": [
-          "moeder",
-          "vader",
-          "broer",
-          "zus",
-          "gezin"
-        ]
-      },
-      "user2": {
-        "nl": "Werk je \"\"vader\"\"?",
-        "ru": "Твой отец работает?",
-        "hints": [
-          "werkt",
-          "vader"
-        ]
-      }
-    },
-    {
-      "user1": {
-        "nl": "Ja, mijn \"\"vader\"\" werkt als \"\"ingenieur\"\".",
-        "ru": "Да, мой отец работает инженером.",
-        "hints": [
-          "vader",
-          "werkt"
-        ]
-      },
-      "user2": {
-        "nl": "\"\"Helpt\"\" je moeder ook in huis?",
-        "ru": "Мама тоже помогает по дому?",
-        "hints": [
-          "moeder",
-          "helpen"
-        ]
-      }
-    },
-    {
-      "user1": {
-        "nl": "Ja, mijn moeder \"\"kookt\"\" en \"\"zorgt voor de kinderen\"\".",
-        "ru": "Да, моя мама готовит и заботится о детях.",
-        "hints": [
-          "moeder",
-          "koken",
-          "kind"
-        ]
-      },
-      "user2": {
-        "nl": "Heb je \"\"grootouders\"\"?",
-        "ru": "У тебя есть бабушка и дедушка?",
-        "hints": [
-          "grootouders",
-          "oma",
-          "opa"
-        ]
-      }
-    },
-    {
-      "user1": {
-        "nl": "Ja, mijn opa en \"\"oma\"\" wonen bij ons.",
-        "ru": "Да, мой дедушка и бабушка живут с нами.",
-        "hints": [
-          "opa",
-          "oma",
-          "wonen"
-        ]
-      },
-      "user2": {
-        "nl": "Speel je vaak met je \"\"broer\"\" en zus?",
-        "ru": "Ты часто играешь с братом и сестрой?",
-        "hints": [
-          "spelen",
-          "broer",
-          "zus"
-        ]
-      }
-    },
-    {
-      "user1": {
-        "nl": "Ja, we spelen samen in de tuin.",
-        "ru": "Да, мы вместе играем в саду.",
-        "hints": [
-          "spelen",
-          "tuin",
-          "broer",
-          "zus"
-        ]
-      },
-      "user2": {
-        "nl": "Hoe oud is je \"\"neef\"\"?",
-        "ru": "Сколько лет твоему двоюродному брату?",
-        "hints": [
-          "neef",
-          "hoe oud"
-        ]
-      }
-    },
-    {
-      "user1": {
-        "nl": "Mijn \"\"neef\"\" is twaalf jaar oud.",
-        "ru": "Моему двоюродному брату двенадцать лет.",
-        "hints": [
-          "neef",
-          "jaar",
-          "oud"
-        ]
-      },
-      "user2": {
-        "nl": "En je nicht? \"\"Hoe oud\"\" is ze?",
-        "ru": "А твоей двоюродной сестре? Сколько ей лет?",
-        "hints": [
-          "nicht",
-          "hoe oud"
-        ]
-      }
-    },
-    {
-      "user1": {
-        "nl": "Mijn \"\"nicht\"\" is acht jaar oud.",
-        "ru": "Моей двоюродной сестре восемь лет.",
-        "hints": [
-          "nicht",
-          "jaar",
-          "oud"
-        ]
-      },
-      "user2": {
-        "nl": "Wie helpt je met je \"\"huiswerk\"\"?",
-        "ru": "Кто помогает тебе с домашними заданиями?",
-        "hints": [
-          "helpen",
-          "huiswerk"
-        ]
-      }
-    },
-    {
-      "user1": {
-        "nl": "Mijn \"\"zus\"\" helpt me vaak.",
-        "ru": "Моя сестра часто мне помогает.",
-        "hints": [
-          "zus",
-          "helpen"
-        ]
-      },
-      "user2": {
-        "nl": "Hou je van je gezin?",
-        "ru": "Ты любишь свою семью?",
-        "hints": [
-          "hou",
-          "gezin"
-        ]
-      }
-    },
-    {
-      "user1": {
-        "nl": "Ja, ik hou heel veel van mijn familie.",
-        "ru": "Да, я очень люблю свою семью.",
-        "hints": [
-          "hou",
-          "familie"
-        ]
-      },
-      "user2": {
-        "nl": "Dat is mooi om te horen.",
-        "ru": "Рад это слышать.",
-        "hints": [
-          "mooi",
-          "horen"
-        ]
-      }
-    },
-    {
-      "user1": {
-        "nl": "Mijn \"\"familie\"\" is groot. \"\"Hoeveel leden\"\" heeft jouw gezin?",
-        "ru": "Моя семья большая. Сколько человек в твоей семье?",
-        "hints": [
-          "familie",
-          "Hoeveel"
-        ]
-      },
-      "user2": {
-        "nl": "Mijn gezin heeft vier \"\"leden\"\". Wie is de jongste in jouw familie?",
-        "ru": "В моей семье четыре человека. Кто самый младший в твоей семье?",
-        "hints": [
-          "leden",
-          "Wie"
-        ]
-      }
-    },
-    {
-      "user1": {
-        "nl": "De \"\"jongste\"\" is mijn \"zus\". Zij is een baby.",
-        "ru": "Самая младшая — моя сестра. Она младенец.",
-        "hints": [
-          "zus",
-          "baby"
-        ]
-      },
-      "user2": {
-        "nl": "\"\"Hoe oud\"\" is jouw zus?",
-        "ru": "Сколько лет твоей сестре?",
-        "hints": [
-          "oud"
-        ]
-      }
-    },
-    {
-      "user1": {
-        "nl": "Ze is \"\"twee\"\" jaar oud. Heb je een \"\"broer\"\" of zus?",
-        "ru": "Ей два года. У тебя есть брат или сестра?",
-        "hints": [
-          "twee",
-          "broer"
-        ]
-      },
-      "user2": {
-        "nl": "Ja, ik heb een broer en een zus. Mijn broer \"\"werkt\"\" in Amsterdam.",
-        "ru": "Да, у меня есть брат и сестра. Мой брат работает в Амстердаме.",
-        "hints": [
-          "werkt"
-        ]
-      }
-    },
-    {
-      "user1": {
-        "nl": "Waar \"\"werkt\"\" hij?",
-        "ru": "Где он работает?",
-        "hints": [
-          "werkt"
-        ]
-      },
-      "user2": {
-        "nl": "Hij werkt in een \"\"ziekenhuis\"\".",
-        "ru": "Он работает в больнице.",
-        "hints": [
-          "ziekenhuis"
-        ]
-      }
-    },
-    {
-      "user1": {
-        "nl": "En jouw zus, wat doet zij?",
-        "ru": "А твоя сестра, что она делает?",
-        "hints": [
-          "doet"
-        ]
-      },
-      "user2": {
-        "nl": "Mijn zus studeert aan de \"\"universiteit\"\".",
-        "ru": "Моя сестра учится в университете.",
-        "hints": [
-          "universiteit"
-        ]
-      }
-    },
-    {
-      "user1": {
-        "nl": "Dat is interessant! Wat \"\"studeert\"\" zij?",
-        "ru": "Это интересно! Что она изучает?",
-        "hints": [
-          "studeert"
-        ]
-      },
-      "user2": {
-        "nl": "Ze studeert \"\"geneeskunde\"\". \"\"Hou\"\" jij van je familie?",
-        "ru": "Она изучает медицину. Ты любишь свою семью?",
-        "hints": [
-          "geneeskunde",
-          "Hou"
-        ]
-      }
-    },
-    {
-      "user1": {
-        "nl": "Ja, ik hou veel van mijn familie. \"\"Help\"\" jij vaak je ouders?",
-        "ru": "Да, я очень люблю свою семью. Ты часто помогаешь своим родителям?",
-        "hints": [
-          "Ja",
-          "Help"
-        ]
-      },
-      "user2": {
-        "nl": "Ja, ik help vaak mijn moeder met \"\"koken\"\".",
-        "ru": "Да, я часто помогаю маме с готовкой.",
-        "hints": [
-          "koken"
-        ]
-      }
+    "translation": {
+      "ru": "магазин",
+      "en": "store"
     }
-  ],
-  "name": {
-    "nl": "Gezin",
-    "ru": "Gezin"
   },
-  "words": "[\"familie\",\"moeder\",\"vader\",\"broer\",\"zus\",\"oma\",\"opa\",\"neef\",\"nicht\",\"oom\",\"tante\",\"kind\",\"baby\",\"gezin\",\"hou\",\"helpen\",\"spelen\",\"wonen\",\"werkt\"]",
-  "html": [
-    "<html><body><div class='header'>Familie informatie</div><div class='dialog_data'><table><tr><th>Name</th><td>John</td></tr><tr><th>Familienaam</th><td>Doe</td></tr><tr><th>Leeftijd</th><td>40</td></tr><tr><th>Moeder</th><td>Anna</td></tr><tr><th>Vader</th><td>Peter</td></tr><tr><th>Broer</th><td>Mark</td></tr><tr><th>Zus</th><td>Sophie</td></tr><tr><th>Woonplaats</th><td>Utrecht</td></tr><tr><th>Beroep</th><td>Arts</td></tr></table></div></body></html>"
-  ]
-}
+  {
+    "original": "de kruidenierswinkel",
+    "infinitive": "",
+    "example": {
+      "nl": "De <<kruidenierswinkel>> is dicht.",
+      "ru": "Продуктовый магазин закрыт.",
+      "en": "The grocery store is closed."
+    },
+    "translation": {
+      "ru": "продуктовый магазин",
+      "en": "grocery store"
+    }
+  },
+  {
+    "original": "het product",
+    "infinitive": "",
+    "example": {
+      "nl": "Ik koop een nieuw <<product>>.",
+      "ru": "Я покупаю новый продукт.",
+      "en": "I am buying a new product."
+    },
+    "translation": {
+      "ru": "продукт",
+      "en": "product"
+    }
+  },
+  {
+    "original": "de prijs",
+    "infinitive": "",
+    "example": {
+      "nl": "Wat is de <<prijs>>?",
+      "ru": "Какова цена?",
+      "en": "What is the price?"
+    },
+    "translation": {
+      "ru": "цена",
+      "en": "price"
+    }
+  },
+  {
+    "original": "de kassa",
+    "infinitive": "",
+    "example": {
+      "nl": "De <<kassa>> is daar.",
+      "ru": "Касса находится там.",
+      "en": "The checkout is over there."
+    },
+    "translation": {
+      "ru": "касса",
+      "en": "checkout"
+    }
+  },
+  {
+    "original": "de verkoopster",
+    "infinitive": "",
+    "example": {
+      "nl": "De <<verkoopster>> helpt me.",
+      "ru": "Продавщица помогает мне.",
+      "en": "The saleswoman is helping me."
+    },
+    "translation": {
+      "ru": "продавщица",
+      "en": "saleswoman"
+    }
+  },
+  {
+    "original": "de klant",
+    "infinitive": "",
+    "example": {
+      "nl": "De <<klant>> vraagt iets.",
+      "ru": "Клиент что-то спрашивает.",
+      "en": "The customer is asking something."
+    },
+    "translation": {
+      "ru": "клиент",
+      "en": "customer"
+    }
+  },
+  {
+    "original": "het geld",
+    "infinitive": "",
+    "example": {
+      "nl": "Ik heb niet genoeg <<geld>>.",
+      "ru": "У меня недостаточно денег.",
+      "en": "I don’t have enough money."
+    },
+    "translation": {
+      "ru": "деньги",
+      "en": "money"
+    }
+  },
+  {
+    "original": "de bon",
+    "infinitive": "",
+    "example": {
+      "nl": "Ik heb de <<bon>> nodig.",
+      "ru": "Мне нужен чек.",
+      "en": "I need the receipt."
+    },
+    "translation": {
+      "ru": "чек",
+      "en": "receipt"
+    }
+  },
+  {
+    "original": "de aanbieding",
+    "infinitive": "",
+    "example": {
+      "nl": "Er is een speciale <<aanbieding>>.",
+      "ru": "Есть специальное предложение.",
+      "en": "There is a special offer."
+    },
+    "translation": {
+      "ru": "предложение",
+      "en": "offer"
+    }
+  },
+  {
+    "original": "de winkelwagen",
+    "infinitive": "",
+    "example": {
+      "nl": "Zet de producten in de <<winkelwagen>>.",
+      "ru": "Положите товары в тележку.",
+      "en": "Put the items in the shopping cart."
+    },
+    "translation": {
+      "ru": "тележка",
+      "en": "shopping cart"
+    }
+  },
+  {
+    "original": "het schap",
+    "infinitive": "",
+    "example": {
+      "nl": "Het product staat op het <<schap>>.",
+      "ru": "Продукт стоит на полке.",
+      "en": "The product is on the shelf."
+    },
+    "translation": {
+      "ru": "полка",
+      "en": "shelf"
+    }
+  },
+  {
+    "original": "de verpakking",
+    "infinitive": "",
+    "example": {
+      "nl": "Bekijk de <<verpakking>>.",
+      "ru": "Посмотрите упаковку.",
+      "en": "Look at the packaging."
+    },
+    "translation": {
+      "ru": "упаковка",
+      "en": "packaging"
+    }
+  },
+  {
+    "original": "de winkelier",
+    "infinitive": "",
+    "example": {
+      "nl": "De <<winkelier>> helpt ons.",
+      "ru": "Продавец нам помогает.",
+      "en": "The shopkeeper is helping us."
+    },
+    "translation": {
+      "ru": "продавец",
+      "en": "shopkeeper"
+    }
+  },
+  {
+    "original": "het assortiment",
+    "infinitive": "",
+    "example": {
+      "nl": "Bekijk het <<assortiment>>.",
+      "ru": "Посмотрите ассортимент.",
+      "en": "Check out the assortment."
+    },
+    "translation": {
+      "ru": "ассортимент",
+      "en": "assortment"
+    }
+  },
+  {
+    "original": "de winkelopeningstijden",
+    "infinitive": "",
+    "example": {
+      "nl": "Wat zijn de <<winkelopeningstijden>>?",
+      "ru": "Какое время работы магазина?",
+      "en": "What are the store hours?"
+    },
+    "translation": {
+      "ru": "время работы магазина",
+      "en": "store hours"
+    }
+  },
+  {
+    "original": "de korting",
+    "infinitive": "",
+    "example": {
+      "nl": "Er is een <<korting>> op deze producten.",
+      "ru": "На эти товары есть скидка.",
+      "en": "There is a discount on these items."
+    },
+    "translation": {
+      "ru": "скидка",
+      "en": "discount"
+    }
+  },
+  {
+    "original": "de fles",
+    "infinitive": "",
+    "example": {
+      "nl": "Ik koop een <<fles>> water.",
+      "ru": "Я покупаю бутылку воды.",
+      "en": "I am buying a bottle of water."
+    },
+    "translation": {
+      "ru": "бутылка",
+      "en": "bottle"
+    }
+  },
+  {
+    "original": "de doos",
+    "infinitive": "",
+    "example": {
+      "nl": "De <<doos>> is zwaar.",
+      "ru": "Коробка тяжелая.",
+      "en": "The box is heavy."
+    },
+    "translation": {
+      "ru": "коробка",
+      "en": "box"
+    }
+  },
+  {
+    "original": "het merk",
+    "infinitive": "",
+    "example": {
+      "nl": "Wat is het <<merk>>?",
+      "ru": "Какой это бренд?",
+      "en": "What is the brand?"
+    },
+    "translation": {
+      "ru": "бренд",
+      "en": "brand"
+    }
+  },
+  {
+    "original": "de aanbiedingen",
+    "infinitive": "",
+    "example": {
+      "nl": "Bekijk de <<aanbiedingen>>.",
+      "ru": "Посмотрите акции.",
+      "en": "Check out the promotions."
+    },
+    "translation": {
+      "ru": "акции",
+      "en": "promotions"
+    }
+  },
+  {
+    "original": "de voorraad",
+    "infinitive": "",
+    "example": {
+      "nl": "Er is geen <<voorraad>> meer.",
+      "ru": "Нет больше в наличии.",
+      "en": "There is no stock left."
+    },
+    "translation": {
+      "ru": "запас",
+      "en": "stock"
+    }
+  },
+  {
+    "original": "de tas",
+    "infinitive": "",
+    "example": {
+      "nl": "Neem een <<tas>> mee.",
+      "ru": "Возьмите с собой сумку.",
+      "en": "Bring a bag with you."
+    },
+    "translation": {
+      "ru": "сумка",
+      "en": "bag"
+    }
+  },
+  {
+    "original": "de winkelier",
+    "infinitive": "",
+    "example": {
+      "nl": "De <<winkelier>> geeft me een korting.",
+      "ru": "Продавец дает мне скидку.",
+      "en": "The shopkeeper gives me a discount."
+    },
+    "translation": {
+      "ru": "продавец",
+      "en": "shopkeeper"
+    }
+  },
+  {
+    "original": "de past",
+    "infinitive": "",
+    "example": {
+      "nl": "De <<past>> is oud.",
+      "ru": "Эта упаковка старая.",
+      "en": "The package is old."
+    },
+    "translation": {
+      "ru": "упаковка",
+      "en": "package"
+    }
+  },
+  {
+    "original": "de voorraad",
+    "infinitive": "",
+    "example": {
+      "nl": "Ik vraag naar de <<voorraad>>.",
+      "ru": "Я спрашиваю о наличии.",
+      "en": "I ask about the stock."
+    },
+    "translation": {
+      "ru": "наличие",
+      "en": "stock"
+    }
+  },
+  {
+    "original": "de waarde",
+    "infinitive": "",
+    "example": {
+      "nl": "Wat is de <<waarde>> van dit product?",
+      "ru": "Какова стоимость этого продукта?",
+      "en": "What is the value of this product?"
+    },
+    "translation": {
+      "ru": "стоимость",
+      "en": "value"
+    }
+  },
+  {
+    "original": "de verkoper",
+    "infinitive": "",
+    "example": {
+      "nl": "De <<verkoper>> geeft advies.",
+      "ru": "Продавец дает совет.",
+      "en": "The salesperson gives advice."
+    },
+    "translation": {
+      "ru": "продавец",
+      "en": "salesperson"
+    }
+  },
+  {
+    "original": "de winkelopeningstijden",
+    "infinitive": "",
+    "example": {
+      "nl": "De <<winkelopeningstijden>> zijn van negen tot vijf.",
+      "ru": "Часы работы магазина с девяти до пяти.",
+      "en": "The store hours are from nine to five."
+    },
+    "translation": {
+      "ru": "время работы магазина",
+      "en": "store hours"
+    }
+  },
+  {
+    "original": "het product",
+    "infinitive": "",
+    "example": {
+      "nl": "Het <<product>> is nieuw.",
+      "ru": "Этот продукт новый.",
+      "en": "The product is new."
+    },
+    "translation": {
+      "ru": "продукт",
+      "en": "product"
+    }
+  },
+  {
+    "original": "de aankoop",
+    "infinitive": "",
+    "example": {
+      "nl": "Ik doe een <<aankoop>>.",
+      "ru": "Я совершаю покупку.",
+      "en": "I am making a purchase."
+    },
+    "translation": {
+      "ru": "покупка",
+      "en": "purchase"
+    }
+  },
+  {
+    "original": "de klant",
+    "infinitive": "",
+    "example": {
+      "nl": "De <<klant>> wacht in de rij.",
+      "ru": "Клиент ждет в очереди.",
+      "en": "The customer is waiting in line."
+    },
+    "translation": {
+      "ru": "клиент",
+      "en": "customer"
+    }
+  },
+  {
+    "original": "de fabrikant",
+    "infinitive": "",
+    "example": {
+      "nl": "De <<fabrikant>> maakt de producten.",
+      "ru": "Производитель делает товары.",
+      "en": "The manufacturer makes the products."
+    },
+    "translation": {
+      "ru": "производитель",
+      "en": "manufacturer"
+    }
+  },
+  {
+    "original": "de tas",
+    "infinitive": "",
+    "example": {
+      "nl": "Neem een <<tas>> mee.",
+      "ru": "Возьмите с собой сумку.",
+      "en": "Bring a bag with you."
+    },
+    "translation": {
+      "ru": "сумка",
+      "en": "bag"
+    }
+  },
+  {
+    "original": "de klantenservice",
+    "infinitive": "",
+    "example": {
+      "nl": "Vraag bij de <<klantenservice>>.",
+      "ru": "Спросите в службу поддержки.",
+      "en": "Ask at the customer service."
+    },
+    "translation": {
+      "ru": "служба поддержки",
+      "en": "customer service"
+    }
+  },
+  {
+    "original": "de uitverkoop",
+    "infinitive": "",
+    "example": {
+      "nl": "Er is een <<uitverkoop>> in de winkel.",
+      "ru": "В магазине распродажа.",
+      "en": "There is a sale in the store."
+    },
+    "translation": {
+      "ru": "распродажа",
+      "en": "sale"
+    }
+  },
+  {
+    "original": "het geld",
+    "infinitive": "",
+    "example": {
+      "nl": "Betaal met <<geld>>.",
+      "ru": "Оплатите наличными.",
+      "en": "Pay with cash."
+    },
+    "translation": {
+      "ru": "деньги",
+      "en": "cash"
+    }
+  },
+  {
+    "original": "de winkelrekken",
+    "infinitive": "",
+    "example": {
+      "nl": "De <<winkelrekken>> zijn goed gevuld.",
+      "ru": "Полки магазина хорошо заполнены.",
+      "en": "The store shelves are well stocked."
+    },
+    "translation": {
+      "ru": "полки магазина",
+      "en": "store shelves"
+    }
+  },
+  {
+    "original": "de toonbank",
+    "infinitive": "",
+    "example": {
+      "nl": "Leg het op de <<toonbank>>.",
+      "ru": "Положите это на прилавок.",
+      "en": "Put it on the counter."
+    },
+    "translation": {
+      "ru": "прилавок",
+      "en": "counter"
+    }
+  },
+  {
+    "original": "de bon",
+    "infinitive": "",
+    "example": {
+      "nl": "Bewaar de <<bon>>.",
+      "ru": "Сохраните чек.",
+      "en": "Keep the receipt."
+    },
+    "translation": {
+      "ru": "чек",
+      "en": "receipt"
+    }
+  },
+  {
+    "original": "het geld",
+    "infinitive": "",
+    "example": {
+      "nl": "Ik betaal met <<geld>>.",
+      "ru": "Я плачу наличными.",
+      "en": "I pay with cash."
+    },
+    "translation": {
+      "ru": "деньги",
+      "en": "cash"
+    }
+  },
+  {
+    "original": "de schaal",
+    "infinitive": "",
+    "example": {
+      "nl": "De <<schaal>> is kapot.",
+      "ru": "Чаша сломана.",
+      "en": "The bowl is broken."
+    },
+    "translation": {
+      "ru": "чаша",
+      "en": "bowl"
+    }
+  },
+  {
+    "original": "de mand",
+    "infinitive": "",
+    "example": {
+      "nl": "Gebruik de <<mand>> voor groenten.",
+      "ru": "Используйте корзину для овощей.",
+      "en": "Use the basket for vegetables."
+    },
+    "translation": {
+      "ru": "корзина",
+      "en": "basket"
+    }
+  },
+  {
+    "original": "de winkelwagentje",
+    "infinitive": "",
+    "example": {
+      "nl": "Duw het <<winkelwagentje>>.",
+      "ru": "Толкай тележку.",
+      "en": "Push the shopping cart."
+    },
+    "translation": {
+      "ru": "тележка",
+      "en": "shopping cart"
+    }
+  }
+]

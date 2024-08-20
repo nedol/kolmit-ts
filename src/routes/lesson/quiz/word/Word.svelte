@@ -94,6 +94,21 @@
   let topAppBar;
   let sentence_span;
 
+  function extractWords(text) {
+    // Регулярное выражение для поиска слов в угловых скобках
+    const regex = /<<(.*?)>>/g;
+    // Массив для хранения найденных слов
+    let result = [];
+    let match;
+
+    // Поиск всех совпадений и добавление их в массив
+    while ((match = regex.exec(text)) !== null) {
+      result.push(match[1]);
+    }
+
+    return result;
+  }
+
   function similarity(s1, s2) {
     let longer = s1;
     let shorter = s2;
@@ -152,43 +167,33 @@
       example = await Translate(currentWord['example'][$llang], $llang, $langs);
     }
 
-    if (example.includes('<<') && example.includes('>>')) {
-      example = example?.replace(
-        /<<([^<>]+)>>/gu,
-        data.level.includes('A1')?'<span style="color:green" onclick=OnClickInput><b>$1</b></span>':'$1'
-      );
-    } else if (example.includes('"')) {
-      example = example?.replace(
-        /"([^"]+)"/gu,
-        data.level.includes('A1')?'<span style="color:green" onclick=OnClickInput><b>$1</b></span>':'$1'
-      );
-    }
-
     const regex = /(<<\w+>>)\s+(<<\w+>>)/;
-    const match = currentWord?.original.match(regex);
-    let original = currentWord.original;
+    const match = currentWord?.example[$llang].match(regex);
+    let original = '';
     if (match) {
       original = `${match[0]} ${match[1]}`;
-    } else original = `${currentWord.original}`;
+    }
+    // else original = `${currentWord.original}`;
 
     resultElement = replaceWordWithInput(
       currentWord?.example[$llang],
       `${original}`
     );
 
-    function extractWords(text) {
-      // Регулярное выражение для поиска слов в угловых скобках
-      const regex = /<<(.*?)>>/g;
-      // Массив для хранения найденных слов
-      let result = [];
-      let match;
-
-      // Поиск всех совпадений и добавление их в массив
-      while ((match = regex.exec(text)) !== null) {
-        result.push(match[1]);
-      }
-
-      return result;
+    if (example.includes('<<') && example.includes('>>')) {
+      example = example?.replace(
+        /<<([^<>]+)>>/gu,
+        data.level.includes('A1')
+          ? '<span style="color:green" onclick=OnClickInput><b>$1</b></span>'
+          : '$1'
+      );
+    } else if (example.includes('"')) {
+      example = example?.replace(
+        /"([^"]+)"/gu,
+        data.level.includes('A1')
+          ? '<span style="color:green" onclick=OnClickInput><b>$1</b></span>'
+          : '$1'
+      );
     }
 
     setTimeout(() => {
@@ -242,13 +247,15 @@
     }
 
     const arSpan = extractSpans(resultElement);
-    const words = word.split(' ');
+    const words = arSpan.length > 1 ? word.split(' ') : [word];
+
+    div_input[0].style.width = '';
 
     arSpan.forEach((el, i) => {
-      if (word.includes(el.attributes.value.textContent)) {
+      if (word === el.attributes.value.textContent.toLowerCase()) {
         userContent[i] = el.attributes.value.textContent;
       } else {
-        userContent[i] = words[i];
+        userContent[i] = words[i]?words[i]:'';
       }
     });
   }
@@ -324,18 +331,15 @@
   }
 
   function checkInput() {
-
-    if (userContent.length < 1 || !userContent[0].replace(/&nbsp;/g, '')) return;
+    if (userContent.length < 1 || !userContent[0].replace(/&nbsp;/g, ''))
+      return;
 
     if (errorIndex > 0) {
       errorIndex = 0;
       // userContent = [];
     }
 
-    const targetWords = currentWord.original
-      .replace(/[.\/#!?$%\^&\*;:{}=`~()]/g, '')
-      .trim()
-      .split(' ');
+    const targetWords = extractWords(currentWord.example[$llang]);
 
     let correctCount = 0;
     result = '';
@@ -351,15 +355,13 @@
       if (targetWords[i] && userInput)
         if (
           userInput
-            ?.toLowerCase()
-            .includes(targetWords[i].toLowerCase().replace('_', ' '))
+            ?.toLowerCase() === targetWords[i].toLowerCase().replace('_', ' ')
         ) {
           // result[i] = `<span class="correct">${targetWords[i]}</span>`;
           if (div_input[i]) div_input[i].style.color = 'green';
           correctCount++;
         } else {
           if (div_input[i]) div_input[i].style.color = 'red';
-
           errorIndex++;
         }
     });
@@ -387,12 +389,6 @@
         currentWordIndex--;
         errorIndex = 0;
       }
-
-      // if (countWordOccurrences(resultElement, '<span') < 2)
-      //   userContent[0] = currentWord.original.replace('_',' ');
-      // else userContent = targetWords;
-
-      // highlightWords(userContent.join(' '));
     } else {
       showCheckMark = false;
       focus_pos = 0;
@@ -409,21 +405,34 @@
   }
 
   function showHint() {
-    // wordsString = shuffleWords(wordsString);
-    currentWord.original = currentWord.original.replace(
-      /[.,\/#!?$%\^&\*;:{}=_`~()]/g,
-      ''
-    );
-    if (hintIndex < currentWord?.original.length) {
-      if (hintIndex === 0) {
-        userContent[0] = '';
-      }
-      userContent[0] += currentWord.original[hintIndex];
-      hintIndex++;
 
-      result = ''; // Очистим результат при каждой новой подсказке
-      showSpeakerButton = true; // Устанавливаем видимость кнопки
-      setFocus();
+    const words = extractWords(currentWord.example[$llang]).join(' ');
+
+    let i = 0,
+      w = 0;
+
+    for (let char of words) {
+      // word = word.replace(/[.,\/#!?$%\^&\*;:{}=_`~()]/g, '');
+      if (char ==' '){
+         w++;
+         if(userContent[w]==='&nbsp;') 
+          userContent[w] = '';
+         continue;
+      }
+
+      if (i === hintIndex) {
+        console.log(char);
+        userContent[w] += char;
+
+        result = ''; // Очистим результат при каждой новой подсказке
+        showSpeakerButton = true; // Устанавливаем видимость кнопки
+        setFocus();
+
+        hintIndex++;
+        break;
+      }
+
+      i++;
     }
   }
 
@@ -527,14 +536,9 @@
         <Row>
           <Section>
             <button class="hint-button" on:click={showHint}>
-              <span class="material-symbols-outlined"> ? </span>
-              <!-- <IconButton class="material-icons" on:click={showHint}>
-					<Icon tag="svg" viewBox="0 0 24 24">
-						<path fill="currentColor" d={mdiHelp} />
-					</Icon>
-				</IconButton> -->
-            </button></Section
-          >
+              <span class="material-symbols-outlined">?</span>
+            </button>
+          </Section>
           <Section
             ><button on:click={onPrev} class="prev-button">-1</button></Section
           >
@@ -627,10 +631,10 @@
             <span
               class="hint_button"
               on:click={() => {
-                OnClickHint(hint.original);
+                OnClickHint(extractWords(hint?.example[$llang]).join(' ') );
               }}
             >
-              {@html hint?.original.replace('_', ' ') + '&nbsp;' + '&nbsp;'}
+              {@html extractWords(hint?.example[$llang]).join(' ') + '&nbsp;' + '&nbsp;'}
             </span>
           {/each}
           <div style="height:50px"></div>
@@ -776,6 +780,6 @@
     color: white;
     background-color: #2196f3;
     border-radius: 3px;
-    padding: 8px 20px;
+    padding: 8px 10px;
   }
 </style>

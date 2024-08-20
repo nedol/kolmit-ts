@@ -72,7 +72,7 @@
 <!-- <Title></Title>
     <Subtitle></Subtitle> -->
 <!-- <Content> -->
-<iframe srcdoc={data.html} class="html_data" width="100%"
+<iframe srcdoc={data.html} class="html_data" 
 ></iframe>
 
 <!-- <div
@@ -111,10 +111,8 @@
     display: grid;
     position: relative;
     overflow-y: auto;
-    width: 100vh;
     height: calc(100vh - 70vh);
     margin: 0 auto;
-
     border: 0;
   }
 
