@@ -466,8 +466,16 @@
   }
 
   function onSpeach() {
-    speak(!showNextButton ? currentWord.original : currentWord.example[$llang]);
-    hintIndex++;
+    
+    speak(!showNextButton ? extractWords(currentWord.example[$llang]).join() : currentWord.example[$llang]);
+    // hintIndex++;
+    const currentWordClone = { ...currentWord };
+
+    if (currentWordIndex + 10 < words.length) {
+      words.splice(currentWordIndex + 10, 0, currentWordClone);
+    } else {
+      words.push(currentWordClone);
+    }
   }
 
   function speak(text) {
