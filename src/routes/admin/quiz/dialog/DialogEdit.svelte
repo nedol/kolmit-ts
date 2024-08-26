@@ -90,14 +90,13 @@
       fetch(
         `./admin?prompt=dialog&quiz_name=${data.name[$llang]}&prompt_owner=${abonent}&prompt_level=${data.level}&prompt_theme=${data.theme}`
       )
-       .then((response) => response.json())
-      .then((resp) => {
-
+        .then((response) => response.json())
+        .then((resp) => {
           prompt = resp.resp.prompt.system + resp.resp.prompt.user;
-      
-      // fetch('./src/routes/admin/quiz/prompts/dialog.ru.txt')
-      //   .then((response) => response.text())
-      //   .then((resp) => {
+
+          // fetch('./src/routes/admin/quiz/prompts/dialog.ru.txt')
+          //   .then((response) => response.text())
+          //   .then((resp) => {
           // prompt = resp;
           prompt = prompt.replaceAll('${llang}', $llang);
           prompt = prompt.replaceAll('${name[$llang]}', name[$llang]);
@@ -106,20 +105,21 @@
           prompt = prompt.replaceAll('${data.level}', data.level);
           prompt = prompt.replaceAll('${num}', num);
 
-          
           dialog_data.words = JSON.stringify(
-            resp.resp.words.data.map((item) => item.original)
+            resp.resp.words.data
+              .map((item) => extractWords(item.example[$llang]))
+              .join(',')
           );
 
-
-          prompt = prompt.replaceAll(
-            '[${dialog_data_words}]',
-            dialog_data.words
-          );
+          if (dialog_data.words)
+            prompt = prompt.replaceAll(
+              '[${dialog_data_words}]',
+              dialog_data.words
+            );
 
           grammar = resp.resp.grammar;
 
-          prompt = prompt.replaceAll('${grammar}', grammar);
+          if (grammar) prompt = prompt.replaceAll('${grammar}', grammar);
 
           prompt = prompt;
         });
@@ -130,6 +130,21 @@
     });
 
   onMount(async () => {});
+
+  function extractWords(text) {
+    // Регулярное выражение для поиска слов в угловых скобках
+    const regex = /<<(.*?)>>/g;
+    // Массив для хранения найденных слов
+    let result = [];
+    let match;
+
+    // Поиск всех совпадений и добавление их в массив
+    while ((match = regex.exec(text)) !== null) {
+      result.push(match[1]);
+    }
+
+    return result;
+  }
 
   async function TranslateContentToCurrentLang() {
     await Promise.all(
@@ -303,6 +318,10 @@
         console.error('Failed to read clipboard contents: ', err);
       });
   }
+
+      function OnGrammarChange() {
+      if (grammar) prompt = prompt.replace('${grammar}', grammar);
+    }
 </script>
 
 <main>
@@ -402,7 +421,11 @@
             {:else if active === grammar_title}
               <Paper variant="unelevated">
                 <Content>
-                  <textarea rows="20" name="dialog_grammar" bind:value={grammar}
+                  <textarea
+                    rows="20"
+                    name="dialog_grammar"
+                    bind:value={grammar}
+                    on:change={OnGrammarChange}
                   ></textarea>
                 </Content>
               </Paper>

@@ -93,7 +93,7 @@
       $llang = resp.lang;
       return resp;
     } catch (error) {
-      console.error(error);
+      // console.error(error);
       return [];
     }
   }
@@ -289,7 +289,7 @@
       }
     );
 
-    console.log(item);
+    // console.log(item);
     if (item) {
       item.type = type;
     }

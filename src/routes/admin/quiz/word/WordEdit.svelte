@@ -46,7 +46,6 @@
     prompt = prompt.replaceAll('${output}', output);
     prompt = prompt.replaceAll('${llang}', $llang);
     prompt = prompt.replaceAll('${langs}', $langs);
-    prompt = prompt.replaceAll('${words}', words);
     prompt = prompt.replaceAll(
       '${topic}',
       data.theme + '.' + data.name[$llang]
@@ -71,9 +70,6 @@
     })();
   }
 
-  $: if (words) {
-    prompt = prompt.replaceAll('${data_words}', words);
-  }
 
   fetch(
     `./lesson?words=theme&name=${data.name[$llang]}&owner=${abonent}&level=${data.level}`
@@ -83,11 +79,11 @@
 
       words_data = data?.data;
 
-      if (words && words_data) {
-        words = words_data.map(async (item) => {
-         return item.original
-        });
-      }
+      // if (words && words_data) {
+      //   words = words_data.map(async (item) => {
+      //    return '${words}'
+      //   });
+      // }
 
       fetch(`./admin?prompt=words`)
         .then((response) => response.json())
@@ -221,6 +217,12 @@
     // Update your lesson.quizes array based on the new order
     items = arrayMove(items, oldIndex, newIndex); // Assuming you have an arrayMove function (see below)
   }
+
+    function OnWordsChange(){
+      if(words)
+      prompt = prompt.replaceAll("${words}", words);
+
+  }
 </script>
 
 <div class="word_container">
@@ -297,7 +299,7 @@
         {#if active === 'Words'}
           <Paper variant="unelevated">
             <Content>
-              <textarea rows="20" name="dialog_words" bind:value={words}
+              <textarea rows="20" name="dialog_words" bind:value={words} on:change={OnWordsChange}
               ></textarea>
             </Content>
           </Paper>
@@ -355,8 +357,7 @@
     <thead>
       <tr>
         <th class="col-1">{$llang}</th>
-        <th class="col-2">Example</th>
-        <th class="col-3">{$langs}</th>
+        <th class="col-2">{$langs}</th>
       </tr>
     </thead>
   </table>
@@ -370,19 +371,11 @@
       {#each words_data as item, index (index)}
         <!-- {@debug item} -->
         <div class="row">
-          {#if item.original}
-            <textarea rows="2" bind:value={item.original} />
-            {#if false && item.infinitive && item.infinitive !== item.original}
-              <textarea rows="2" bind:value={item.infinitive}></textarea>
-            {/if}
-          {:else}
-            <textarea rows="2" />
-          {/if}
 
+          <textarea rows="2" bind:value={item.example[$llang]} />
+          {#if item.example[$llang]!= item.example[$langs]}
           <textarea rows="2" bind:value={item.example[$langs]} />
-
-          <textarea rows="2" bind:value={item.translation[$langs]} />
-
+          {/if}
           <button class="remrec_but" on:click={remRecord(index)} {index}
             >-</button
           >

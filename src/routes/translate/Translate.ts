@@ -17,7 +17,7 @@ export async function Translate_(text, from, to) {
 
   translate(text, {from: from, to: to})
     .then((res) => {
-      console.log(res);
+      // console.log(res);
       return res.text;
     })
     .catch((err) => {
@@ -40,15 +40,26 @@ export async function Translate(text, from, to) {
 
     // Перевод каждой части текста (по 2 предложения)
     for (let i = 0; i < sentences.length; i += 2) {
-      const chunk = sentences.slice(i, i + 2).join('. '); // Объединение 10 предложений в одну часть
+      let chunk = sentences.slice(i, i + 2).join('. '); // Объединение 10 предложений в одну часть
       let res;
-      try {
-        translate.engine = 'deepl';
-        res = await translate(chunk, to);
-      } catch (ex) {
+      // try {
+
+      //   chunk = chunk.replace('<<', '<');
+      //   chunk = chunk.replace('>>', '>');
+ 
+      //   translate.engine = 'deepl';
+      //   res = await translate(chunk, to);
+
+      //   res = res.replace(/\<(.*?)\>/g, '<<$1>>');
+        
+      // } catch (ex) {
+      chunk = chunk.replace(/<</g, '<< ').replace(/>>/g, ' >>');
+      //  chunk = chunk.replace(/<</g, '<').replace(/>>/g, '"');//инверсия 
         translate.engine = 'google';
         res = await translate(chunk, to);
-      }
+        res = res.replace(/<<\s*(.*?)\s*>>/g,'<<$1>>');
+        res = res.replace(/«\s*(.*?)\s*»/g, '<<$1>>');
+      // }
       translatedText += res + ' '; // Добавление переведенной части к полному тексту
     }
 

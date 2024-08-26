@@ -3,6 +3,15 @@
 
   import { onMount, onDestroy, getContext } from 'svelte';
   import TopAppBar, { Row, Title, Section } from '@smui/top-app-bar';
+  import Badge from '@smui-extra/badge';
+  import Accordion, { Panel, Header, Content } from '@smui-extra/accordion';
+  import IconButton, { Icon } from '@smui/icon-button';
+  import {
+    mdiPagePreviousOutline,
+    mdiChevronDownCircleOutline,
+    mdiHelp,
+    mdiVolumeHigh,
+  } from '@mdi/js';
 
   import { llang } from '$lib/js/stores.js';
   // import words from './80.json';
@@ -18,15 +27,6 @@
 
   import TTS from '../../../speech/tts/Tts.svelte';
   let tts;
-
-  import Accordion, { Panel, Header, Content } from '@smui-extra/accordion';
-  import IconButton, { Icon } from '@smui/icon-button';
-  import {
-    mdiPagePreviousOutline,
-    mdiChevronDownCircleOutline,
-    mdiHelp,
-    mdiVolumeHigh,
-  } from '@mdi/js';
 
   import { dicts } from '$lib/js/stores.js';
 
@@ -65,7 +65,7 @@
   let counter = 0;
   let isVisible = false;
 
-  let names = data.name.split(',');
+  let names = data.name?.split(',');
 
   // Создаем массив промисов для каждого запроса
 
@@ -94,7 +94,7 @@
   let topAppBar;
   let sentence_span;
 
-  function extractWords(text) {
+  export function extractWords(text) {
     // Регулярное выражение для поиска слов в угловых скобках
     const regex = /<<(.*?)>>/g;
     // Массив для хранения найденных слов
@@ -200,7 +200,7 @@
       const wAr = extractWords(currentWord?.example[$llang]);
       const spanElements = document.querySelectorAll('.sentence_span');
       spanElements.forEach((spanElement, i) => {
-        div_input[i].style.display = '';
+        if (div_input) div_input[i].style.display = '';
         spanElement.appendChild(div_input[i]); // Используем cloneNode, чтобы не удалить div_input из DOM
         // spanElement.style.width = "50px";
         resultElementWidth[i] = getTextWidth(wAr[i], '20px Arial');
@@ -255,7 +255,7 @@
       if (word === el.attributes.value.textContent.toLowerCase()) {
         userContent[i] = el.attributes.value.textContent;
       } else {
-        userContent[i] = words[i]?words[i]:'';
+        userContent[i] = words[i] ? words[i] : '';
       }
     });
   }
@@ -331,13 +331,11 @@
   }
 
   function checkInput() {
+
     if (userContent.length < 1 || !userContent[0].replace(/&nbsp;/g, ''))
       return;
 
-    if (errorIndex > 0) {
-      errorIndex = 0;
-      // userContent = [];
-    }
+    let thisErrorIndex = 0;  
 
     const targetWords = extractWords(currentWord.example[$llang]);
 
@@ -354,42 +352,59 @@
 
       if (targetWords[i] && userInput)
         if (
-          userInput
-            ?.toLowerCase() === targetWords[i].toLowerCase().replace('_', ' ')
+          userInput?.toLowerCase() ===
+          targetWords[i].toLowerCase().replace('_', ' ')
         ) {
           // result[i] = `<span class="correct">${targetWords[i]}</span>`;
           if (div_input[i]) div_input[i].style.color = 'green';
           correctCount++;
         } else {
           if (div_input[i]) div_input[i].style.color = 'red';
+          thisErrorIndex++;
           errorIndex++;
         }
     });
 
-    // console.log(targetWords.length)
+    function addClone(){
 
-    if (errorIndex < 1) {
-      showCheckMark = true; // Показываем галочку
-      showNextButton = true;
-      speak(currentWord.example[$llang]);
+        const currentWordClone =JSON.parse(JSON.stringify(currentWord));
 
-      if (hintIndex != 0 || errorIndex != 0) {
-        // Перемещаем текущее слово в конец своей "десятки" в words
-        words.splice(currentWordIndex, 1);
-        words.splice(parseInt(currentWordIndex / 10) * 10 + 9, 0, currentWord);
-        const currentWordClone = { ...currentWord };
-
-        if (currentWordIndex + 20 < words.length) {
-          words.splice(currentWordIndex + 20, 0, currentWordClone);
+        if (currentWordIndex + 10 < words.length) {
+          words.splice(currentWordIndex + 10, 0, currentWordClone);
         } else {
-          words.push(currentWordClone);
+          if(currentWordIndex + words.length/2 < words.length)
+           words.splice(currentWordIndex + words.length/2, 0, currentWordClone);
+          else
+           words.push(currentWordClone);
         }
 
         words = words;
-        currentWordIndex--;
-        errorIndex = 0;
+    }
+
+    // console.log(targetWords.length)
+
+    if (thisErrorIndex < 1 ) {
+
+      if(hintIndex > 0){
+        addClone();
       }
+
+      showCheckMark = true; // Показываем галочку
+      showNextButton = true;
+      speak(currentWord.example[$llang]);
+      currentWordIndex = currentWordIndex + 1;
+      errorIndex = 0;
+
     } else {
+
+      if (hintIndex != 0 || errorIndex<=thisErrorIndex ) {
+        // Перемещаем текущее слово в конец своей "десятки" в words
+        // words.splice(currentWordIndex, 1);
+        // words.splice(parseInt(currentWordIndex / 10) * 10 + 9, 0, currentWord);
+
+        addClone();
+ 
+      }
       showCheckMark = false;
       focus_pos = 0;
       setFocus();
@@ -405,7 +420,6 @@
   }
 
   function showHint() {
-
     const words = extractWords(currentWord.example[$llang]).join(' ');
 
     let i = 0,
@@ -413,11 +427,10 @@
 
     for (let char of words) {
       // word = word.replace(/[.,\/#!?$%\^&\*;:{}=_`~()]/g, '');
-      if (char ==' '){
-         w++;
-         if(userContent[w]==='&nbsp;') 
-          userContent[w] = '';
-         continue;
+      if (char == ' ') {
+        w++;
+        if (userContent[w] === '&nbsp;') userContent[w] = '';
+        continue;
       }
 
       if (i === hintIndex) {
@@ -437,7 +450,7 @@
   }
 
   function nextWord() {
-    currentWordIndex = currentWordIndex + 1;
+
     if (currentWordIndex >= words.length) currentWordIndex = 0;
     currentWord = words[currentWordIndex];
     makeExample();
@@ -466,8 +479,11 @@
   }
 
   function onSpeach() {
-    
-    speak(!showNextButton ? extractWords(currentWord.example[$llang]).join() : currentWord.example[$llang]);
+    speak(
+      !showNextButton
+        ? extractWords(currentWord.example[$llang]).join()
+        : currentWord.example[$llang]
+    );
     // hintIndex++;
     const currentWordClone = { ...currentWord };
 
@@ -526,7 +542,7 @@
 
 <TTS bind:this={tts}></TTS>
 
-{#if !words[0]}
+{#if words?.length < 1}
   <div style="text-align:center">
     <span
       class="material-symbols-outlined"
@@ -558,7 +574,21 @@
               >
             </button></Section
           >
-          <Section><div>{currentWordIndex + 1}/{words.length}</div></Section>
+          <Section>
+            <div class="counter">
+              <p>
+                <span class="mdc-typography--overline" style="position:relative"
+                  >{currentWordIndex }
+                  <Badge
+                    position="middle"
+                    align="bottom-end - bottom-middle"
+                    aria-label="unread count"
+                    style="margin-right:-10px;scale:.8">{words.length}</Badge
+                  >
+                </span>
+              </p>
+            </div>
+          </Section>
 
           <Section align="end">
             {#if showNextButton}
@@ -580,9 +610,13 @@
     {/await}
 
     <div class="word">
-      {#await Translate(example, 'en', $langs) then data}
-        {@html data}
-      {/await}
+      {#if example}
+        {@html example}
+      {:else}
+        {#await Translate(example, 'ru', $langs) then data}
+          {@html data}
+        {/await}
+      {/if}
     </div>
 
     <div class="input-container">
@@ -639,10 +673,12 @@
             <span
               class="hint_button"
               on:click={() => {
-                OnClickHint(extractWords(hint?.example[$llang]).join(' ') );
+                OnClickHint(extractWords(hint?.example[$llang]).join(' '));
               }}
             >
-              {@html extractWords(hint?.example[$llang]).join(' ') + '&nbsp;' + '&nbsp;'}
+              {@html extractWords(hint?.example[$llang]).join(' ') +
+                '&nbsp;' +
+                '&nbsp;'}
             </span>
           {/each}
           <div style="height:50px"></div>
@@ -785,9 +821,34 @@
   }
 
   .hint-button {
+    border: 0px;
     color: white;
     background-color: #2196f3;
     border-radius: 3px;
     padding: 8px 10px;
+  }
+  .counter {
+    /* position: absolute; */
+    background-color: #f0f0f0;
+    padding: 0px;
+    border-radius: 25px;
+    width: 30px;
+    height: 30px;
+    top: -10px;
+    left: -6px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    text-align: center;
+  }
+
+  .counter p {
+    margin: 0;
+    font-size: 15px;
+    color: #333;
+  }
+
+  .counter span {
+    font-weight: 700;
+    font-size: 15px;
+    color: #ff5733; /* цвет счетчика */
   }
 </style>

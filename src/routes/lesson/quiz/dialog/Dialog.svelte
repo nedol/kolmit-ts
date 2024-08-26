@@ -17,10 +17,7 @@
 
   import { Translate } from '../../../translate/Transloc';
 
-  // import '$lib/js/talkify.js';
-  // import 'talkify-tts/dist/talkify.min.js';
-
-  import IconButton, { Icon } from '@smui/icon-button';
+ 
   import CircularProgress from '@smui/circular-progress';
   import Chip, { Set, LeadingIcon, TrailingIcon, Text } from '@smui/chips';
   import '$lib/css/Typography.scss';
@@ -116,7 +113,8 @@
   let dc = $dc_oper || $dc_user;
 
   $: if ($msg_user) {
-    if ($msg_user.lesson) {
+    
+    if ($msg_user.lesson?.quiz==='dialog') {
       dialog_data = $msg_user.lesson.dialog_data;
       isFlipped = !$msg_user.lesson.isFlipped;
       cur_qa = $msg_user.lesson.cur_qa;
@@ -132,7 +130,7 @@
 
   $: if ($msg_oper) {
     // console.log($msg_oper);
-    if ($msg_oper.lesson) {
+    if ($msg_oper.lesson?.quiz==='dialog') {
       dialog_data = $msg_oper.lesson.dialog_data;
       isFlipped = !$msg_oper.lesson.isFlipped;
       cur_qa = $msg_oper.lesson.cur_qa;
@@ -332,6 +330,7 @@
       await dc.SendData(
         {
           lesson: {
+            quiz:'dialog',
             llang: $llang,
             level: data.level,
             name: dialog_data.name,
@@ -673,7 +672,7 @@
         {/await}
 
         <div class="user2_tr">
-          {#if a}
+          {#if a }
             {#if !a[$langs]}
               {#await Translate(a[$llang].replace(/"([^"]*)"/g, '$1'), $llang, $langs) then data}
                 {data}
@@ -1101,6 +1100,7 @@
   }
 
   .hint-button {
+    border:0px;
     color: white;
     background-color: #2196f3;
     border-radius: 3px;
