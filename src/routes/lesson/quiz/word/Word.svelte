@@ -19,7 +19,15 @@
   // translate.engine = 'google';
   // translate.from = $llang;
 
-  import { langs } from '$lib/js/stores.js';
+    import { langs } from '$lib/js/stores.js';
+
+  import langs_list from '$lib/dict/learn_langs_list.json';
+
+  let lang_menu = false;
+
+  import ISO6391 from 'iso-google-locales';
+
+
 
   import CircularProgress from '@smui/circular-progress';
 
@@ -46,7 +54,8 @@
   let currentWordIndex = 0;
   let currentWord;
   let hl_words = data.highlight ? data.highlight.split(',') : [];
-
+  let _llang = $llang;
+  let value = $llang;
   let arrayOfArrays;
   let userContent = [];
   let div_input = [];
@@ -161,10 +170,10 @@
   async function makeExample() {
     if (!currentWord) return;
 
-    if (currentWord.example[$langs]) {
-      example = currentWord['example'][$langs];
+    if (currentWord?.example?.langs) {
+      example = currentWord.example.langs;
     } else if (currentWord.example[$llang]) {
-      example = await Translate(currentWord['example'][$llang], $llang, $langs);
+      example = await Translate(currentWord.example[$llang], $llang, $langs);
     }
 
     const regex = /(<<\w+>>)\s+(<<\w+>>)/;
@@ -528,9 +537,19 @@
     // setFocus()
   }
 
+    function setLang(ev) {
+    let lang = ev.currentTarget.outerText;
+    let code = ISO6391.getCode(lang);
+    if (code !== 'English') {
+      $llang = code;
+    }
+    // console.log($langs);
+    lang_menu = false;
+  }
+
   onDestroy(() => {
     // Очищаем интервал при размонтировании компонента
-
+    $llang = _llang;
     console.log('Компонент размонтирован');
   });
 </script>
@@ -588,6 +607,30 @@
                 </span>
               </p>
             </div>
+          </Section>
+
+                    <Section align="end">
+            <span
+              class="lang_span"
+              on:click={() => {
+                lang_menu = !lang_menu;
+              }}
+              >{(() => {
+                return $llang;
+              })()}</span
+            >
+            {#if lang_menu}
+              <div class="lang_list">
+                {#each langs_list as lang}
+                  <div
+                    style="color:black; margin:10px;font-size:smaller"
+                    on:click={setLang}
+                  >
+                    {lang}
+                  </div>
+                {/each}
+              </div>
+            {/if}
           </Section>
 
           <Section align="end">
@@ -850,5 +893,20 @@
     font-weight: 700;
     font-size: 15px;
     color: #ff5733; /* цвет счетчика */
+  }
+
+    .lang_span {
+    font-size: large;
+  }
+
+  .lang_list {
+    position: absolute;
+    top: 50px;
+    height: 80vh;
+    overflow: auto;
+    justify-content: center; /* Выравниваем содержимое по центру вертикально */
+    align-items: center; /* Выравниваем содержимое по центру горизонтально */
+    background-color: white;
+    /* opacity: 50%; */
   }
 </style>

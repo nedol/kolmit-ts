@@ -4,14 +4,22 @@
   import { onMount, onDestroy, getContext } from 'svelte';
   import TopAppBar, { Row, Title, Section } from '@smui/top-app-bar';
   import Badge from '@smui-extra/badge';
+  import Select, { Option } from '@smui/select';
 
   import { llang } from '$lib/js/stores.js';
+
   // import words from './80.json';
   import { Translate } from '../../../translate/Transloc';
   // translate.engine = 'google';
   // translate.from = $llang;
 
   import { langs } from '$lib/js/stores.js';
+
+  import langs_list from '$lib/dict/learn_langs_list.json';
+
+  let lang_menu = false;
+
+  import ISO6391 from 'iso-google-locales';
 
   import CircularProgress from '@smui/circular-progress';
 
@@ -65,9 +73,10 @@
   let hintIndex = 0;
   let showHints = {};
   let errorIndex = 0;
-
+  let _llang = $llang;
+  let value = $llang;
   let showNextButton = false;
-   let showCheckButton = false;
+  let showCheckButton = false;
   let resultElementWidth = [];
   let showSpeakerButton = false;
   let focus_pos = 0;
@@ -109,7 +118,7 @@
         hints[false] = JSON.parse(JSON.stringify(words));
         hints[true] = JSON.parse(JSON.stringify(words));
 
-        showHints[isFlipped]=true;
+        showHints[isFlipped] = true;
 
         //   shuffle(hints);
       })
@@ -130,7 +139,7 @@
       isFlipped = !$msg_user.lesson.isFlipped;
       level = $msg_user.lesson.level;
       share_mode = true;
-	    showHints[isFlipped] = false;
+      showHints[isFlipped] = false;
     } else if (
       ($msg_user.lesson.word_correct || $msg_user.lesson.word_correct == 0) &&
       hints
@@ -152,13 +161,13 @@
       makeExample();
     } else if ($msg_user?.lesson.word_flip) {
       isFlipped = $msg_user.lesson.word_flip;
-
+      $msg_user.lesson.word_flip = null;
       hints[isFlipped] = hints[isFlipped];
     }
   }
 
   $: if ($msg_oper?.lesson?.quiz === 'word') {
-    if (($msg_oper.lesson.word_index || $msg_oper.lesson.word_index == 0) ) {
+    if ($msg_oper.lesson.word_index || $msg_oper.lesson.word_index == 0) {
       currentWord = words[$msg_oper.lesson.word_index];
       currentWordIndex = $msg_oper.lesson.word_index;
       //   isFlipped = !$msg_oper.lesson.isFlipped;
@@ -172,7 +181,7 @@
       level = $msg_oper.lesson.level;
       share_mode = true;
       isFlipped = !$msg_oper.lesson.isFlipped;
-	    showHints[isFlipped] = false;
+      showHints[isFlipped] = false;
     } else if (
       ($msg_oper.lesson.word_correct || $msg_oper.lesson.word_correct == 0) &&
       hints
@@ -180,8 +189,8 @@
       hints[isFlipped][$msg_oper.lesson.word_correct].disabled = 'disabled';
     } else if ($msg_oper.lesson.word_flip) {
       isFlipped = $msg_oper.lesson.word_flip;
-
-      hints = hints;
+      hints[isFlipped] = hints[isFlipped];
+      $msg_oper.lesson.word_flip = null;
     }
   }
 
@@ -493,7 +502,7 @@
         ) {
           // result[i] = `<span class="correct">${targetWords[i]}</span>`;
           if (div_input[i]) div_input[i].style.color = 'green';
- // Показываем галочку
+          // Показываем галочку
           showNextButton = true;
           speak(currentWord.example[$llang]);
 
@@ -564,13 +573,15 @@
     userContent[0] = '&nbsp;';
     userContent[1] = '&nbsp;';
 
+    /*
     currentWord.example[$langs] = '&nbsp;';
     currentWord.example[$llang] = '&nbsp;';
     makeExample();
+    */
 
     hintIndex = 0;
 
-	  showHints[isFlipped] = false;
+    showHints[isFlipped] = false;
     // result = '&nbsp;';
 
     showNextButton = false;
@@ -639,9 +650,18 @@
     // setFocus()
   }
 
+  function setLang(ev) {
+    let lang = ev.currentTarget.outerText;
+    let code = ISO6391.getCode(lang);
+    if (code !== 'English') {
+      $llang = code;
+    }
+    // console.log($langs);
+    lang_menu = false;
+  }
   onDestroy(() => {
     // Очищаем интервал при размонтировании компонента
-
+    $llang = _llang;
     console.log('Компонент размонтирован');
   });
 </script>
@@ -703,12 +723,35 @@
               </p>
             </div>
           </Section>
+          <Section align="end">
+            <span
+              class="lang_span"
+              on:click={() => {
+                lang_menu = !lang_menu;
+              }}
+              >{(() => {
+                return $llang;
+              })()}</span
+            >
+            {#if lang_menu}
+              <div class="lang_list">
+                {#each langs_list as lang}
+                  <div
+                    style="color:black; margin:10px;font-size:smaller"
+                    on:click={setLang}
+                  >
+                    {lang}
+                  </div>
+                {/each}
+              </div>
+            {/if}
+          </Section>
 
           <Section align="end">
             {#if isFlipped}
               {#if showNextButton}
                 <button on:click={nextWord} class="next-button"
-                  >{#await Translate('Дальше', 'ru', $langs) then data}
+                  >{#await Translate('Вперед', 'ru', $langs) then data}
                     {data}
                   {/await}</button
                 >
@@ -725,65 +768,65 @@
       </TopAppBar>
     </div>
 
-    {#if isFlipped}
-      {#await Translate('Write translation', 'en', $langs) then data}
-        <div class="title">{data}:</div>
-      {/await}
+    {#if showHints[isFlipped]}
+      {#if isFlipped}
+        {#await Translate('Write translation', 'en', $langs) then data}
+          <div class="title">{data}:</div>
+        {/await}
 
-      <div class="word">
-        {@html example}
-      </div>
+        <div class="word">
+          {@html example}
+        </div>
 
-      <div class="input-container">
-        {#if resultElement}
-          {@html resultElement}
+        <div class="input-container">
+          {#if resultElement}
+            {@html resultElement}
+          {/if}
+
+          <div
+            class="input"
+            contenteditable="true"
+            on:click={OnClickInput}
+            on:input={onChangeUserContent}
+            bind:this={div_input[0]}
+            bind:innerHTML={userContent[0]}
+            style="display:none;width: {resultElementWidth[0]}px"
+          >
+            {@html result}
+          </div>
+          <div
+            class="input"
+            contenteditable="true"
+            on:input={onChangeUserContent}
+            bind:this={div_input[1]}
+            bind:innerHTML={userContent[1]}
+            style="display:none;width: {resultElementWidth[1]}px"
+          >
+            {@html result}
+          </div>
+        </div>
+
+        {#if showSpeakerButton}
+          <div class="speaker-button">
+            <IconButton on:click={onSpeach}>
+              <Icon tag="svg" viewBox="0 0 24 24">
+                <path fill="currentColor" d={mdiVolumeHigh} />
+              </Icon>
+            </IconButton>
+          </div>
         {/if}
+      {/if}
 
-        <div
-          class="input"
-          contenteditable="true"
-          on:click={OnClickInput}
-          on:input={onChangeUserContent}
-          bind:this={div_input[0]}
-          bind:innerHTML={userContent[0]}
-          style="display:none;width: {resultElementWidth[0]}px"
-        >
-          {@html result}
-        </div>
-        <div
-          class="input"
-          contenteditable="true"
-          on:input={onChangeUserContent}
-          bind:this={div_input[1]}
-          bind:innerHTML={userContent[1]}
-          style="display:none;width: {resultElementWidth[1]}px"
-        >
-          {@html result}
-        </div>
-      </div>
-
-      {#if showSpeakerButton}
-        <div class="speaker-button">
-          <IconButton on:click={onSpeach}>
-            <Icon tag="svg" viewBox="0 0 24 24">
-              <path fill="currentColor" d={mdiVolumeHigh} />
-            </Icon>
-          </IconButton>
-        </div>
+      {#if isFlipped}
+        {#await Translate('Заполни пропуски', 'ru', $langs) then data}
+          <div class="title">{data}:</div>
+        {/await}
+      {:else}
+        {#await Translate('Выбери слово', 'ru', $langs) then data}
+          <div class="title">{data}:</div>
+        {/await}
       {/if}
     {/if}
-
-	{#if showHints[isFlipped]}
-    {#if isFlipped}
-      {#await Translate('Заполни пропуски', 'ru', $langs) then data}
-        <div class="title">{data}:</div>
-      {/await}
-    {:else}
-      {#await Translate('Выбери слово', 'ru', $langs) then data}
-        <div class="title">{data}:</div>
-      {/await}
-    {/if}
-	{/if}
 
     {#if showHints[isFlipped]}
       <div class="words_div accordion-container">
@@ -1001,5 +1044,20 @@
     font-weight: 700;
     font-size: 15px;
     color: #ff5733; /* цвет счетчика */
+  }
+
+  .lang_span {
+    font-size: large;
+  }
+
+  .lang_list {
+    position: absolute;
+    top: 50px;
+    height: 80vh;
+    overflow: auto;
+    justify-content: center; /* Выравниваем содержимое по центру вертикально */
+    align-items: center; /* Выравниваем содержимое по центру горизонтально */
+    background-color: white;
+    /* opacity: 50%; */
   }
 </style>

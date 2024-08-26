@@ -37,12 +37,12 @@
     let voices = EasySpeech.voices();
 
     for (let v in voices) {
-      tts = { voice: voices[v] };
+      //tts = { voice: voices[v] };
 
-      if (voices[v].lang.includes('nl')) {
+      if (voices[v].lang.includes(lang)) {
         tts = { voice: voices[v] };
 
-        if (voices[v].lang.includes('BE')) {
+        if (lang==='nl' && voices[v].lang.includes('BE')) {
           // utterance.voice = voices[index]; //'Microsoft Bart - Dutch (Belgium)';
           tts = { voice: voices[v] };
           break;
