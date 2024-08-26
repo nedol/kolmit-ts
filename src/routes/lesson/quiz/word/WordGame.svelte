@@ -301,7 +301,7 @@
     // else original = `${currentWord.original}`;
 
     resultElement = replaceWordWithInput(
-      currentWord?.example[$llang],
+      currentWord?.example[$llang]?currentWord?.example[$llang]:await Translate(currentWord.example['ru'], 'ru', $llang) ,
       `${original}`
     );
 

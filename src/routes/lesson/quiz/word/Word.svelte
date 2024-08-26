@@ -19,15 +19,13 @@
   // translate.engine = 'google';
   // translate.from = $llang;
 
-    import { langs } from '$lib/js/stores.js';
+  import { langs } from '$lib/js/stores.js';
 
   import langs_list from '$lib/dict/learn_langs_list.json';
 
   let lang_menu = false;
 
   import ISO6391 from 'iso-google-locales';
-
-
 
   import CircularProgress from '@smui/circular-progress';
 
@@ -68,6 +66,7 @@
   let resultElementWidth = [];
   let showSpeakerButton = false;
   let focus_pos = 0;
+  let speak_text= ''
 
   // defineWordsArray();
 
@@ -170,14 +169,16 @@
   async function makeExample() {
     if (!currentWord) return;
 
-    if (currentWord?.example?.langs) {
-      example = currentWord.example.langs;
+    if (currentWord?.example[$langs]) {
+      example = currentWord.example[$langs];
     } else if (currentWord.example[$llang]) {
       example = await Translate(currentWord.example[$llang], $llang, $langs);
     }
 
     const regex = /(<<\w+>>)\s+(<<\w+>>)/;
-    const match = currentWord?.example[$llang].match(regex);
+    const match = currentWord?.example[$llang]
+      ? currentWord?.example[$llang].match(regex)
+      : '';
     let original = '';
     if (match) {
       original = `${match[0]} ${match[1]}`;
@@ -185,7 +186,9 @@
     // else original = `${currentWord.original}`;
 
     resultElement = replaceWordWithInput(
-      currentWord?.example[$llang],
+      speak_text = currentWord?.example[$llang]
+        ? currentWord?.example[$llang]
+        : currentWord.example[$llang] = await Translate(currentWord.example['ru'], 'ru', $llang),
       `${original}`
     );
 
@@ -340,11 +343,10 @@
   }
 
   function checkInput() {
-
     if (userContent.length < 1 || !userContent[0].replace(/&nbsp;/g, ''))
       return;
 
-    let thisErrorIndex = 0;  
+    let thisErrorIndex = 0;
 
     const targetWords = extractWords(currentWord.example[$llang]);
 
@@ -374,45 +376,43 @@
         }
     });
 
-    function addClone(){
+    function addClone() {
+      const currentWordClone = JSON.parse(JSON.stringify(currentWord));
 
-        const currentWordClone =JSON.parse(JSON.stringify(currentWord));
+      if (currentWordIndex + 10 < words.length) {
+        words.splice(currentWordIndex + 10, 0, currentWordClone);
+      } else {
+        if (currentWordIndex + words.length / 2 < words.length)
+          words.splice(
+            currentWordIndex + words.length / 2,
+            0,
+            currentWordClone
+          );
+        else words.push(currentWordClone);
+      }
 
-        if (currentWordIndex + 10 < words.length) {
-          words.splice(currentWordIndex + 10, 0, currentWordClone);
-        } else {
-          if(currentWordIndex + words.length/2 < words.length)
-           words.splice(currentWordIndex + words.length/2, 0, currentWordClone);
-          else
-           words.push(currentWordClone);
-        }
-
-        words = words;
+      words = words;
     }
 
     // console.log(targetWords.length)
 
-    if (thisErrorIndex < 1 ) {
-
-      if(hintIndex > 0){
+    if (thisErrorIndex < 1) {
+      if (hintIndex > 0) {
         addClone();
       }
 
       showCheckMark = true; // Показываем галочку
       showNextButton = true;
-      speak(currentWord.example[$llang]);
+      speak(speak_text);
       currentWordIndex = currentWordIndex + 1;
       errorIndex = 0;
-
     } else {
-
-      if (hintIndex != 0 || errorIndex<=thisErrorIndex ) {
+      if (hintIndex != 0 || errorIndex <= thisErrorIndex) {
         // Перемещаем текущее слово в конец своей "десятки" в words
         // words.splice(currentWordIndex, 1);
         // words.splice(parseInt(currentWordIndex / 10) * 10 + 9, 0, currentWord);
 
         addClone();
- 
       }
       showCheckMark = false;
       focus_pos = 0;
@@ -459,7 +459,6 @@
   }
 
   function nextWord() {
-
     if (currentWordIndex >= words.length) currentWordIndex = 0;
     currentWord = words[currentWordIndex];
     makeExample();
@@ -537,7 +536,7 @@
     // setFocus()
   }
 
-    function setLang(ev) {
+  function setLang(ev) {
     let lang = ev.currentTarget.outerText;
     let code = ISO6391.getCode(lang);
     if (code !== 'English') {
@@ -545,6 +544,9 @@
     }
     // console.log($langs);
     lang_menu = false;
+    userContent[0] = '&nbsp;';
+    userContent[1] = '&nbsp;';
+    makeExample();
   }
 
   onDestroy(() => {
@@ -597,7 +599,7 @@
             <div class="counter">
               <p>
                 <span class="mdc-typography--overline" style="position:relative"
-                  >{currentWordIndex }
+                  >{currentWordIndex}
                   <Badge
                     position="middle"
                     align="bottom-end - bottom-middle"
@@ -609,7 +611,7 @@
             </div>
           </Section>
 
-                    <Section align="end">
+          <Section align="end">
             <span
               class="lang_span"
               on:click={() => {
@@ -713,16 +715,37 @@
           style="line-height: 2.0; overflow-y:auto; height:50vh !important"
         >
           {#each hints as hint, i}
-            <span
-              class="hint_button"
-              on:click={() => {
-                OnClickHint(extractWords(hint?.example[$llang]).join(' '));
-              }}
-            >
-              {@html extractWords(hint?.example[$llang]).join(' ') +
-                '&nbsp;' +
-                '&nbsp;'}
-            </span>
+            {#if hint?.example[$llang]}
+                <span
+                  class="hint_button"
+                  on:click={() => {
+                    OnClickHint(
+                      extractWords(
+                        hint?.example[$llang]
+                      ).join(' '),
+                      i
+                    );
+                  }}
+                >
+                  {@html extractWords(
+                    hint?.example[$llang]
+                  ).join(' ') +
+                    '&nbsp;' +
+                    '&nbsp;'}
+                </span>
+            {:else}
+              {#await Translate(hint?.example['ru'], 'ru', $llang) then data}
+                <span
+                  class="hint_button"
+                  on:click={() => {
+                    OnClickHint(extractWords(data).join(' '));
+                  }}
+                >
+               
+                {@html extractWords(data).join(' ') + '&nbsp;' + '&nbsp;'}
+                 </span>
+              {/await}
+            {/if}
           {/each}
           <div style="height:50px"></div>
         </Content>
@@ -895,7 +918,7 @@
     color: #ff5733; /* цвет счетчика */
   }
 
-    .lang_span {
+  .lang_span {
     font-size: large;
   }
 

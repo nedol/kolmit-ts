@@ -73,7 +73,7 @@
       voice: tts.voice,
       volume: 1,
       rate: 0.8,
-      pitch: 1.2,
+      pitch: 1,
       boundary: (e) => console.debug('boundary reached'),
       end: (e) => {
         window.speechSynthesis.cancel();
