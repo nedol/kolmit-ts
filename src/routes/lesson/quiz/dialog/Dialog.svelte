@@ -13,7 +13,7 @@
   import TopAppBar, { Row, Title, Section } from '@smui/top-app-bar';
   import Button, { Label } from '@smui/button';
   import Badge from '@smui-extra/badge';
-
+ import IconButton, { Icon } from '@smui/icon-button';
 
   import { Translate } from '../../../translate/Transloc';
 

@@ -37,12 +37,12 @@
     let voices = EasySpeech.voices();
 
     for (let v in voices) {
-      tts = { voice: voices[v] };
+      //tts = { voice: voices[v] };
 
-      if (voices[v].lang.includes('nl')) {
+      if (voices[v].lang.includes(lang)) {
         tts = { voice: voices[v] };
 
-        if (voices[v].lang.includes('BE')) {
+        if (lang==='nl' && voices[v].lang.includes('BE')) {
           // utterance.voice = voices[index]; //'Microsoft Bart - Dutch (Belgium)';
           tts = { voice: voices[v] };
           break;
@@ -73,7 +73,7 @@
       voice: tts.voice,
       volume: 1,
       rate: 0.8,
-      pitch: 1.2,
+      pitch: 1,
       boundary: (e) => console.debug('boundary reached'),
       end: (e) => {
         window.speechSynthesis.cancel();
