@@ -3,7 +3,6 @@
 
   import ConText from './Dialog.Context.svelte';
 
- 
   import { Number2Words } from '$lib/tts/convert.nl.js';
   import { NumberString, numberToDutchString } from '$lib/tts/Listen.numbers';
   // import BottomAppBar, { Section } from '@smui-extra/bottom-app-bar';
@@ -13,11 +12,10 @@
   import TopAppBar, { Row, Title, Section } from '@smui/top-app-bar';
   import Button, { Label } from '@smui/button';
   import Badge from '@smui-extra/badge';
- import IconButton, { Icon } from '@smui/icon-button';
+  import IconButton, { Icon } from '@smui/icon-button';
 
   import { Translate } from '../../../translate/Transloc';
 
- 
   import CircularProgress from '@smui/circular-progress';
   import Chip, { Set, LeadingIcon, TrailingIcon, Text } from '@smui/chips';
   import '$lib/css/Typography.scss';
@@ -113,8 +111,7 @@
   let dc = $dc_oper || $dc_user;
 
   $: if ($msg_user) {
-    
-    if ($msg_user.lesson?.quiz==='dialog') {
+    if ($msg_user.lesson?.quiz === 'dialog') {
       dialog_data = $msg_user.lesson.dialog_data;
       isFlipped = !$msg_user.lesson.isFlipped;
       cur_qa = $msg_user.lesson.cur_qa;
@@ -130,7 +127,7 @@
 
   $: if ($msg_oper) {
     // console.log($msg_oper);
-    if ($msg_oper.lesson?.quiz==='dialog') {
+    if ($msg_oper.lesson?.quiz === 'dialog') {
       dialog_data = $msg_oper.lesson.dialog_data;
       isFlipped = !$msg_oper.lesson.isFlipped;
       cur_qa = $msg_oper.lesson.cur_qa;
@@ -196,7 +193,7 @@
       .then((response) => response.json())
       .then((data) => {
         dialog_data = data.data.dialog;
-        total_cnt = dialog_data.content.length
+        total_cnt = dialog_data.content.length;
         if (data.data.html) {
           dialog_data.html = splitHtmlContent(data.data.html);
         }
@@ -330,7 +327,7 @@
       await dc.SendData(
         {
           lesson: {
-            quiz:'dialog',
+            quiz: 'dialog',
             llang: $llang,
             level: data.level,
             name: dialog_data.name,
@@ -518,7 +515,6 @@
   });
 </script>
 
-
 <link
   rel="stylesheet"
   href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0"
@@ -580,22 +576,41 @@
                 <path fill="currentColor" d={mdiAccountConvertOutline} />
               </Icon>
               {#if !isFlipped}
-               <Badge  position='middle' align="bottom-end - bottom-middle" aria-label="unread count" style="scale:.8">A</Badge>
-               {:else}
-              <Badge  color="secondary" position='middle' align="bottom-end - bottom-middle" aria-label="unread count" style="scale:.8">B</Badge>
+                <Badge
+                  position="middle"
+                  align="bottom-end - bottom-middle"
+                  aria-label="unread count"
+                  style="scale:.8">A</Badge
+                >
+              {:else}
+                <Badge
+                  color="secondary"
+                  position="middle"
+                  align="bottom-end - bottom-middle"
+                  aria-label="unread count"
+                  style="scale:.8">B</Badge
+                >
               {/if}
             </IconButton>
           </div>
         </Section>
         <Section>
           <div class="counter">
-            <p><span class="mdc-typography--overline" style="position:relative">{cur_qa + 1}
-             <Badge  position='middle' align="bottom-end - bottom-middle" aria-label="unread count" style="margin-right:-10px;scale:.8">{total_cnt}</Badge>
-             </span></p>
+            <p>
+              <span class="mdc-typography--overline" style="position:relative"
+                >{cur_qa + 1}
+                <Badge
+                  position="middle"
+                  align="bottom-end - bottom-middle"
+                  aria-label="unread count"
+                  style="margin-right:-10px;scale:.8">{total_cnt}</Badge
+                >
+              </span>
+            </p>
           </div>
         </Section>
         <Section>
-          <button  class="hint-button" on:click={onClickQ}>
+          <button class="hint-button" on:click={onClickQ}>
             <span class="material-symbols-outlined">?</span>
           </button>
         </Section>
@@ -637,34 +652,35 @@
 
         <div class="tip mdc-typography--headline6 {tip_hidden_text}">
           {@html q[$llang].replace(/"([^"]*)"/g, '$1')}
+          <div
+            style="display: inline-flex; float: right; margin-right: 10px;}"
+          >
+            <br />
+            <!-- {#if showSpeakerButton} -->
+            <div class="speaker-button">
+              <IconButton on:click={speak(q[$llang])}>
+                <Icon tag="svg" viewBox="0 0 24 24">
+                  <path fill="currentColor" d={mdiPlay} />
+                </Icon>
+              </IconButton>
+            </div>
+            <!-- {/if} -->
+          </div>
+
         </div>
 
         <div style="text-align: center;">
           <div class="user1" style="visibility:{visibility[1]}">
-            {#if !dialog_data.content[cur_qa].user1[$langs]}
-              {#await Translate(q[$llang].replace(/"([^"]*)"/g, '$1'), $llang, $langs) then data}
-                {@html data}
-              {/await}
-            {:else}
-              {@html q[$langs].replace(/"([^"]*)"/g, '$1')}
-            {/if}
+            <span>
+              {#if !dialog_data.content[cur_qa].user1[$langs]}
+                {#await Translate(q[$llang].replace(/"([^"]*)"/g, '$1'), $llang, $langs) then data}
+                  {@html data}
+                {/await}
+              {:else}
+                {@html q[$langs].replace(/"([^"]*)"/g, '$1')}
+              {/if}
+            </span>
           </div>
-        </div>
-
-        <div
-          class="margins"
-          style="text-align: center; display: flex; align-items: center; justify-content: space-between;"
-        >
-          <br />
-          <!-- {#if showSpeakerButton} -->
-          <div class="speaker-button">
-            <IconButton on:click={speak(q[$llang])}>
-              <Icon tag="svg" viewBox="0 0 24 24">
-                <path fill="currentColor" d={mdiPlay} />
-              </Icon>
-            </IconButton>
-          </div>
-          <!-- {/if} -->
         </div>
 
         {#await Translate('Переведи и ответь', 'ru', $langs) then data}
@@ -672,7 +688,7 @@
         {/await}
 
         <div class="user2_tr">
-          {#if a }
+          {#if a}
             {#if !a[$langs]}
               {#await Translate(a[$llang].replace(/"([^"]*)"/g, '$1'), $llang, $langs) then data}
                 {data}
@@ -692,6 +708,16 @@
           {:else if visibility[2] === 'visible'}
             {@html a[$llang].replace(/"([^"]*)"/g, '$1')}
           {/if}
+
+                    <!-- {#if showSpeakerButton} -->
+          <div class="speaker-button">
+            <IconButton on:click={speak(a[$llang])}>
+              <Icon tag="svg" viewBox="0 0 24 24">
+                <path fill="currentColor" d={mdiPlay} />
+              </Icon>
+            </IconButton>
+          </div>
+          <!-- {/if} -->
         </div>
 
         <div style="text-align: center">
@@ -722,15 +748,7 @@
           <Stt bind:this={stt} {SttResult} {StopListening} bind:display_audio
           ></Stt>
 
-          <!-- {#if showSpeakerButton} -->
-          <div class="speaker-button">
-            <IconButton on:click={speak(a[$llang])}>
-              <Icon tag="svg" viewBox="0 0 24 24">
-                <path fill="currentColor" d={mdiPlay} />
-              </Icon>
-            </IconButton>
-          </div>
-          <!-- {/if} -->
+
         </div>
       {:else}
         {#await Translate('Спроси', 'ru', $langs) then data}
@@ -938,7 +956,6 @@
   }
 
   .margins {
-
     top: 10px;
     position: relative;
 
@@ -982,7 +999,8 @@
   }
 
   .speaker-button {
-    position: relative;
+    display:inline-flex;
+    float:right;
     font-size: large;
     border-radius: 25px;
   }
@@ -1059,7 +1077,6 @@
     color: #2196f3;
     margin-left: 10px;
     margin-right: 10px;
-
   }
 
   .user2_tr {
@@ -1100,7 +1117,7 @@
   }
 
   .hint-button {
-    border:0px;
+    border: 0px;
     color: white;
     background-color: #2196f3;
     border-radius: 3px;
@@ -1135,7 +1152,6 @@
     margin: 5px;
     background-color: transparent;
   }
-
 
   .hidden-text {
     opacity: 0;

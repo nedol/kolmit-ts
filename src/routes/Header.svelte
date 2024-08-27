@@ -47,7 +47,7 @@
   let menu = 'menu';
 
   let topAppBar;
-  let abonent;
+  let abonent = '';
 
   onMount(async () => {
     let params = new URL(document.location).searchParams;
