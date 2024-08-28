@@ -111,8 +111,10 @@
     display: grid;
     position: relative;
     overflow-y: auto;
-    height: calc(100vh - 70vh);
+    width:100vw;
+    height: 70vh;
     margin: 0 auto;
+    margin-top: 30px;
     border: 0;
   }
 

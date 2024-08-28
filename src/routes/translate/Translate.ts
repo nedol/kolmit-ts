@@ -40,7 +40,7 @@ export async function Translate(text, from, to) {
 
     // Перевод каждой части текста (по 2 предложения)
     for (let i = 0; i < sentences.length; i += 2) {
-      let chunk = sentences.slice(i, i + 2).join('. '); // Объединение 10 предложений в одну часть
+      let chunk = sentences[0];//sentences.slice(i, i + 2).join('. '); // Объединение 10 предложений в одну часть
       let res;
       // try {
 
@@ -60,7 +60,7 @@ export async function Translate(text, from, to) {
         res = res.replace(/<<\s*(.*?)\s*>>/g,'<<$1>>');
         res = res.replace(/«\s*(.*?)\s*»/g, '<<$1>>');
       // }
-      translatedText += res + ' '; // Добавление переведенной части к полному тексту
+      translatedText += res + '. '; // Добавление переведенной части к полному тексту
     }
 
     return translatedText.trim(); // Удаление лишних пробелов в конце текста

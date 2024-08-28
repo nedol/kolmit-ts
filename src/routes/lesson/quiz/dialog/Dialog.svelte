@@ -652,9 +652,7 @@
 
         <div class="tip mdc-typography--headline6 {tip_hidden_text}">
           {@html q[$llang].replace(/"([^"]*)"/g, '$1')}
-          <div
-            style="display: inline-flex; float: right; margin-right: 10px;}"
-          >
+          <div style="display: inline-flex; float: right; margin-right: 10px;}">
             <br />
             <!-- {#if showSpeakerButton} -->
             <div class="speaker-button">
@@ -666,7 +664,6 @@
             </div>
             <!-- {/if} -->
           </div>
-
         </div>
 
         <div style="text-align: center;">
@@ -709,7 +706,7 @@
             {@html a[$llang].replace(/"([^"]*)"/g, '$1')}
           {/if}
 
-                    <!-- {#if showSpeakerButton} -->
+          <!-- {#if showSpeakerButton} -->
           <div class="speaker-button">
             <IconButton on:click={speak(a[$llang])}>
               <Icon tag="svg" viewBox="0 0 24 24">
@@ -717,40 +714,39 @@
               </Icon>
             </IconButton>
           </div>
+          <div
+            class="margins"
+            style="text-align: center; display: flex; align-items: center; justify-content: space-between;"
+          >
+            <div>
+              <IconButton
+                class="material-icons"
+                aria-label="Back"
+                on:click={onClickMicrophone}
+              >
+                <Icon tag="svg" viewBox="0 0 24 24">
+                  {#if isListening}
+                    <path fill="currentColor" d={mdiMicrophone} />
+                  {:else}
+                    <path fill="currentColor" d={mdiMicrophoneOutline} />
+                  {/if}
+                </Icon>
+              </IconButton>
+            </div>
+            <Stt bind:this={stt} {SttResult} {StopListening} bind:display_audio
+            ></Stt>
+          </div>
           <!-- {/if} -->
         </div>
 
-        <div style="text-align: center">
+        <div style="text-align: center;   margin-top: 10px;">
           <span style="color: darkgreen;">
             {@html stt_text}
           </span>
         </div>
 
-        <div
-          class="margins"
-          style="text-align: center; display: flex; align-items: center; justify-content: space-between;"
-        >
-          <div>
-            <IconButton
-              class="material-icons"
-              aria-label="Back"
-              on:click={onClickMicrophone}
-            >
-              <Icon tag="svg" viewBox="0 0 24 24">
-                {#if isListening}
-                  <path fill="currentColor" d={mdiMicrophone} />
-                {:else}
-                  <path fill="currentColor" d={mdiMicrophoneOutline} />
-                {/if}
-              </Icon>
-            </IconButton>
-          </div>
-          <Stt bind:this={stt} {SttResult} {StopListening} bind:display_audio
-          ></Stt>
-
-
-        </div>
       {:else}
+
         {#await Translate('Спроси', 'ru', $langs) then data}
           <div class="title">{data}:</div>
         {/await}
@@ -767,12 +763,6 @@
           {/if}
         </div>
 
-        <!-- <div class="user2" style="visibility:{visibility[1]}">
-          {#if a}
-            {@html a[$llang]}
-          {/if}
-        </div> -->
-
         <div class="user2">
           {#if a && visibility[1] === 'hidden'}
             {@html a[$llang].replace(/(?<!")\b\w+\b(?!")/g, (match) => {
@@ -782,47 +772,48 @@
           {:else if visibility[2] === 'visible'}
             {@html a[$llang].replace(/"([^"]*)"/g, '$1')}
           {/if}
+          <div
+            class="margins"
+            style="text-align: center; display: flex; align-items: center; justify-content: space-between;"
+          >
+            <div>
+              <IconButton
+                class="material-icons"
+                aria-label="Back"
+                on:click={onClickMicrophone}
+              >
+                <Icon tag="svg" viewBox="0 0 24 24">
+                  {#if isListening}
+                    <path fill="currentColor" d={mdiMicrophone} />
+                  {:else}
+                    <path fill="currentColor" d={mdiMicrophoneOutline} />
+                  {/if}
+                </Icon>
+              </IconButton>
+            </div>
+            <Stt bind:this={stt} {SttResult} {StopListening} bind:display_audio
+            ></Stt>
+
+            <!-- {#if showSpeakerButton} -->
+            <div class="speaker-button">
+              <IconButton on:click={speak(a[$llang])}>
+                <Icon tag="svg" viewBox="0 0 24 24">
+                  <path fill="currentColor" d={mdiPlay} />
+                </Icon>
+              </IconButton>
+            </div>
+            <!-- {/if} -->
+          </div>
+
         </div>
 
-        <div style="text-align: center">
+        <div style="text-align: center;   margin-top: 10px; ">
           <span style="color: darkgreen;">
             {@html stt_text}
           </span>
+
+
         </div>
-
-        <div
-          class="margins"
-          style="text-align: center; display: flex; align-items: center; justify-content: space-between;"
-        >
-          <div>
-            <IconButton
-              class="material-icons"
-              aria-label="Back"
-              on:click={onClickMicrophone}
-            >
-              <Icon tag="svg" viewBox="0 0 24 24">
-                {#if isListening}
-                  <path fill="currentColor" d={mdiMicrophone} />
-                {:else}
-                  <path fill="currentColor" d={mdiMicrophoneOutline} />
-                {/if}
-              </Icon>
-            </IconButton>
-          </div>
-          <Stt bind:this={stt} {SttResult} {StopListening} bind:display_audio
-          ></Stt>
-
-          <!-- {#if showSpeakerButton} -->
-          <div class="speaker-button">
-            <IconButton on:click={speak(a[$llang])}>
-              <Icon tag="svg" viewBox="0 0 24 24">
-                <path fill="currentColor" d={mdiPlay} />
-              </Icon>
-            </IconButton>
-          </div>
-          <!-- {/if} -->
-        </div>
-
         <div class="container">
           {#if dc}
             <div class="repeat_but">
@@ -855,23 +846,23 @@
             {:else}
               {@html q[$langs]}
             {/if}
-          </div>
-        </div>
 
-        <div
-          class="margins"
-          style="text-align: center; display: flex; align-items: center; justify-content: space-between;"
-        >
-          <br />
-          <!-- {#if showSpeakerButton} -->
-          <div class="speaker-button">
-            <IconButton on:click={speak(q[$llang])}>
-              <Icon tag="svg" viewBox="0 0 24 24">
-                <path fill="currentColor" d={mdiPlay} />
-              </Icon>
-            </IconButton>
+            <div
+              class="margins"
+              style="text-align: center; display: flex; align-items: center; justify-content: space-between;"
+            >
+              <br />
+              <!-- {#if showSpeakerButton} -->
+              <div class="speaker-button">
+                <IconButton on:click={speak(q[$llang])}>
+                  <Icon tag="svg" viewBox="0 0 24 24">
+                    <path fill="currentColor" d={mdiPlay} />
+                  </Icon>
+                </IconButton>
+              </div>
+              <!-- {/if} -->
+            </div>
           </div>
-          <!-- {/if} -->
         </div>
       {/if}
 
@@ -958,8 +949,6 @@
   .margins {
     top: 10px;
     position: relative;
-
-    height: 25px;
     margin-right: 10px;
     margin-left: 10px;
   }
@@ -999,20 +988,20 @@
   }
 
   .speaker-button {
-    display:inline-flex;
-    float:right;
+    display: inline-flex;
+    float: right;
     font-size: large;
     border-radius: 25px;
   }
 
   .html_data {
     display: grid;
-    width: 50vh;
+    width: 100vw;
     position: relative;
     overflow-y: auto;
-    height: 50%;
+    height: 100vh;
     margin: 0 auto;
-    margin-top: 10px;
+    margin-top: 30px;
     border: 0;
   }
 
@@ -1054,6 +1043,7 @@
   .title {
     width: fit-content;
     margin: 5px auto; /* Центрирование второго элемента */
+    margin-top: 15px;
     color: #b06db7;
     line-height: normal;
     text-align: center;
@@ -1128,13 +1118,13 @@
     transition: transform 0.3s ease-in-out;
     width: 100%;
     top: 80px;
-    /* border: grey solid 1px; */
+    overflow-y: auto;
     border-radius: 5px;
     margin: 0 auto;
     position: relative;
     transform-style: preserve-3d;
     transition: transform 0.5s;
-    height: calc(100vh - 23vh);
+    height: 60vh;
   }
 
   .words_div {

@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount, onDestroy } from 'svelte';
   import { MediaRecorder } from 'extendable-media-recorder';
-  import type { IBlobEvent, IMediaRecorder } from "extendable-media-recorder";
+  import type { IBlobEvent, IMediaRecorder } from 'extendable-media-recorder';
   // import { CreateMLCEngine } from '@mlc-ai/web-llm';
   // import { connect } from 'extendable-media-recorder-wav-encoder';
   // import { createModel, KaldiRecognizer } from 'vosk-browser';
@@ -11,7 +11,7 @@
   let mediaRecorder: IMediaRecorder,
     mediaStream: any,
     audioAnalyser: any,
-    audioChunks : Array<Blob> =  [],
+    audioChunks: Array<Blob> = [],
     audioUrl,
     audioPlayer,
     isRecording = false,
@@ -147,7 +147,6 @@
 
   // Функция для начала записи
   function startRecording() {
-
     if (Array.isArray(audioChunks) && audioChunks.length > 0) {
       audioChunks.splice(0, 1);
     }
@@ -248,6 +247,7 @@
 <style>
   audio {
     height: 25px;
-    width: 30vw;
+    margin: 0 auto;
+    /* width: 30vw; */
   }
 </style>
