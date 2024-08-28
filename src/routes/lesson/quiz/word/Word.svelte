@@ -7,10 +7,14 @@
   import Accordion, { Panel, Header, Content } from '@smui-extra/accordion';
   import IconButton, { Icon } from '@smui/icon-button';
   import {
+    mdiArrowRight,
+    mdiArrowLeft,
+    mdiShuffle,
     mdiPagePreviousOutline,
     mdiChevronDownCircleOutline,
     mdiHelp,
-    mdiVolumeHigh,
+    mdiTextBoxCheckOutline,
+    mdiPlay,
   } from '@mdi/js';
 
   import { llang } from '$lib/js/stores.js';
@@ -66,7 +70,7 @@
   let resultElementWidth = [];
   let showSpeakerButton = false;
   let focus_pos = 0;
-  let speak_text= ''
+  let speak_text = '';
 
   // defineWordsArray();
 
@@ -186,9 +190,13 @@
     // else original = `${currentWord.original}`;
 
     resultElement = replaceWordWithInput(
-      speak_text = currentWord?.example[$llang]
+      (speak_text = currentWord?.example[$llang]
         ? currentWord?.example[$llang]
-        : currentWord.example[$llang] = await Translate(currentWord.example['ru'], 'ru', $llang),
+        : (currentWord.example[$llang] = await Translate(
+            currentWord.example['ru'],
+            'ru',
+            $llang
+          ))),
       `${original}`
     );
 
@@ -580,21 +588,32 @@
       <TopAppBar bind:this={topAppBar} variant="fixed">
         <Row>
           <Section>
+            {#if currentWordIndex > 0}
+              <Icon
+                tag="svg"
+                on:click={onPrev}
+                viewBox="0 0 24 24"
+                style="margin-top:0px; scale:.5; width:50px"
+              >
+                <path fill="white" d={mdiArrowLeft} />
+              </Icon>
+            {/if}
+          </Section>
+          <Section>
             <button class="hint-button" on:click={showHint}>
               <span class="material-symbols-outlined">?</span>
             </button>
           </Section>
-          <Section
-            ><button on:click={onPrev} class="prev-button">-1</button></Section
-          >
           <Section>
-            <button on:click={onShuffleWords} class="shuffle-button">
-              <i
-                class="material-symbols-outlined"
-                style="font-size: 15px;  scale:1.5">shuffle</i
-              >
-            </button></Section
-          >
+            <Icon
+              tag="svg"
+              on:click={onShuffleWords}
+              viewBox="0 0 24 24"
+              style="margin-top:0px; scale:.5; width:50px"
+            >
+              <path fill="white" d={mdiShuffle} />
+            </Icon>
+          </Section>
           <Section>
             <div class="counter">
               <p>
@@ -637,15 +656,25 @@
 
           <Section align="end">
             {#if showNextButton}
-              <button on:click={nextWord} class="next-button"
-                >{dict['Дальше'][$langs]}</button
+              <Icon
+                tag="svg"
+                on:click={nextWord}
+                viewBox="0 0 24 24"
+                style="margin-top:0px; scale:.5; width:50px"
               >
+                <path fill="green" d={mdiArrowRight} />
+              </Icon>
             {:else}
-              <button on:click={checkInput} class="check-button"
-                >{dict['Проверить'][$langs]}</button
+              <Icon
+                tag="svg"
+                on:click={checkInput}
+                viewBox="0 0 24 24"
+                style="margin-top:0px; scale:.5; width:50px"
               >
-            {/if}</Section
-          >
+                <path fill="white" d={mdiTextBoxCheckOutline} />
+              </Icon>
+            {/if}
+          </Section>
         </Row>
       </TopAppBar>
     </div>
@@ -690,22 +719,14 @@
       >
         {@html result}
       </div>
-    </div>
-
-    {#if true || showSpeakerButton}
       <div class="speaker-button">
         <IconButton on:click={onSpeach}>
           <Icon tag="svg" viewBox="0 0 24 24">
-            <path fill="currentColor" d={mdiVolumeHigh} />
+            <path fill="currentColor" d={mdiPlay} />
           </Icon>
         </IconButton>
       </div>
-      <!-- <button on:click={onSpeach} class="speaker-button">
-					<span class="material-symbols-outlined" style="font-size: 15px; color: blue; scale:1.5">
-						volume_up
-					</span>
-				</button> -->
-    {/if}
+    </div>
 
     <!-- <br /> -->
     <!-- {#if hintIndex != 0} -->
@@ -716,23 +737,16 @@
         >
           {#each hints as hint, i}
             {#if hint?.example[$llang]}
-                <span
-                  class="hint_button"
-                  on:click={() => {
-                    OnClickHint(
-                      extractWords(
-                        hint?.example[$llang]
-                      ).join(' '),
-                      i
-                    );
-                  }}
-                >
-                  {@html extractWords(
-                    hint?.example[$llang]
-                  ).join(' ') +
-                    '&nbsp;' +
-                    '&nbsp;'}
-                </span>
+              <span
+                class="hint_button"
+                on:click={() => {
+                  OnClickHint(extractWords(hint?.example[$llang]).join(' '), i);
+                }}
+              >
+                {@html extractWords(hint?.example[$llang]).join(' ') +
+                  '&nbsp;' +
+                  '&nbsp;'}
+              </span>
             {:else}
               {#await Translate(hint?.example['ru'], 'ru', $llang) then data}
                 <span
@@ -741,9 +755,8 @@
                     OnClickHint(extractWords(data).join(' '));
                   }}
                 >
-               
-                {@html extractWords(data).join(' ') + '&nbsp;' + '&nbsp;'}
-                 </span>
+                  {@html extractWords(data).join(' ') + '&nbsp;' + '&nbsp;'}
+                </span>
               {/await}
             {/if}
           {/each}
@@ -821,10 +834,11 @@
   }
 
   .speaker-button {
-    position: relative;
-    /* flex: auto; */
-    top: 0px;
-    right: 10px;
+    display: inline-flex;
+    float: right;
+    margin-right: 10px;
+    font-size: large;
+    border-radius: 25px;
     transform: translate(50%, 0%);
     font-size: large;
     z-index: 1;
