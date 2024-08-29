@@ -26,6 +26,61 @@ export async function Translate_(text, from, to) {
 }
 
 export async function Translate(text, from, to) {
+  let deepl = deepl_langs_list.indexOf(to);
+
+
+
+    if (!text) return;
+    translate.from = from;
+    text = text.replace(/\r\n/g, '');
+
+    // Разделение текста на предложения
+    const sentences = text.match(/[^.!?]+[.!?]+|[^.!?]+$/g);//text.split(/([.!?]\s+|$)/);//text.split(/[.!?]/);
+    let translatedText = '';
+
+    // Перевод каждой части текста (по 2 предложения)
+    for (let i  in sentences ) {
+      let chunk = sentences[i];//sentences.slice(i, i + 2).join('. '); // Объединение 10 предложений в одну часть
+      if (!chunk)
+        continue;
+        
+      let res;
+      // try {
+
+      //   chunk = chunk.replace('<<', '<');
+      //   chunk = chunk.replace('>>', '>');
+ 
+      //   translate.engine = 'deepl';
+      //   res = await translate(chunk, to);
+
+      //   res = res.replace(/\<(.*?)\>/g, '<<$1>>');
+        
+      // } catch (ex) {
+      chunk = chunk.replace(/<</g, '<< ').replace(/>>/g, ' >>');
+      //  chunk = chunk.replace(/<</g, '<').replace(/>>/g, '"');//инверсия 
+        
+      translate.engine = 'google';
+      
+      try {
+     
+          res = await translate(chunk, to);
+        } catch (error) {
+          console.error('Translation error:', error);
+
+          // text; // или другое подходящее значение по умолчанию
+        }
+        res = res?.replace(/<<\s*(.*?)\s*>>/g,'<<$1>>');
+        res = res?.replace(/«\s*(.*?)\s*»/g, '<<$1>>');
+      // }
+       translatedText += (res + ' '); // Добавление переведенной части к полному тексту
+    }
+
+    return translatedText.trim(); // Удаление лишних пробелов в конце текста
+    
+
+}
+
+export async function _Translate(text, from, to) {
     if (!text) return; // Return early if no text is provided
 
     text = text.replace(/\r\n/g, ''); // Remove carriage returns
@@ -62,4 +117,3 @@ export async function Translate(text, from, to) {
 
     return translatedText.trim(); // Return the final translated text
 }
-
