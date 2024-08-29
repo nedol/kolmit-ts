@@ -29,19 +29,21 @@ export async function Translate(text, from, to) {
   let deepl = deepl_langs_list.indexOf(to);
 
 
-  try {
+
     if (!text) return;
     translate.from = from;
     text = text.replace(/\r\n/g, '');
 
     // Разделение текста на предложения
-    const sentences = text.split(/[.!?]/);
+    const sentences = text.split('.');//text.split(/[.!?]/);
     let translatedText = '';
 
     // Перевод каждой части текста (по 2 предложения)
-    for (let i = 0; i < sentences.length; i += 2) {
-      let chunk = sentences[0];//sentences.slice(i, i + 2).join('. '); // Объединение 10 предложений в одну часть
-      let res;
+    for (let i  in sentences ) {
+      let chunk = sentences[i];//sentences.slice(i, i + 2).join('. '); // Объединение 10 предложений в одну часть
+      if (!chunk)
+        continue;
+        let res;
       // try {
 
       //   chunk = chunk.replace('<<', '<');
@@ -55,19 +57,24 @@ export async function Translate(text, from, to) {
       // } catch (ex) {
       chunk = chunk.replace(/<</g, '<< ').replace(/>>/g, ' >>');
       //  chunk = chunk.replace(/<</g, '<').replace(/>>/g, '"');//инверсия 
-        translate.engine = 'google';
-        res = await translate(chunk, to);
+        
+      translate.engine = 'google';
+      
+      try {
+     
+          res = await translate(chunk, to);
+        } catch (error) {
+          console.error('Translation error:', error);
+
+          // text; // или другое подходящее значение по умолчанию
+        }
         res = res.replace(/<<\s*(.*?)\s*>>/g,'<<$1>>');
         res = res.replace(/«\s*(.*?)\s*»/g, '<<$1>>');
       // }
-      translatedText += res + '. '; // Добавление переведенной части к полному тексту
+       translatedText += (res + '. '); // Добавление переведенной части к полному тексту
     }
 
     return translatedText.trim(); // Удаление лишних пробелов в конце текста
     
-  } catch (error) {
-    console.error('Translation error:', error);
 
-    return text; // или другое подходящее значение по умолчанию
-  }
 }
