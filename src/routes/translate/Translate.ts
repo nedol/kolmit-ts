@@ -40,7 +40,7 @@ export async function Translate(text, from, to) {
         let chunk = sentences[i].trim(); // The sentence part
         let punctuation = sentences[i + 1] || ''; // The punctuation part (if any)
 
-        if (!chunk) continue;
+        if (!chunk) continue;//
 
         chunk = chunk.replace(/<</g, '<< ').replace(/>>/g, ' >>'); // Adjust formatting before translation
         
