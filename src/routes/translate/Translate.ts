@@ -26,9 +26,7 @@ export async function Translate_(text, from, to) {
 }
 
 export async function Translate(text, from, to) {
-  let deepl = deepl_langs_list.indexOf(to);
-
-
+  // let deepl = deepl_langs_list.indexOf(to);
 
     if (!text) return;
     translate.from = from;
@@ -80,40 +78,3 @@ export async function Translate(text, from, to) {
 
 }
 
-export async function _Translate(text, from, to) {
-    if (!text) return; // Return early if no text is provided
-
-    text = text.replace(/\r\n/g, ''); // Remove carriage returns
-
-    // Split text into sentences based on '.', '!', or '?' followed by a space or end of line
-    const sentences = text.split(/([.!?]\s+|$)/);
-
-    let translatedText = '';
-
-    // Iterate through each sentence for translation
-    for (let i = 0; i < sentences.length; i += 2) {
-        let chunk = sentences[i].trim(); // The sentence part
-        let punctuation = sentences[i + 1] || ''; // The punctuation part (if any)
-
-        if (!chunk) continue;//
-
-        chunk = chunk.replace(/<</g, '<< ').replace(/>>/g, ' >>'); // Adjust formatting before translation
-        
-        let res;
-        try {
-            translate.engine = 'google'; // Set translation engine to Google
-            res = await translate(chunk, to); // Attempt translation
-        } catch (error) {
-            console.error('Translation error:', error);
-            continue; // Skip to next sentence in case of an error
-        }
-
-        // Adjust formatting after translation
-        res = res.replace(/<<\s*(.*?)\s*>>/g, '<<$1>>');
-        res = res.replace(/«\s*(.*?)\s*»/g, '<<$1>>');
-
-        translatedText += res + punctuation; // Append translated sentence with original punctuation
-    }
-
-    return translatedText.trim(); // Return the final translated text
-}
