@@ -11,7 +11,7 @@ export async function POST({ url, fetch, cookies, request }) {
     question.from_lang,
     question.to_lang
   );
-  console.log(question.text,resp);
+  // console.log(question.text,resp);
 
 
   let response = new Response(JSON.stringify({ resp }));

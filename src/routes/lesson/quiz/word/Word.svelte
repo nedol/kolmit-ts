@@ -272,8 +272,8 @@
     div_input[0].style.width = '';
 
     arSpan.forEach((el, i) => {
-      if (word === el.attributes.value.textContent.toLowerCase()) {
-        userContent[i] = el.attributes.value.textContent;
+      if ( word.includes(el.attributes.value.nodeValue.toLowerCase())) {
+        userContent[i] = el.attributes.value.nodeValue;
       } else {
         userContent[i] = words[i] ? words[i] : '';
       }

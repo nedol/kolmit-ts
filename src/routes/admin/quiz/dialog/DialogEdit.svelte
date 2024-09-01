@@ -50,10 +50,12 @@
 
   // {@dialogue: ${dlg_content} {There is dlg_content:${dlg_content}}
   $: if (dialog_data && $llang) {
-    const dlg_content = dialog_data.content.map((line) => {
-      return JSON.stringify(line);
-    });
-    let dialog_data_words = dialog_data.words || '';
+    try {
+      const dlg_content = dialog_data.content.map((line) => {
+        return JSON.stringify(line);
+      });
+      let dialog_data_words = dialog_data.words || '';
+    } catch (ex) {}
   }
 
   $: if (dialog_data && $langs) {
@@ -147,6 +149,7 @@
   }
 
   async function TranslateContentToCurrentLang() {
+    try{
     await Promise.all(
       dialog_data.content.map(async (item: any) => {
         await Promise.all(
@@ -161,6 +164,9 @@
         );
       })
     );
+    }catch(ex){
+
+    }
   }
 
   function splitHtmlContent(inputString: string) {
@@ -319,9 +325,9 @@
       });
   }
 
-      function OnGrammarChange() {
-      if (grammar) prompt = prompt.replace('${grammar}', grammar);
-    }
+  function OnGrammarChange() {
+    if (grammar) prompt = prompt.replace('${grammar}', grammar);
+  }
 </script>
 
 <main>

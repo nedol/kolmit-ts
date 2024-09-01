@@ -18,7 +18,7 @@
     abonent = params.get('abonent');
   });
 
-  function setLang(ev) {
+  function OnSetLang(ev) {
     let lang = ev.currentTarget.outerText;
     let code = ISO6391.getCode(lang);
     if (code !== 'English') {
@@ -28,7 +28,7 @@
     lang_menu = false;
 
 
-     fetch(`./?func=cookie&abonent=${abonent}&admin==${abonent}&lang=${$langs}`)
+     fetch(`/?func=set_lang&abonent=${abonent}&admin==${abonent}&lang=${$langs}`)
       .then(() => console.log())
       .catch((error) => {
         console.log(error);
@@ -93,7 +93,7 @@
               {#each google_langs_list as lang}
                 <div
                   style="color:black; margin:10px;font-size:smaller"
-                  on:click={setLang}
+                  on:click={OnSetLang}
                 >
                   {lang}
                 </div>

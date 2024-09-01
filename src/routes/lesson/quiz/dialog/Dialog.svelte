@@ -992,6 +992,8 @@
     float: right;
     font-size: large;
     border-radius: 25px;
+    margin-right:10px;
+     margin-left:10px;
   }
 
   .html_data {
@@ -1116,7 +1118,6 @@
 
   .card {
     transition: transform 0.3s ease-in-out;
-    width: 100%;
     top: 80px;
     overflow-y: auto;
     border-radius: 5px;
@@ -1125,6 +1126,8 @@
     transform-style: preserve-3d;
     transition: transform 0.5s;
     height: 60vh;
+    margin-left: 10px;
+    margin-right: 10px;
   }
 
   .words_div {

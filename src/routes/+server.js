@@ -58,7 +58,7 @@ export async function GET({ url, fetch, cookies }) {
         let cookie = cookies.get(`kolmit.operator:${abonent}`);
         cookie = JSON.parse(cookie);
         cookie.lang = lang;
-        const oper = admin ? 'admin' : 'operator';          
+        const oper = admin ? 'admin' : 'operator';
         cookies.set(`kolmit.${oper}:${abonent}`, JSON.stringify(cookie), {
           path: '/',
           maxAge: 60 * 60 * 24 * 400,
@@ -67,6 +67,22 @@ export async function GET({ url, fetch, cookies }) {
         console.log(ex);
       }
     }
+  } else if (func === 'set_lang') {
+    if (lang) {
+      try {
+        let cookie = cookies.get(`kolmit.admin:${abonent}`);
+        cookie = JSON.parse(cookie);
+        cookie.lang = lang;
+        const oper = admin ? 'admin' : 'operator';
+        cookies.set(`kolmit.${oper}:${abonent}`, JSON.stringify(cookie), {
+          path: '/',
+          maxAge: 60 * 60 * 24 * 400,
+        });
+      } catch (ex) {
+        console.log(ex);
+      }
+    }
+
     let response = new Response();
     response.headers.append('Access-Control-Allow-Origin', `*`);
     return response;

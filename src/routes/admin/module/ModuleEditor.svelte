@@ -60,7 +60,7 @@
   let llang_input;
   let theme_sort_list, quiz_sort_list, items;
 
-  let lesson_data = { data: '' };
+  let lesson_data = { data: {level:''} };
   let levels: any = [];
   let module_input: any;
 
@@ -157,7 +157,7 @@
     }
   }
 
-  function onClickQuiz(quiz: any, level, theme) {
+  function onClickQuiz(quiz: any, level:string, theme:string) {
 
     $view = 'quiz';
 
@@ -181,7 +181,8 @@
     // disabled = 'disabled';
   }
 
-  export function findDeep(obj, predicate, path = '') {
+  export function findDeep(obj:object, predicate:string, path = '') {
+    
     if (predicate(obj, path)) {
       return obj;
     }
@@ -212,7 +213,7 @@
         pushTheme({ theme: { name: '' } });
       });
 
-    function pushTheme(quiz_data) {
+    function pushTheme(quiz_data:object) {
       lesson_data.data.module.themes.push({
         name: {
           [$llang]: quiz_data.theme.name,
@@ -237,7 +238,7 @@
     lesson_data = lesson_data;
   }
 
-  function OnRemoveItem(name, t) {
+  function OnRemoveItem(name:string, t: any) {
     // let quiz = find(
     //   lesson_data.data.module.themes[t].lessons[0].quizes,
     //   (q) => {
@@ -253,22 +254,7 @@
     lesson_data = lesson_data;
   }
 
-  function OnChangeThemeName(ev) {
-    const upd = ev.target.innerText;
-    if (name === upd) return;
-    let item = findDeep(
-      lesson_data.data.module.themes,
-      (value) => value[0].name === name,
-      {
-        childrenPath: 'themes',
-      }
-    );
 
-    if (item) {
-      item[0].name = upd;
-    }
-    lesson_data = lesson_data;
-  }
 
   async function OnAddQuiz(name, t) {
     lesson_data.data.module.themes[t].lessons[0].quizes.push({

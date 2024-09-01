@@ -8,10 +8,6 @@
   import { Dict } from '../dict/dict';
   // $view = 'lesson';
 
-  $: if ($view) {
-    console.log($view);
-  }
-
   import GroupEditor from './group/GroupEditor.svelte';
 
   import { dicts } from '$lib/js/stores.js';

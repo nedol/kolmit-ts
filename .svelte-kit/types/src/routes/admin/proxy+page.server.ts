@@ -63,8 +63,7 @@ export async function load({ fetch, cookies, route, url, stuff }) {
 
 	let { operators, admin, groups } = await GetGroups(params); 
 
-
-	return {
+return {
 		check: true,
 		host: host,
 		groups: groups,
