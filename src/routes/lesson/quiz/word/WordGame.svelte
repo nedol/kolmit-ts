@@ -150,6 +150,12 @@
       hints[isFlipped][$msg_user.lesson.word_correct].disabled = 'disabled';
       hint_example = '';
     } else if (
+      ($msg_user.lesson.word_error || $msg_user.lesson.word_error == 0) &&
+      hints
+    ) {
+      // hints[isFlipped][$msg_user.lesson.word_correct].disabled = 'disabled';
+      hint_example = '';
+    } else if (
       $msg_user.lesson.word_index ||
       $msg_user.lesson.word_index == 0
     ) {
@@ -195,6 +201,12 @@
       hints
     ) {
       hints[isFlipped][$msg_oper.lesson.word_correct].disabled = 'disabled';
+      hint_example = '';
+    } else if (
+      ($msg_oper.lesson.word_error || $msg_oper.lesson.word_error == 0) &&
+      hints
+    ) {
+      // hints[isFlipped][$msg_user.lesson.word_correct].disabled = 'disabled';
       hint_example = '';
     } else if ($msg_oper.lesson.word_flip) {
       isFlipped = $msg_oper.lesson.word_flip;
@@ -381,9 +393,8 @@
     return metrics.width + 5;
   }
 
-  function OnClickHint(word, i) {
-    if(!share_mode)
-      onShare();
+  function OnClickHint(ev, word, i) {
+    if (!share_mode) onShare();
 
     if (!isFlipped) {
       const data = {
@@ -396,6 +407,8 @@
       };
       SendData(data);
       showHints[isFlipped] = false;
+      ev.target.classList.add('selected');
+      label[false] = 'Ожидай ответ';
     } else {
       showCheckButton = true;
       div_input.forEach((di) => {
@@ -514,6 +527,7 @@
     if (userContent.length < 1 || !userContent[0].replace(/&nbsp;/g, ''))
       return;
 
+    let thisErrorIndex = 0;
     const targetWords = extractWords(currentWord.example[$llang]);
 
     let correctCount = 0;
@@ -534,29 +548,45 @@
         ) {
           // result[i] = `<span class="correct">${targetWords[i]}</span>`;
           if (div_input[i]) div_input[i].style.color = 'green';
-          // Показываем галочку
-          showNextButton = true;
-          speak(currentWord.example[$llang]);
-
-          showHints[isFlipped] = false;
-
-          const data = {
-            lesson: {
-              quiz: 'word',
-              word_correct: currentWordIndex,
-            },
-          };
-          if (errorIndex < 1) {
-            SendData(data);
-            doneWords++;
-          }
-          errorIndex = 0;
+          correctCount++;
         } else {
           if (div_input[i]) div_input[i].style.color = 'red';
+          thisErrorIndex++;
           errorIndex++;
         }
     });
 
+    if (thisErrorIndex < 1) {
+      if (errorIndex < 1) {
+        const data = {
+          lesson: {
+            quiz: 'word',
+            word_correct: currentWordIndex,
+          },
+        };
+        SendData(data);
+        doneWords++;
+        errorIndex = 0;
+        label[true] = 'Нажми "Вперед"';
+        speak(currentWord.example[$llang]);
+        showHints[isFlipped] = false;
+        showNextButton = true;
+      } else {
+        const data = {
+          lesson: {
+            quiz: 'word',
+            word_error: currentWordIndex,
+          },
+        };
+        SendData(data);
+        label[true] = 'Нажми "Вперед"';
+           showHints[isFlipped] = false;
+           showNextButton = true;
+      }
+    } else {
+      errorIndex++;
+      label[true] = 'Исправь ошибку';
+    }
     // console.log(targetWords.length)
   }
 
@@ -607,11 +637,7 @@
     userContent[0] = '&nbsp;';
     userContent[1] = '&nbsp;';
 
-    /*
-    currentWord.example[$langs] = '&nbsp;';
-    currentWord.example[$llang] = '&nbsp;';
-    makeExample();
-    */
+    errorIndex = 0;
 
     label[isFlipped] = 'Выбери слово';
 
@@ -877,6 +903,7 @@
                   class="hint_button {hint.disabled}"
                   on:click={() => {
                     OnClickHint(
+                      this,
                       extractWords(
                         hint?.example[isFlipped ? $llang : $langs]
                       ).join(' '),
@@ -895,8 +922,8 @@
                 {#await Translate(hint?.example['ru'], 'ru', $langs) then data}
                   <span
                     class="hint_button {hint.disabled}"
-                    on:click={() => {
-                      OnClickHint(extractWords(data).join(' '), i);
+                    on:click={(ev) => {
+                      OnClickHint(ev, extractWords(data).join(' '), i);
                     }}
                   >
                     {@html extractWords(data).join(' ') + '&nbsp;' + '&nbsp;'}
@@ -916,8 +943,9 @@
               <!--  -->
               <span
                 class="hint_button {hint.disabled}"
-                on:click={() => {
+                on:click={(ev) => {
                   OnClickHint(
+                    ev,
                     extractWords(
                       hint?.example[isFlipped ? $llang : $langs]
                     ).join(' '),
@@ -936,8 +964,8 @@
               {#await Translate(hint?.example['ru'], 'ru', $langs) then data}
                 <span
                   class="hint_button {hint.disabled}"
-                  on:click={() => {
-                    OnClickHint(extractWords(data).join(' '), i);
+                  on:click={(ev) => {
+                    OnClickHint(ev, extractWords(data).join(' '), i);
                   }}
                 >
                   {@html extractWords(data).join(' ') + '&nbsp;' + '&nbsp;'}
@@ -969,7 +997,7 @@
     /* top: 30px; */
   }
   .title {
-    color: grey;
+    color: coral;
     position: relative;
     text-align: center;
     margin-top: 0px;
@@ -1148,5 +1176,9 @@
     align-items: center; /* Выравниваем содержимое по центру горизонтально */
     background-color: white;
     /* opacity: 50%; */
+  }
+
+  .selected {
+    background-color: coral;
   }
 </style>
