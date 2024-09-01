@@ -6,8 +6,6 @@
   import Badge from '@smui-extra/badge';
   import Select, { Option } from '@smui/select';
 
-  import { llang } from '$lib/js/stores.js';
-
   // import words from './80.json';
   import { Translate } from '../../../translate/Transloc';
   // translate.engine = 'google';
@@ -40,6 +38,8 @@
 
   import {
     lesson,
+    llang, 
+    view,
     dicts,
     dc_oper,
     dc_user,
@@ -65,6 +65,7 @@
   let currentWord;
   let hl_words = data.highlight ? data.highlight.split(',') : [];
   let doneWords = 0;
+  let doneWords_2 = 0;
   let arrayOfArrays;
   let userContent = [];
   let div_input = [];
@@ -149,6 +150,7 @@
     ) {
       hints[isFlipped][$msg_user.lesson.word_correct].disabled = 'disabled';
       hint_example = '';
+       doneWords_2 = $msg_user.lesson.done_words;
     } else if (
       ($msg_user.lesson.word_error || $msg_user.lesson.word_error == 0) &&
       hints
@@ -202,10 +204,11 @@
     ) {
       hints[isFlipped][$msg_oper.lesson.word_correct].disabled = 'disabled';
       hint_example = '';
+       doneWords_2 = $msg_oper.lesson.done_words;
     } else if (
       ($msg_oper.lesson.word_error || $msg_oper.lesson.word_error == 0) &&
       hints
-    ) {
+    ) {     
       // hints[isFlipped][$msg_user.lesson.word_correct].disabled = 'disabled';
       hint_example = '';
     } else if ($msg_oper.lesson.word_flip) {
@@ -558,14 +561,16 @@
 
     if (thisErrorIndex < 1) {
       if (errorIndex < 1) {
+          doneWords++;
         const data = {
           lesson: {
             quiz: 'word',
             word_correct: currentWordIndex,
+            done_words:doneWords
           },
         };
         SendData(data);
-        doneWords++;
+      
         errorIndex = 0;
         label[true] = 'Нажми "Вперед"';
         speak(currentWord.example[$llang]);
@@ -576,6 +581,7 @@
           lesson: {
             quiz: 'word',
             word_error: currentWordIndex,
+            done_words:doneWords
           },
         };
         SendData(data);
@@ -658,7 +664,7 @@
     const data = {
       lesson: {
         quiz: 'word',
-        word_flip: isFlipped,
+        word_flip: isFlipped
       },
     };
     SendData(data);
@@ -728,6 +734,8 @@
   onDestroy(() => {
     // Очищаем интервал при размонтировании компонента
     $llang = _llang;
+    $view = 'lesson'
+     $lesson.data = { quiz: '' };
     console.log('Компонент размонтирован');
   });
 </script>
@@ -775,15 +783,15 @@
           </Section>
 
           <Section>
-            <div class="counter">
+            <div class="counter" style="display:inline">
               <p>
                 <span class="mdc-typography--overline" style="position:relative"
-                  >{doneWords}
+                  >{doneWords}:{doneWords_2}
                   <Badge
                     position="middle"
                     align="bottom-end - bottom-middle"
                     aria-label="unread count"
-                    style="margin-right:-10px;scale:.8">{words.length}</Badge
+                    style="margin-right:-15px;scale:.8">{words.length}</Badge
                   >
                 </span>
               </p>
@@ -1143,7 +1151,7 @@
     background-color: #f0f0f0;
     padding: 0px;
     border-radius: 25px;
-    width: 30px;
+    width: 50px;
     height: 30px;
     top: -10px;
     left: -6px;

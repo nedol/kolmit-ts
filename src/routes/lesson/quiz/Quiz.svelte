@@ -38,7 +38,8 @@
   {:else if quiz === 'word'}
     {#if  dc && $call_but_status === 'talk' }
        <WordGame {data} />
-    {:else}    
+    {:else}  
+    
       <Word {data} /> 
     {/if}
   {/if}
