@@ -20,7 +20,21 @@
   import Chip, { Set, LeadingIcon, TrailingIcon, Text } from '@smui/chips';
   import '$lib/css/Typography.scss';
 
-  import { langs, dicts, llang, view } from '$lib/js/stores.js';
+  import {
+    lesson,
+    langs,
+    dicts,
+    llang,
+    view,
+    dc_oper,
+    dc_user,
+    dc_oper_state,
+    dc_user_state,
+    msg_user,
+    msg_oper,
+    call_but_status,
+  } from '$lib/js/stores.js';
+
   const dict = $dicts;
 
   import {
@@ -96,17 +110,6 @@
   let share_button_class = 'button_shared_false';
 
   let variant = 'outlined';
-
-  import {
-    lesson,
-    dc_oper,
-    dc_user,
-    dc_oper_state,
-    dc_user_state,
-    msg_user,
-    msg_oper,
-    call_but_status,
-  } from '$lib/js/stores.js';
 
   let dc = $dc_oper || $dc_user;
 
@@ -512,6 +515,8 @@
     stt_text = '';
     stt = '';
     tts = '';
+    $view = 'lesson';
+    $lesson.data = { quiz: '' };
   });
 </script>
 
@@ -537,28 +542,30 @@
     <TopAppBar bind:this={bottomAppBar} variant="fixed">
       <Row>
         <Section>
-          {#if cur_qa > 0}
-            <Icon
-              tag="svg"
-              on:click={onBackQA}
-              viewBox="0 0 24 24"
-              style="margin-top:0px; scale:.5;width:50px"
-            >
-              <path fill="white" d={mdiArrowLeft} />
-            </Icon>
-          {:else}
-            <Icon
-              tag="svg"
-              on:click={onBackQA}
-              viewBox="0 0 24 24"
-              style="visibility:hidden;margin-top:0px; scale:.5;width:50px"
-            >
-              <path fill="" d={mdiArrowLeft} />
-            </Icon>
+          {#if !isFlipped}
+            {#if cur_qa > 0}
+              <Icon
+                tag="svg"
+                on:click={onBackQA}
+                viewBox="0 0 24 24"
+                style="margin-top:0px; scale:.5;width:50px"
+              >
+                <path fill="white" d={mdiArrowLeft} />
+              </Icon>
+            {:else}
+              <Icon
+                tag="svg"
+                on:click={onBackQA}
+                viewBox="0 0 24 24"
+                style="visibility:hidden;margin-top:0px; scale:.5;width:50px"
+              >
+                <path fill="" d={mdiArrowLeft} />
+              </Icon>
+            {/if}
           {/if}
         </Section>
         <Section>
-          {#if share_button && $call_but_status === 'talk'}
+          {#if !isFlipped && share_button && $call_but_status === 'talk'}
             <div class={share_button_class} on:click={onShare}>
               <IconButton>
                 <Icon tag="svg" viewBox="0 0 24 24">
@@ -615,14 +622,16 @@
           </button>
         </Section>
         <Section align="end">
-          <Icon
-            tag="svg"
-            on:click={onNextQA}
-            viewBox="0 0 24 24"
-            style="margin-top:0px; scale:.5; width:50px"
-          >
-            <path fill="white" d={mdiArrowRight} />
-          </Icon>
+          {#if !isFlipped}
+            <Icon
+              tag="svg"
+              on:click={onNextQA}
+              viewBox="0 0 24 24"
+              style="margin-top:0px; scale:.5; width:50px"
+            >
+              <path fill="white" d={mdiArrowRight} />
+            </Icon>
+          {/if}
         </Section>
       </Row>
     </TopAppBar>
@@ -632,7 +641,7 @@
     {#if q || a}
       {#if !isFlipped}
         <div class="container">
-          {#if dc}
+          {#if $call_but_status=='talk'}
             <div class="repeat_but">
               <Button
                 class="button-shaped-round"
@@ -744,9 +753,7 @@
             {@html stt_text}
           </span>
         </div>
-
       {:else}
-
         {#await Translate('Спроси', 'ru', $langs) then data}
           <div class="title">{data}:</div>
         {/await}
@@ -772,6 +779,16 @@
           {:else if visibility[2] === 'visible'}
             {@html a[$llang].replace(/"([^"]*)"/g, '$1')}
           {/if}
+
+                      <!-- {#if showSpeakerButton} -->
+            <div class="speaker-button">
+              <IconButton on:click={speak(a[$llang])}>
+                <Icon tag="svg" viewBox="0 0 24 24">
+                  <path fill="currentColor" d={mdiPlay} />
+                </Icon>
+              </IconButton>
+            </div>
+            <!-- {/if} -->
           <div
             class="margins"
             style="text-align: center; display: flex; align-items: center; justify-content: space-between;"
@@ -794,28 +811,17 @@
             <Stt bind:this={stt} {SttResult} {StopListening} bind:display_audio
             ></Stt>
 
-            <!-- {#if showSpeakerButton} -->
-            <div class="speaker-button">
-              <IconButton on:click={speak(a[$llang])}>
-                <Icon tag="svg" viewBox="0 0 24 24">
-                  <path fill="currentColor" d={mdiPlay} />
-                </Icon>
-              </IconButton>
-            </div>
-            <!-- {/if} -->
-          </div>
 
+          </div>
         </div>
 
         <div style="text-align: center;   margin-top: 10px; ">
           <span style="color: darkgreen;">
             {@html stt_text}
           </span>
-
-
         </div>
         <div class="container">
-          {#if dc}
+          {#if $call_but_status=='talk'}
             <div class="repeat_but">
               <Button
                 class="button-shaped-round"
@@ -919,7 +925,7 @@
 
   .container {
     display: flex;
-    top: 0px;
+    top: 10px;
     margin-bottom: 7px;
     position: relative;
     justify-content: space-between;
@@ -927,11 +933,12 @@
   }
 
   .repeat_but {
+    display: inline-flex;
     position: absolute;
-    margin-right: auto; /* Сдвиг первого элемента к левому краю */
+    float: left;
+    margin-right: auto;
     font-size: smaller;
-    left: 0px;
-    top: -5px;
+    top: 0px;
     z-index: 2;
     scale: 0.7;
   }
@@ -992,8 +999,8 @@
     float: right;
     font-size: large;
     border-radius: 25px;
-    margin-right:10px;
-     margin-left:10px;
+    margin-right: 10px;
+    margin-left: 10px;
   }
 
   .html_data {
@@ -1046,7 +1053,7 @@
     width: fit-content;
     margin: 5px auto; /* Центрирование второго элемента */
     margin-top: 15px;
-    color: #b06db7;
+    color:coral;
     line-height: normal;
     text-align: center;
     font-size: 0.8em;
@@ -1080,6 +1087,8 @@
   }
 
   .tip {
+    position: relative;
+    top:10px;
     text-align: center;
     line-height: normal;
     font-size: 1em;
