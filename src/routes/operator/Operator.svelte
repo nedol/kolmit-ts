@@ -11,7 +11,12 @@
   import TopAppBar, { Row, Title } from '@smui/top-app-bar';
 
   import { mdiAccountBox, mdiVolumeHigh, mdiVolumeOff } from '@mdi/js';
+
+ 
   import {
+    view,posterst,
+    lesson,signal,click_call_func,dc_oper_state,
+    call_but_status,
     muted,
     user_placeholder,
     audioCtx,
@@ -46,26 +51,21 @@
 
   import md5 from 'md5';
 
-  import { lesson } from '$lib/js/stores.js';
-
-  import { signal } from '$lib/js/stores.js';
-
-  import { click_call_func } from '$lib/js/stores.js';
-
-  import { dc_oper_state } from '$lib/js/stores.js';
-  $:if($dc_oper_state){
-    switch($dc_oper_state){
-    case 'open':
-      break;
-    case 'close':
-      OnMessage({data:{call:{func:'mute'}}}, null);
-      break;    
+/*TODO: дает*/
+  // $:if($dc_oper_state){
+  //   switch($dc_oper_state){
+  //   case 'open':
+  //     break;
+  //   case 'close':
+  //     OnMessage({data:{call:{func:'mute'}}}, null);
+  //     break;    
     
-    case 'mute':
-      OnMessage({data:{call:{func:'mute'}}}, null);
-      break;    
-    }
-  }
+  //   case 'mute':
+  //     OnMessage({data:{call:{func:'mute'}}}, null);
+  //     break;    
+  //   }
+  // }
+  
 
   import { msg_user } from '$lib/js/stores.js';
   $: if ($msg_user) {
@@ -77,8 +77,7 @@
     OnMessage($msg_oper, null);
   }
 
-  import { view } from '$lib/js/stores.js';
-  import { posterst } from '$lib/js/stores.js';
+
 
   let dlg_display = 'none';
 
@@ -111,7 +110,7 @@
     lesson_display: string,
     chat_display = 'block';
 
-  import { call_but_status } from '$lib/js/stores.js';
+
   $call_but_status = 'inactive';
 
   import { editable } from '$lib/js/stores.js';
@@ -296,9 +295,13 @@
   }
 
   function OnClickCallButton() {
+     console.log($call_but_status)
+    if($call_but_status==undefined)
+      $call_but_status = 'inactive'
     switch ($call_but_status) {
       case 'inactive':
         rtc.Offer();
+       
         $call_but_status = 'active';
         break;
 
@@ -489,7 +492,7 @@
           on:click={OnClickCallButton}
           on:mute
           bind:isRemoteAudioMute
-          status={$call_but_status}
+    
         ></VideoRemote>
         {#if $call_but_status === 'talk'}
           <div class="speaker-button">

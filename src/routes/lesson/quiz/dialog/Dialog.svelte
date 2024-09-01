@@ -38,7 +38,7 @@
   const dict = $dicts;
 
   import {
-    mdiPagePreviousOutline,
+    mdiRepeat,
     mdiArrowRight,
     mdiArrowLeft,
     mdiShareVariant,
@@ -641,16 +641,21 @@
     {#if q || a}
       {#if !isFlipped}
         <div class="container">
-          {#if $call_but_status=='talk'}
+          {#if $call_but_status == 'talk'}
             <div class="repeat_but">
-              <Button
+              <IconButton on:click={() => SendRepeat()}>
+                <Icon tag="svg" color="secondary" viewBox="0 0 24 24">
+                  <path fill="currentColor" d={mdiRepeat} />
+                </Icon>
+              </IconButton>
+              <!-- <Button
                 class="button-shaped-round"
                 color="secondary"
                 on:click={() => SendRepeat()}
                 {variant}
               >
                 <Label>{dict['Repeat'][$langs]}</Label>
-              </Button>
+              </Button> -->
             </div>
           {/if}
           <!-- <div class="cnt">{cur_qa + 1}</div> -->
@@ -780,15 +785,15 @@
             {@html a[$llang].replace(/"([^"]*)"/g, '$1')}
           {/if}
 
-                      <!-- {#if showSpeakerButton} -->
-            <div class="speaker-button">
-              <IconButton on:click={speak(a[$llang])}>
-                <Icon tag="svg" viewBox="0 0 24 24">
-                  <path fill="currentColor" d={mdiPlay} />
-                </Icon>
-              </IconButton>
-            </div>
-            <!-- {/if} -->
+          <!-- {#if showSpeakerButton} -->
+          <div class="speaker-button">
+            <IconButton on:click={speak(a[$llang])}>
+              <Icon tag="svg" viewBox="0 0 24 24">
+                <path fill="currentColor" d={mdiPlay} />
+              </Icon>
+            </IconButton>
+          </div>
+          <!-- {/if} -->
           <div
             class="margins"
             style="text-align: center; display: flex; align-items: center; justify-content: space-between;"
@@ -810,8 +815,6 @@
             </div>
             <Stt bind:this={stt} {SttResult} {StopListening} bind:display_audio
             ></Stt>
-
-
           </div>
         </div>
 
@@ -821,16 +824,21 @@
           </span>
         </div>
         <div class="container">
-          {#if $call_but_status=='talk'}
+          {#if $call_but_status == 'talk'}
             <div class="repeat_but">
-              <Button
+              <IconButton on:click={() => SendRepeat()}>
+                <Icon tag="svg" color="secondary" viewBox="0 0 24 24">
+                  <path fill="currentColor" d={mdiRepeat} />
+                </Icon>
+              </IconButton>
+              <!-- <Button
                 class="button-shaped-round"
                 color="secondary"
                 on:click={() => SendRepeat()}
                 {variant}
               >
                 <Label>{dict['Repeat'][$langs]}</Label>
-              </Button>
+              </Button> -->
             </div>
           {/if}
 
@@ -925,7 +933,7 @@
 
   .container {
     display: flex;
-    top: 10px;
+    top: 0px;
     margin-bottom: 7px;
     position: relative;
     justify-content: space-between;
@@ -935,12 +943,13 @@
   .repeat_but {
     display: inline-flex;
     position: absolute;
-    float: left;
+    /* float: right; */
+    color:grey;
     margin-right: auto;
     font-size: smaller;
     top: 0px;
     z-index: 2;
-    scale: 0.7;
+    scale: 1;
   }
   .top-app-bar-container {
     /* display: inline-block; */
@@ -1053,7 +1062,7 @@
     width: fit-content;
     margin: 5px auto; /* Центрирование второго элемента */
     margin-top: 15px;
-    color:coral;
+    color: coral;
     line-height: normal;
     text-align: center;
     font-size: 0.8em;
@@ -1062,6 +1071,7 @@
 
   .user1 {
     /* width: 100vw;*/
+    position:relative;
     text-align: center;
     line-height: normal;
     font-size: 0.8em;
@@ -1088,7 +1098,7 @@
 
   .tip {
     position: relative;
-    top:10px;
+    top: 0px;
     text-align: center;
     line-height: normal;
     font-size: 1em;

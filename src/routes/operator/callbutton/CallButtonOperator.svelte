@@ -1,9 +1,14 @@
 <script lang='ts'>
 	// let status = 'talk';
 	// import 'long-press-event';
+	import { call_but_status } from '$lib/js/stores.js';
 
-	export let status;
+	let status;
 	export let OnLongPress;
+
+	$: if($call_but_status){
+		status = $call_but_status;
+	}
 </script>
 
 <div class="callObject" on:long-press={OnLongPress} style="display: block;">

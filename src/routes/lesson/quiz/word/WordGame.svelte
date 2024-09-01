@@ -393,7 +393,7 @@
 
     // Измеряем длину текста
     const metrics = context.measureText(text);
-    return metrics.width + 5;
+    return metrics.width + 20;
   }
 
   function OnClickHint(ev, word, i) {
@@ -437,6 +437,7 @@
       arSpan.forEach((el, i) => {
         if (word.includes(el.attributes.value.nodeValue.toLowerCase())) {
           userContent[i] = el.attributes.value.nodeValue;
+           el.style.width = getTextWidth(userContent[i],'20px Arial');
         } else {
           userContent[i] = words[i] ? words[i] : '';
         }
