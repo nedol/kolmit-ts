@@ -3,15 +3,15 @@
 	// import 'long-press-event';
 	import { call_but_status } from '$lib/js/stores.js';
 
-	let status;
-	export let OnLongPress;
+	let status:string;
+	// export let OnLongPress;
 
 	$: if($call_but_status){
 		status = $call_but_status;
 	}
 </script>
 
-<div class="callObject" on:long-press={OnLongPress} style="display: block;">
+<div class="callObject"  style="display: block;">
 	<!-- {@debug status} -->
 	<svg class="callButton" {status} on:click width="50" height="50">
 		<!-- <rect id="backgroundrect" width="100%" height="100%" x="0" y="0" fill="none" stroke="none"/>

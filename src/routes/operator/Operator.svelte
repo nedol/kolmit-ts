@@ -431,7 +431,7 @@
 
       setTimeout(() => {
         $call_but_status = 'inactive';
-      }, 0);
+      }, 100);
 
       if ($call_but_status === 'talk') {
         rtc.OnInactive();

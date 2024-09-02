@@ -82,5 +82,3 @@ export async function Translate(text, from, to) {
     
 
 }
-
-"Mon « réveil » sonne à six heures."
