@@ -63,7 +63,6 @@
   let hints = {};
   let currentWordIndex = 0;
   let currentWord;
-  let hl_words = data.highlight ? data.highlight.split(',') : [];
   let doneWords = 0;
   let doneWords_2 = 0;
   let arrayOfArrays;
@@ -132,6 +131,10 @@
       });
 
   $: if ($langs) {
+    makeExample();
+  }
+
+  $: if ($llang) {
     makeExample();
   }
 
@@ -437,7 +440,7 @@
       arSpan.forEach((el, i) => {
         if (word.includes(el.attributes.value.nodeValue.toLowerCase())) {
           userContent[i] = el.attributes.value.nodeValue;
-           el.style.width = getTextWidth(userContent[i],'20px Arial');
+           el.style.width = getTextWidth(userContent[i],'20px Arial')
         } else {
           userContent[i] = words[i] ? words[i] : '';
         }
@@ -574,7 +577,7 @@
       
         errorIndex = 0;
         label[true] = 'Нажми "Вперед"';
-        speak(currentWord.example[$llang]);
+        // speak(currentWord.example[$llang]);TODO: для fr
         showHints[isFlipped] = false;
         showNextButton = true;
       } else {
@@ -757,9 +760,8 @@
       <CircularProgress style="height: 50px; width: 50px;" indeterminate />
     </span>
   </div>
-{/if}
+{:else}
 
-{#if words}
   <main>
     <div class="top-app-bar-container flexor">
       <TopAppBar bind:this={topAppBar} variant="fixed">
@@ -889,7 +891,9 @@
       {#await Translate(label[isFlipped], 'ru', $langs) then data}
         <div class="title">{data}</div>
       {/await}
+
     {:else}
+
       {#await Translate(label[isFlipped], 'ru', $langs) then data}
         <div class="title">{data}:</div>
       {/await}
@@ -906,7 +910,7 @@
           <Content style="line-height: 2.0; overflow-y:auto; height:70vh">
             {#each hints[isFlipped] as hint, i}
               <!-- {@debug isFlipped} -->
-              {#if hint?.example[!isFlipped ? $llang : $langs]}
+              {#if hint?.example[$llang]}
                 <!--  -->
                 <span
                   class="hint_button {hint.disabled}"
@@ -914,21 +918,21 @@
                     OnClickHint(
                       this,
                       extractWords(
-                        hint?.example[isFlipped ? $llang : $langs]
+                        hint.example[$llang]
                       ).join(' '),
                       i
                     );
                   }}
                 >
                   {@html extractWords(
-                    hint?.example[isFlipped ? $llang : $langs]
+                    hint.example[$llang]
                   ).join(' ') +
                     '&nbsp;' +
                     '&nbsp;'}
                 </span>
                 <!-- {/if} -->
               {:else}
-                {#await Translate(hint?.example['ru'], 'ru', $langs) then data}
+                {#await Translate(hint?.example['ru'], 'ru', $llang) then data}
                   <span
                     class="hint_button {hint.disabled}"
                     on:click={(ev) => {
@@ -948,7 +952,7 @@
         <Content style="line-height: 2.0; overflow-y:auto; height:70vh">
           {#each hints[isFlipped] as hint, i}
             <!-- {@debug isFlipped} -->
-            {#if hint?.example[!isFlipped ? $llang : $langs]}
+            {#if hint?.example[$langs]}
               <!--  -->
               <span
                 class="hint_button {hint.disabled}"
@@ -963,7 +967,7 @@
                 }}
               >
                 {@html extractWords(
-                  hint?.example[isFlipped ? $llang : $langs]
+                  hint?.example[$langs]
                 ).join(' ') +
                   '&nbsp;' +
                   '&nbsp;'}

@@ -66,10 +66,15 @@ export async function Translate(text, from, to) {
           console.error('Translation error:', error);
 
           // text; // или другое подходящее значение по умолчанию
-        }
+      }
+      if (res) {
+        res = res.replace(/«/g, '<<');
+        res = res.replace(/»/g, '>>');
         res = res?.replace(/<<\s*(.*?)\s*>>/g,'<<$1>>');
-        res = res?.replace(/«\s*(.*?)\s*»/g, '<<$1>>');
-      // }
+
+      } else {
+        res = text;
+      }
        translatedText += (res + ' '); // Добавление переведенной части к полному тексту
     }
 
@@ -78,3 +83,4 @@ export async function Translate(text, from, to) {
 
 }
 
+"Mon « réveil » sonne à six heures."
