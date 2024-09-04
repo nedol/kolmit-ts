@@ -100,7 +100,7 @@
           }}
         >
           <Item style="text-align: center">
-            <User {group} bind:user_={user} {OnClickUpload} />
+            <User {group} bind:user_={user}  {OnClickUpload} />
 
             <Supporting>
               <Label>{user.name}</Label>

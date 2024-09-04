@@ -451,7 +451,13 @@
   }
 
   async function SendData(data) {
-    const dc = $dc_user || $dc_oper;
+  let dc = null;
+
+  if ($dc_user?.dc.readyState === 'open') {
+    dc = $dc_user;
+  } else if ($dc_oper?.dc.readyState === 'open') {
+    dc = $dc_oper;
+  }
     if (share_mode && dc) {
       //  words.content[cur_qa].user2['a_shfl'] = a_shfl;
       await dc.SendData(data, (ex) => {

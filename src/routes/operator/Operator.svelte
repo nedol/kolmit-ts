@@ -15,7 +15,9 @@
  
   import {
     view,posterst,
-    lesson,signal,click_call_func,dc_oper_state,
+    lesson,signal,
+    click_call_func,
+    dc_oper_state,
     call_but_status,
     muted,
     user_placeholder,
@@ -52,20 +54,19 @@
   import md5 from 'md5';
 
 /*TODO: дает*/
-  // $:if($dc_oper_state){
-  //   switch($dc_oper_state){
-  //   case 'open':
-  //     break;
-  //   case 'close':
-  //     OnMessage({data:{call:{func:'mute'}}}, null);
-  //     break;    
+  $:if($dc_oper_state){
+    switch($dc_oper_state){
+    // case 'open':
+    //   break;
+    case 'close':
+      $call_but_status = 'inactive'
+      break;    
     
-  //   case 'mute':
-  //     OnMessage({data:{call:{func:'mute'}}}, null);
-  //     break;    
-  //   }
-  // }
-  
+    case 'mute':
+      $call_but_status = 'inactive'
+      break;    
+    }
+  }
 
   import { msg_user } from '$lib/js/stores.js';
   $: if ($msg_user) {
@@ -76,8 +77,6 @@
   $: if ($msg_oper) {
     OnMessage($msg_oper, null);
   }
-
-
 
   let dlg_display = 'none';
 
@@ -295,9 +294,9 @@
   }
 
   function OnClickCallButton() {
-     console.log($call_but_status)
-    if($call_but_status==undefined)
-      $call_but_status = 'inactive'
+ 
+    // if($call_but_status==undefined)
+    //   $call_but_status = 'inactive'
     switch ($call_but_status) {
       case 'inactive':
         rtc.Offer();
@@ -355,7 +354,7 @@
     }
   }
 
-  $click_call_func = OnClickCallButton;
+  // $click_call_func = OnClickCallButton;
 
   $: if (!$click_call_func) {
     $click_call_func = OnClickCallButton;
@@ -396,13 +395,12 @@
       video_button_display = false;
 
       if (data.profile) {
-        let profile = data.profile;
-        let avatar = profile.img;
-        remote.video.poster = avatar;
-        if (avatar) remote.video.display = 'block';
 
-        remote.text.name = profile.name;
-        remote.text.email = profile.email;
+        $posterst = data.profile.img;
+        if (data.profile.img) remote.video.display = 'block';
+
+        remote.text.name = data.profile.name;
+        remote.text.email = data.profile.email;
       }
     }
     if (data.func === 'talk') {
@@ -430,11 +428,12 @@
       // rtc.OnInactive();
 
       setTimeout(() => {
-        $call_but_status = 'inactive';
+        // $call_but_status = 'inactive';
       }, 100);
 
       if ($call_but_status === 'talk') {
         rtc.OnInactive();
+        
       } else if ($call_but_status === 'call') {
         rtc.OnHangup();
         // Group.GetUsers();
@@ -521,8 +520,6 @@
     <Section>
       <CallButton
         on:click={$click_call_func}
-        bind:status={$call_but_status}
-        {OnLongPress}
       >
         <b
           class="call_cnt"

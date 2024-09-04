@@ -1,4 +1,4 @@
-<script lang='ts'>
+<script lang="ts">
   import { onMount, onDestroy, getContext } from 'svelte';
   import md5 from 'md5';
   import RTCUser from './rtc/RTCUser';
@@ -16,31 +16,33 @@
   import { muted } from '$lib/js/stores.js';
 
   export let user_, group: [];
-  let  poster = user_.picture?user_.picture:'/assets/operator.svg';
+
+  let poster = user_.picture ? user_.picture : '/assets/operator.svg';
   let name = user_.name;
   let operator = user_.operator;
   let abonent = user_.abonent;
 
-   //user_.display = 'none' //видимость в группе
+  user_.display = 'none'; //видимость в группе
 
   // const operator = getContext('operator')
 
-  import { signal } from '$lib/js/stores.js';
-
-  import { call_but_status } from '$lib/js/stores.js';
-
-  import { click_call_func } from '$lib/js/stores.js';
+  import {
+    signal,
+    call_but_status,
+    dc_user_state,
+    click_call_func,
+    user_placeholder,
+    msg_user,
+  } from '$lib/js/stores.js';
 
   $click_call_func = null;
-
-  import { user_placeholder } from '$lib/js/stores.js';
 
   import pkg from 'lodash';
   const { groupBy, find } = pkg;
 
   // import './lib/icofont/icofont.min.css';
 
-  import { msg_user } from '$lib/js/stores.js';
+  import {} from '$lib/js/stores.js';
   $: if ($msg_user) {
     // if ($msg_user.operator) {
     // 	if ($msg_user.operator === operator) OnMessage($msg_user);
@@ -51,21 +53,17 @@
 
   let dc = false;
 
-  import { dc_user_state } from '$lib/js/stores.js';
-  $:if($dc_user_state){
-    switch($dc_user_state){
-    case 'open':
-      break;
-    case 'close':
-      OnMessage({data:{call:{func:'mute'}}}, null);
-      break;    
-    
-    case 'mute':
-      OnMessage({data:{call:{func:'mute'}}}, null);
-      break;    
+  import {} from '$lib/js/stores.js';
+
+  $: if ($dc_user_state) {
+    switch ($dc_user_state) {
+      // case 'open':
+      //   break;
+      case ('close', 'mute'):
+        $call_but_status = 'inactive';
+        break;
     }
   }
-
 
   let checked = false;
 
@@ -84,8 +82,6 @@
 
   let video_button_display = false;
   let video_element, parent_div;
-
-
 
   let progress = {
     display: 'none',
@@ -123,9 +119,10 @@
     operator: operator,
     abonent: abonent,
     type: 'user',
+    display: 'none',
   };
 
-  let oper = getContext('operator')
+  let oper = getContext('operator');
 
   onMount(async () => {
     rtc = new RTCUser(user, uid, $signal, oper);
@@ -190,8 +187,8 @@
           if (status !== 'call') {
             status = 'active';
             // $call_but_status = 'active';
-            //user_.display = 'block'
           }
+          // user_.display = 'block'
         } else if (res['busy']) {
           // if ($click_call_func === null)
           if (
@@ -208,7 +205,7 @@
 
           //rtc.abonent = url.searchParams.get('abonent');
           status = 'inactive';
-          //user_.display = 'none'
+          user_.display = 'none';
           // $call_but_status = 'inactive';
           $click_call_func = null; //operator -> OnClickCallButton
           parent_div.appendChild(card);
@@ -236,6 +233,10 @@
       }
     }
 
+    if (data.func === 'offer') {
+      if (user_.operator === data.operator) user_.display = 'block';
+    }
+
     if (data.func === 'call') {
       // $muted = true;
     }
@@ -250,8 +251,9 @@
       status = 'inactive';
       $call_but_status = 'inactive';
       $click_call_func = null; //operator -> OnClickCallButton
-//parent_div.appendChild(card);
+      //parent_div.appendChild(card);
       // video_element.load();
+      if (user_.operator === data.operator) user_.display = 'none';
     }
 
     if (data.func === 'talk') {
@@ -309,15 +311,15 @@
       // 	rtc.SendCheck();
       // 	break;
       case 'active':
+        user_.display = 'block';
         $click_call_func = OnClickCallButton;
         function call() {
-          //user_.display = 'block'
           rtc.Call();
           status = 'call';
           $call_but_status = 'call';
           video_element.load();
 
-         $user_placeholder.appendChild(card);//звонок
+          $user_placeholder.appendChild(card); //звонок
 
           window.scrollTo({ top: 0, behavior: 'smooth' });
         }
@@ -389,8 +391,6 @@
   }
 </script>
 
-
-
 <VideoRemote
   {...remote.video}
   {name}
@@ -401,7 +401,5 @@
   bind:status
   on:click={OnClickCallButton}
 ></VideoRemote>
-
-
 
 <AudioLocal {...local.audio} bind:paused={local.audio.paused} />

@@ -659,7 +659,7 @@
             </div>
           {/if}
           <!-- <div class="cnt">{cur_qa + 1}</div> -->
-          {#await Translate('Послушай вопрос', 'ru', $langs) then data}
+          {#await Translate('Cлушай вопрос', 'ru', $langs) then data}
             <div class="title">{data}:</div>
           {/await}
         </div>

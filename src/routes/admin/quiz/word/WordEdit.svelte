@@ -70,14 +70,12 @@
     })();
   }
 
-
   fetch(
     `./lesson?words=theme&name=${data.name[$llang]}&owner=${abonent}&level=${data.level}`
   )
     .then((response) => response.json())
     .then((data) => {
-
-      words_data = data?.data;
+      words_data = data.data ? data.data : [];
 
       // if (words && words_data) {
       //   words = words_data.map(async (item) => {
@@ -110,9 +108,11 @@
 
   function addEmptyRecord() {
     const emptyRecord = {
-      original: '',
-      infinitive: '',
-      translation: { nl: '', ru: '', uk: '', fr: '', en: '', de: '' },
+      example: {
+        nl: ' ',
+        ru: ' ',
+        en: ' ',
+      },
     };
     words_data.push(emptyRecord);
     words_data = words_data;
@@ -188,12 +188,11 @@
       .then((text) => {
         content = text;
         const parsed = JSON.parse(text);
-        if(words_data){
-        words_data = words_data.concat(parsed);
-        }else{
-          words_data = parsed
+        if (words_data) {
+          words_data = words_data.concat(parsed);
+        } else {
+          words_data = parsed;
         }
-
       })
       .catch((err) => {
         console.error('Failed to read clipboard contents: ', err);
@@ -218,10 +217,8 @@
     items = arrayMove(items, oldIndex, newIndex); // Assuming you have an arrayMove function (see below)
   }
 
-    function OnWordsChange(){
-      if(words)
-      prompt = prompt.replaceAll("${words}", words);
-
+  function OnWordsChange() {
+    if (words) prompt = prompt.replaceAll('${words}', words);
   }
 </script>
 
@@ -299,7 +296,11 @@
         {#if active === 'Words'}
           <Paper variant="unelevated">
             <Content>
-              <textarea rows="20" name="dialog_words" bind:value={words} on:change={OnWordsChange}
+              <textarea
+                rows="20"
+                name="dialog_words"
+                bind:value={words}
+                on:change={OnWordsChange}
               ></textarea>
             </Content>
           </Paper>
@@ -371,10 +372,9 @@
       {#each words_data as item, index (index)}
         <!-- {@debug item} -->
         <div class="row">
-
           <textarea rows="2" bind:value={item.example[$llang]} />
-          {#if item.example[$llang]!= item.example[$langs]}
-          <textarea rows="2" bind:value={item.example[$langs]} />
+          {#if item.example[$llang] != item.example[$langs]}
+            <textarea rows="2" bind:value={item.example[$langs]} />
           {/if}
           <button class="remrec_but" on:click={remRecord(index)} {index}
             >-</button

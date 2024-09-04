@@ -119,6 +119,7 @@
     scale: 0.8;
     bottom: 20px;
 
+
   }
   video {
     display: block;

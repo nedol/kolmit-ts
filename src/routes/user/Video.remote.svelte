@@ -74,6 +74,7 @@
     left: 0px;
     height: 70px;
     width: 70px;
+    margin: 0 auto;
   }
   video {
     display: block;
@@ -89,15 +90,15 @@
     opacity: 1;
   }
   [status='muted'] {
-    opacity: 0.3;
+    opacity: 0.05;
   }
   [status='inactive'] {
-    opacity: 0.3;
+    opacity: 0.05;
   }
   [status='active'] {
     opacity: 1;
   }
   [status='busy'] {
-    opacity: 0.3;
+    opacity: 0.05;
   }
 </style>
