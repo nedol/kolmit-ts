@@ -272,7 +272,7 @@
     div_input[0].style.width = '';
 
     arSpan.forEach((el, i) => {
-      if ( word.includes(el.attributes.value.nodeValue.toLowerCase())) {
+      if (word.includes(el.attributes.value.nodeValue.toLowerCase())) {
         userContent[i] = el.attributes.value.nodeValue;
       } else {
         userContent[i] = words[i] ? words[i] : '';
@@ -442,6 +442,15 @@
     let i = 0,
       w = 0;
 
+    if (hintIndex == 0) {
+      userContent[0] = '&nbsp;';
+      userContent[1] = '&nbsp;';
+      div_input[0].style.color = '#2196f3';
+      div_input[1].style.color = '#2196f3';
+      div_input[0].style.width = getTextWidth(words, '20px Arial')+'px';
+      div_input[1].style.width = getTextWidth(words, '20px Arial')+'px';
+    }
+
     for (let char of words) {
       // word = word.replace(/[.,\/#!?$%\^&\*;:{}=_`~()]/g, '');
       if (char == ' ') {
@@ -451,7 +460,6 @@
       }
 
       if (i === hintIndex) {
-        console.log(char);
         userContent[w] += char;
 
         result = ''; // Очистим результат при каждой новой подсказке
@@ -868,7 +876,7 @@
     outline: none;
     border: none;
     background: rgba(0, 0, 0, 0.12);
-    text-align: center;
+    text-align: left;
   }
 
   .input:focus {
