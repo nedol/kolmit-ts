@@ -54,14 +54,14 @@
   // import Dialog2 from './Dialog.2.svelte';
   // import RV from '/src/routes/speech/tts/RV.svelte';
   // import { Speak } from '../../../speech/tts/RV.svelte';
-  import { Speak } from '/src/routes/speech/tts/VoiceRSS';
+  import { Speak } from '../../../speech/tts/VoiceRSS';
   let voice;
-  import Tts from '/src/routes/speech/tts/Tts.svelte';
-  import Stt from '/src/routes/speech/stt/Stt.svelte';
+  import Tts from '../../../speech/tts/Tts.svelte';
+  import Stt from '../../../speech/stt/Stt.svelte';
 
   const operator = getContext('operator');
 
-  let stt: any, tts;
+  let stt: any, tts:any;
 
   let dialog_data: any;
 
@@ -77,7 +77,7 @@
   const visibility = ['visible', 'hidden', 'hidden'];
   let visibility_cnt = 1;
 
-  let bottomAppBar;
+  let topAppBar;
 
   let share_mode = false;
   export let data;
@@ -175,6 +175,12 @@
       break;
   }
 
+  
+
+  onMount(async () => {
+
+  });
+
   async function init() {
     function splitHtmlContent(inputString) {
       // Регулярное выражение для поиска содержимого внутри тегов <html>...</html>
@@ -212,6 +218,9 @@
   }
 
   function Dialog() {
+    if(!dialog_data.content[0]){
+        return
+    }
     let qa = dialog_data.content[cur_qa];
     if (!qa) {
       cur_qa = 0;
@@ -310,7 +319,7 @@
     Dialog();
     SendData();
     stt_text = '';
-    stt.CollectGarbage();
+    // stt.CollectGarbage();
     // onClickMicrophone();
   }
 
@@ -486,9 +495,6 @@
     return similarity;
   }
 
-  onMount(async () => {
-    // style_button = style_button_non_shared;
-  });
 
   function SendRepeat() {
     variant = 'unelevated';
@@ -515,7 +521,7 @@
     stt_text = '';
     stt = '';
     tts = '';
-    $view = 'lesson';
+    // $view = 'lesson';
     $lesson.data = { quiz: '' };
   });
 </script>
@@ -539,7 +545,7 @@
     </div>
   {/if}
   <div class="top-app-bar-container flexor">
-    <TopAppBar bind:this={bottomAppBar} variant="fixed">
+    <TopAppBar bind:this={topAppBar} variant="fixed">
       <Row>
         <Section>
           {#if !isFlipped}
@@ -712,7 +718,7 @@
 
         <div class="user2">
           {#if a && visibility[2] === 'hidden'}
-            {@html a[$llang].replace(/(?<!")\b\w+\b(?!")/g, (match) => {
+            {@html a[$llang].replace(/(?<!")\b[\p{L}\p{M}]+\b(?!")/gu, (match) => {
               return `<span class="span_hidden" onclick="(this.style.color='#2196f3')" 
                 style="display:inline-block; margin: 5px 0px; padding: 1px 5px;border:1px;border-style:groove;border-color:lightblue;color:transparent;">${match}</span>`;
             })}
@@ -777,7 +783,7 @@
 
         <div class="user2">
           {#if a && visibility[1] === 'hidden'}
-            {@html a[$llang].replace(/(?<!")\b\w+\b(?!")/g, (match) => {
+            {@html a[$llang].replace(/(?<!")\b[\p{L}\p{M}]+\b(?!")/gu, (match) => {
               return `<span class="span_hidden" onclick="(this.style.color='#2196f3')" 
                 style="display:inline-block;margin: 5px 0px;border:1px;border-style:groove;border-color:light-blue;color:transparent;">${match}</span>`;
             })}
@@ -831,14 +837,6 @@
                   <path fill="currentColor" d={mdiRepeat} />
                 </Icon>
               </IconButton>
-              <!-- <Button
-                class="button-shaped-round"
-                color="secondary"
-                on:click={() => SendRepeat()}
-                {variant}
-              >
-                <Label>{dict['Repeat'][$langs]}</Label>
-              </Button> -->
             </div>
           {/if}
 
@@ -882,19 +880,6 @@
 
       <br />
 
-      <!-- <div class="words_div accordion-container">
-        {#if !dialog_data.html && hints?.length > 0}
-          <Content style="line-height: 2.0; overflow-y:auto;">
-            {#each hints as hint, i}
-              <span class="hint_button">
-                {@html hint + '&nbsp;' + '&nbsp;'}
-              </span>
-            {/each}
-            <div style="height:0px"></div>
-          </Content>
-        {/if}
-      </div> -->
-
       {#if dialog_data.html}
         <ConText data={dialog_data} />
       {/if}
@@ -904,14 +889,14 @@
           class="material-symbols-outlined"
           style="font-size: 20px; color: blue; scale:1.5;"
         >
-          <CircularProgress style="height: 50px; width: 50px;" indeterminate />
+          <CircularProgress style="top: 100px;height: 50px; width: 50px;" indeterminate />
         </span>
       </div>
     {/if}
   </div>
 </main>
 
-<style>
+<style scoped>
   main {
     overflow-y: clip;
     transition: transform 0.3s ease-in-out;
@@ -944,7 +929,7 @@
     display: inline-flex;
     position: absolute;
     /* float: right; */
-    color:grey;
+    color: grey;
     margin-right: auto;
     font-size: smaller;
     top: 0px;
@@ -1008,7 +993,7 @@
     float: right;
     font-size: large;
     border-radius: 25px;
-    margin-right: 10px;
+    margin-right: 0px;
     margin-left: 10px;
   }
 
@@ -1071,7 +1056,7 @@
 
   .user1 {
     /* width: 100vw;*/
-    position:relative;
+    position: relative;
     text-align: center;
     line-height: normal;
     font-size: 0.8em;
@@ -1144,7 +1129,7 @@
     position: relative;
     transform-style: preserve-3d;
     transition: transform 0.5s;
-    height: 60vh;
+    height: calc(100vh - 80px);
     margin-left: 10px;
     margin-right: 10px;
   }

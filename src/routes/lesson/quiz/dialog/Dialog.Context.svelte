@@ -66,88 +66,14 @@
     }
   }
 </script>
-
-<!-- <main> -->
-<!-- <Paper> -->
-<!-- <Title></Title>
-    <Subtitle></Subtitle> -->
-<!-- <Content> -->
-<iframe srcdoc={data.html} class="html_data" 
-></iframe>
-
-<!-- <div
-        
-        on:touchend={onSelectionEnd}
-        on:mouseup={onSelectionEnd}
-      >
-        {@html data.html}
-      </div> -->
-<!-- </Content> -->
-<!-- </Paper> -->
-<!-- </main> -->
+<!-- <div> -->
+{@html data.html}
+<!-- </div> -->
 
 <style>
-  main {
-    text-align: center;
-    width: 98vw;
-    margin: 0 auto;
-  }
-  #translationOverlay {
-    display: block;
-    position: absolute;
-    line-height: 2.2;
-    width: 70%;
-    word-wrap: break-word;
-    right: 5px;
-    /* padding: 5px; */
-    /* white-space: nowrap; */
-    font-size: small;
-    height: auto;
-    color: green;
-    visibility: hidden;
-  }
-
-  .html_data {
-    display: grid;
-    position: relative;
-    overflow-y: auto;
-    width:100vw;
-    height: 70vh;
-    margin: 0 auto;
-    margin-top: 30px;
-    border: 0;
-  }
-
-  .context_div {
-    line-height: 2.2;
-    justify-content: center;
-  }
-
-  .accordion-container {
-    margin-top: 40px;
-  }
-
-  .text_container {
-    width: 90vw;
-    line-height: 50px;
-    /* font-weight: 100; */
-    margin: 0 auto;
-    text-align: justify;
-    height: 140vh;
-  }
-  .speaker_div {
-    position: fixed;
-    right: 12px;
-    top: 10vh;
-    z-index: 2;
-    border: darkgrey solid 1px;
-    border-radius: 25px;
-  }
-
   ::selection {
     /* color: rgb(27, 155, 49); */
     background: rgb(190, 201, 205);
   }
-
 
 </style>

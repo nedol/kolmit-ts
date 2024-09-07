@@ -90,7 +90,7 @@
       dialog_data.name = name;
       //DB
       fetch(
-        `./admin?prompt=dialog&quiz_name=${data.name[$llang]}&prompt_owner=${abonent}&prompt_level=${data.level}&prompt_theme=${data.theme}`
+        `./admin?prompt=dialog.${$langs}&quiz_name=${data.name[$llang]}&prompt_owner=${abonent}&prompt_level=${data.level}&prompt_theme=${data.theme}`
       )
         .then((response) => response.json())
         .then((resp) => {
@@ -107,11 +107,11 @@
           prompt = prompt.replaceAll('${data.level}', data.level);
           prompt = prompt.replaceAll('${num}', num);
 
-          dialog_data.words = JSON.stringify(
-            resp.resp.words.data
-              .map((item) => extractWords(item.example[$llang]))
-              .join(',')
-          );
+          // dialog_data.words = JSON.stringify(
+          //   resp.resp.words.data
+          //     .map((item) => extractWords(item.example[$llang]))
+          //     .join(',')
+          // );
 
           if (dialog_data.words)
             prompt = prompt.replaceAll(
@@ -149,24 +149,22 @@
   }
 
   async function TranslateContentToCurrentLang() {
-    try{
-    await Promise.all(
-      dialog_data.content.map(async (item: any) => {
-        await Promise.all(
-          Object.keys(item).map(async (key: string) => {
-            // console.log(key, item);
-            if (item[key][$llang] && !item[key][$langs]) {
-              let tr = await Translate(item[key][$llang], $llang, $langs);
-              item[key][$langs] = tr;
-              dialog_data = dialog_data;
-            }
-          })
-        );
-      })
-    );
-    }catch(ex){
-
-    }
+    try {
+      await Promise.all(
+        dialog_data.content.map(async (item: any) => {
+          await Promise.all(
+            Object.keys(item).map(async (key: string) => {
+              // console.log(key, item);
+              if (item[key][$llang] && !item[key][$langs]) {
+                let tr = await Translate(item[key][$llang], $llang, $langs);
+                item[key][$langs] = tr;
+                dialog_data = dialog_data;
+              }
+            })
+          );
+        })
+      );
+    } catch (ex) {}
   }
 
   function splitHtmlContent(inputString: string) {
@@ -260,8 +258,7 @@
   }
 
   function OnContextChange() {
-    prompt = prompt.replace(/<<(\w+)>>/g, `<<${dialog_data.html}>>`);
-    console.log();
+    prompt = prompt.replace('${dialog_data_html}', dialog_data.html);
   }
 
   function OnWordsChange() {

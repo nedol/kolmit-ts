@@ -30,7 +30,7 @@
     new_content = false,
     words_data: [];
   const name = data?.name[$llang];
-  let words = data?.module.themes[0].words,
+  let words = data?.module.themes[0].words || [],
     prompt: string,
     dialog_task: any,
     dialog_words,
@@ -40,7 +40,8 @@
   {original:'',infinitive:'',example:'',translation:{ [${$langs}]: '',  en: '' }}
   `;
 
-  let system = ``;
+  let system = ``,
+    context = '';
 
   $: if ($langs && prompt) {
     prompt = prompt.replaceAll('${output}', output);
@@ -217,9 +218,67 @@
     items = arrayMove(items, oldIndex, newIndex); // Assuming you have an arrayMove function (see below)
   }
 
+async function findWordsInText(wordAr, word) {
+
+  // Разбиваем текст на предложения
+  const sentences = context.match(/[^.!?]+[.!?]+/g) || [];
+  let result = [];
+
+  for (const sentence of sentences) {
+    for (const word of wordAr) {
+      const regex = new RegExp(`\\b(${word})\\b`, 'gi'); // Регулярное выражение для поиска слова
+      if (sentence.match(regex)) {
+        const sent = sentence.replace(regex, '<<$1>>');
+        
+        const translation = await Translate(sent, $llang, $langs); // Дожидаемся перевода
+        
+        result.push({
+          example: {
+            [$llang]: sent, // Выделяем слово в предложении
+            [$langs]: translation, // Перевод
+          },
+        });
+      }
+    }
+  }
+
+  return result;
+}
+
+
   function OnWordsChange() {
     if (words) prompt = prompt.replaceAll('${words}', words);
+
+    //words_data = findWordsInText();
   }
+
+  function OnContextChange() {
+    // words_data = findWordsInText();
+  }
+
+  async function handleSelection(event) {
+    const textArea = event.target;
+    const text = textArea.value;
+    let wordAr = []
+
+    // Получаем позицию выделенного текста
+    const selectionStart = textArea.selectionStart;
+    const selectionEnd = textArea.selectionEnd;
+
+    // Извлекаем выделенный текст
+    const selectedText = text.substring(selectionStart, selectionEnd).trim();
+
+    // Проверяем, что слово не пустое и еще не добавлено в массив
+    if (selectedText) {
+      wordAr = [...wordAr, selectedText]; // Добавляем слово в массив
+    }
+
+    const res = await findWordsInText(wordAr, selectedText);
+    words_data = words_data.concat(res);
+    
+  }
+
+
 </script>
 
 <div class="word_container">
@@ -277,7 +336,7 @@
     <div class="collapsible" in:slide={{ duration: 300 }}>
       <div class="generator_container">
         <TabBar
-          tabs={[words_title, prompt_title, content_title]}
+          tabs={[context_title, words_title, prompt_title, content_title]}
           let:tab
           bind:active
         >
@@ -285,15 +344,19 @@
             <Label>{tab}</Label>
           </Tab>
         </TabBar>
-        <!-- {#if active === 'Format'}
+        {#if active === context_title}
           <Paper variant="unelevated">
             <Content>
-              <div>
-                {@html output}
-              </div>
+              <textarea style="font-size: large;"
+                on:dblclick|preventDefault|stopPropagation ={handleSelection}
+                rows="20"
+                name="dialog_context"
+                bind:value={context}
+                on:change={OnContextChange}
+              ></textarea>
             </Content>
-          </Paper> -->
-        {#if active === 'Words'}
+          </Paper>
+        {:else if active === 'Words'}
           <Paper variant="unelevated">
             <Content>
               <textarea

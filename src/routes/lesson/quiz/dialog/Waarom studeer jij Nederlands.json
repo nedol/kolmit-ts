@@ -1,0 +1,85 @@
+{
+    "school": "CVO",
+    "lang": "nl",
+    "level": "B1",
+    "module": {
+        "themes": [
+            {
+                "name": {
+                    "nl": "Herhalingsoefeningen"
+                },
+                "lessons": [
+                    {
+                        "quizes": [
+                            {
+                                "type": "word",
+                                "name": {
+                                    "nl": "ABC-lijst normal perfectum"
+                                }
+                            },
+                            {
+                                "type": "word",
+                                "name": {
+                                    "nl": "ABC-lijst speciaal perfectum"
+                                }
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "name": {
+                    "nl": "Belgiё en mijn thuisland"
+                },
+                "lessons": [
+                    {
+                        "quizes": [
+                            {
+                                "type": "dialog",
+                                "name": {
+                                    "nl": "Waarom studeer jij Nederlands"
+                                },
+                                "grammar": [
+                                    "constructie met “om ... te”"
+                                ],
+                                "words": [
+                                    "eigenlijk",
+                                    "juf",
+                                    "verbeteren",
+                                    "vrijwilligerswerk",
+                                    "doel",
+                                    "werksituatie",
+                                    "vlotter",
+                                    "sinds kort",
+                                    "door",
+                                    "wil houden",
+                                    "aan betaalbare prijzen",
+                                    "voertaal",
+                                    "gemakkelijker",
+                                    "duidelijker"
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "name": {
+                    "nl": "Extra oefeningen"
+                },
+                "lessons": [
+                    {
+                        "quizes": [
+                            {
+                                "type": "dialog",
+                                "name": {
+                                    "nl": "Openingswoord aan het begin van de cursus"
+                                }
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+}

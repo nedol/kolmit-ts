@@ -36,7 +36,7 @@ export async function POST({ request, url, fetch }) {
 			resp = GetGroups({ owner, psw, lang });
 
 		case 'upd_lesson':
-			UpdateLesson({ owner, level, levels, data, lang });
+			resp = UpdateLesson({ owner, level, levels, data, lang });
 			break;
 	}
 	

@@ -32,6 +32,10 @@
 
   let group = getContext('group');
 
+  let no_users_display = 'block';
+
+  let users_online = 0;
+
   const headers = {
     'Content-Type': 'application/json',
     // Authorization: `Bearer ${token}`
@@ -78,30 +82,48 @@
   }
 
   function OnClickUpload() {}
-</script>
 
-<!-- <div
-	style="display:{display};    
-	height: 80vh;
-    overflow-y: scroll;"
-> -->
+  function checkUsersOnline(el) {
+    const onDisplayChange = (mutationsList:MutationRecord) => {
+      for (const mutation of mutationsList) {
+        if (mutation.attributeName === 'style') {
+          const displayValue = el.style.display;
+          if(displayValue=='block'){
+            users_online++;
+          } else{
+             users_online--
+           
+          }
+
+          if(users_online>0)
+           no_users_display = 'none'
+          else
+           no_users_display = 'block'
+        }
+      }
+    };
+    const observer = new MutationObserver(onDisplayChange);
+    observer.observe(el, { attributes: true });
+  }
+</script>
 
 <!-- {@debug operator} -->
 <div class="deps_div">
+  <span style="display:{no_users_display}">There are no users online</span>
   <div class="flexy-dad">
-    {#each group as user, i }
+    {#each group as user, i}
       {#if user}
         <br />
         <div
-          class="mdc-elevation--z{i+1} flexy-boy"
+          class="mdc-elevation--z{i + 1} flexy-boy"
           style="display:{user.display}"
           on:click={(ev) => {
             OnClickUser({ user });
           }}
+          use:checkUsersOnline
         >
           <Item style="text-align: center">
-            <User {group} bind:user_={user}  {OnClickUpload} />
-
+            <User {group} bind:user_={user} {OnClickUpload} />
             <Supporting>
               <Label>{user.name}</Label>
             </Supporting>

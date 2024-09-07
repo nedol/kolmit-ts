@@ -287,9 +287,9 @@ function SendEmail(q, new_email) {
     'nedol@narod.ru',
     q.send_mail || new_email,
     {
-      ru: 'Новый оператор сети Колми',
-      en: 'New Kolmi network operator',
-      fr: 'Le nouvel opérateur de Kolmi',
+      ru: 'Новый оператор сети Колмит',
+      en: 'New Kolmit network operator',
+      fr: 'Le nouvel opérateur de Kolmit',
     }[q.lang],
     html,
     (result) => {
