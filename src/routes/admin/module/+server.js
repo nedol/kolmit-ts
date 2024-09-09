@@ -14,7 +14,7 @@ import {
 export async function POST({ request, url, fetch }) {
 	let resp;
 
-	const { func, owner, level, name, new_name, data, lang } = await request.json();
+	const { func, owner, level, name, new_name, data, lang, context } = await request.json();
 
 	switch (func) {
     case 'upd_dlg':
@@ -24,7 +24,7 @@ export async function POST({ request, url, fetch }) {
       UpdateListen({ owner, level, name, new_name, data, lang });
       break;
     case 'upd_words':
-      UpdateWords({ owner, level, name, new_name, data, lang });
+      UpdateWords({ owner, level, name, new_name, data, lang, context });
       break;
   }
 

@@ -27,18 +27,12 @@
   } from '@smui/top-app-bar';
   import IconButton from '@smui/icon-button';
 
-  import { lesson } from '$lib/js/stores.js';
+  import { lesson , view, langs, dicts, editable, showBottomAppBar} from '$lib/js/stores.js';
 
-  import { editable } from '$lib/js/stores.js';
   $: if ($editable) {
     edited_display = $editable;
   }
 
-  import { view } from '$lib/js/stores.js';
-
-  import { langs } from '$lib/js/stores.js';
-
-  import { dicts } from '$lib/js/stores.js';
 
   $: if ($dicts) {
     console.log($dicts);
@@ -117,6 +111,7 @@
                 <Title
                   on:click={() => {
                     $view = 'group';
+                     $showBottomAppBar = true;
                   }}>{$dicts ? $dicts['CLASS'][$langs] : 'CLASS'}</Title
                 >
                 <Title
@@ -124,6 +119,7 @@
                     console.log();
                     $lesson.data = { quiz: '' };
                     $view = 'lesson';
+                    $showBottomAppBar = true;
                   }}>{$dicts ? $dicts['LESSON'][$langs] : 'LESSON'}</Title
                 >
                 <!-- <IconButton class="material-icons" aria-label="Bookmark this page">bookmark</IconButton> -->
@@ -181,6 +177,8 @@
 
   .lang_span {
     font-size: smaller;
+       bottom: -15px;
+    position: relative;
   }
 
   .lang_list {

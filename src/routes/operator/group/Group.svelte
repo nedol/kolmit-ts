@@ -3,6 +3,8 @@
   // import { getContext } from 'svelte';
   import { getContext, onMount } from 'svelte';
 
+  import { Translate } from '../../translate/Transloc.js';
+
   import Tutor from '../../tutor/Tutor.svelte';
 
   import '$lib/css/Elevation.scss';
@@ -19,7 +21,7 @@
   import pkg from 'lodash';
   const { forEach, findIndex } = pkg;
 
-  import { msg_oper, msg_user } from '$lib/js/stores.js';
+  import { users_status, langs, msg_oper, msg_user } from '$lib/js/stores.js';
 
   import User from '../../user/User.svelte';
 
@@ -27,7 +29,6 @@
 
   let cnt;
 
-  import { langs } from '$lib/js/stores.js';
   let lang = $langs;
 
   let group = getContext('group');
@@ -83,33 +84,31 @@
 
   function OnClickUpload() {}
 
-  function checkUsersOnline(el) {
-    const onDisplayChange = (mutationsList:MutationRecord) => {
-      for (const mutation of mutationsList) {
-        if (mutation.attributeName === 'style') {
-          const displayValue = el.style.display;
-          if(displayValue=='block'){
-            users_online++;
-          } else{
-             users_online--
-           
-          }
+  $: if ($users_status) {
 
-          if(users_online>0)
-           no_users_display = 'none'
-          else
-           no_users_display = 'block'
-        }
-      }
-    };
-    const observer = new MutationObserver(onDisplayChange);
-    observer.observe(el, { attributes: true });
+    Object.keys($users_status).forEach(key => {
+      const status = $users_status[key]
+      if (status !== 'inactive') 
+        users_online++;
+    });
+
+    if (users_online > 0) no_users_display = 'none';
+    else no_users_display = 'block';
+
+    users_online = 0;
+ 
   }
+
 </script>
 
 <!-- {@debug operator} -->
 <div class="deps_div">
-  <span style="display:{no_users_display}">There are no users online</span>
+  {#await Translate('Нет пользователей онлайн', 'ru', $langs) then data}
+    <span
+      style="display:{no_users_display};position: relative;top:50px;text-align: center;"
+      >{data}</span
+    >
+  {/await}
   <div class="flexy-dad">
     {#each group as user, i}
       {#if user}
@@ -120,7 +119,8 @@
           on:click={(ev) => {
             OnClickUser({ user });
           }}
-          use:checkUsersOnline
+
+
         >
           <Item style="text-align: center">
             <User {group} bind:user_={user} {OnClickUpload} />

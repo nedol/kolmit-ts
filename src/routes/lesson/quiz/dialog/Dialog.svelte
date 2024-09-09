@@ -33,6 +33,7 @@
     msg_user,
     msg_oper,
     call_but_status,
+    showBottomAppBar
   } from '$lib/js/stores.js';
 
   const dict = $dicts;
@@ -178,7 +179,9 @@
   
 
   onMount(async () => {
-
+    setTimeout(()=>{
+     $showBottomAppBar = false;
+    },1000)
   });
 
   async function init() {

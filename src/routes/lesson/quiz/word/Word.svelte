@@ -1,6 +1,7 @@
 <script>
   // @ts-nocheck
 
+
   import { onMount, onDestroy, getContext } from 'svelte';
   import TopAppBar, { Row, Title, Section } from '@smui/top-app-bar';
   import Badge from '@smui-extra/badge';
@@ -17,13 +18,12 @@
     mdiPlay,
   } from '@mdi/js';
 
-  import { llang } from '$lib/js/stores.js';
   // import words from './80.json';
   import { Translate } from '../../../translate/Transloc';
   // translate.engine = 'google';
   // translate.from = $llang;
 
-  import { langs } from '$lib/js/stores.js';
+  import {llang, langs ,dicts, lesson, showBottomAppBar } from '$lib/js/stores.js';
 
   import langs_list from '$lib/dict/learn_langs_list.json';
 
@@ -38,11 +38,7 @@
   import TTS from '../../../speech/tts/Tts.svelte';
   let tts;
 
-  import { dicts } from '$lib/js/stores.js';
-
   let dict = $dicts;
-
-  import { lesson } from '$lib/js/stores.js';
 
   export let data;
 
@@ -86,7 +82,7 @@
   )
     .then((response) => response.json())
     .then((data) => {
-      words = data.data;
+      words = data.data.data;
       if (!words[0]) return;
 
       hints = [...words];
@@ -280,7 +276,12 @@
     });
   }
 
-  onMount(async () => {});
+  onMount(async () => {
+    setTimeout(()=>{
+     $showBottomAppBar = false;
+    },1000)
+
+  });
 
   function handleBackClick() {
     $lesson.data = { quiz: '' }; // При клике на "Back" показываем компонент Lesson
@@ -687,7 +688,7 @@
       </TopAppBar>
     </div>
 
-    {#await Translate('Write translation', 'en', $langs) then data}
+    {#await Translate('Заполнить пропуски', 'ru', $langs) then data}
       <div class="title">{data}:</div>
     {/await}
 
@@ -741,7 +742,7 @@
     <div class="words_div accordion-container">
       {#if hints?.length > 0}
         <Content
-          style="line-height: 2.0; overflow-y:auto; height:50vh !important"
+          style="line-height: 2.0; overflow-y:auto;"
         >
           {#each hints as hint, i}
             {#if hint?.example[$llang]}
@@ -785,7 +786,7 @@
     position: relative;
     /* transform-style: preserve-3d; */
     transition: transform 0.5s;
-    height: 80vh;
+    /* height: 80vh; */
     margin-top: 30px;
   }
 
@@ -794,7 +795,7 @@
     /* top: 30px; */
   }
   .title {
-    color: grey;
+    color: coral;
     position: relative;
     text-align: center;
     margin-top: 60px;
@@ -813,11 +814,12 @@
 
   /* Стилизуйте компонент по вашему усмотрению */
   .word {
-    font-size: larger;
+    font-size: .8em;
     flex-direction: column;
     align-items: center;
     margin: 2px;
     text-align: center;
+        line-height: 17px;
   }
 
   .example {
@@ -854,7 +856,7 @@
 
   .input-container {
     display: inline-block;
-    font-size: larger;
+    font-size: 1em;
     position: relative;
     color: #2196f3;
     width: 95vw;
@@ -866,6 +868,7 @@
     position: relative;
     text-align: center;
     overflow-y: auto;
+    height: 70vh;
   }
 
   .input {

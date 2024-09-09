@@ -116,7 +116,7 @@
     )
       .then((response) => response.json())
       .then((data) => {
-        words = data.data;
+        words = data.data.data || [];
         if (!words[0]) return;
 
         hints[false] = JSON.parse(JSON.stringify(words));

@@ -33,10 +33,6 @@
     $langs = JSON.parse(data.cookies).lang// data.operator[0].lang;//
 
     $ice_conf = data.ice_conf;
-
-    if (data.quizes) {
-      $quiz_userst = data.quizes;
-    }
   }
 
   if (data.operator) {

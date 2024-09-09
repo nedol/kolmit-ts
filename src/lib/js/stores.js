@@ -61,3 +61,5 @@ export let user_placeholder = writable();
 export let muted = writable(true);
 
 export let audioCtx = writable();
+
+export let showBottomAppBar = writable(true);

@@ -132,6 +132,8 @@
 
   .lang_span {
     font-size: smaller;
+    bottom: -15px;
+    position: relative;
   }
 
   .lang_list {

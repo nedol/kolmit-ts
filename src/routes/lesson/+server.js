@@ -83,7 +83,6 @@ export async function GET({ url, fetch, cookies }) {
     let { data, lang, level, levels } = await GetLesson({
       owner: owner,
       operator: operator,
-      level: lvl,
     });
     let response = new Response(JSON.stringify({ data, lang, level, levels }));
     response.headers.append('Access-Control-Allow-Origin', `*`);
@@ -107,13 +106,16 @@ export async function GET({ url, fetch, cookies }) {
 /** @type {import('./$types').RequestHandler} */
 export async function POST({ request, url, fetch }) {
   let resp;
-  let abonent = url.searchParams.get('abonent');
   const { par } = await request.json();
   const q = par;
 
   switch (q.func) {
     case 'quiz_users':
       resp = await BroadcastQuizUsers(q);
+      break;
+    case 'get_subscribers':
+      resp = await GetDialog({ name: q.quiz, owner: q.abonent, level: q.level });
+      resp = resp.subscribe;
       break;
   }
 

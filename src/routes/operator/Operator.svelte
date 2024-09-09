@@ -24,7 +24,9 @@
     audioCtx,
     dicts,
     langs,
+    showBottomAppBar
   } from '$lib/js/stores.js';
+
   import CircularProgress from '@smui/circular-progress';
 
   // import {Dict} from '$lib/js/$dicts'
@@ -391,6 +393,8 @@
 
       rtc.OnCall();
 
+      $showBottomAppBar = true;
+
       remote.text.display = 'block';
       video_button_display = false;
 
@@ -475,11 +479,11 @@
 </div>
 
 <div
-  style="position: relative;
-    bottom: 15px;
-	z-index:2"
+  class="bottom-app-bar-wrapper"
+  class:hide={!$showBottomAppBar} 
+
 >
-  <BottomAppBar slot="oper" variant="static" bind:this={bottomAppBar}>
+  <BottomAppBar slot="oper"  bind:this={bottomAppBar}>
     <Section>
       <div class="remote_div">
         <div class="user_placeholder" bind:this={$user_placeholder}></div>
@@ -572,6 +576,25 @@
 </div>
 
 <style lang="scss">
+   /* Hide everything above this component. */
+
+  .bottom-app-bar-wrapper {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    transform: translateY(0); // Позиция панели по умолчанию
+    transition: transform 0.7s ease; // Плавное появление
+
+  }
+  .hide {
+    transform: translateY(100px); // Смещаем вниз
+    transition: transform 0.7s ease; // Плавное задвигание
+  }
+
+    /* Если не скрыт, панель остается на месте */
+
+
+
   .dialog {
     position: fixed;
     background-color: aliceblue;

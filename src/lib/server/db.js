@@ -150,15 +150,7 @@ export async function GetGroup(par) {
 			WHERE operators.abonent=${par.abonent} AND operator=${par.operator}
       `;
 
-  const quizes = await sql`
-			SELECT 
-			 quizes
-			FROM operators
-			WHERE operators.abonent=${par.abonent}  AND "group"=${oper[0].group} 
-      AND quizes IS NOT NULL
-      `;
-
-  return { group, oper, quizes };
+  return { group, oper };
 }
 
 export async function GetUsers(par) {
@@ -419,10 +411,10 @@ export async function GetListen(q) {
 
 export async function GetWords(q) {
   try {
-    let res = await sql`SELECT data FROM words
+    let res = await sql`SELECT data, context FROM words
 		WHERE name=${q.name} AND owner=${q.owner} AND level=${q.level}`;
     //debugger;
-    return res[0]?.data;
+    return res[0];
   } catch (ex) {
     return JSON.stringify({ func: q.func, res: ex });
   }
@@ -430,10 +422,14 @@ export async function GetWords(q) {
 
 export async function GetDialog(q) {
   try {
-    let res = await sql`SELECT dialog, html FROM dialogs
+    let res = await sql`SELECT dialog, html, subscribe FROM dialogs
 		WHERE name=${q.name} AND owner=${q.owner} AND level=${q.level}`;
 
-    return { dialog: res[0].dialog, html: res[0].html || '' };
+    return {
+      dialog: res[0].dialog,
+      html: res[0].html || '',
+      subscribe: res[0].subscribe,
+    };
   } catch (ex) {
     return JSON.stringify({ func: q.func, res: ex });
   }
@@ -487,29 +483,45 @@ export async function GetLesson(q) {
   }
 }
 
+
 export async function UpdateQuizUsers(q) {
   try {
-    let res = await sql`SELECT quizes FROM operators 
-		WHERE operator=${q.add} AND abonent=${q.abonent}`;
-    let qu = res[0].quizes;
-    if (!qu) {
-      qu = {};
-      qu[q.quiz] = [];
+    // Получаем текущие подписки в формате JSON
+    let res = await sql`SELECT subscribe FROM dialogs 
+                        WHERE name = ${q.quiz} AND owner = ${q.abonent}`;
+
+    // Извлекаем подписки, если пусто - создаем пустой массив
+    let qu = res[0]?.subscribe || [];
+
+    // Если нужно добавить новую подписку
+    if (q.add) {
+      qu.push(q.add);
     }
-    if (q.add && !qu[q.quiz].includes(q.add)) {
-      qu[q.quiz].push(q.add);
-    } else if (q.rem && qu[q.quiz].includes(q.rem)) {
-      let ind = qu[q.quiz].indexOf(q.rem);
-      qu[q.quiz].splice(1, ind);
+    // Если нужно удалить подписку
+    else if (q.rem) {
+      let index = qu.indexOf(q.rem); // находим индекс элемента
+      if (index > -1) {
+        // проверяем, что элемент найден
+        qu.splice(index, 1); // удаляем элемент
+      }
     }
 
-    res = await sql`UPDATE operators SET quizes=${qu}
-		WHERE abonent=${q.abonent} AND operator=${q.add}`;
+    // Обновляем базу данных, преобразуя массив в JSON
+    res = await sql`UPDATE dialogs 
+                    SET subscribe = ${sql.json(
+                      qu
+                    )} -- используем JSON для PostgreSQL
+                    WHERE name = ${q.quiz} AND owner = ${q.abonent}`;
 
     return qu;
-    //debugger;
-  } catch (ex) {}
+  } catch (ex) {
+    console.log(ex);
+    throw ex; // чтобы ошибка могла быть обработана выше
+  }
 }
+
+
+
 
 export async function GetDict(q) {
   try {

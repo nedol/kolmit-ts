@@ -33,6 +33,7 @@
     click_call_func,
     user_placeholder,
     msg_user,
+    users_status,
   } from '$lib/js/stores.js';
 
   $click_call_func = null;
@@ -63,6 +64,10 @@
         $call_but_status = 'inactive';
         break;
     }
+  }
+
+  $: if (status) {
+    $users_status[operator] = status;
   }
 
   let checked = false;

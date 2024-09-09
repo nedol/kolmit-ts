@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount, onDestroy, getContext } from 'svelte';
 
-  import translate from 'translate';
+ import { Translate } from '../translate/Transloc.js';
 
   import pkg from 'lodash';
   const { find, findKey, mapValues } = pkg;
@@ -25,7 +25,6 @@
     llang,
     dicts,
     msg_oper,
-    quiz_userst,
     users_status,
   } from '$lib/js/stores.js';
 
@@ -78,25 +77,24 @@
   export let data;
   let panel_disabled = true;
 
-  let containerWidth = '100%'; // Исходная ширина - 100% ширины родительского окна
-  let containerHeight = '100vh';
-
   let checked = {};
   let quiz_users = {};
 
   $: if ($users_status) {
-    BuildQuizUsers($quiz_userst);
+    console.log( quiz_users);
+   
+    // map((user) => {
+    //   BuildQuizUsers(quiz, user);
+    // });
   }
 
-  BuildQuizUsers($quiz_userst);
-
-  $: if ($msg_oper)
-    if($msg_oper['quiz_users']) {
-    // console.log($msg_oper['quiz_users']);
-    BuildQuizUsers($msg_oper.quiz_users);
-  }else if ($msg_oper['lesson'] && $msg_oper['lesson']?.level && $msg_oper['lesson']?.name && $msg_oper['lesson'].dialog_data?.name){
-    onClickQuiz($msg_oper['lesson']?.quiz,  $msg_oper['lesson']?.level, $msg_oper['lesson']?.name, $msg_oper['lesson'].dialog_data?.name);
-  }
+  // $: if ($msg_oper)
+  //   if($msg_oper['quiz_users']) {
+  //   // console.log($msg_oper['quiz_users']);
+  //   BuildQuizUsers($msg_oper.quiz_users);
+  // }else if ($msg_oper['lesson'] && $msg_oper['lesson']?.level && $msg_oper['lesson']?.name && $msg_oper['lesson'].dialog_data?.name){
+  //   onClickQuiz($msg_oper['lesson']?.quiz,  $msg_oper['lesson']?.level, $msg_oper['lesson']?.name, $msg_oper['lesson'].dialog_data?.name);
+  // }
 
   (async () => {
     const lessonData = await fetchLesson(operator.abonent, operator.operator);
@@ -106,31 +104,7 @@
     $llang = lesson_data.lang;
 
     translate.from = lesson_data.lang;
-
   })();
-
-  function BuildQuizUsers(qu) {
-    Object.keys(qu).map((quiz) => {
-      quiz_users[quiz] = [
-        {
-          name: 'Tutor',
-          src: tutor_src,
-        },
-      ];
-      // qu[quiz].quizes.map((user) => {
-      //   if (user === operator.operator) {
-      //     checked[quiz] = true;
-      //     return false;
-      //   }
-      //   let obj = find(usersPic, { operator: user });
-      //   let obj_pic = find($users[0].pictures, { operator: user });
-      //   // obj.src = obj_pic.picture;
-      //   // console.log(obj);
-      //   if ($users_status[user] !== 'inactive') quiz_users[quiz].push(obj);
-      // });
-    });
-    quiz_users = quiz_users;
-  }
 
   export async function fetchLesson(owner, operator) {
     try {
@@ -148,16 +122,7 @@
     }
   }
 
-  onMount(async () => {
-    // // Получаем ширину родительского окна при загрузке компонента
-    // const parentWidth = window.innerWidth; // Может потребоваться window.innerWidth - некоторое смещение, если у вас есть другие элементы на странице
-    // // Устанавливаем ширину контейнера равной ширине родительского окна
-    // containerWidth = parentWidth + 'px';
-    // // Получаем высоту родительского окна при загрузке компонента
-    // const parentHeight = window.innerHeight; // Может потребоваться window.innerHeight - некоторое смещение, если у вас есть другие элементы на странице
-    // // Устанавливаем высоту контейнера равной высоте родительского окна
-    // containerHeight = parentHeight + 'px';
-  });
+  onMount(async () => {});
 
   onDestroy(() => {
     data = '';
@@ -192,12 +157,13 @@
   function OnCheck(node) {
     // console.log(node.currentTarget.attributes['name'].value);
     const name = node.currentTarget.attributes['name'].value;
+    const type = node.currentTarget.attributes['type'].value;
     let par = {};
     par.proj = 'kolmit';
     par.func = 'quiz_users';
     par.abonent = operator.abonent;
     par.quiz = name;
-    if (!checked[name]) {
+    if (checked[name] === false) {
       checked[node.currentTarget.attributes['name'].value];
       let obj = find(usersPic, {
         operator: operator.operator,
@@ -208,6 +174,7 @@
           src: obj.src,
           operator: operator.operator,
           name: obj.name,
+          type: type
         });
 
       par.add = operator.operator;
@@ -242,42 +209,75 @@
       });
   }
 
-  function AddCheck(node) {
-    // console.log(node.attributes['name'].value);
-    if (!checked[node.attributes['name'].value])
-      checked[node.attributes['name'].value] = false;
-    if (!quiz_users[node.attributes['name'].value])
-      quiz_users[node.attributes['name'].value] = [];
-  }
+  function BuildQuizUsers(quiz, user, type) {
+    // Object.keys(qu).map((quiz) => {
+    //   quiz_users[quiz] = [
+    //     {
+    //       name: 'Tutor',
+    //       src: tutor_src,
+    //     },
+    //   ];
 
-  function OnClickUserCard(ev) {
-    if (ev.currentTarget.attributes['operator']) {
-      const operator = ev.currentTarget.attributes['operator'].value;
-    } else {
-      // onClickQuiz(ev);
+    if (user === operator.operator) {
+      checked[quiz] = true;
+      return;
     }
+
+    let obj = find(usersPic, { operator: user });
+    obj.type = type;
+
+
+   quiz_users[quiz].push(obj);
+
+    quiz_users = quiz_users;
   }
 
-  async function Translate(text: string, from_lang: string, to_lang: string) {
-    try {
-      translate.from = from_lang;
+  function GetSubscribers(node) {
+ 
+    let par = {};
+    par.proj = 'kolmit';
+    par.func = 'get_subscribers';
+    par.abonent = operator.abonent;
+    par.quiz = node.attributes['name'].value;
+    par.level = lesson_data.level;
+    par.type = node.attributes['type'].value;
 
-      return (
-        ($dicts[text] && $dicts[text][$langs]) ||
-        (await translate(text.trim(), to_lang))
-      );
-    } catch (error) {
-      console.error('Translation error:', error);
-      return text; // или другое подходящее значение по умолчанию
-    }
+    fetch('/lesson', {
+      method: 'POST',
+      // mode: 'no-cors',
+      body: JSON.stringify({ par }),
+      headers: { 'Content-Type': 'application/json' },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data && data.resp) {
+          checked[par.quiz] = false;
+          quiz_users[par.quiz] = [];
+          data.resp.map((user) => {
+            BuildQuizUsers(par.quiz, user, node.attributes['type'].value);
+          });
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+        return [];
+      });
+    // if (!checked[node.attributes['name'].value])
+    //   checked[node.attributes['name'].value] = false;
+    // if (!quiz_users[node.attributes['name'].value])
+    //   quiz_users[node.attributes['name'].value] = [];
   }
+
+  function OnClickUserCard(user,theme, module, quiz) {
+    console.log(user, quiz.name[$llang])
+  }
+
+
 
   async function OnThemeNameInput(theme) {
     theme.name = await Translate(theme.name[$llang], $llang, $langs);
     module = module;
   }
-
-
 </script>
 
 <main>
@@ -316,7 +316,8 @@
                         {#if quiz.name[$llang]}
                           <div
                             class="quiz-container mdc-typography--caption"
-                            use:AddCheck
+                            type= {quiz.type}
+                            use:GetSubscribers
                             name={quiz.name[$llang]}
                           >
                             {#if quiz.type === 'dialog'}
@@ -385,6 +386,7 @@
                                   <Checkbox
                                     on:click={OnCheck}
                                     name={quiz.name[$llang]}
+                                    type = {quiz.type}
                                     bind:checked={checked[quiz.name[$llang]]}
                                     touch
                                   ></Checkbox>
@@ -394,19 +396,19 @@
                           </div>
 
                           {#if quiz_users[quiz.name[$llang]] && quiz_users[quiz.name[$llang]].length > 0}
-                            <!-- {@debug quiz_users} -->
+                          
                             <div class="user-cards">
                               {#each quiz_users[quiz.name[$llang]] as qu, q}
-                                {#if qu.operator !== operator.operator}
+                          
+                                {#if 
+                                  quiz.type === qu.type && 
+                                  qu.operator !== operator.operator && 
+                                  $users_status[qu.operator] !== 'inactive'
+                                }
                                   <div
-                                    on:click={OnClickUserCard}
+                                    on:click={()=>{OnClickUserCard(qu.operator,theme, module, quiz)}}
                                     operator={qu.operator}
-                                    {t}
-                                    type={quiz.type}
-                                    name={quiz.name[$llang]}
-                                    level={module.level}
-                                    theme={theme.num}
-                                    theme_name={theme.name[$llang]}
+                                    {t}                                
                                   >
                                     <Card
                                       style="width:30px;  margin-right:15px"
@@ -479,7 +481,7 @@
     color: white;
     background-color: rgba(225, 55, 55, 0.8);
     top: 60px;
-    right: 0px;
+    left: 10px;
     transform: translate(-50%, -50%);
     z-index: 1;
   }

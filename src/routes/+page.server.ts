@@ -79,7 +79,7 @@ export async function load({ fetch, cookies, route, url, stuff }) {
 	};
 
 	let { operators, admin } = await GetUsers(params); //cc[0]; //
-	let { group, oper, quizes} = await GetGroup(params);
+	let { group, oper} = await GetGroup(params);
 
 
 	return {
@@ -91,7 +91,6 @@ export async function load({ fetch, cookies, route, url, stuff }) {
 		abonent: abonent,
 		dict: dict,
 		group: group,
-		quizes: quizes, //res && res.quiz_users ? res.quiz_users : '',
 		ice_conf: ice_conf
 	};
 }
