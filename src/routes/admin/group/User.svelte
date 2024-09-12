@@ -45,7 +45,7 @@
   let video_element, parent_div;
 
   $: if (status) {
-    $users_status[operator.operator] = status;
+    $users[operator.operator].status = status;
   }
 
   let progress = {

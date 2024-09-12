@@ -4,7 +4,7 @@ export let operatorst = writable();
 
 export let editable = writable(false);
 
-export let view = writable('group');
+export let view = writable('lesson');
 
 export let nlang = writable('en');//native lang
 
@@ -30,11 +30,7 @@ export let dicts = writable();
 
 export let credentials = writable();
 
-export let users = writable();
-
-export let users_status = writable({});
-
-export let quiz_userst = writable();
+export let users = writable({});
 
 export let call_but_status = writable('inactive');
 

@@ -14,15 +14,9 @@
 
   import poster from '$lib/images/tutor.png';
 
-  import { call_but_status } from '$lib/js/stores.js';
-
-  import { click_call_func } from '$lib/js/stores.js';
-
-  import { users_status } from '$lib/js/stores.js';
+  import { users, call_but_status, click_call_func, user_placeholder } from '$lib/js/stores.js';
 
   $click_call_func = null;
-
-  import { user_placeholder } from '$lib/js/stores.js';
 
   import pkg from 'lodash';
   const { groupBy, find } = pkg;
@@ -41,8 +35,8 @@
   let video_button_display = false;
   let video_element, parent_div;
 
-  $: if (status) {
-    $users_status[operator] = status;
+  $: if (status && operator) {
+     $users[operator].status = status;
   }
 
   let progress = {

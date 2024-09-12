@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount, onDestroy, getContext } from 'svelte';
 
- import { Translate } from '../translate/Transloc.js';
+  import { Translate } from '../translate/Transloc.js';
 
   import pkg from 'lodash';
   const { find, findKey, mapValues } = pkg;
@@ -19,14 +19,7 @@
   import Checkbox from '@smui/checkbox';
   import Quiz from './quiz/Quiz.svelte';
 
-  import {
-    users,
-    langs,
-    llang,
-    dicts,
-    msg_oper,
-    users_status,
-  } from '$lib/js/stores.js';
+  import { users, langs, llang, dicts, msg_oper,dc_user_state } from '$lib/js/stores.js';
 
   // import lesson_data from './lesson.json';
   let lesson_data: any;
@@ -35,8 +28,8 @@
   const operator = getContext('operator');
 
   function findPic(operator: any) {
-    const pic = find(group[0].pictures, { operator: operator });
-    return pic ? pic.pictures : '/assets/operator.svg';
+    const oper = find(group, { operator: operator });
+    return oper.picture || '/assets/operator.svg';
   }
 
   let usersPic = group.map((item: any) => ({
@@ -77,33 +70,14 @@
   export let data;
   let panel_disabled = true;
 
-  let checked = {};
+  let checked = { dialog: {}, word: {} };
   let quiz_users = {};
-
-  $: if ($users_status) {
-    console.log( quiz_users);
-   
-    // map((user) => {
-    //   BuildQuizUsers(quiz, user);
-    // });
-  }
-
-  // $: if ($msg_oper)
-  //   if($msg_oper['quiz_users']) {
-  //   // console.log($msg_oper['quiz_users']);
-  //   BuildQuizUsers($msg_oper.quiz_users);
-  // }else if ($msg_oper['lesson'] && $msg_oper['lesson']?.level && $msg_oper['lesson']?.name && $msg_oper['lesson'].dialog_data?.name){
-  //   onClickQuiz($msg_oper['lesson']?.quiz,  $msg_oper['lesson']?.level, $msg_oper['lesson']?.name, $msg_oper['lesson'].dialog_data?.name);
-  // }
 
   (async () => {
     const lessonData = await fetchLesson(operator.abonent, operator.operator);
     lesson_data = lessonData.data;
     module = lesson_data.module;
-
     $llang = lesson_data.lang;
-
-    translate.from = lesson_data.lang;
   })();
 
   export async function fetchLesson(owner, operator) {
@@ -163,35 +137,12 @@
     par.func = 'quiz_users';
     par.abonent = operator.abonent;
     par.quiz = name;
-    if (checked[name] === false) {
-      checked[node.currentTarget.attributes['name'].value];
-      let obj = find(usersPic, {
-        operator: operator.operator,
-      });
-
-      if (obj)
-        quiz_users[name].push({
-          src: obj.src,
-          operator: operator.operator,
-          name: obj.name,
-          type: type
-        });
-
+    par.type = type;
+    if (checked[type][name] === false) {
       par.add = operator.operator;
     } else {
-      let el = find(quiz_users[name], { operator: operator.operator });
-      try {
-        // el = '';
-        const ind = quiz_users[name].indexOf(el);
-
-        quiz_users[name].splice(ind, 1);
-        console.log(quiz_users[name]);
-      } catch (ex) {
-        console.log(ex);
-      }
       par.rem = operator.operator;
     }
-    quiz_users = quiz_users;
 
     fetch('/lesson', {
       method: 'POST',
@@ -219,21 +170,19 @@
     //   ];
 
     if (user === operator.operator) {
-      checked[quiz] = true;
+      checked[type][quiz] = true;
       return;
     }
 
     let obj = find(usersPic, { operator: user });
     obj.type = type;
 
-
-   quiz_users[quiz].push(obj);
+    quiz_users[type][quiz].push(obj);
 
     quiz_users = quiz_users;
   }
 
   function GetSubscribers(node) {
- 
     let par = {};
     par.proj = 'kolmit';
     par.func = 'get_subscribers';
@@ -241,6 +190,8 @@
     par.quiz = node.attributes['name'].value;
     par.level = lesson_data.level;
     par.type = node.attributes['type'].value;
+
+    checked[par.type] = { [par.quiz]: false };
 
     fetch('/lesson', {
       method: 'POST',
@@ -251,9 +202,9 @@
       .then((response) => response.json())
       .then((data) => {
         if (data && data.resp) {
-          checked[par.quiz] = false;
-          quiz_users[par.quiz] = [];
-          data.resp.map((user) => {
+          console.log(data);
+          quiz_users[par.type] = { [par.quiz]: [] };
+          data.resp[par.type].subscribers.map((user) => {
             BuildQuizUsers(par.quiz, user, node.attributes['type'].value);
           });
         }
@@ -262,17 +213,19 @@
         console.log(error);
         return [];
       });
-    // if (!checked[node.attributes['name'].value])
-    //   checked[node.attributes['name'].value] = false;
-    // if (!quiz_users[node.attributes['name'].value])
-    //   quiz_users[node.attributes['name'].value] = [];
   }
 
-  function OnClickUserCard(user,theme, module, quiz) {
-    console.log(user, quiz.name[$llang])
+  function OnClickUserCard(user, theme, module, quiz) {
+    console.log(user, quiz.name[$llang]);
+    if($users[user].status==='active')
+      $users[user]['OnClickCallButton']();
+    onClickQuiz(
+      quiz.type,
+      lesson_data.level,
+      theme.name[$llang],
+      quiz.name[$llang]
+    );
   }
-
-
 
   async function OnThemeNameInput(theme) {
     theme.name = await Translate(theme.name[$llang], $llang, $langs);
@@ -316,7 +269,7 @@
                         {#if quiz.name[$llang]}
                           <div
                             class="quiz-container mdc-typography--caption"
-                            type= {quiz.type}
+                            type={quiz.type}
                             use:GetSubscribers
                             name={quiz.name[$llang]}
                           >
@@ -380,14 +333,16 @@
                               highlight={quiz.highlight || ''}
                               >{quiz.name[$llang]}
                             </a><span />
-                            {#if quiz.type === 'dialog'}
+                            {#if quiz.type === 'dialog' || quiz.type === 'word'}
                               <div class="form-field-container">
                                 <FormField>
                                   <Checkbox
                                     on:click={OnCheck}
                                     name={quiz.name[$llang]}
-                                    type = {quiz.type}
-                                    bind:checked={checked[quiz.name[$llang]]}
+                                    type={quiz.type}
+                                    bind:checked={checked[quiz.type][
+                                      quiz.name[$llang]
+                                    ]}
                                     touch
                                   ></Checkbox>
                                 </FormField>
@@ -395,20 +350,21 @@
                             {/if}
                           </div>
 
-                          {#if quiz_users[quiz.name[$llang]] && quiz_users[quiz.name[$llang]].length > 0}
-                          
+                          {#if quiz_users[quiz.type] && quiz_users[quiz.type][quiz.name[$llang]] && quiz_users[quiz.type][quiz.name[$llang]].length > 0}
                             <div class="user-cards">
-                              {#each quiz_users[quiz.name[$llang]] as qu, q}
-                          
-                                {#if 
-                                  quiz.type === qu.type && 
-                                  qu.operator !== operator.operator && 
-                                  $users_status[qu.operator] !== 'inactive'
-                                }
+                              {#each quiz_users[quiz.type][quiz.name[$llang]] as qu, q}
+                                {#if quiz.type === qu.type && qu.operator !== operator.operator && $users[qu.operator].status !== 'inactive'}
                                   <div
-                                    on:click={()=>{OnClickUserCard(qu.operator,theme, module, quiz)}}
+                                    on:click={() => {
+                                      OnClickUserCard(
+                                        qu.operator,
+                                        theme,
+                                        module,
+                                        quiz
+                                      );
+                                    }}
                                     operator={qu.operator}
-                                    {t}                                
+                                    {t}
                                   >
                                     <Card
                                       style="width:30px;  margin-right:15px"

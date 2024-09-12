@@ -19,9 +19,9 @@
   import Button, { Label } from '@smui/button';
 
   import pkg from 'lodash';
-  const { forEach, findIndex } = pkg;
+  const { mapValues } = pkg;
 
-  import { users_status, langs, msg_oper, msg_user } from '$lib/js/stores.js';
+  import {  users, langs, msg_oper, msg_user } from '$lib/js/stores.js';
 
   import User from '../../user/User.svelte';
 
@@ -76,7 +76,7 @@
     // SendCheck({ func: 'check', type: 'user', abonent: operator.abonent, em: operator.em });
   });
 
-  let edited_display = false;
+
 
   function OnClickUser(user: any) {
     // console.log(user);
@@ -84,19 +84,18 @@
 
   function OnClickUpload() {}
 
-  $: if ($users_status) {
 
-    Object.keys($users_status).forEach(key => {
-      const status = $users_status[key]
-      if (status !== 'inactive') 
-        users_online++;
+  $: if (Object.keys($users).length>0) {
+
+     mapValues($users, function(o) { 
+      if(o.status !== "inactive" &&  o.status !== "busy") 
+      users_online++;
     });
 
     if (users_online > 0) no_users_display = 'none';
     else no_users_display = 'block';
 
-    users_online = 0;
- 
+    users_online = 0; 
   }
 
 </script>

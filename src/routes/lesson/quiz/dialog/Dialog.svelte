@@ -33,7 +33,7 @@
     msg_user,
     msg_oper,
     call_but_status,
-    showBottomAppBar
+    showBottomAppBar,
   } from '$lib/js/stores.js';
 
   const dict = $dicts;
@@ -47,6 +47,7 @@
     mdiMicrophoneOutline,
     mdiAccountConvertOutline,
     mdiPlay,
+    mdiThumbUpOutline,
   } from '@mdi/js';
 
   import pkg from 'lodash';
@@ -62,13 +63,14 @@
 
   const operator = getContext('operator');
 
-  let stt: any, tts:any;
+  let stt: any, tts: any;
 
   let dialog_data: any;
 
   let isFlipped = false;
 
-  let isRepeat = false;
+  let isRepeat = false,
+    isThumb = false;
 
   function flipCard() {
     isFlipped = !isFlipped;
@@ -88,8 +90,9 @@
     if (data.quiz !== 'dialog.client') init();
   }
 
-  // translate.from = $llang;
-  // translate.engine = 'google';
+  $: if (dialog_data && $call_but_status === 'talk') {
+    if (!share_mode) onShare();
+  }
 
   // llang = data.llang;
   let showSpeakerButton = false;
@@ -112,8 +115,6 @@
 
   let variant = 'outlined';
 
-  let dc = $dc_oper || $dc_user;
-
   $: if ($msg_user) {
     if ($msg_user.lesson?.quiz === 'dialog') {
       dialog_data = $msg_user.lesson.dialog_data;
@@ -125,6 +126,14 @@
       isRepeat = true;
       setTimeout(() => {
         isRepeat = false;
+      }, 2000);
+    } else if ($msg_user.command === 'thumb') {
+      isThumb = true;
+      setTimeout(() => {
+        isThumb = false;
+        if (!isFlipped) {
+          onNextQA();
+        }
       }, 2000);
     }
   }
@@ -141,6 +150,11 @@
       isRepeat = true;
       setTimeout(() => {
         isRepeat = false;
+      }, 2000);
+    } else if ($msg_oper.command === 'thumb') {
+      isThumb = true;
+      setTimeout(() => {
+        isThumb = false;
       }, 2000);
     }
   }
@@ -176,12 +190,12 @@
       break;
   }
 
-  
-
   onMount(async () => {
-    setTimeout(()=>{
-     $showBottomAppBar = false;
-    },1000)
+    setTimeout(() => {
+      if (!share_mode) {
+        $showBottomAppBar = false; //test
+      }
+    }, 5000);
   });
 
   async function init() {
@@ -221,8 +235,8 @@
   }
 
   function Dialog() {
-    if(!dialog_data.content[0]){
-        return
+    if (!dialog_data.content[0]) {
+      return;
     }
     let qa = dialog_data.content[cur_qa];
     if (!qa) {
@@ -377,6 +391,8 @@
 
     dialog_data.content[cur_qa].user2['a_shfl'] = a_shfl;
     if (dc && share_mode) SendData();
+
+    visibility_cnt = 1;
   }
 
   function onClickQ() {
@@ -498,17 +514,18 @@
     return similarity;
   }
 
-
-  function SendRepeat() {
+  function SendCommand(cmd) {
     variant = 'unelevated';
     setTimeout(() => {
       variant = 'outlined';
     }, 1000);
 
+    const dc = $dc_user || $dc_oper;
+
     if (dc)
       dc.SendData(
         {
-          command: 'repeat',
+          command: cmd,
         },
         () => {
           console.log();
@@ -540,13 +557,6 @@
 
 <!-- <VoiceRSS bind:this={voice}></VoiceRSS> -->
 <main>
-  {#if isRepeat}
-    <div class="repeat_alert">
-      <Button>
-        <Label>{dict['Repeat'][$langs]}</Label>
-      </Button>
-    </div>
-  {/if}
   <div class="top-app-bar-container flexor">
     <TopAppBar bind:this={topAppBar} variant="fixed">
       <Row>
@@ -574,17 +584,8 @@
           {/if}
         </Section>
         <Section>
-          {#if !isFlipped && share_button && $call_but_status === 'talk'}
-            <div class={share_button_class} on:click={onShare}>
-              <IconButton>
-                <Icon tag="svg" viewBox="0 0 24 24">
-                  <path fill="currentColor" d={mdiShareVariant} />
-                </Icon>
-              </IconButton>
-            </div>
-          {/if}
-        </Section>
 
+        </Section>
         <Section>
           <div class="flip_button" on:click={onChangeUserClick}>
             <IconButton>
@@ -652,25 +653,28 @@
         <div class="container">
           {#if $call_but_status == 'talk'}
             <div class="repeat_but">
-              <IconButton on:click={() => SendRepeat()}>
+              <IconButton on:click={() => SendCommand('repeat')}>
                 <Icon tag="svg" color="secondary" viewBox="0 0 24 24">
                   <path fill="currentColor" d={mdiRepeat} />
                 </Icon>
               </IconButton>
-              <!-- <Button
-                class="button-shaped-round"
-                color="secondary"
-                on:click={() => SendRepeat()}
-                {variant}
-              >
-                <Label>{dict['Repeat'][$langs]}</Label>
-              </Button> -->
             </div>
           {/if}
+
           <!-- <div class="cnt">{cur_qa + 1}</div> -->
-          {#await Translate('Cлушай вопрос', 'ru', $langs) then data}
+          {#await Translate('Послушай вопрос', 'ru', $langs) then data}
             <div class="title">{data}:</div>
           {/await}
+
+          {#if $call_but_status == 'talk'}
+            <div class="thumb_but">
+              <IconButton on:click={() => SendCommand('thumb')}>
+                <Icon tag="svg" color="secondary" viewBox="0 0 24 24">
+                  <path fill="currentColor" d={mdiThumbUpOutline} />
+                </Icon>
+              </IconButton>
+            </div>
+          {/if}
         </div>
 
         <div class="tip mdc-typography--headline6 {tip_hidden_text}">
@@ -703,6 +707,22 @@
           </div>
         </div>
 
+        {#if isThumb}
+          <div class="thumb_alert">
+            <Icon tag="svg" color="green" viewBox="0 0 24 24">
+              <path fill="currentColor" d={mdiThumbUpOutline} />
+            </Icon>
+          </div>
+        {/if}
+
+        {#if isRepeat}
+          <div class="repeat_alert">
+            <Button>
+              <Label>{dict['Repeat'][$langs]}</Label>
+            </Button>
+          </div>
+        {/if}
+
         {#await Translate('Переведи и ответь', 'ru', $langs) then data}
           <div class="title">{data}:</div>
         {/await}
@@ -720,11 +740,14 @@
         </div>
 
         <div class="user2">
-          {#if a && visibility[2] === 'hidden'}
-            {@html a[$llang].replace(/(?<!")\b[\p{L}\p{M}]+\b(?!")/gu, (match) => {
-              return `<span class="span_hidden" onclick="(this.style.color='#2196f3')" 
+          {#if a && visibility[1] === 'hidden'}
+            {@html a[$llang].replace(
+              /(?<!")\b[\p{L}\p{M}]+\b(?!")/gu,
+              (match) => {
+                return `<span class="span_hidden" onclick="(this.style.color='#2196f3')" 
                 style="display:inline-block; margin: 5px 0px; padding: 1px 5px;border:1px;border-style:groove;border-color:lightblue;color:transparent;">${match}</span>`;
-            })}
+              }
+            )}
           {:else if visibility[2] === 'visible'}
             {@html a[$llang].replace(/"([^"]*)"/g, '$1')}
           {/if}
@@ -748,10 +771,12 @@
                 on:click={onClickMicrophone}
               >
                 <Icon tag="svg" viewBox="0 0 24 24">
-                  {#if isListening}
-                    <path fill="currentColor" d={mdiMicrophone} />
-                  {:else}
-                    <path fill="currentColor" d={mdiMicrophoneOutline} />
+                  {#if !share_mode}
+                    {#if isListening}
+                      <path fill="currentColor" d={mdiMicrophone} />
+                    {:else}
+                      <path fill="currentColor" d={mdiMicrophoneOutline} />
+                    {/if}
                   {/if}
                 </Icon>
               </IconButton>
@@ -768,6 +793,22 @@
           </span>
         </div>
       {:else}
+        {#if isThumb}
+          <div class="thumb_alert">
+            <Icon tag="svg" color="green" viewBox="0 0 24 24">
+              <path fill="currentColor" d={mdiThumbUpOutline} />
+            </Icon>
+          </div>
+        {/if}
+
+        {#if isRepeat}
+          <div class="repeat_alert">
+            <Button>
+              <Label>{dict['Repeat'][$langs]}</Label>
+            </Button>
+          </div>
+        {/if}
+
         {#await Translate('Спроси', 'ru', $langs) then data}
           <div class="title">{data}:</div>
         {/await}
@@ -786,11 +827,14 @@
 
         <div class="user2">
           {#if a && visibility[1] === 'hidden'}
-            {@html a[$llang].replace(/(?<!")\b[\p{L}\p{M}]+\b(?!")/gu, (match) => {
-              return `<span class="span_hidden" onclick="(this.style.color='#2196f3')" 
+            {@html a[$llang].replace(
+              /(?<!")\b[\p{L}\p{M}]+\b(?!")/gu,
+              (match) => {
+                return `<span class="span_hidden" onclick="(this.style.color='#2196f3')" 
                 style="display:inline-block;margin: 5px 0px;border:1px;border-style:groove;border-color:light-blue;color:transparent;">${match}</span>`;
-            })}
-          {:else if visibility[2] === 'visible'}
+              }
+            )}
+          {:else if visibility[1] === 'visible'}
             {@html a[$llang].replace(/"([^"]*)"/g, '$1')}
           {/if}
 
@@ -814,10 +858,12 @@
                 on:click={onClickMicrophone}
               >
                 <Icon tag="svg" viewBox="0 0 24 24">
-                  {#if isListening}
-                    <path fill="currentColor" d={mdiMicrophone} />
-                  {:else}
-                    <path fill="currentColor" d={mdiMicrophoneOutline} />
+                  {#if !share_mode}
+                    {#if isListening}
+                      <path fill="currentColor" d={mdiMicrophone} />
+                    {:else}
+                      <path fill="currentColor" d={mdiMicrophoneOutline} />
+                    {/if}
                   {/if}
                 </Icon>
               </IconButton>
@@ -835,7 +881,7 @@
         <div class="container">
           {#if $call_but_status == 'talk'}
             <div class="repeat_but">
-              <IconButton on:click={() => SendRepeat()}>
+              <IconButton on:click={() => SendCommand('repeat')}>
                 <Icon tag="svg" color="secondary" viewBox="0 0 24 24">
                   <path fill="currentColor" d={mdiRepeat} />
                 </Icon>
@@ -846,6 +892,16 @@
           {#await Translate('Послушай ответ', 'ru', $langs) then data}
             <div class="title">{data}:</div>
           {/await}
+
+          {#if $call_but_status == 'talk'}
+            <div class="thumb_but">
+              <IconButton on:click={() => SendCommand('thumb')}>
+                <Icon tag="svg" color="secondary" viewBox="0 0 24 24">
+                  <path fill="currentColor" d={mdiThumbUpOutline} />
+                </Icon>
+              </IconButton>
+            </div>
+          {/if}
         </div>
 
         <div class="tip mdc-typography--headline6">
@@ -892,7 +948,10 @@
           class="material-symbols-outlined"
           style="font-size: 20px; color: blue; scale:1.5;"
         >
-          <CircularProgress style="top: 100px;height: 50px; width: 50px;" indeterminate />
+          <CircularProgress
+            style="top: 100px;height: 50px; width: 50px;"
+            indeterminate
+          />
         </span>
       </div>
     {/if}
@@ -913,10 +972,16 @@
 
   .repeat_alert {
     position: absolute;
-    top: 85px;
-    right: 0px;
-    scale: 0.7;
+    left: 30px;
+    /* scale: 0.7; */
     z-index: 2;
+  }
+
+  .thumb_alert {
+    position: absolute;
+    width: 30px;
+    z-index: 2;
+    right: 40px;
   }
 
   .container {
@@ -930,10 +995,20 @@
 
   .repeat_but {
     display: inline-flex;
-    position: absolute;
-    /* float: right; */
+    /* position: absolute; */
     color: grey;
-    margin-right: auto;
+    margin-left: 15px;
+    font-size: smaller;
+    top: 0px;
+    z-index: 2;
+    scale: 1;
+  }
+
+  .thumb_but {
+    display: inline-flex;
+    /* position: absolute; */
+    color: grey;
+    margin-right: 15px;
     font-size: smaller;
     top: 0px;
     z-index: 2;

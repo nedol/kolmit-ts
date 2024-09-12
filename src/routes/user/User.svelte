@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount, onDestroy, getContext } from 'svelte';
+  import { onMount, onDestroy, getContext, setContext } from 'svelte';
   import md5 from 'md5';
   import RTCUser from './rtc/RTCUser';
   import Profile from './modal/Profile.svelte';
@@ -27,13 +27,14 @@
   // const operator = getContext('operator')
 
   import {
+    users,
     signal,
     call_but_status,
     dc_user_state,
     click_call_func,
     user_placeholder,
     msg_user,
-    users_status,
+
   } from '$lib/js/stores.js';
 
   $click_call_func = null;
@@ -62,12 +63,15 @@
       //   break;
       case ('close', 'mute'):
         $call_but_status = 'inactive';
+        // $users_status[operator] = 'inactive';
+        // parent_div.appendChild(card);
         break;
     }
   }
 
   $: if (status) {
-    $users_status[operator] = status;
+
+    $users[operator].status = status;
   }
 
   let checked = false;
@@ -203,6 +207,7 @@
               rtc.DC.dc.readyState !== 'connecting')
           )
             status = 'busy';
+            
         } else if (res['close']) {
           local.video.display = 'none';
           // remote.video.display = 'none';
@@ -256,13 +261,13 @@
       status = 'inactive';
       $call_but_status = 'inactive';
       $click_call_func = null; //operator -> OnClickCallButton
-      //parent_div.appendChild(card);
+      parent_div.appendChild(card);
       // video_element.load();
       if (user_.operator === data.operator) user_.display = 'none';
     }
 
     if (data.func === 'talk') {
-      console.log('user talk', data.operator);
+
       if (data.operator === operator) {
         $call_but_status = 'talk';
         status = 'talk';
@@ -288,7 +293,9 @@
     // $call_but_status = status;
   }
 
-  let OnClickCallButton = function (ev, email) {
+
+
+  let OnClickCallButton = function () {
     // if (email && email !== rtc.operator) return;
     try {
       // Fix up for prefixing
@@ -301,6 +308,8 @@
     } catch (ex) {
       console.log('Web Audio API is not supported in this browser');
     }
+
+    console.log();
 
     switch (status) {
       case 'inactive':
@@ -334,7 +343,7 @@
         break;
       case 'call':
         status = 'inactive';
-        //user_.display = 'none'
+        user_.display = 'none'
         $call_but_status = 'inactive';
 
         local.audio.paused = true;
@@ -348,7 +357,7 @@
         break;
       case 'talk':
         status = 'inactive';
-        //user_.display = 'none'
+        user_.display = 'none'
         $call_but_status = 'inactive';
 
         local.video.display = 'none';
@@ -364,7 +373,7 @@
         break;
       case 'muted':
         status = 'inactive';
-        //user_.display = 'none'
+        user_.display = 'none'
         // $call_but_status = 'inactive';
         video_button_display = 'none';
         $click_call_func = null; //operator -> OnClickCallButton
@@ -374,7 +383,7 @@
         // rtc.Call();
         if ($call_but_status === 'talk') {
           status = 'inactive';
-          //user_.display = 'none'
+          user_.display = 'none'
           $call_but_status = 'inactive';
           rtc.OnInactive();
         }
@@ -389,6 +398,9 @@
         break;
     }
   };
+
+  $users[operator] = {'OnClickCallButton': OnClickCallButton}
+
 
   function toggle_remote_audio() {
     isRemoteAudioMute = !isRemoteAudioMute;

@@ -1,5 +1,5 @@
 /* user.kolmit.RTCUser.svelte*/
-import { writable } from 'svelte/store';
+// import { writable } from 'svelte/store';
 import { RTCBase } from './RTCBase';
 // import { getParameterByName, log } from './utils';
 
@@ -7,7 +7,7 @@ import { RTCBase } from './RTCBase';
 // import { SignalingChannel } from './signalingChannel.js';
 import { langs } from '$lib/js/stores.js';
 
-import { msg_user } from '$lib/js/stores.js';
+import { users, msg_user } from '$lib/js/stores.js';
 
 // export const msg = writable('');
 
@@ -37,6 +37,8 @@ export default class RTCUser extends RTCBase {
 				console.log(ex);
 			}
 		});
+
+		users.msg
 	}
 
 	Init(cb) {

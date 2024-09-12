@@ -12,10 +12,12 @@
 
   import { mdiAccountBox, mdiVolumeHigh, mdiVolumeOff } from '@mdi/js';
 
- 
   import {
-    view,posterst,
-    lesson,signal,
+    users,
+    view,
+    posterst,
+    lesson,
+    signal,
     click_call_func,
     dc_oper_state,
     call_but_status,
@@ -24,7 +26,7 @@
     audioCtx,
     dicts,
     langs,
-    showBottomAppBar
+    showBottomAppBar,
   } from '$lib/js/stores.js';
 
   import CircularProgress from '@smui/circular-progress';
@@ -55,24 +57,23 @@
 
   import md5 from 'md5';
 
-/*TODO: дает*/
-  $:if($dc_oper_state){
-    switch($dc_oper_state){
-    // case 'open':
-    //   break;
-    case 'close':
-      $call_but_status = 'inactive'
-      break;    
-    
-    case 'mute':
-      $call_but_status = 'inactive'
-      break;    
+  /*TODO: дает*/
+  $: if ($dc_oper_state) {
+    switch ($dc_oper_state) {
+      // case 'open':
+      //   break;
+      case 'close':
+        $call_but_status = 'inactive';
+        break;
+
+      case 'mute':
+        $call_but_status = 'inactive';
+        break;
     }
   }
 
-  import { msg_user } from '$lib/js/stores.js';
-  $: if ($msg_user) {
-    OnMessage($msg_user, null);
+  $: if ($users[uid] && $users[uid].msg) {
+    OnMessage($users[uid].msg, null);
   }
 
   import { msg_oper } from '$lib/js/stores.js';
@@ -111,7 +112,6 @@
     lesson_display: string,
     chat_display = 'block';
 
-
   $call_but_status = 'inactive';
 
   import { editable } from '$lib/js/stores.js';
@@ -123,7 +123,6 @@
   operator.type = 'operator';
   const abonent = operator.abonent;
   const name = operator.name;
-
 
   const uid = md5(operator);
 
@@ -296,13 +295,12 @@
   }
 
   function OnClickCallButton() {
- 
     // if($call_but_status==undefined)
     //   $call_but_status = 'inactive'
     switch ($call_but_status) {
       case 'inactive':
         rtc.Offer();
-       
+
         $call_but_status = 'active';
         break;
 
@@ -338,6 +336,8 @@
         remote.text.email = '';
         $call_but_status = 'inactive';
         rtc.OnInactive();
+        $users = $users;
+
         break;
       case 'muted':
         $call_but_status = 'inactive';
@@ -399,7 +399,6 @@
       video_button_display = false;
 
       if (data.profile) {
-
         $posterst = data.profile.img;
         if (data.profile.img) remote.video.display = 'block';
 
@@ -437,7 +436,6 @@
 
       if ($call_but_status === 'talk') {
         rtc.OnInactive();
-        
       } else if ($call_but_status === 'call') {
         rtc.OnHangup();
         // Group.GetUsers();
@@ -451,7 +449,7 @@
 
     if (data.lesson) {
       $view = 'lesson';
-      $lesson.data = data.lesson;      
+      $lesson.data = data.lesson;
     }
   }
 
@@ -478,12 +476,8 @@
   <Chat></Chat>
 </div>
 
-<div
-  class="bottom-app-bar-wrapper"
-  class:hide={!$showBottomAppBar} 
-
->
-  <BottomAppBar slot="oper"  bind:this={bottomAppBar}>
+<div class="bottom-app-bar-wrapper" class:hide={!$showBottomAppBar}>
+  <BottomAppBar slot="oper" bind:this={bottomAppBar}>
     <Section>
       <div class="remote_div">
         <div class="user_placeholder" bind:this={$user_placeholder}></div>
@@ -495,7 +489,6 @@
           on:click={OnClickCallButton}
           on:mute
           bind:isRemoteAudioMute
-    
         ></VideoRemote>
         {#if $call_but_status === 'talk'}
           <div class="speaker-button">
@@ -522,9 +515,7 @@
       {/if}
     </Section>
     <Section>
-      <CallButton
-        on:click={$click_call_func}
-      >
+      <CallButton on:click={$click_call_func}>
         <b
           class="call_cnt"
           style="display:none;position: relative;left:22px;top:10px;color:#0e0cff;font-size: 12px;"
@@ -576,7 +567,7 @@
 </div>
 
 <style lang="scss">
-   /* Hide everything above this component. */
+  /* Hide everything above this component. */
 
   .bottom-app-bar-wrapper {
     position: fixed;
@@ -584,16 +575,13 @@
     width: 100%;
     transform: translateY(0); // Позиция панели по умолчанию
     transition: transform 0.7s ease; // Плавное появление
-
   }
   .hide {
     transform: translateY(100px); // Смещаем вниз
     transition: transform 0.7s ease; // Плавное задвигание
   }
 
-    /* Если не скрыт, панель остается на месте */
-
-
+  /* Если не скрыт, панель остается на месте */
 
   .dialog {
     position: fixed;

@@ -114,8 +114,20 @@ export async function POST({ request, url, fetch }) {
       resp = await BroadcastQuizUsers(q);
       break;
     case 'get_subscribers':
-      resp = await GetDialog({ name: q.quiz, owner: q.abonent, level: q.level });
-      resp = resp.subscribe;
+      if (q.type === 'dialog') {
+        const dlg = await GetDialog({ name: q.quiz, owner: q.abonent, level: q.level });
+        if (dlg.subscribe?.length > 0)
+          resp = {
+            [q.type]: { quiz: dlg.dialog?.name, subscribers: dlg.subscribe },
+          };
+      } else if (q.type === 'word') {
+         
+        const dlg = await GetWords({ name: q.quiz, owner: q.abonent, level: q.level });
+        if (dlg.subscribe?.length > 0)
+          resp = {
+            [q.type]: { quiz: dlg.dialog?.name, subscribers: dlg.subscribe },
+          };
+      }
       break;
   }
 
@@ -126,7 +138,7 @@ export async function POST({ request, url, fetch }) {
 
 async function BroadcastQuizUsers(q) {
   let qu = await UpdateQuizUsers(q);
-  let remAr = [{ quiz_users: qu }];
+  let remAr = [ q ];
 
   for (let operator in global.rtcPool['operator'][q.abonent]) {
     if (operator === q.operator && q.status === 'inactive')

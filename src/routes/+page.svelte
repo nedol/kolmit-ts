@@ -9,7 +9,7 @@
   import { langs } from '$lib/js/stores.js';
   import { ice_conf } from '$lib/js/stores.js';
   import { dicts } from '$lib/js/stores.js';
-  import { quiz_userst } from '$lib/js/stores.js';
+
   export let data;
   let operator, abonent, name, user_pic;
 
