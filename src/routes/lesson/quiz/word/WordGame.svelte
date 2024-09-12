@@ -38,7 +38,7 @@
 
   import {
     lesson,
-    llang, 
+    llang,
     view,
     dicts,
     dc_oper,
@@ -153,7 +153,7 @@
     ) {
       hints[isFlipped][$msg_user.lesson.word_correct].disabled = 'disabled';
       hint_example = '';
-       doneWords_2 = $msg_user.lesson.done_words;
+      doneWords_2 = $msg_user.lesson.done_words;
     } else if (
       ($msg_user.lesson.word_error || $msg_user.lesson.word_error == 0) &&
       hints
@@ -207,11 +207,11 @@
     ) {
       hints[isFlipped][$msg_oper.lesson.word_correct].disabled = 'disabled';
       hint_example = '';
-       doneWords_2 = $msg_oper.lesson.done_words;
+      doneWords_2 = $msg_oper.lesson.done_words;
     } else if (
       ($msg_oper.lesson.word_error || $msg_oper.lesson.word_error == 0) &&
       hints
-    ) {     
+    ) {
       // hints[isFlipped][$msg_user.lesson.word_correct].disabled = 'disabled';
       hint_example = '';
     } else if ($msg_oper.lesson.word_flip) {
@@ -440,7 +440,7 @@
       arSpan.forEach((el, i) => {
         if (word.includes(el.attributes.value.nodeValue.toLowerCase())) {
           userContent[i] = el.attributes.value.nodeValue;
-           el.style.width = getTextWidth(userContent[i],'20px Arial')
+          el.style.width = getTextWidth(userContent[i], '20px Arial');
         } else {
           userContent[i] = words[i] ? words[i] : '';
         }
@@ -451,13 +451,13 @@
   }
 
   async function SendData(data) {
-  let dc = null;
+    let dc = null;
 
-  if ($dc_user?.dc.readyState === 'open') {
-    dc = $dc_user;
-  } else if ($dc_oper?.dc.readyState === 'open') {
-    dc = $dc_oper;
-  }
+    if ($dc_user?.dc.readyState === 'open') {
+      dc = $dc_user;
+    } else if ($dc_oper?.dc.readyState === 'open') {
+      dc = $dc_oper;
+    }
     if (share_mode && dc) {
       //  words.content[cur_qa].user2['a_shfl'] = a_shfl;
       await dc.SendData(data, (ex) => {
@@ -468,9 +468,9 @@
 
   onMount(async () => {});
 
-  function handleBackClick() {
-    $lesson.data = { quiz: '' }; // При клике на "Back" показываем компонент Lesson
-  }
+  // function handleBackClick() {
+  //   $lesson.data = { quiz: '' }; // При клике на "Back" показываем компонент Lesson
+  // }
 
   function shuffle(array) {
     for (let i = array.length - 1; i > 0; i--) {
@@ -571,16 +571,16 @@
 
     if (thisErrorIndex < 1) {
       if (errorIndex < 1) {
-          doneWords++;
+        doneWords++;
         const data = {
           lesson: {
             quiz: 'word',
             word_correct: currentWordIndex,
-            done_words:doneWords
+            done_words: doneWords,
           },
         };
         SendData(data);
-      
+
         errorIndex = 0;
         label[true] = 'Нажми "Вперед"';
         // speak(currentWord.example[$llang]);TODO: для fr
@@ -591,13 +591,13 @@
           lesson: {
             quiz: 'word',
             word_error: currentWordIndex,
-            done_words:doneWords
+            done_words: doneWords,
           },
         };
         SendData(data);
         label[true] = 'Нажми "Вперед"';
-           showHints[isFlipped] = false;
-           showNextButton = true;
+        showHints[isFlipped] = false;
+        showNextButton = true;
       }
     } else {
       errorIndex++;
@@ -674,7 +674,7 @@
     const data = {
       lesson: {
         quiz: 'word',
-        word_flip: isFlipped
+        word_flip: isFlipped,
       },
     };
     SendData(data);
@@ -744,8 +744,8 @@
   onDestroy(() => {
     // Очищаем интервал при размонтировании компонента
     $llang = _llang;
-    $view = 'lesson'
-     $lesson.data = { quiz: '' };
+    $view = 'lesson';
+    $lesson.data = { quiz: '' };
     console.log('Компонент размонтирован');
   });
 </script>
@@ -767,7 +767,6 @@
     </span>
   </div>
 {:else}
-
   <main>
     <div class="top-app-bar-container flexor">
       <TopAppBar bind:this={topAppBar} variant="fixed">
@@ -897,9 +896,7 @@
       {#await Translate(label[isFlipped], 'ru', $langs) then data}
         <div class="title">{data}</div>
       {/await}
-
     {:else}
-
       {#await Translate(label[isFlipped], 'ru', $langs) then data}
         <div class="title">{data}:</div>
       {/await}
@@ -923,16 +920,12 @@
                   on:click={() => {
                     OnClickHint(
                       this,
-                      extractWords(
-                        hint.example[$llang]
-                      ).join(' '),
+                      extractWords(hint.example[$llang]).join(' '),
                       i
                     );
                   }}
                 >
-                  {@html extractWords(
-                    hint.example[$llang]
-                  ).join(' ') +
+                  {@html extractWords(hint.example[$llang]).join(' ') +
                     '&nbsp;' +
                     '&nbsp;'}
                 </span>
@@ -972,9 +965,7 @@
                   );
                 }}
               >
-                {@html extractWords(
-                  hint?.example[$langs]
-                ).join(' ') +
+                {@html extractWords(hint?.example[$langs]).join(' ') +
                   '&nbsp;' +
                   '&nbsp;'}
               </span>

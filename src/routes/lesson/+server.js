@@ -41,7 +41,6 @@ export async function GET({ url, fetch, cookies }) {
       theme: theme,
       title: title,
     });
-
   } else if (dict) {
     const theme = url.searchParams.get('theme');
     // let resp = await fetch('/src/routes/operator/operator/lesson/' + path);
@@ -54,32 +53,34 @@ export async function GET({ url, fetch, cookies }) {
     // let data = await resp.text();
     // let items = text.split('\r\n');
     //debugger;
-
   } else if (words) {
     const theme = url.searchParams.get('theme');
     const name = url.searchParams.get('name');
     const owner = url.searchParams.get('owner');
     const level = url.searchParams.get('level');
-    data = await GetWords({ theme: theme, name: name, owner: owner, level: level });
-    
+    data = await GetWords({
+      theme: theme,
+      name: name,
+      owner: owner,
+      level: level,
+    });
+
     let response = new Response(JSON.stringify({ data }));
     response.headers.append('Access-Control-Allow-Origin', `*`);
     return response;
-
   } else if (dialog) {
     let name = dialog;
     let owner = url.searchParams.get('owner');
     let level = url.searchParams.get('level');
-    data = await GetDialog({ name: name, owner: owner, level:level });
+    data = await GetDialog({ name: name, owner: owner, level: level });
 
     let response = new Response(JSON.stringify({ data }));
     response.headers.append('Access-Control-Allow-Origin', `*`);
     return response;
-
   } else if (lesson) {
     let owner = url.searchParams.get('owner');
     let operator = lesson;
-    
+
     let { data, lang, level, levels } = await GetLesson({
       owner: owner,
       operator: operator,
@@ -87,13 +88,12 @@ export async function GET({ url, fetch, cookies }) {
     let response = new Response(JSON.stringify({ data, lang, level, levels }));
     response.headers.append('Access-Control-Allow-Origin', `*`);
     return response;
-
   } else if (listen) {
     let name = url.searchParams.get('listen');
     let owner = url.searchParams.get('owner');
     let lang = url.searchParams.get('lang');
-    data = await GetListen({name: name, owner: owner ,lang:lang});
-    
+    data = await GetListen({ name: name, owner: owner, lang: lang });
+
     let response = new Response(JSON.stringify({ data }));
     response.headers.append('Access-Control-Allow-Origin', `*`);
     return response;
@@ -115,14 +115,21 @@ export async function POST({ request, url, fetch }) {
       break;
     case 'get_subscribers':
       if (q.type === 'dialog') {
-        const dlg = await GetDialog({ name: q.quiz, owner: q.abonent, level: q.level });
+        const dlg = await GetDialog({
+          name: q.quiz,
+          owner: q.abonent,
+          level: q.level,
+        });
         if (dlg.subscribe?.length > 0)
           resp = {
             [q.type]: { quiz: dlg.dialog?.name, subscribers: dlg.subscribe },
           };
       } else if (q.type === 'word') {
-         
-        const dlg = await GetWords({ name: q.quiz, owner: q.abonent, level: q.level });
+        const dlg = await GetWords({
+          name: q.quiz,
+          owner: q.abonent,
+          level: q.level,
+        });
         if (dlg.subscribe?.length > 0)
           resp = {
             [q.type]: { quiz: dlg.dialog?.name, subscribers: dlg.subscribe },
@@ -138,7 +145,7 @@ export async function POST({ request, url, fetch }) {
 
 async function BroadcastQuizUsers(q) {
   let qu = await UpdateQuizUsers(q);
-  let remAr = [ q ];
+  let remAr = [q];
 
   for (let operator in global.rtcPool['operator'][q.abonent]) {
     if (operator === q.operator && q.status === 'inactive')

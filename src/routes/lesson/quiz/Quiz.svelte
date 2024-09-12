@@ -10,7 +10,6 @@
   import { dc_oper } from '$lib/js/stores.js';
   import { dc_user } from '$lib/js/stores.js';
   import { call_but_status } from '$lib/js/stores.js';
-  const dc = $dc_user || $dc_oper;
 
   export let data;
   let quiz = data.quiz;
@@ -36,10 +35,9 @@
   {:else if quiz === 'text'}
     <Text {data} />
   {:else if quiz === 'word'}
-    {#if  dc && $call_but_status === 'talk' }
+    {#if ($dc_user || $dc_oper) && $call_but_status === 'talk' }
        <WordGame {data} />
-    {:else}  
-    
+    {:else}      
       <Word {data} /> 
     {/if}
   {/if}

@@ -148,7 +148,7 @@ async function removeModule(item) {
 
 export async function UpdateDialog(q) {
   try {
-    let res = await sql`INSERT INTO dialogs
+    let res = await sql`INSERT INTO dialog
 			(name , dialog, owner, html, level)
 			VALUES(${q.new_name},${q.data},${q.owner},${q.data.html || ''}, ${q.level}  )
 			ON CONFLICT (name, owner, level)
@@ -178,7 +178,7 @@ export async function UpdateListen(q) {
 
 export async function UpdateWords(q) {
   try {
-    let res = await sql`INSERT INTO words
+    let res = await sql`INSERT INTO word
 			(name , data, owner, level,context)
 			VALUES(${q.new_name},${q.data},${q.owner}, ${q.level}, ${q.context})
 			ON CONFLICT (name, owner, level)
@@ -197,7 +197,7 @@ export async function GetPrompt(prompt, quiz_name, owner, level, theme) {
   let prompt_res, words_res, gram_res, gram;
   try {
     prompt_res = await sql`SELECT * FROM prompts WHERE name=${prompt}`;
-    words_res = await sql`SELECT * FROM words, context WHERE name=${quiz_name}`;
+    words_res = await sql`SELECT * FROM word, context WHERE name=${quiz_name}`;
     gram_res =
       await sql`SELECT * FROM grammar WHERE owner=${owner} AND level=${level}`;
     gram = find(gram_res[0].data, { theme: theme });

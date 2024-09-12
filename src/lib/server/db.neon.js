@@ -402,7 +402,7 @@ export async function GetText(q) {
 
 export async function GetWords(q) {
 	try {
-		let res = await sql`SELECT data FROM words
+		let res = await sql`SELECT data FROM word
 		WHERE name=${q.name} AND owner=${q.owner}`;
 		//debugger;
 		return res[0].data;

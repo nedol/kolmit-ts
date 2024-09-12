@@ -19,7 +19,14 @@
   import Checkbox from '@smui/checkbox';
   import Quiz from './quiz/Quiz.svelte';
 
-  import { users, langs, llang, dicts, msg_oper,dc_user_state } from '$lib/js/stores.js';
+  import {
+    users,
+    langs,
+    llang,
+    dicts,
+    msg_oper,
+    dc_user_state,
+  } from '$lib/js/stores.js';
 
   // import lesson_data from './lesson.json';
   let lesson_data: any;
@@ -71,7 +78,7 @@
   let panel_disabled = true;
 
   let checked = { dialog: {}, word: {} };
-  let quiz_users = {};
+  let quiz_users = { dialog: {}, word: {} };
 
   (async () => {
     const lessonData = await fetchLesson(operator.abonent, operator.operator);
@@ -88,6 +95,7 @@
       if (!response.ok) {
         throw new Error('Failed to fetch data');
       }
+
       const data = await response.json();
       return data;
     } catch (error) {
@@ -138,7 +146,7 @@
     par.abonent = operator.abonent;
     par.quiz = name;
     par.type = type;
-    if (checked[type][name] === false) {
+    if (checked[type][name] === false || checked[type][name] === null) {
       par.add = operator.operator;
     } else {
       par.rem = operator.operator;
@@ -177,9 +185,10 @@
     let obj = find(usersPic, { operator: user });
     obj.type = type;
 
-    quiz_users[type][quiz].push(obj);
-
-    quiz_users = quiz_users;
+    if(!find(quiz_users[type][quiz], obj)) {
+      quiz_users[type][quiz].push(obj);
+      quiz_users[type][quiz] = quiz_users[type][quiz];
+    }
   }
 
   function GetSubscribers(node) {
@@ -191,7 +200,9 @@
     par.level = lesson_data.level;
     par.type = node.attributes['type'].value;
 
-    checked[par.type] = { [par.quiz]: false };
+    checked[par.type][par.quiz] = false;
+
+    if (!quiz_users[par.type][par.quiz]) quiz_users[par.type][par.quiz] = [];
 
     fetch('/lesson', {
       method: 'POST',
@@ -202,8 +213,6 @@
       .then((response) => response.json())
       .then((data) => {
         if (data && data.resp) {
-          console.log(data);
-          quiz_users[par.type] = { [par.quiz]: [] };
           data.resp[par.type].subscribers.map((user) => {
             BuildQuizUsers(par.quiz, user, node.attributes['type'].value);
           });
@@ -217,8 +226,7 @@
 
   function OnClickUserCard(user, theme, module, quiz) {
     console.log(user, quiz.name[$llang]);
-    if($users[user].status==='active')
-      $users[user]['OnClickCallButton']();
+    if ($users[user].status === 'active') $users[user]['OnClickCallButton']();
     onClickQuiz(
       quiz.type,
       lesson_data.level,
@@ -350,10 +358,10 @@
                             {/if}
                           </div>
 
-                          {#if quiz_users[quiz.type] && quiz_users[quiz.type][quiz.name[$llang]] && quiz_users[quiz.type][quiz.name[$llang]].length > 0}
+                          {#if quiz_users[quiz.type] && quiz_users[quiz.type][quiz.name[$llang]]}
                             <div class="user-cards">
                               {#each quiz_users[quiz.type][quiz.name[$llang]] as qu, q}
-                                {#if quiz.type === qu.type && qu.operator !== operator.operator && $users[qu.operator].status !== 'inactive'}
+                                {#if $users[qu.operator].status !== 'inactive'}
                                   <div
                                     on:click={() => {
                                       OnClickUserCard(

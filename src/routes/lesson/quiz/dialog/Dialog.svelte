@@ -541,7 +541,7 @@
     stt_text = '';
     stt = '';
     tts = '';
-    // $view = 'lesson';
+    $view = 'lesson';
     $lesson.data = { quiz: '' };
   });
 </script>
@@ -583,9 +583,7 @@
             {/if}
           {/if}
         </Section>
-        <Section>
-
-        </Section>
+        <Section></Section>
         <Section>
           <div class="flip_button" on:click={onChangeUserClick}>
             <IconButton>
@@ -752,39 +750,42 @@
             {@html a[$llang].replace(/"([^"]*)"/g, '$1')}
           {/if}
 
-          <!-- {#if showSpeakerButton} -->
-          <div class="speaker-button">
-            <IconButton on:click={speak(a[$llang])}>
-              <Icon tag="svg" viewBox="0 0 24 24">
-                <path fill="currentColor" d={mdiPlay} />
-              </Icon>
-            </IconButton>
-          </div>
-          <div
-            class="margins"
-            style="text-align: center; display: flex; align-items: center; justify-content: space-between;"
-          >
-            <div>
-              <IconButton
-                class="material-icons"
-                aria-label="Back"
-                on:click={onClickMicrophone}
-              >
+          
+            <div class="speaker-button">
+              <IconButton on:click={speak(a[$llang])}>
                 <Icon tag="svg" viewBox="0 0 24 24">
-                  {#if !share_mode}
+                  <path fill="currentColor" d={mdiPlay} />
+                </Icon>
+              </IconButton>
+            </div>
+            {#if !share_mode}
+            <div
+              class="margins"
+              style="text-align: center; display: flex; align-items: center; justify-content: space-between;"
+            >
+              <div>
+                <IconButton
+                  class="material-icons"
+                  aria-label="Back"
+                  on:click={onClickMicrophone}
+                >
+                  <Icon tag="svg" viewBox="0 0 24 24">
                     {#if isListening}
                       <path fill="currentColor" d={mdiMicrophone} />
                     {:else}
                       <path fill="currentColor" d={mdiMicrophoneOutline} />
                     {/if}
-                  {/if}
-                </Icon>
-              </IconButton>
+                  </Icon>
+                </IconButton>
+              </div>
+              <Stt
+                bind:this={stt}
+                {SttResult}
+                {StopListening}
+                bind:display_audio
+              ></Stt>
             </div>
-            <Stt bind:this={stt} {SttResult} {StopListening} bind:display_audio
-            ></Stt>
-          </div>
-          <!-- {/if} -->
+          {/if}
         </div>
 
         <div style="text-align: center;   margin-top: 10px;">
@@ -838,39 +839,42 @@
             {@html a[$llang].replace(/"([^"]*)"/g, '$1')}
           {/if}
 
-          <!-- {#if showSpeakerButton} -->
-          <div class="speaker-button">
-            <IconButton on:click={speak(a[$llang])}>
-              <Icon tag="svg" viewBox="0 0 24 24">
-                <path fill="currentColor" d={mdiPlay} />
-              </Icon>
-            </IconButton>
-          </div>
-          <!-- {/if} -->
-          <div
-            class="margins"
-            style="text-align: center; display: flex; align-items: center; justify-content: space-between;"
-          >
-            <div>
-              <IconButton
-                class="material-icons"
-                aria-label="Back"
-                on:click={onClickMicrophone}
-              >
+        
+            <div class="speaker-button">
+              <IconButton on:click={speak(a[$llang])}>
                 <Icon tag="svg" viewBox="0 0 24 24">
-                  {#if !share_mode}
+                  <path fill="currentColor" d={mdiPlay} />
+                </Icon>
+              </IconButton>
+            </div>
+              {#if !share_mode}
+            <div
+              class="margins"
+              style="text-align: center; display: flex; align-items: center; justify-content: space-between;"
+            >
+              <div>
+                <IconButton
+                  class="material-icons"
+                  aria-label="Back"
+                  on:click={onClickMicrophone}
+                >
+                  <Icon tag="svg" viewBox="0 0 24 24">
                     {#if isListening}
                       <path fill="currentColor" d={mdiMicrophone} />
                     {:else}
                       <path fill="currentColor" d={mdiMicrophoneOutline} />
                     {/if}
-                  {/if}
-                </Icon>
-              </IconButton>
+                  </Icon>
+                </IconButton>
+              </div>
+              <Stt
+                bind:this={stt}
+                {SttResult}
+                {StopListening}
+                bind:display_audio
+              ></Stt>
             </div>
-            <Stt bind:this={stt} {SttResult} {StopListening} bind:display_audio
-            ></Stt>
-          </div>
+          {/if}
         </div>
 
         <div style="text-align: center;   margin-top: 10px; ">

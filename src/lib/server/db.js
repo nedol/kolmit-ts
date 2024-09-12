@@ -411,7 +411,7 @@ export async function GetListen(q) {
 
 export async function GetWords(q) {
   try {
-    let res = await sql`SELECT data, context FROM words
+    let res = await sql`SELECT data, context, subscribe FROM word
 		WHERE name=${q.name} AND owner=${q.owner} AND level=${q.level}`;
     //debugger;
     return res[0];
@@ -483,12 +483,17 @@ export async function GetLesson(q) {
   }
 }
 
-
 export async function UpdateQuizUsers(q) {
+  let res;
   try {
     // Получаем текущие подписки в формате JSON
-    let res = await sql`SELECT subscribe FROM dialogs 
-                        WHERE name = ${q.quiz} AND owner = ${q.abonent}`;
+
+    if (q.type == 'dialog')
+      res =
+        await sql`SELECT subscribe FROM dialogs WHERE name = ${q.quiz} AND owner = ${q.abonent}`;
+    else if (q.type == 'word')
+      res =
+        await sql`SELECT subscribe FROM word WHERE name = ${q.quiz} AND owner = ${q.abonent}`;
 
     // Извлекаем подписки, если пусто - создаем пустой массив
     let qu = res[0]?.subscribe || [];
@@ -507,7 +512,14 @@ export async function UpdateQuizUsers(q) {
     }
 
     // Обновляем базу данных, преобразуя массив в JSON
-    res = await sql`UPDATE dialogs 
+    if (q.type == 'dialog')
+      res = await sql`UPDATE dialogs 
+                    SET subscribe = ${sql.json(
+                      qu
+                    )} -- используем JSON для PostgreSQL
+                    WHERE name = ${q.quiz} AND owner = ${q.abonent}`;
+    else if (q.type == 'word')
+      res = await sql`UPDATE word 
                     SET subscribe = ${sql.json(
                       qu
                     )} -- используем JSON для PostgreSQL
@@ -519,9 +531,6 @@ export async function UpdateQuizUsers(q) {
     throw ex; // чтобы ошибка могла быть обработана выше
   }
 }
-
-
-
 
 export async function GetDict(q) {
   try {
