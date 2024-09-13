@@ -147,8 +147,9 @@ async function BroadcastQuizUsers(q) {
   let qu = await UpdateQuizUsers(q);
   let remAr = [q];
 
+
   for (let operator in global.rtcPool['operator'][q.abonent]) {
-    if (operator === q.operator && q.status === 'inactive')
+    if (operator === q.rem || operator === q.add)
       //not to send to yourself
       continue;
 

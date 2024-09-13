@@ -22,7 +22,7 @@
   let operator = user_.operator;
   let abonent = user_.abonent;
 
-  user_.display = 'none'; //видимость в группе
+  // user_.display = 'none'; //видимость в группе
 
   // const operator = getContext('operator')
 
@@ -70,7 +70,6 @@
   }
 
   $: if (status) {
-
     $users[operator].status = status;
   }
 

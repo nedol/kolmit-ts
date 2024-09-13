@@ -79,7 +79,9 @@ export async function load({ fetch, cookies, route, url, stuff }) {
 	};
 
 	let { operators, admin } = await GetUsers(params); //cc[0]; //
-	let { group, oper} = await GetGroup(params);
+	let { group, oper } = await GetGroup(params);
+	
+	
 
 
 	return {

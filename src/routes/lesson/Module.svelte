@@ -4,7 +4,7 @@
   import { Translate } from '../translate/Transloc.js';
 
   import pkg from 'lodash';
-  const { find, findKey, mapValues } = pkg;
+  const { find, findIndex, remove } = pkg;
   import IconButton, { Icon } from '@smui/icon-button';
   import Card, { PrimaryAction, Media, MediaContent } from '@smui/card';
   import {
@@ -26,6 +26,7 @@
     dicts,
     msg_oper,
     dc_user_state,
+    showBottomAppBar,
   } from '$lib/js/stores.js';
 
   // import lesson_data from './lesson.json';
@@ -80,6 +81,19 @@
   let checked = { dialog: {}, word: {} };
   let quiz_users = { dialog: {}, word: {} };
 
+  $: if ($msg_oper?.add) {
+    console.log($msg_oper);
+    BuildQuizUsers($msg_oper.quiz, $msg_oper.add, $msg_oper.type);
+    $msg_oper.add = '';
+  } else if ($msg_oper?.rem) {
+    let obj = find(usersPic, { operator: $msg_oper.rem });
+    obj.type = $msg_oper.type;
+    remove(quiz_users[$msg_oper.type][$msg_oper.quiz], obj);
+    quiz_users[$msg_oper.type][$msg_oper.quiz] =
+      quiz_users[$msg_oper.type][$msg_oper.quiz];
+    $msg_oper.rem = '';
+  }
+
   (async () => {
     const lessonData = await fetchLesson(operator.abonent, operator.operator);
     lesson_data = lessonData.data;
@@ -104,14 +118,11 @@
     }
   }
 
-  onMount(async () => {});
-
-  onDestroy(() => {
-    data = '';
-    lesson_data = '';
-    module = '';
-    quiz_users = '';
+  onMount(async () => {
+    $showBottomAppBar = true; 
   });
+
+
 
   function onClickQuiz(type, level, theme, name) {
     try {
@@ -169,14 +180,6 @@
   }
 
   function BuildQuizUsers(quiz, user, type) {
-    // Object.keys(qu).map((quiz) => {
-    //   quiz_users[quiz] = [
-    //     {
-    //       name: 'Tutor',
-    //       src: tutor_src,
-    //     },
-    //   ];
-
     if (user === operator.operator) {
       checked[type][quiz] = true;
       return;
@@ -185,20 +188,20 @@
     let obj = find(usersPic, { operator: user });
     obj.type = type;
 
-    if(!find(quiz_users[type][quiz], obj)) {
+    if (!find(quiz_users[type][quiz], obj)) {
       quiz_users[type][quiz].push(obj);
       quiz_users[type][quiz] = quiz_users[type][quiz];
     }
   }
 
-  function GetSubscribers(node) {
+  function GetSubscribers(node, msg) {
     let par = {};
     par.proj = 'kolmit';
     par.func = 'get_subscribers';
-    par.abonent = operator.abonent;
-    par.quiz = node.attributes['name'].value;
+    par.abonent = operator.abonent || msg.abonent;
+    par.quiz = node?.attributes['name'].value || msg.quiz;
     par.level = lesson_data.level;
-    par.type = node.attributes['type'].value;
+    par.type = node?.attributes['type'].value || msg.type;
 
     checked[par.type][par.quiz] = false;
 
@@ -234,6 +237,13 @@
       quiz.name[$llang]
     );
   }
+    onDestroy(() => {
+    data = '';
+    lesson_data = '';
+    module = '';
+    quiz_users = '';
+
+  });
 
   async function OnThemeNameInput(theme) {
     theme.name = await Translate(theme.name[$llang], $llang, $langs);

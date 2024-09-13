@@ -164,7 +164,14 @@ export async function GetUsers(par) {
 			*,
 			operator as email
 			FROM operators
-			WHERE role<>'admin' AND operators.abonent=${par.abonent}`;
+			WHERE role<>'admin' AND operators.abonent=${par.abonent} AND
+      operators.group = (
+          SELECT operators.group
+          FROM operators
+          WHERE operators.operator=${par.operator} AND operators.abonent=${par.abonent} 
+      )
+      `;
+
       admin = await sql`
 			SELECT 
 			*,

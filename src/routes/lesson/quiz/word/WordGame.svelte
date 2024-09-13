@@ -48,6 +48,7 @@
     msg_user,
     msg_oper,
     call_but_status,
+    showBottomAppBar
   } from '$lib/js/stores.js';
 
   let dict = $dicts;
@@ -747,6 +748,7 @@
     $view = 'lesson';
     $lesson.data = { quiz: '' };
     console.log('Компонент размонтирован');
+     $showBottomAppBar = true;
   });
 </script>
 

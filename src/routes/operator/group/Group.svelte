@@ -104,7 +104,7 @@
 <div class="deps_div">
   {#await Translate('Нет пользователей онлайн', 'ru', $langs) then data}
     <span
-      style="display:{no_users_display};position: relative;top:50px;text-align: center;"
+      style="display:{no_users_display};position: relative;top:0px;text-align: center;"
       >{data}</span
     >
   {/await}

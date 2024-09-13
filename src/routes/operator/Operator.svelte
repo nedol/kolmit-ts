@@ -115,6 +115,7 @@
   $call_but_status = 'inactive';
 
   import { editable } from '$lib/js/stores.js';
+  import { Translate } from '../translate/Translate';
   $: if ($editable) {
     edited_display = $editable;
   }
@@ -205,7 +206,7 @@
   let remote = {
     text: {
       display: 'none',
-      msg: $dicts['Вам звонит:'] ? $dicts['Вам звонит:'][$langs] : '',
+      msg:  '',
       name: '',
       email: '',
     },
@@ -428,7 +429,7 @@
       remote.text.display = 'none';
       // local.video.poster = UserSvg;
       // console.log('rtc', rtc);
-      // rtc.OnInactive();
+      rtc.OnInactive();
 
       setTimeout(() => {
         // $call_but_status = 'inactive';
@@ -508,9 +509,11 @@
     <Section>
       {#if remote.text.display && remote.text.name}
         <div class="remote_text_display" style="display:{remote.text.display};">
+          {#await Translate('Это звонит:', 'ru', $langs) then data}
           <p class="remote_msg">
-            {remote.text.msg}<br />{remote.text.name}
+            {data}{remote.text.name}
           </p>
+          {/await}
         </div>
       {/if}
     </Section>

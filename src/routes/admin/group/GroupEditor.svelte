@@ -3,7 +3,7 @@
   import Accordion, { Panel, Header, Content } from '@smui-extra/accordion';
 
   import pkg from 'lodash';
-  const { forEach, findIndex, remove } = pkg;
+  const { remove } = pkg;
 
   import '$lib/css/Elevation.scss';
 

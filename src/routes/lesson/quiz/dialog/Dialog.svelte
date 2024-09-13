@@ -195,7 +195,7 @@
       if (!share_mode) {
         $showBottomAppBar = false; //test
       }
-    }, 5000);
+    }, 3000);
   });
 
   async function init() {
@@ -543,6 +543,7 @@
     tts = '';
     $view = 'lesson';
     $lesson.data = { quiz: '' };
+     $showBottomAppBar = true;
   });
 </script>
 
@@ -721,44 +722,51 @@
           </div>
         {/if}
 
-        {#await Translate('Переведи и ответь', 'ru', $langs) then data}
+        {#await Translate('Ответь', 'ru', $langs) then data}
           <div class="title">{data}:</div>
         {/await}
 
-        <div class="user2_tr">
-          {#if a}
-            {#if !a[$langs]}
-              {#await Translate(a[$llang].replace(/"([^"]*)"/g, '$1'), $llang, $langs) then data}
-                {data}
-              {/await}
-            {:else}
-              {@html a[$langs].replace(/"([^"]*)"/g, '$1')}
-            {/if}
-          {/if}
-        </div>
-
         <div class="user2">
-          {#if a && visibility[1] === 'hidden'}
+          {#if a && visibility[2] === 'hidden'}
             {@html a[$llang].replace(
               /(?<!")\b[\p{L}\p{M}]+\b(?!")/gu,
               (match) => {
                 return `<span class="span_hidden" onclick="(this.style.color='#2196f3')" 
-                style="display:inline-block; margin: 5px 0px; padding: 1px 5px;border:1px;border-style:groove;border-color:lightblue;color:transparent;">${match}</span>`;
+                style="display:inline-block; margin: 5px 0px; padding: 1px 5px;border:1px;border-style:groove;border-color:lightblue;
+                color:transparent;">${match}</span>`;
               }
             )}
           {:else if visibility[2] === 'visible'}
-            {@html a[$llang].replace(/"([^"]*)"/g, '$1')}
+            {@html a[$llang].replace(
+              /(?<!")\b[\p{L}\p{M}]+\b(?!")/gu,
+              (match) => {
+                return `<span class="span_hidden"  
+                style="display:inline-block; margin: 5px 0px; padding: 1px 5px;border:1px;border-style:groove;border-color:lightblue;
+                color:#2196f3">${match}</span>`;
+              }
+            )}
           {/if}
 
-          
-            <div class="speaker-button">
-              <IconButton on:click={speak(a[$llang])}>
-                <Icon tag="svg" viewBox="0 0 24 24">
-                  <path fill="currentColor" d={mdiPlay} />
-                </Icon>
-              </IconButton>
-            </div>
-            {#if !share_mode}
+          <div class="user2_tr">
+            {#if a && visibility[1] === 'visible'}
+              {#if !a[$langs]}
+                {#await Translate(a[$llang].replace(/"([^"]*)"/g, '$1'), $llang, $langs) then data}
+                  {data}
+                {/await}
+              {:else}
+                {@html a[$langs].replace(/"([^"]*)"/g, '$1')}
+              {/if}
+            {/if}
+          </div>
+
+          <div class="speaker-button">
+            <IconButton on:click={speak(a[$llang])}>
+              <Icon tag="svg" viewBox="0 0 24 24">
+                <path fill="currentColor" d={mdiPlay} />
+              </Icon>
+            </IconButton>
+          </div>
+          {#if !share_mode}
             <div
               class="margins"
               style="text-align: center; display: flex; align-items: center; justify-content: space-between;"
@@ -832,22 +840,29 @@
               /(?<!")\b[\p{L}\p{M}]+\b(?!")/gu,
               (match) => {
                 return `<span class="span_hidden" onclick="(this.style.color='#2196f3')" 
-                style="display:inline-block;margin: 5px 0px;border:1px;border-style:groove;border-color:light-blue;color:transparent;">${match}</span>`;
+                style="display:inline-block;margin: 5px 0px;border:1px;border-style:groove;border-color:light-blue;
+                color:transparent;">${match}</span>`;
               }
             )}
           {:else if visibility[1] === 'visible'}
-            {@html a[$llang].replace(/"([^"]*)"/g, '$1')}
+            {@html a[$llang].replace(
+              /(?<!")\b[\p{L}\p{M}]+\b(?!")/gu,
+              (match) => {
+                return `<span class="span_hidden"  
+                style="display:inline-block;margin: 5px 0px;border:1px;border-style:groove;border-color:light-blue;
+                color:#2196f3">${match}</span>`;
+              }
+            )}
           {/if}
 
-        
-            <div class="speaker-button">
-              <IconButton on:click={speak(a[$llang])}>
-                <Icon tag="svg" viewBox="0 0 24 24">
-                  <path fill="currentColor" d={mdiPlay} />
-                </Icon>
-              </IconButton>
-            </div>
-              {#if !share_mode}
+          <div class="speaker-button">
+            <IconButton on:click={speak(a[$llang])}>
+              <Icon tag="svg" viewBox="0 0 24 24">
+                <path fill="currentColor" d={mdiPlay} />
+              </Icon>
+            </IconButton>
+          </div>
+          {#if !share_mode}
             <div
               class="margins"
               style="text-align: center; display: flex; align-items: center; justify-content: space-between;"
@@ -1158,7 +1173,7 @@
   .user2_tr {
     text-align: center;
     line-height: normal;
-    font-size: 1em;
+    font-size: .8em;
     margin-bottom: 0px;
     color: #333;
   }

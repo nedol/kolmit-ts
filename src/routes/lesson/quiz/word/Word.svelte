@@ -279,7 +279,7 @@
   onMount(async () => {
     setTimeout(()=>{
      $showBottomAppBar = false;
-    },1000)
+    },3000)
 
   });
 
