@@ -6,11 +6,11 @@ export let editable = writable(false);
 
 export let view = writable('lesson');
 
-export let nlang = writable('en');//native lang
+export let nlang = writable('en'); //native lang
 
-export let langs = writable('en');//current lang
+export let langs = writable('en'); //current lang
 
-export let llang = writable('en');//learning
+export let llang = writable('en'); //learning
 
 export let pswd = writable();
 
@@ -59,3 +59,5 @@ export let muted = writable(true);
 export let audioCtx = writable();
 
 export let showBottomAppBar = writable(true);
+
+export let OnCheckQU = writable();

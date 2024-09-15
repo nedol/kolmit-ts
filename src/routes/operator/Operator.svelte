@@ -27,7 +27,10 @@
     dicts,
     langs,
     showBottomAppBar,
+    
   } from '$lib/js/stores.js';
+
+
 
   import CircularProgress from '@smui/circular-progress';
 
@@ -59,14 +62,12 @@
 
   /*TODO: дает*/
   $: if ($dc_oper_state) {
+    console.log($dc_oper_state)
     switch ($dc_oper_state) {
-      // case 'open':
-      //   break;
-      case 'close':
-        $call_but_status = 'inactive';
+      case 'open':
+        $call_but_status = 'call';
         break;
-
-      case 'mute':
+      case 'close':
         $call_but_status = 'inactive';
         break;
     }
@@ -129,6 +130,7 @@
 
   let container;
 
+
   const headers = {
     'Content-Type': 'application/json',
   };
@@ -159,6 +161,8 @@
 
   onMount(async () => {
     try {
+  
+
       rtc = new RTCOperator(operator, uid, $signal);
       initRTC();
       rtc.SendCheck();
@@ -181,6 +185,7 @@
 
       // Добавьте слушателя событий для скрытия списка команд при клике за его пределами
       // document.addEventListener('click', handleOutsideClick);
+        
     } catch (ex) {
       console.log();
     }
@@ -509,7 +514,7 @@
     <Section>
       {#if remote.text.display && remote.text.name}
         <div class="remote_text_display" style="display:{remote.text.display};">
-          {#await Translate('Это звонит:', 'ru', $langs) then data}
+          {#await Translate('Это вызывает ', 'ru', $langs) then data}
           <p class="remote_msg">
             {data}{remote.text.name}
           </p>

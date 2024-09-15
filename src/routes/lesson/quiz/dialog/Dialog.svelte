@@ -16,6 +16,8 @@
 
   import { Translate } from '../../../translate/Transloc';
 
+  // import {  RemoveQuizUser} from '../../Module.svelte'
+
   import CircularProgress from '@smui/circular-progress';
   import Chip, { Set, LeadingIcon, TrailingIcon, Text } from '@smui/chips';
   import '$lib/css/Typography.scss';
@@ -34,6 +36,7 @@
     msg_oper,
     call_but_status,
     showBottomAppBar,
+    OnCheckQU,
   } from '$lib/js/stores.js';
 
   const dict = $dicts;
@@ -72,11 +75,6 @@
   let isRepeat = false,
     isThumb = false;
 
-  function flipCard() {
-    isFlipped = !isFlipped;
-    Dialog();
-  }
-
   const visibility = ['visible', 'hidden', 'hidden'];
   let visibility_cnt = 1;
 
@@ -86,12 +84,26 @@
   export let data;
 
   if (data.name) {
-    console.log('data:', data);
+    // console.log('data:', data);
     if (data.quiz !== 'dialog.client') init();
   }
 
   $: if (dialog_data && $call_but_status === 'talk') {
     if (!share_mode) onShare();
+  }
+
+  $: switch ($call_but_status) {
+    case 'talk':
+      break;
+
+    case 'inactive':
+      if (share_mode) $lesson.data = { quiz: '' };
+
+      break;
+    default:
+      share_mode = false;
+      // style_button = style_button_non_shared;
+      break;
   }
 
   // llang = data.llang;
@@ -110,7 +122,6 @@
   let isListening = false;
   let total_cnt = 0;
 
-  let share_button = false;
   let share_button_class = 'button_shared_false';
 
   let variant = 'outlined';
@@ -179,17 +190,6 @@
     onChangeUserClick();
   }
 
-  $: switch ($call_but_status) {
-    case 'talk':
-      share_button = true;
-      break;
-    default:
-      share_button = false;
-      share_mode = false;
-      // style_button = style_button_non_shared;
-      break;
-  }
-
   onMount(async () => {
     setTimeout(() => {
       if (!share_mode) {
@@ -197,6 +197,11 @@
       }
     }, 3000);
   });
+
+  function flipCard() {
+    isFlipped = !isFlipped;
+    Dialog();
+  }
 
   async function init() {
     function splitHtmlContent(inputString) {
@@ -268,7 +273,7 @@
 
     q_shfl = q[$llang].slice(0);
 
-    const dc = $dc_user || $dc_oper;
+    const dc = $dc_user?.dc.readyState === 'open' ? $dc_user : $dc_oper;
 
     if (!dc && !isFlipped) speak(q[$llang]);
 
@@ -349,9 +354,12 @@
   }
 
   async function SendData() {
-    const dc = $dc_user || $dc_oper;
+    const dc = $dc_user?.dc.readyState === 'open' ? $dc_user : $dc_oper;
+
     if (share_mode && dc) {
       dialog_data.content[cur_qa].user2['a_shfl'] = a_shfl;
+
+      $msg_user = $msg_oper = null; //предотвр.повтор isFlipped
 
       await dc.SendData(
         {
@@ -367,7 +375,8 @@
           },
         },
         (ex) => {
-          console.log(ex);
+          console.log(dc);
+          $OnCheckQU(dc.rtc.oper_uid, 'dialog', dialog_data.name);
         }
       );
     }
@@ -387,7 +396,8 @@
     data.quiz = data.quiz === 'dialog.client' ? 'dialog' : 'dialog.client';
     const client_quiz =
       data.quiz === 'dialog.client' ? 'dialog' : 'dialog.client';
-    const dc = $dc_user || $dc_oper;
+
+    const dc = $dc_user?.dc.readyState === 'open' ? $dc_user : $dc_oper;
 
     dialog_data.content[cur_qa].user2['a_shfl'] = a_shfl;
     if (dc && share_mode) SendData();
@@ -514,13 +524,15 @@
     return similarity;
   }
 
-  function SendCommand(cmd) {
+  function SendCommand(cmd, ev) {
     variant = 'unelevated';
     setTimeout(() => {
       variant = 'outlined';
     }, 1000);
 
-    const dc = $dc_user || $dc_oper;
+    ev.target.style.color = 'red';
+
+    const dc = $dc_user?.dc.readyState === 'open' ? $dc_user : $dc_oper;
 
     if (dc)
       dc.SendData(
@@ -534,16 +546,13 @@
   }
 
   onDestroy(() => {
-    // share_button = false;
     // voice.Cancel();
     dialog_data = '';
     data = '';
     stt_text = '';
     stt = '';
     tts = '';
-    $view = 'lesson';
-    $lesson.data = { quiz: '' };
-     $showBottomAppBar = true;
+    $showBottomAppBar = true;
   });
 </script>
 
@@ -652,7 +661,7 @@
         <div class="container">
           {#if $call_but_status == 'talk'}
             <div class="repeat_but">
-              <IconButton on:click={() => SendCommand('repeat')}>
+              <IconButton on:click={(ev) => SendCommand('repeat', ev)}>
                 <Icon tag="svg" color="secondary" viewBox="0 0 24 24">
                   <path fill="currentColor" d={mdiRepeat} />
                 </Icon>
@@ -667,7 +676,7 @@
 
           {#if $call_but_status == 'talk'}
             <div class="thumb_but">
-              <IconButton on:click={() => SendCommand('thumb')}>
+              <IconButton on:click={(ev) => SendCommand('thumb', ev)}>
                 <Icon tag="svg" color="secondary" viewBox="0 0 24 24">
                   <path fill="currentColor" d={mdiThumbUpOutline} />
                 </Icon>
@@ -900,7 +909,7 @@
         <div class="container">
           {#if $call_but_status == 'talk'}
             <div class="repeat_but">
-              <IconButton on:click={() => SendCommand('repeat')}>
+              <IconButton on:click={(ev) => SendCommand('repeat', ev)}>
                 <Icon tag="svg" color="secondary" viewBox="0 0 24 24">
                   <path fill="currentColor" d={mdiRepeat} />
                 </Icon>
@@ -914,7 +923,7 @@
 
           {#if $call_but_status == 'talk'}
             <div class="thumb_but">
-              <IconButton on:click={() => SendCommand('thumb')}>
+              <IconButton on:click={(ev) => SendCommand('thumb', ev)}>
                 <Icon tag="svg" color="secondary" viewBox="0 0 24 24">
                   <path fill="currentColor" d={mdiThumbUpOutline} />
                 </Icon>
@@ -1173,7 +1182,7 @@
   .user2_tr {
     text-align: center;
     line-height: normal;
-    font-size: .8em;
+    font-size: 0.8em;
     margin-bottom: 0px;
     color: #333;
   }

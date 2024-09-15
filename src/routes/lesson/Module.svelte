@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount, onDestroy, getContext } from 'svelte';
+  import { onMount, onDestroy, setContext, getContext } from 'svelte';
 
   import { Translate } from '../translate/Transloc.js';
 
@@ -27,6 +27,7 @@
     msg_oper,
     dc_user_state,
     showBottomAppBar,
+    OnCheckQU,
   } from '$lib/js/stores.js';
 
   // import lesson_data from './lesson.json';
@@ -86,12 +87,7 @@
     BuildQuizUsers($msg_oper.quiz, $msg_oper.add, $msg_oper.type);
     $msg_oper.add = '';
   } else if ($msg_oper?.rem) {
-    let obj = find(usersPic, { operator: $msg_oper.rem });
-    obj.type = $msg_oper.type;
-    remove(quiz_users[$msg_oper.type][$msg_oper.quiz], obj);
-    quiz_users[$msg_oper.type][$msg_oper.quiz] =
-      quiz_users[$msg_oper.type][$msg_oper.quiz];
-    $msg_oper.rem = '';
+    RemoveQuizUser($msg_oper.rem, $msg_oper.type, $msg_oper.quiz);
   }
 
   (async () => {
@@ -119,10 +115,8 @@
   }
 
   onMount(async () => {
-    $showBottomAppBar = true; 
+    $showBottomAppBar = true;
   });
-
-
 
   function onClickQuiz(type, level, theme, name) {
     try {
@@ -147,10 +141,10 @@
     // disabled = 'disabled';
   }
 
-  function OnCheck(node) {
+  $OnCheckQU = function (node, type_, name_) {
     // console.log(node.currentTarget.attributes['name'].value);
-    const name = node.currentTarget.attributes['name'].value;
-    const type = node.currentTarget.attributes['type'].value;
+    const name = name_ || node.currentTarget.attributes['name'].value;
+    const type = type_ || node.currentTarget.attributes['type'].value;
     let par = {};
     par.proj = 'kolmit';
     par.func = 'quiz_users';
@@ -177,7 +171,15 @@
         console.log(error);
         return [];
       });
-  }
+  };
+
+  let RemoveQuizUser = function (user, type, quiz) {
+    let obj = find(usersPic, { operator: user });
+    obj.type = $msg_oper.type;
+    remove(quiz_users[type][quiz], obj);
+    quiz_users[type][quiz] = quiz_users[type][quiz];
+    $msg_oper.rem = '';
+  };
 
   function BuildQuizUsers(quiz, user, type) {
     if (user === operator.operator) {
@@ -237,12 +239,11 @@
       quiz.name[$llang]
     );
   }
-    onDestroy(() => {
+  onDestroy(() => {
     data = '';
     lesson_data = '';
     module = '';
     quiz_users = '';
-
   });
 
   async function OnThemeNameInput(theme) {
@@ -355,7 +356,7 @@
                               <div class="form-field-container">
                                 <FormField>
                                   <Checkbox
-                                    on:click={OnCheck}
+                                    on:click={$OnCheckQU}
                                     name={quiz.name[$llang]}
                                     type={quiz.type}
                                     bind:checked={checked[quiz.type][

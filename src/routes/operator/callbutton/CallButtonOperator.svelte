@@ -33,7 +33,7 @@
 <style>
 	.callButton {
 		position: absolute;
-		left: 25%;
+		left: 80%;
 		top: 5px;
 		z-index: 1;
 	}

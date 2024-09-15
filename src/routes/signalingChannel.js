@@ -1,6 +1,6 @@
 import { msg_oper, msg_user } from '$lib/js/stores.js';
 
-const token = 'CPkJ1MYWC7DMlvw6MvtV0yBw';
+// const token = 'CPkJ1MYWC7DMlvw6MvtV0yBw';
 const headers = {
 	'Content-Type': 'application/json'
 	// Authorization: `Bearer ${token}`

@@ -22,7 +22,7 @@
   let operator = user_.operator;
   let abonent = user_.abonent;
 
-  // user_.display = 'none'; //видимость в группе
+  user_.display = 'none'; //видимость в группе
 
   // const operator = getContext('operator')
 
@@ -57,17 +57,17 @@
 
   import {} from '$lib/js/stores.js';
 
-  $: if ($dc_user_state) {
-    switch ($dc_user_state) {
-      // case 'open':
-      //   break;
-      case ('close', 'mute'):
+  $: switch ($dc_user_state) {
+      case 'open':
+        $call_but_status = 'call';
+        break;
+      case 'close':
         $call_but_status = 'inactive';
         // $users_status[operator] = 'inactive';
         // parent_div.appendChild(card);
         break;
     }
-  }
+  
 
   $: if (status) {
     $users[operator].status = status;

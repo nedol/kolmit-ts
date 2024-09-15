@@ -48,7 +48,8 @@
     msg_user,
     msg_oper,
     call_but_status,
-    showBottomAppBar
+    showBottomAppBar,
+    OnCheckQU
   } from '$lib/js/stores.js';
 
   let dict = $dicts;
@@ -93,12 +94,10 @@
 
   $: switch ($call_but_status) {
     case 'talk':
-      share_button = true;
       break;
     default:
-      share_button = false;
       share_mode = false;
-      // style_button = style_button_non_shared;
+
       break;
   }
 
@@ -124,6 +123,12 @@
         hints[true] = JSON.parse(JSON.stringify(words));
 
         showHints[isFlipped] = true;
+
+        if ($call_but_status !== 'active') {
+          onShare();
+      
+        }
+
         //   shuffle(hints);
       })
       .catch((error) => {
@@ -232,7 +237,7 @@
     // Обработчик нажатия на кнопку "share"
     share_mode = true;
     share_button_class = `button_shared_${share_mode}`;
-    const data = {
+    const lesson = {
       lesson: {
         quiz: 'word',
         llang: $llang,
@@ -244,7 +249,10 @@
     // isFlipped = !isFlipped;
     // currentWord = words[currentWordIndex];
     // makeExample();
-    SendData(data);
+    SendData(lesson);
+      const dc = $dc_user?.dc.readyState === 'open' ? $dc_user : $dc_oper;
+     $OnCheckQU(dc.rtc.oper_uid, 'word', data.name);
+
   }
 
   let topAppBar;
@@ -467,7 +475,9 @@
     }
   }
 
-  onMount(async () => {});
+  onMount(async () => {
+
+  });
 
   // function handleBackClick() {
   //   $lesson.data = { quiz: '' }; // При клике на "Back" показываем компонент Lesson
@@ -748,7 +758,7 @@
     $view = 'lesson';
     $lesson.data = { quiz: '' };
     console.log('Компонент размонтирован');
-     $showBottomAppBar = true;
+    $showBottomAppBar = true;
   });
 </script>
 
@@ -885,7 +895,7 @@
         </div>
       </div>
 
-      {#if showSpeakerButton}
+      <!-- {#if showSpeakerButton}
         <div class="speaker-button">
           <IconButton on:click={onSpeach}>
             <Icon tag="svg" viewBox="0 0 24 24">
@@ -893,7 +903,7 @@
             </Icon>
           </IconButton>
         </div>
-      {/if}
+      {/if} -->
 
       {#await Translate(label[isFlipped], 'ru', $langs) then data}
         <div class="title">{data}</div>

@@ -21,7 +21,7 @@
   import pkg from 'lodash';
   const { mapValues } = pkg;
 
-  import {  users, langs, msg_oper, msg_user } from '$lib/js/stores.js';
+  import { users, langs, msg_oper, msg_user } from '$lib/js/stores.js';
 
   import User from '../../user/User.svelte';
 
@@ -76,36 +76,30 @@
     // SendCheck({ func: 'check', type: 'user', abonent: operator.abonent, em: operator.em });
   });
 
-
-
   function OnClickUser(user: any) {
     // console.log(user);
   }
 
   function OnClickUpload() {}
 
-
-  $: if (Object.keys($users).length>0) {
-
-     mapValues($users, function(o) { 
-      if(o.status !== "inactive" &&  o.status !== "busy") 
-      users_online++;
+  $: if (Object.keys($users).length > 0) {
+    mapValues($users, function (o) {
+      if (o.status !== 'inactive' && o.status !== 'busy') users_online++;
     });
 
     if (users_online > 0) no_users_display = 'none';
     else no_users_display = 'block';
 
-    users_online = 0; 
+    users_online = 0;
   }
-
 </script>
 
 <!-- {@debug operator} -->
 <div class="deps_div">
   {#await Translate('Нет пользователей онлайн', 'ru', $langs) then data}
     <span
-      style="display:{no_users_display};position: relative;top:0px;text-align: center;"
-      >{data}</span
+      style="display:{no_users_display};position: relative;top:0px;text-align: center; font-size: smaller;
+      font-family: monospace;">{data}</span
     >
   {/await}
   <div class="flexy-dad">
@@ -118,8 +112,6 @@
           on:click={(ev) => {
             OnClickUser({ user });
           }}
-
-
         >
           <Item style="text-align: center">
             <User {group} bind:user_={user} {OnClickUpload} />
