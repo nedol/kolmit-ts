@@ -514,7 +514,7 @@
     <Section>
       {#if remote.text.display && remote.text.name}
         <div class="remote_text_display" style="display:{remote.text.display};">
-          {#await Translate('Это вызывает ', 'ru', $langs) then data}
+          {#await Translate('Тебя вызывает - ', 'ru', $langs) then data}
           <p class="remote_msg">
             {data}{remote.text.name}
           </p>

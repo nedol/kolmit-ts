@@ -153,6 +153,9 @@
       level = $msg_user.lesson.level;
       share_mode = true;
       showHints[isFlipped] = false;
+
+       $OnCheckQU(null, 'word', $msg_user.lesson.name);
+     
     } else if (
       ($msg_user.lesson.word_correct || $msg_user.lesson.word_correct == 0) &&
       hints
@@ -174,7 +177,7 @@
       currentWordIndex = $msg_user.lesson.word_index;
       showHints[isFlipped] = true;
       label[true] = 'Заполни пропуски';
-      label[false] = 'Выбери слово';
+      label[false] = 'Твой ход. Выбери слово';
       level = $msg_user.lesson.level;
       makeExample();
     } else if ($msg_user?.lesson.word_flip) {
@@ -195,10 +198,11 @@
       currentWord = words[$msg_oper.lesson.word_index];
       currentWordIndex = $msg_oper.lesson.word_index;
       label[true] = 'Заполни пропуски';
-      label[false] = 'Выбери слово';
+      label[false] = 'Твой ход. Выбери слово';
       showHints[isFlipped] = true;
       level = $msg_oper.lesson.level;
       makeExample();
+
     } else if ($msg_oper?.lesson.words_data) {
       words = $msg_oper.lesson.words_data;
       hints[false] = JSON.parse(JSON.stringify(words));
@@ -207,6 +211,8 @@
       share_mode = true;
       isFlipped = !$msg_oper.lesson.isFlipped;
       showHints[isFlipped] = false;
+
+       $OnCheckQU(null, 'word', $msg_oper.lesson.name) ;
     } else if (
       ($msg_oper.lesson.word_correct || $msg_oper.lesson.word_correct == 0) &&
       hints
@@ -240,6 +246,7 @@
     const lesson = {
       lesson: {
         quiz: 'word',
+        name: data.name,
         llang: $llang,
         level: level,
         words_data: words,

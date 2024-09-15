@@ -132,6 +132,7 @@
       isFlipped = !$msg_user.lesson.isFlipped;
       cur_qa = $msg_user.lesson.cur_qa;
       Dialog();
+      $OnCheckQU(null, 'dialog', dialog_data.name);
     }
     if ($msg_user.command === 'repeat') {
       isRepeat = true;
@@ -156,6 +157,7 @@
       isFlipped = !$msg_oper.lesson.isFlipped;
       cur_qa = $msg_oper.lesson.cur_qa;
       Dialog();
+      $OnCheckQU(null, 'dialog', dialog_data.name);
     }
     if ($msg_oper.command === 'repeat') {
       isRepeat = true;
@@ -376,7 +378,7 @@
         },
         (ex) => {
           console.log(dc);
-          $OnCheckQU(dc.rtc.oper_uid, 'dialog', dialog_data.name);
+
         }
       );
     }
@@ -794,6 +796,11 @@
                     {/if}
                   </Icon>
                 </IconButton>
+                {#if isListening}
+                  {#await Translate('говори', 'ru', $llang) then data}
+                    <span>{data}</span>
+                  {/await}
+                {/if}
               </div>
               <Stt
                 bind:this={stt}
