@@ -458,6 +458,8 @@ function SendOperatorOffer(q) {
           cand: global.rtcPool['operator'][q.abonent][q.operator][uid].cand,
         };
 
+        console.log('SendOperatorOffer', operator);
+
         if (q.type === 'user') {
           let item = global.rtcPool['user'][q.abonent][q.operator][q.uid];
           global.rtcPool['user'][q.abonent][q.operator].resolve([
