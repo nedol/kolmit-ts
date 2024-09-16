@@ -188,9 +188,9 @@
     }
 
     let obj = find(usersPic, { operator: user });
-    obj.type = type;
+    if (obj) obj.type = type;
 
-    if (!find(quiz_users[type][quiz], obj)) {
+    if (obj && !find(quiz_users[type][quiz], obj)) {
       quiz_users[type][quiz].push(obj);
       quiz_users[type][quiz] = quiz_users[type][quiz];
     }
