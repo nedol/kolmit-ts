@@ -131,6 +131,9 @@
       dialog_data = $msg_user.lesson.dialog_data;
       isFlipped = !$msg_user.lesson.isFlipped;
       cur_qa = $msg_user.lesson.cur_qa;
+      visibility[1] = 'hidden';
+      visibility[2] = 'hidden';
+      visibility_cnt = 1;
       Dialog();
       $OnCheckQU(null, 'dialog', dialog_data.name);
     }
@@ -156,6 +159,9 @@
       dialog_data = $msg_oper.lesson.dialog_data;
       isFlipped = !$msg_oper.lesson.isFlipped;
       cur_qa = $msg_oper.lesson.cur_qa;
+      visibility[1] = 'hidden';
+      visibility[2] = 'hidden';
+      visibility_cnt = 1;
       Dialog();
       $OnCheckQU(null, 'dialog', dialog_data.name);
     }
@@ -378,7 +384,6 @@
         },
         (ex) => {
           console.log(dc);
-
         }
       );
     }
@@ -1021,8 +1026,8 @@
 
   .container {
     display: flex;
-    top: 0px;
-    margin-bottom: 7px;
+    top: 5px;
+    margin-bottom: 30px;
     position: relative;
     justify-content: space-between;
     align-items: center;

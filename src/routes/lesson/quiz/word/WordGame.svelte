@@ -430,7 +430,7 @@
       SendData(data);
       showHints[isFlipped] = false;
       ev.target.classList.add('selected');
-      label[false] = 'Ожидай ответ';
+      label[false] = 'Ожидай вопрос';
     } else {
       showCheckButton = true;
       div_input.forEach((di) => {
