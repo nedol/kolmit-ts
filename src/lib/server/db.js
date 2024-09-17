@@ -418,7 +418,7 @@ export async function GetListen(q) {
 
 export async function GetWords(q) {
   try {
-    let res = await sql`SELECT data, context, subscribe, published  FROM word
+    let res = await sql`SELECT data, context, subscribe  FROM word
 		WHERE name=${q.name} AND owner=${q.owner} AND level=${q.level}`;
     //debugger;
     return res[0];
@@ -429,7 +429,7 @@ export async function GetWords(q) {
 
 export async function GetDialog(q) {
   try {
-    let res = await sql`SELECT dialog, html, subscribe, published FROM dialogs
+    let res = await sql`SELECT dialog, html, subscribe FROM dialogs
 		WHERE name=${q.name} AND owner=${q.owner} AND level=${q.level}`;
 
     return {

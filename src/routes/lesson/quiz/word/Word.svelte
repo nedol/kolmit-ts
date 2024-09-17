@@ -614,6 +614,7 @@
             </button>
           </Section>
           <Section>
+            {#if words.length<=20}
             <Icon
               tag="svg"
               on:click={onShuffleWords}
@@ -622,6 +623,10 @@
             >
               <path fill="white" d={mdiShuffle} />
             </Icon>
+            {:else}
+              <div on:click={ jumpNext10 }>+10</div>            
+            
+            {/if}
           </Section>
           <Section>
             <div class="counter">
