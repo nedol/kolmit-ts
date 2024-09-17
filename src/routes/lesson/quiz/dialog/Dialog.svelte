@@ -201,7 +201,7 @@
   onMount(async () => {
     setTimeout(() => {
       if (!share_mode) {
-        $showBottomAppBar = false; //test
+        // $showBottomAppBar = false; //test
       }
     }, 3000);
   });

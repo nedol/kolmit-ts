@@ -84,7 +84,9 @@ export async function GET({ url, fetch, cookies }) {
     let { data, lang, level, levels } = await GetLesson({
       owner: owner,
       operator: operator,
+      level: lvl
     });
+    console.log(data)
     let response = new Response(JSON.stringify({ data, lang, level, levels }));
     response.headers.append('Access-Control-Allow-Origin', `*`);
     return response;

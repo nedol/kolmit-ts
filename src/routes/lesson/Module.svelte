@@ -83,8 +83,9 @@
   let quiz_users = { dialog: {}, word: {} };
 
   $: if ($msg_oper?.add) {
-    console.log($msg_oper);
-    BuildQuizUsers($msg_oper.quiz, $msg_oper.add, $msg_oper.type);
+    try {
+      BuildQuizUsers($msg_oper.quiz, $msg_oper.add, $msg_oper.type);
+    } catch (ex) {}
     $msg_oper.add = '';
   } else if ($msg_oper?.rem) {
     RemoveQuizUser($msg_oper.rem, $msg_oper.type, $msg_oper.quiz);
@@ -204,6 +205,9 @@
     par.quiz = node?.attributes['name'].value || msg.quiz;
     par.level = lesson_data.level;
     par.type = node?.attributes['type'].value || msg.type;
+
+    if(!checked[par.type])
+      return;
 
     checked[par.type][par.quiz] = false;
 
@@ -480,7 +484,7 @@
     display: flex;
     justify-content: start;
     align-items: center;
-    padding: 10px; /* Установите желаемый отступ вокруг элемента */
+    padding: 0px; /* Установите желаемый отступ вокруг элемента */
   }
 
   .form-field-container {

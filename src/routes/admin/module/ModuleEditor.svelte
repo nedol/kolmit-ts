@@ -702,7 +702,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 10px; /* Установите желаемый отступ вокруг элемента */
+    padding: 0px; /* Установите желаемый отступ вокруг элемента */
   }
 
   .add_quiz,

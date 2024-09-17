@@ -473,16 +473,21 @@ export async function GetLesson(q) {
       res =
         await sql`SELECT data, level, lang FROM lessons WHERE owner=${q.owner} AND level=${q.level}  ORDER BY level desc`;
     } else {
+
+      
       res =
         await sql`SELECT data, level, lang FROM lessons WHERE owner=${q.owner}  ORDER BY level desc`;
+      
     }
     //debugger;
     const levels = await getLevels(q.owner);
 
+    const les = find(res, {level:q.level})
+
     return {
-      data: res[0].data,
-      lang: res[0].lang,
-      level: res[0].level,
+      data: les?les.data:res[0].data,
+      lang: les?.lang?les.lang:res[0].lang,
+      level: les?.level?les.level:res[0].level,
       levels: levels,
     };
   } catch (ex) {

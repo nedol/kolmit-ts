@@ -242,7 +242,7 @@ export async function POST({ request, url, fetch, cookies }) {
           let item = global.rtcPool[q.type][q.abonent][q.operator][q.uid];
           if (item) {
             item.status = q.status;
-            if (q.type === 'operator') BroadcastOperatorStatus(q, 'close');
+            if (q.type === 'operator') BroadcastOperatorStatus(q, q.status);
           }
         } catch (ex) {}
         //this.RemoveAbonent(q);
@@ -457,8 +457,6 @@ function SendOperatorOffer(q) {
           desc: global.rtcPool['operator'][q.abonent][q.operator][uid].desc,
           cand: global.rtcPool['operator'][q.abonent][q.operator][uid].cand,
         };
-
-        console.log('SendOperatorOffer', operator);
 
         if (q.type === 'user') {
           let item = global.rtcPool['user'][q.abonent][q.operator][q.uid];

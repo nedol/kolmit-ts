@@ -278,7 +278,7 @@
 
   onMount(async () => {
     setTimeout(()=>{
-     $showBottomAppBar = false;
+    //  $showBottomAppBar = false;//test
     },3000)
 
   });

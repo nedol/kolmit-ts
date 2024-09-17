@@ -101,6 +101,7 @@ declare module '$env/static/private' {
 	export const PATHEXT: string;
 	export const PhpStorm: string;
 	export const PM2_HOME: string;
+	export const POWERSHELL_DISTRIBUTION_CHANNEL: string;
 	export const PROCESSOR_ARCHITECTURE: string;
 	export const PROCESSOR_IDENTIFIER: string;
 	export const PROCESSOR_LEVEL: string;
@@ -237,6 +238,7 @@ declare module '$env/dynamic/private' {
 		PATHEXT: string;
 		PhpStorm: string;
 		PM2_HOME: string;
+		POWERSHELL_DISTRIBUTION_CHANNEL: string;
 		PROCESSOR_ARCHITECTURE: string;
 		PROCESSOR_IDENTIFIER: string;
 		PROCESSOR_LEVEL: string;

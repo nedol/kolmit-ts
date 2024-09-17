@@ -55,8 +55,6 @@
 
   let dc = false;
 
-  import {} from '$lib/js/stores.js';
-
   $: switch ($dc_user_state) {
       case 'open':
         $call_but_status = 'call';
