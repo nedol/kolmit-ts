@@ -289,7 +289,8 @@
                     {#if lesson.quizes}
                       {#each lesson.quizes as quiz}
                         <!-- {@debug quiz} -->
-                        {#if quiz.name[$llang]}
+                         
+                        {#if quiz.name[$llang] && quiz.published}
                           <div
                             class="quiz-container mdc-typography--caption"
                             type={quiz.type}

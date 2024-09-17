@@ -7,7 +7,8 @@
   const { find, findKey, mapValues } = pkg;
 
   import _ from 'lodash';
- 
+
+  import Checkbox from '@smui/checkbox';
   import { SortableList } from '@jhubbardsf/svelte-sortablejs';
 
   import List, { Item, Separator, Text } from '@smui/list';
@@ -25,7 +26,7 @@
     mdiFileWordBoxOutline,
     mdiHelp,
   } from '@mdi/js';
-  
+
   import Accordion, { Panel, Header, Content } from '@smui-extra/accordion';
 
   import { langs, llang, dicts } from '$lib/js/stores.js';
@@ -60,7 +61,7 @@
   let llang_input;
   let theme_sort_list, quiz_sort_list, items;
 
-  let lesson_data = { data: {level:''} };
+  let lesson_data = { data: { level: '' } };
   let levels: any = [];
   let module_input: any;
 
@@ -157,8 +158,7 @@
     }
   }
 
-  function onClickQuiz(quiz: any, level:string, theme:string) {
-
+  function onClickQuiz(quiz: any, level: string, theme: string) {
     $view = 'quiz';
 
     lesson_data.data.llang = lesson_data.data.lang;
@@ -181,8 +181,7 @@
     // disabled = 'disabled';
   }
 
-  export function findDeep(obj:object, predicate:string, path = '') {
-    
+  export function findDeep(obj: object, predicate: string, path = '') {
     if (predicate(obj, path)) {
       return obj;
     }
@@ -200,7 +199,6 @@
     return null;
   }
 
-
   function OnAddTheme() {
     navigator.clipboard
       .readText()
@@ -213,7 +211,7 @@
         pushTheme({ theme: { name: '' } });
       });
 
-    function pushTheme(quiz_data:object) {
+    function pushTheme(quiz_data: object) {
       lesson_data.data.module.themes.push({
         name: {
           [$llang]: quiz_data.theme.name,
@@ -238,7 +236,7 @@
     lesson_data = lesson_data;
   }
 
-  function OnRemoveItem(name:string, t: any) {
+  function OnRemoveItem(name: string, t: any) {
     // let quiz = find(
     //   lesson_data.data.module.themes[t].lessons[0].quizes,
     //   (q) => {
@@ -253,8 +251,6 @@
     lesson_data.data.module.themes[t].lessons[0].quizes.splice(ind, 1);
     lesson_data = lesson_data;
   }
-
-
 
   async function OnAddQuiz(name, t) {
     lesson_data.data.module.themes[t].lessons[0].quizes.push({
@@ -303,7 +299,7 @@
   }
 
   let level = '';
-  
+
   async function OnInput(ev) {
     lesson_data.level = ev.target.value;
     module = {
@@ -357,10 +353,14 @@
     items = arrayMove(items, oldIndex, newIndex); // Assuming you have an arrayMove function (see below)
   }
 
+  function OnPublish(quiz, state) {
+    quiz.published = state?'': Date.now()
+  }
+
   // async function OnThemeNameInput(t) {
   //   // console.log(theme)
   //   // return;
-  //   let theme = lesson_data.data.module.themes[t];
+  //   let theme = lesson_data.data.module;
   //   if (!theme.name[$llang]) {
   //     Object.keys(theme.name).forEach(async (key) => {
   //       console.log(key);
@@ -495,10 +495,18 @@
                           >
                             {#each lesson.quizes as quiz, q}
                               <!-- {@debug quiz} -->
-                              <div class="quiz-container">
-                                <div
 
-                                  on:click ={() => {
+                              <div class="quiz-container">
+                                <Checkbox
+                         
+                                  on:click={()=>OnPublish(lesson_data.data.module.themes[t].lessons[0].quizes[q], quiz.published)}
+    
+                                  checked={quiz.published ? 'true' : ''}
+                                  touch
+                                ></Checkbox>
+
+                                <div
+                                  on:click={() => {
                                     onClickQuiz(
                                       quiz,
                                       lesson_data.data.module.level,
@@ -554,8 +562,8 @@
                                     </Icon>
                                   {:else if quiz.type === 'quiz'}
                                     <select
-                                      on:click|preventDefault|once|stopPropagation= {()=>{}}
-                                      on:change ={(event) =>
+                                      on:click|preventDefault|once|stopPropagation={() => {}}
+                                      on:change={(event) =>
                                         OnSelectQuiztype(
                                           event.target.value,
                                           t,
