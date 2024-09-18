@@ -5,7 +5,6 @@
   
   import moment from 'moment';
   moment.locale('nl-be');
-  import { DateTime } from 'luxon';
   // import 'moment/locale/nl';
   import IconButton, { Icon } from '@smui/icon-button';
   import {
@@ -220,7 +219,7 @@
 
   async function speak(text) {
     //Speak(text);
-    tts.Speak(text)
+    tts.Speak($llang,text)
   }
 
   function repeat() {

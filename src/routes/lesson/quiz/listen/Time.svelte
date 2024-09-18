@@ -407,17 +407,15 @@
   }
 
   async function speak(text) {
-    tts.Speak(text);
+    tts.Speak($llang, text);
   }
 
   function repeat() {
     // Реализуйте функцию озвучивания числа, используя доступные средства или библиотеки
     // Например, можно использовать Text-to-Speech API или библиотеку для озвучивания
-    if (name === 'numbers') {
-      speak(numberToDutchString(generatedValue));
-    } else if (name === 'time') {
-      speak(formatTime($llang, generatedValueObj));
-    }
+
+    speak(formatTime($llang, generatedValueObj));
+
     div_input.focus();
   }
 
