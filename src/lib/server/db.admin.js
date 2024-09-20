@@ -148,15 +148,14 @@ async function removeModule(item) {
 
 export async function UpdateDialog(q) {
   try {
-    let res = await sql`INSERT INTO dialog
-			(name , dialog, owner, html, level, published)
-			VALUES(${q.new_name},${q.data},${q.owner},${q.data.html || ''}, ${q.level} , ${q.published?CURRENT_TIMESTAMP:''} )
+    let res = await sql`INSERT INTO dialogs
+			(name , dialog, owner, html, level)
+			VALUES(${q.new_name},${q.data},${q.owner},${q.data.html || ''}, ${q.level} )
 			ON CONFLICT (name, owner, level)
 			DO UPDATE SET
 			name = EXCLUDED.name,
       html = EXCLUDED.html,
-			dialog = EXCLUDED.dialog,
-      published=EXCLUDXED.published`;
+			dialog = EXCLUDED.dialog`;
     return { res };
   } catch (ex) {
     return JSON.stringify({ func: q.func, res: ex });
@@ -198,7 +197,7 @@ export async function GetPrompt(prompt, quiz_name, owner, level, theme) {
   let prompt_res, words_res, gram_res, gram;
   try {
     prompt_res = await sql`SELECT * FROM prompts WHERE name=${prompt}`;
-    words_res = await sql`SELECT * FROM word, context WHERE name=${quiz_name}`;
+    words_res = await sql`SELECT * FROM word WHERE name=${quiz_name}`;
     gram_res =
       await sql`SELECT * FROM grammar WHERE owner=${owner} AND level=${level}`;
     gram = find(gram_res[0].data, { theme: theme });

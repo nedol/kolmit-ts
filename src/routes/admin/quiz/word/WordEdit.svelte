@@ -7,10 +7,16 @@
 
   import { langs, llang } from '$lib/js/stores.js';
 
+  import Menu from '@smui/menu';
+  import List, { Item, Separator, Text } from '@smui/list';
   import Tab, { Label } from '@smui/tab';
   import TabBar from '@smui/tab-bar';
   import Button from '@smui/button';
   import Paper, { Content } from '@smui/paper';
+  import { Anchor } from '@smui/menu-surface';
+
+  let menu: Menu, anchor: HTMLDivElement;
+   let anchorClasses: { [k: string]: boolean } = {};
 
   let active = 'Prompt';
 
@@ -71,16 +77,7 @@
     })();
   }
 
-  fetch(`/admin?prompt=words`)
-    .then((response) => response.json())
-    .then((data) => {
-      prompt = data.resp.prompt.system;
-      prompt = prompt;
-    })
-    .catch((error) => {
-      console.log(error);
-      // dialog_data.content = [];
-    });
+  LoadPrompt('basic');
 
   fetch(
     `./lesson?words=theme&name=${data.name[$llang]}&owner=${abonent}&level=${data.level}`
@@ -97,7 +94,7 @@
     })
     .catch((error) => {
       console.log(error);
-      words_data = { content: [], lang: '' };
+      words_data = [];
     });
 
   onMount(() => {
@@ -106,6 +103,19 @@
     // 	words_data = JSON.parse(storedData);
     // }
   });
+
+  function LoadPrompt(name) {
+    fetch(`/admin?prompt=words.${name}`)
+      .then((response) => response.json())
+      .then((data) => {
+        prompt = data.resp.prompt.system;
+        prompt = prompt;
+      })
+      .catch((error) => {
+        console.log(error);
+        // dialog_data.content = [];
+      });
+  }
 
   function addEmptyRecord() {
     const emptyRecord = {
@@ -367,6 +377,42 @@
         {:else if active === 'Prompt'}
           <Paper variant="unelevated">
             <Content>
+              <div
+                class={Object.keys(anchorClasses).join(' ')}
+                use:Anchor={{
+                  addClass: (className) => {
+                    if (!anchorClasses[className]) {
+                      anchorClasses[className] = true;
+                    }
+                  },
+                  removeClass: (className) => {
+                    if (anchorClasses[className]) {
+                      delete anchorClasses[className];
+                      anchorClasses = anchorClasses;
+                    }
+                  },
+                }}
+                bind:this={anchor}
+              >
+                <Button on:click={() => menu.setOpen(true)}>
+                  <Label>Выбрать промпт</Label>
+                </Button>
+                <Menu
+                  bind:this={menu}
+                  anchor={false}
+                  bind:anchorElement={anchor}
+                  anchorCorner="BOTTOM_LEFT"
+                >
+                  <List>
+                    <Item on:click={() => LoadPrompt('basic')}>
+                      <Text>basic</Text>
+                    </Item>
+                    <Item on:click={() => LoadPrompt('context')}>
+                      <Text>context</Text>
+                    </Item>
+                  </List>
+                </Menu>
+              </div>
               <textarea rows="20" name="dialog_task" bind:value={prompt}
               ></textarea>
               {#await Translate('Копировать промпт', 'ru', $langs) then data}

@@ -84,7 +84,6 @@
   export let data;
 
   if (data.name) {
-    // console.log('data:', data);
     if (data.quiz !== 'dialog.client') init();
   }
 
@@ -663,6 +662,8 @@
   </div>
   <!-- Ваш контент для лицевой стороны -->
   <div class="card">
+    <span style="font-size:smaller;font-family: ui-monospace;">{data.name}</span
+    >
     {#if q || a}
       {#if !isFlipped}
         <div class="container">
@@ -697,8 +698,8 @@
           <div style="display: inline-flex; float: right; margin-right: 10px;}">
             <br />
             <!-- {#if showSpeakerButton} -->
-            <div class="speaker-button">
-              <IconButton on:click={speak(q[$llang])}>
+            <div class="speaker-button" on:click={speak(q[$llang])}>
+              <IconButton>
                 <Icon tag="svg" viewBox="0 0 24 24">
                   <path fill="currentColor" d={mdiPlay} />
                 </Icon>
@@ -764,7 +765,7 @@
           {/if}
 
           <div class="user2_tr">
-            {#if a && visibility[1] === 'visible'}
+            {#if a && visibility[0] === 'visible'}
               {#if !a[$langs]}
                 {#await Translate(a[$llang].replace(/"([^"]*)"/g, '$1'), $llang, $langs) then data}
                   {data}
@@ -775,13 +776,14 @@
             {/if}
           </div>
 
-          <div class="speaker-button">
-            <IconButton on:click={speak(a[$llang])}>
+          <div class="speaker-button" on:click={speak(a[$llang])}>
+            <IconButton>
               <Icon tag="svg" viewBox="0 0 24 24">
                 <path fill="currentColor" d={mdiPlay} />
               </Icon>
             </IconButton>
           </div>
+
           {#if !share_mode}
             <div
               class="margins"
@@ -876,8 +878,8 @@
             )}
           {/if}
 
-          <div class="speaker-button">
-            <IconButton on:click={speak(a[$llang])}>
+          <div class="speaker-button" on:click={speak(a[$llang])}>
+            <IconButton>
               <Icon tag="svg" viewBox="0 0 24 24">
                 <path fill="currentColor" d={mdiPlay} />
               </Icon>
@@ -963,16 +965,16 @@
               style="text-align: center; display: flex; align-items: center; justify-content: space-between;"
             >
               <br />
-              <!-- {#if showSpeakerButton} -->
-              <div class="speaker-button">
-                <IconButton on:click={speak(q[$llang])}>
-                  <Icon tag="svg" viewBox="0 0 24 24">
-                    <path fill="currentColor" d={mdiPlay} />
-                  </Icon>
-                </IconButton>
-              </div>
-              <!-- {/if} -->
             </div>
+            <!-- {#if showSpeakerButton} -->
+            <div class="speaker-button" on:click={speak(q[$llang])}>
+              <IconButton>
+                <Icon tag="svg" viewBox="0 0 24 24">
+                  <path fill="currentColor" d={mdiPlay} />
+                </Icon>
+              </IconButton>
+            </div>
+            <!-- {/if} -->
           </div>
         </div>
       {/if}
@@ -1113,6 +1115,7 @@
     border-radius: 25px;
     margin-right: 0px;
     margin-left: 10px;
+    z-index: 2;
   }
 
   .html_data {
@@ -1180,6 +1183,7 @@
     font-size: 0.8em;
     margin-bottom: 0px;
     color: #333;
+    z-index: -1;
   }
 
   .user2 {
@@ -1197,6 +1201,7 @@
     font-size: 0.8em;
     margin-bottom: 0px;
     color: #333;
+    z-index:-1
   }
 
   .tip {

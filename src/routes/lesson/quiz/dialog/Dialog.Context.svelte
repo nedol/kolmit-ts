@@ -66,14 +66,15 @@
     }
   }
 </script>
-<!-- <div> -->
+<div  style="font-size:smaller">
 {@html data.html}
-<!-- </div> -->
+</div>
 
 <style>
   ::selection {
     /* color: rgb(27, 155, 49); */
     background: rgb(190, 201, 205);
   }
+
 
 </style>

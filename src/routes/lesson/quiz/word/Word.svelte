@@ -693,6 +693,8 @@
       </TopAppBar>
     </div>
 
+    <span style="display:block;position:relative;top: 55px;font-size:smaller;font-family: serif;">{data.name}</span>
+
     {#await Translate('Заполнить пропуски', 'ru', $langs) then data}
       <div class="title">{data}:</div>
     {/await}
@@ -733,8 +735,8 @@
       >
         {@html result}
       </div>
-      <div class="speaker-button">
-        <IconButton on:click={onSpeach}>
+      <div class="speaker-button" on:click={onSpeach}>
+        <IconButton>
           <Icon tag="svg" viewBox="0 0 24 24">
             <path fill="currentColor" d={mdiPlay} />
           </Icon>
@@ -850,13 +852,14 @@
 
   .speaker-button {
     display: inline-flex;
+    position: relative;
     float: right;
     margin-right: 10px;
     font-size: large;
     border-radius: 25px;
     transform: translate(50%, 0%);
     font-size: large;
-    z-index: 1;
+    z-index: 2 !important;
   }
 
   .input-container {

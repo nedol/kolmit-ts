@@ -5,13 +5,15 @@
 
   import { nlang, llang, langs, dicts } from '$lib/js/stores.js';
 
+  import List, { Item, Separator, Text } from '@smui/list';
   import Tab, { Label } from '@smui/tab';
   import TabBar from '@smui/tab-bar';
   import Accordion, { Panel, Header } from '@smui-extra/accordion';
-
+  import Menu from '@smui/menu';
   import Button from '@smui/button';
   import IconButton from '@smui/icon-button';
   import Paper, { Content } from '@smui/paper';
+  import { Anchor } from '@smui/menu-surface';
 
   export let ChangeQuizName: any;
 
@@ -25,6 +27,9 @@
   let dialog_data = { lang: '', content: [], words: [], html: [''], name: '' };
   const name = data.name;
   let dialog_task: HTMLDivElement, dialog_words, dialog_tmplt;
+
+  let menu: Menu, anchor: HTMLDivElement;
+  let anchorClasses: { [k: string]: boolean } = {};
 
   let viewHTML = false;
 
@@ -90,7 +95,7 @@
       dialog_data.name = name;
       //DB
       fetch(
-        `./admin?prompt=dialog.${$langs}&quiz_name=${data.name[$llang]}&prompt_owner=${abonent}&prompt_level=${data.level}&prompt_theme=${data.theme}`
+        `./admin?prompt=dialog.basic&quiz_name=${data.name[$llang]}&prompt_owner=${abonent}&prompt_level=${data.level}&prompt_theme=${data.theme}`
       )
         .then((response) => response.json())
         .then((resp) => {
@@ -132,6 +137,28 @@
     });
 
   onMount(async () => {});
+
+  function LoadPrompt(name, data) {
+    fetch(
+      `/admin?prompt=dialog.${name}&quiz_name=${data.name[$llang]}&prompt_owner=${abonent}&prompt_level=${data.level}&prompt_theme=${data.theme}`
+    )
+      .then((response) => response.json())
+      .then((data) => {
+        prompt = data.resp.prompt.system + data.resp.prompt.user;
+        prompt = prompt.replaceAll('${llang}', $llang);
+        prompt = prompt.replaceAll('${name[$llang]}', name[$llang]);
+        prompt = prompt.replaceAll('${langs}', $langs);
+        prompt = prompt.replaceAll('${dialog_data.html}', dialog_data.html);
+        prompt = prompt.replaceAll('${data.level}', data.level);
+        prompt = prompt.replaceAll('${num}', num);
+        prompt = prompt.replaceAll('${grammar}', data.resp.grammar);
+        prompt = prompt;
+      })
+      .catch((error) => {
+        console.log(error);
+        // dialog_data.content = [];
+      });
+  }
 
   function extractWords(text) {
     // Регулярное выражение для поиска слов в угловых скобках
@@ -446,6 +473,45 @@
             {:else if active === prompt_title}
               <Paper variant="unelevated">
                 <Content>
+                  <div
+                    class={Object.keys(anchorClasses).join(' ')}
+                    use:Anchor={{
+                      addClass: (className) => {
+                        if (!anchorClasses[className]) {
+                          anchorClasses[className] = true;
+                        }
+                      },
+                      removeClass: (className) => {
+                        if (anchorClasses[className]) {
+                          delete anchorClasses[className];
+                          anchorClasses = anchorClasses;
+                        }
+                      },
+                    }}
+                    bind:this={anchor}
+                  >
+                    <Button on:click={() => menu.setOpen(true)}>
+                      <Label>Выбрать промпт</Label>
+                    </Button>
+                    <Menu
+                      bind:this={menu}
+                      anchor={false}
+                      bind:anchorElement={anchor}
+                      anchorCorner="BOTTOM_LEFT"
+                    >
+                      <List>
+                        <Item on:click={() => LoadPrompt('basic', data)}>
+                          <Text>basic</Text>
+                        </Item>
+                        <Item on:click={() => LoadPrompt('context', data)}>
+                          <Text>context</Text>
+                        </Item>
+                        <Item on:click={() => LoadPrompt('grammar', data)}>
+                          <Text>grammar</Text>
+                        </Item>
+                      </List>
+                    </Menu>
+                  </div>
                   <textarea rows="20" name="dialog_task" bind:value={prompt}
                   ></textarea>
                   <!-- <div contenteditable="true" bind:this={dialog_task}>

@@ -151,7 +151,8 @@
       }
       const data = await response.json();
 
-      //  lesson_data.data = data;
+      console.log(data);
+      
     } catch (error) {
       console.error(error);
       return [];
