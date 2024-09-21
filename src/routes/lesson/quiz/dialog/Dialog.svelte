@@ -662,8 +662,7 @@
   </div>
   <!-- Ваш контент для лицевой стороны -->
   <div class="card">
-    <span style="font-size:smaller;font-family: ui-monospace;">{data.name}</span
-    >
+    <span style="display:block;position:relative;color: lightgray;font-style: italic;font-size:smaller;font-family: serif;">{data.name}</span>
     {#if q || a}
       {#if !isFlipped}
         <div class="container">
@@ -746,7 +745,7 @@
         <div class="user2">
           {#if a && visibility[2] === 'hidden'}
             {@html a[$llang].replace(
-              /(?<!")\b[\p{L}\p{M}]+\b(?!")/gu,
+              /(?<!")\b\p{L}+(?<!\s)(?!")/gu,
               (match) => {
                 return `<span class="span_hidden" onclick="(this.style.color='#2196f3')" 
                 style="display:inline-block; margin: 5px 0px; padding: 1px 5px;border:1px;border-style:groove;border-color:lightblue;
@@ -755,7 +754,7 @@
             )}
           {:else if visibility[2] === 'visible'}
             {@html a[$llang].replace(
-              /(?<!")\b[\p{L}\p{M}]+\b(?!")/gu,
+              /(?<!")\b\p{L}+(?<!\s)(?!")/gu,
               (match) => {
                 return `<span class="span_hidden"  
                 style="display:inline-block; margin: 5px 0px; padding: 1px 5px;border:1px;border-style:groove;border-color:lightblue;
