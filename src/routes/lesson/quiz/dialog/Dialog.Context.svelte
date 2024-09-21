@@ -66,8 +66,9 @@
     }
   }
 </script>
-<div  style="font-size:smaller">
-{@html data.html}
+
+<div style="height:300vh; overflow-y:auto;font-size:smaller;color:#2196f3">
+  {@html data.html}
 </div>
 
 <style>
@@ -75,6 +76,4 @@
     /* color: rgb(27, 155, 49); */
     background: rgb(190, 201, 205);
   }
-
-
 </style>

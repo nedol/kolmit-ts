@@ -231,7 +231,7 @@
 
   async function findWordsInText(wordAr, word) {
     // Разбиваем текст на предложения
-    const sentences = context.match(/[^.!?]+[.!?]+/g) || [];
+    const sentences = context.match(/(?:\d+\.\d+|[^.!?])+[.!?]/gu) || [];
     let result = [];
 
     for (const sentence of sentences) {

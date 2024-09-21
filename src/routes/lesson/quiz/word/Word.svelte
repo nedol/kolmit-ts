@@ -608,13 +608,13 @@
               </Icon>
             {/if}
           </Section>
-          <Section   align="middle">
+          <Section   align="start">
             <button class="hint-button" on:click={showHint}>
               <span class="material-symbols-outlined">?</span>
             </button>
           </Section>
 
-          <Section align="middle">
+          <Section align="end">
             <div class="counter">
               <p>
                 <span class="mdc-typography--overline" style="position:relative"
@@ -629,7 +629,7 @@
               </p>
             </div>
           </Section>
-          <Section  align="middle">
+          <Section  align="end">
             {#if true || words.length<=20}
             <Icon
               tag="svg"
@@ -644,7 +644,7 @@
             
             {/if}
           </Section>
-          <Section  align="middle">
+          <Section  align="end">
             <span
               class="lang_span"
               on:click={() => {

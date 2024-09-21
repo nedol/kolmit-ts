@@ -124,6 +124,8 @@
               dialog_data.words
             );
 
+          dialog_data.html = resp.resp.words[0]?.context;
+
           grammar = resp.resp.grammar;
 
           if (grammar) prompt = prompt.replaceAll('${grammar}', grammar);

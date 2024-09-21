@@ -233,7 +233,7 @@
         dialog_data = data.data.dialog;
         total_cnt = dialog_data.content.length;
         if (data.data.html) {
-          dialog_data.html = splitHtmlContent(data.data.html);
+          dialog_data.html = data.data.html;//splitHtmlContent(data.data.html);
         }
         dialog_data.name = name;
         Dialog();
