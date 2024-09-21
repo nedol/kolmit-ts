@@ -596,7 +596,7 @@
     <div class="top-app-bar-container flexor">
       <TopAppBar bind:this={topAppBar} variant="fixed">
         <Row>
-          <Section>
+          <Section  align="start">
             {#if currentWordIndex > 0}
               <Icon
                 tag="svg"
@@ -608,27 +608,13 @@
               </Icon>
             {/if}
           </Section>
-          <Section>
+          <Section   align="middle">
             <button class="hint-button" on:click={showHint}>
               <span class="material-symbols-outlined">?</span>
             </button>
           </Section>
-          <Section>
-            {#if words.length<=20}
-            <Icon
-              tag="svg"
-              on:click={onShuffleWords}
-              viewBox="0 0 24 24"
-              style="margin-top:0px; scale:.5; width:50px"
-            >
-              <path fill="white" d={mdiShuffle} />
-            </Icon>
-            {:else}
-              <div on:click={ jumpNext10 }>+10</div>            
-            
-            {/if}
-          </Section>
-          <Section>
+
+          <Section align="middle">
             <div class="counter">
               <p>
                 <span class="mdc-typography--overline" style="position:relative"
@@ -643,8 +629,22 @@
               </p>
             </div>
           </Section>
-
-          <Section align="end">
+          <Section  align="middle">
+            {#if true || words.length<=20}
+            <Icon
+              tag="svg"
+              on:click={onShuffleWords}
+              viewBox="0 0 24 24"
+              style="margin-top:0px; scale:.5; width:50px"
+            >
+              <path fill="white" d={mdiShuffle} />
+            </Icon>
+            {:else}
+              <div on:click={ jumpNext10 }>+10</div>            
+            
+            {/if}
+          </Section>
+          <Section  align="middle">
             <span
               class="lang_span"
               on:click={() => {
@@ -693,7 +693,7 @@
       </TopAppBar>
     </div>
 
-    <span style="display:block;position:relative;top: 55px;font-size:smaller;font-family: serif;">{data.name}</span>
+    <span style="display:block;position:relative;top: 60px;color: lightgray;font-style: italic;font-size:smaller;font-family: serif;">{data.name}</span>
 
     {#await Translate('Заполнить пропуски', 'ru', $langs) then data}
       <div class="title">{data}:</div>
@@ -816,6 +816,7 @@
     width: auto;
     padding-left: 8px;
     margin: 5px;
+    color: #2196E6;
     background-color: transparent;
   }
 
