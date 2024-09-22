@@ -57,10 +57,7 @@
   import pkg from 'lodash';
   const { maxBy } = pkg;
 
-  // import Dialog2 from './Dialog.2.svelte';
-  // import RV from '/src/routes/speech/tts/RV.svelte';
-  // import { Speak } from '../../../speech/tts/RV.svelte';
-  import { Speak } from '../../../speech/tts/VoiceRSS';
+
   let voice;
   import Tts from '../../../speech/tts/Tts.svelte';
   import Stt from '../../../speech/stt/Stt.svelte';

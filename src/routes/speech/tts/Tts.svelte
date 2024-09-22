@@ -1,8 +1,7 @@
 <script>
   import { onMount, onDestroy, getContext } from 'svelte';
   import EasySpeech from '../../speech/tts/EasySpeech.svelte';
-  
-  import { convertTimeToWords } from './time.convert.js';
+
 
   let easyspeech;
 
@@ -12,22 +11,23 @@
 
   export async function Speak(lang,text) {
 
-    text = convertTimeToWords(lang, text);
-
     // if ('speechSynthesis' in window) 
     try{
-      await easyspeech.Speak(lang,text);
+      // await easyspeech.Speak(lang,text);
+      Speak_server(lang, text)
+
     }catch(ex){    
-      Speak_server(text);
+     await easyspeech.Speak(lang,text);
     }
   }
 
-  export async function Speak_server(text) {
+  export async function Speak_server(lang, text) {
     if (!audio || (audio && text !== audio.text)) {
       text = text.replace(/<[^>]+>.*?<\/[^>]+>/g, '');
       const par = {
         func: 'tts',
         text: text,
+        lang: lang//(lang=='nl'?lang+'-BE':lang)
       };
 
       const response = await fetch('/speech/tts', {
@@ -44,10 +44,14 @@
       // Пример того, как можно воспроизвести полученный аудиофайл
 
       audio = new Audio(url.resp.audio);
+      audio.type='audio/mpeg';
       audio.text = text;
-      audio.playbackRate = 0.7;
+      audio.playbackRate = 0.9;
+     
     }
-    audio.play();
+
+      audio.play();
+   
   }
 
   export function CollectGarbage() {}

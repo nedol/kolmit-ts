@@ -123,6 +123,8 @@
 
   let operator = getContext('operator');
   operator.type = 'operator';
+
+
   const abonent = operator.abonent;
   const name = operator.name;
 
@@ -171,6 +173,7 @@
       rtc = new RTCOperator(operator, uid, $signal);
       initRTC();
       rtc.SendCheck();
+      operator.rtc =  rtc;
       CallWaiting(operator);
       try {
         // Fix up for prefixing

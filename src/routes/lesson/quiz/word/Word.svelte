@@ -1,7 +1,6 @@
 <script>
   // @ts-nocheck
 
-
   import { onMount, onDestroy, getContext } from 'svelte';
   import TopAppBar, { Row, Title, Section } from '@smui/top-app-bar';
   import Badge from '@smui-extra/badge';
@@ -23,7 +22,13 @@
   // translate.engine = 'google';
   // translate.from = $llang;
 
-  import {llang, langs ,dicts, lesson, showBottomAppBar } from '$lib/js/stores.js';
+  import {
+    llang,
+    langs,
+    dicts,
+    lesson,
+    showBottomAppBar,
+  } from '$lib/js/stores.js';
 
   import langs_list from '$lib/dict/learn_langs_list.json';
 
@@ -32,8 +37,6 @@
   import ISO6391 from 'iso-google-locales';
 
   import CircularProgress from '@smui/circular-progress';
-
-  import { Speak } from '/src/routes/speech/tts/VoiceRSS';
 
   import TTS from '../../../speech/tts/Tts.svelte';
   let tts;
@@ -277,10 +280,9 @@
   }
 
   onMount(async () => {
-    setTimeout(()=>{
-    //  $showBottomAppBar = false;//test
-    },3000)
-
+    setTimeout(() => {
+      //  $showBottomAppBar = false;//test
+    }, 3000);
   });
 
   function handleBackClick() {
@@ -448,8 +450,8 @@
       userContent[1] = '&nbsp;';
       div_input[0].style.color = '#2196f3';
       div_input[1].style.color = '#2196f3';
-      div_input[0].style.width = getTextWidth(words, '20px Arial')+'px';
-      div_input[1].style.width = getTextWidth(words, '20px Arial')+'px';
+      div_input[0].style.width = getTextWidth(words, '20px Arial') + 'px';
+      div_input[1].style.width = getTextWidth(words, '20px Arial') + 'px';
     }
 
     for (let char of words) {
@@ -569,7 +571,7 @@
   onDestroy(() => {
     // Очищаем интервал при размонтировании компонента
     $llang = _llang;
-     $lesson.data = { quiz: '' };
+    $lesson.data = { quiz: '' };
   });
 </script>
 
@@ -596,7 +598,7 @@
     <div class="top-app-bar-container flexor">
       <TopAppBar bind:this={topAppBar} variant="fixed">
         <Row>
-          <Section  align="start">
+          <Section align="start">
             {#if currentWordIndex > 0}
               <Icon
                 tag="svg"
@@ -608,7 +610,7 @@
               </Icon>
             {/if}
           </Section>
-          <Section   align="start">
+          <Section align="start">
             <button class="hint-button" on:click={showHint}>
               <span class="material-symbols-outlined">?</span>
             </button>
@@ -629,22 +631,21 @@
               </p>
             </div>
           </Section>
-          <Section  align="end">
-            {#if true || words.length<=20}
-            <Icon
-              tag="svg"
-              on:click={onShuffleWords}
-              viewBox="0 0 24 24"
-              style="margin-top:0px; scale:.5; width:50px"
-            >
-              <path fill="white" d={mdiShuffle} />
-            </Icon>
+          <Section align="end">
+            {#if true || words.length <= 20}
+              <Icon
+                tag="svg"
+                on:click={onShuffleWords}
+                viewBox="0 0 24 24"
+                style="margin-top:0px; scale:.5; width:50px"
+              >
+                <path fill="white" d={mdiShuffle} />
+              </Icon>
             {:else}
-              <div on:click={ jumpNext10 }>+10</div>            
-            
+              <div on:click={jumpNext10}>+10</div>
             {/if}
           </Section>
-          <Section  align="end">
+          <Section align="end">
             <span
               class="lang_span"
               on:click={() => {
@@ -693,7 +694,10 @@
       </TopAppBar>
     </div>
 
-    <span style="display:block;position:relative;top: 60px;color: lightgray;font-style: italic;font-size:smaller;font-family: serif;">{data.name}</span>
+    <span
+      style="display:block;position:relative;top: 60px;color: lightgray;font-style: italic;font-size:smaller;font-family: serif;"
+      >{data.name}</span
+    >
 
     {#await Translate('Заполнить пропуски', 'ru', $langs) then data}
       <div class="title">{data}:</div>
@@ -748,9 +752,7 @@
     <!-- {#if hintIndex != 0} -->
     <div class="words_div accordion-container">
       {#if hints?.length > 0}
-        <Content
-          style="line-height: 2.0; overflow-y:auto;"
-        >
+        <Content style="line-height: 2.0; overflow-y:auto;">
           {#each hints as hint, i}
             {#if hint?.example[$llang]}
               <span
@@ -816,18 +818,18 @@
     width: auto;
     padding-left: 8px;
     margin: 5px;
-    color: #2196E6;
-    background-color:transparent;
+    color: #2196e6;
+    background-color: transparent;
   }
 
   /* Стилизуйте компонент по вашему усмотрению */
   .word {
-    font-size: .8em;
+    font-size: 0.8em;
     flex-direction: column;
     align-items: center;
     margin: 2px;
     text-align: center;
-        line-height: 17px;
+    line-height: 17px;
   }
 
   .example {

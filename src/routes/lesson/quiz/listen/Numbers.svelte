@@ -21,9 +21,6 @@
   let tts;
 
 
-  // import RV from '/src/routes/speech/tts/RV.svelte';
-  // let voice;
-
   import { lesson } from '$lib/js/stores.js';
   import { dc_user } from '$lib/js/stores.js';
   import { dc_oper } from '$lib/js/stores.js';

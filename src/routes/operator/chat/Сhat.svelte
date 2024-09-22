@@ -1,6 +1,5 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { Speak } from '/src/routes/speech/tts/VoiceRSS';
   import { Translate } from '../../translate/Transloc';
 
   import {

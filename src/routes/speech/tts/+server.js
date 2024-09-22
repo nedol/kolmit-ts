@@ -1,6 +1,8 @@
 import path from 'path';
 import { fileURLToPath } from 'url';
 
+import * as googleTTS from 'google-tts-api';
+
 import { json } from '@sveltejs/kit';
 
 import axios from 'axios';
@@ -28,8 +30,7 @@ export async function POST({ url, fetch, cookies, request, response }) {
 
   switch (q.func) {
     case 'tts':
-      
-      resp = { audio: await tts_sm4(q.text, 'nl', 'nl') };
+      resp = { audio: await tts_google(q.text, q.lang) };
       break;
   }
 
@@ -74,26 +75,22 @@ async function tts_sm4(text, from_lang, to_lang) {
   ]);
 
   return (
-    'https://bluman1-seamless-m4t-v2-large.hf.space/file=' +
-    result.data[0].path
+    'https://bluman1-seamless-m4t-v2-large.hf.space/file=' + result.data[0].path
   );
 }
 
-async function tts_google(text, language) {
+async function tts_google(text, lang) {
   try {
-    const client = new textToSpeech.TextToSpeechClient();
+    const url = await googleTTS.
+      getAudioBase64(text, {
+      //getAudioUrl(text, {
+      lang: lang,
+      slow: false,
+      host: 'https://translate.google.com',
+      timeout: 10000,
+    });
 
-    // Construct the request
-    const request = {
-      input: { text: text },
-      // Select the language and SSML voice gender (optional)
-      voice: { languageCode: 'en-US', ssmlGender: 'NEUTRAL' },
-      // select the type of audio encoding
-      audioConfig: { audioEncoding: 'MP3' },
-    };
-    const [response] = await client.synthesizeSpeech(request);
-
-    return response;
+    return  "data:audio/mpeg;base64," + url;
   } catch (error) {
     console.error('Error converting text to speech:', error);
   }

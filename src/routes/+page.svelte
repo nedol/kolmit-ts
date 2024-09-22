@@ -41,20 +41,7 @@
 
   onMount(async () => {
 
-    // const script = document.createElement('script');
-    // script.src =
-    //   'https://code.responsivevoice.org/responsivevoice.js?key=n8TO6XTS';
-    // script.async = true;
-    // document.head.appendChild(script);
 
-    // script.onload = () => {
-    //   // Скрипт загружен и готов к использованию
-    //   // Например, вы можете использовать responsiveVoice.speak()
-    //   // responsiveVoice.enableEstimationTimeout = false;
-    //   responsiveVoice.enableWindowClickHook();
-    //   responsiveVoice.setDefaultVoice('Dutch Female');
-    //   voicelist = true; //responsiveVoice.getVoices();
-    // };
   });
 
 

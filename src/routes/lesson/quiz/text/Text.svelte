@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount, getContext, onDestroy } from 'svelte';
   import translate from 'translate';
-  import RV from '../../../speech/tts/RV.svelte';
+
   let voice: any;
   import CircularProgress from '@smui/circular-progress';
 

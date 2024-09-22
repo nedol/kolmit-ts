@@ -21,8 +21,6 @@
 
   import CircularProgress from '@smui/circular-progress';
 
-  import { Speak } from '/src/routes/speech/tts/VoiceRSS';
-
   import TTS from '../../../speech/tts/Tts.svelte';
   let tts;
 
