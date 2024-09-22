@@ -13,9 +13,8 @@
   // let langs_list = JSON.parse(localStorage.getItem('langs_list'));
   //ISO6391.getAllNames();
 
-  import translate from 'translate';
-  translate.from = 'en';
-  translate.engine = 'google';
+ import { Translate } from './translate/Transloc';
+
 
   import List, { Item, Graphic, Separator, Text } from '@smui/list';
 
@@ -27,12 +26,18 @@
   } from '@smui/top-app-bar';
   import IconButton from '@smui/icon-button';
 
-  import { lesson , view, langs, dicts, editable, showBottomAppBar} from '$lib/js/stores.js';
+  import {
+    lesson,
+    view,
+    langs,
+    dicts,
+    editable,
+    showBottomAppBar,
+  } from '$lib/js/stores.js';
 
   $: if ($editable) {
     edited_display = $editable;
   }
-
 
   $: if ($dicts) {
     console.log($dicts);
@@ -91,7 +96,6 @@
     // console.log($langs);
     lang_menu = false;
 
-
     fetch(`./?func=cookie&abonent=${abonent}&lang=${$langs}`)
       .then(() => console.log())
       .catch((error) => {
@@ -108,20 +112,41 @@
           <div class="sec_items">
             {#if $view !== 'login'}
               <Section>
+                {#await Translate('Quit the exercise?','en',$langs) then data}
                 <Title
                   on:click={() => {
-                    $view = 'group';
-                     $showBottomAppBar = true;
+                    if ($lesson.data?.quiz) {
+                      
+                      if (confirm(data)) {
+                        $view = 'group';
+                        $showBottomAppBar = true;
+                      }
+                   
+                    } else {
+                      $view = 'group';
+                      $showBottomAppBar = true;
+                    }
                   }}>{$dicts ? $dicts['CLASS'][$langs] : 'CLASS'}</Title
                 >
+                 
                 <Title
                   on:click={async () => {
-                    console.log();
-                    $lesson.data = { quiz: '' };
-                    $view = 'lesson';
-                    $showBottomAppBar = true;
+                    if ($lesson.data?.quiz) {
+                     
+                      if (confirm(data)) {
+                        $lesson.data = { quiz: '' };
+                        $view = 'lesson';
+                        $showBottomAppBar = true;
+                      }
+            
+                    } else {
+                      $lesson.data = { quiz: '' };
+                      $view = 'lesson';
+                      $showBottomAppBar = true;
+                    }
                   }}>{$dicts ? $dicts['LESSON'][$langs] : 'LESSON'}</Title
                 >
+                  {/await}
                 <!-- <IconButton class="material-icons" aria-label="Bookmark this page">bookmark</IconButton> -->
               </Section>
             {/if}
@@ -177,7 +202,7 @@
 
   .lang_span {
     font-size: smaller;
-       bottom: -15px;
+    bottom: -15px;
     position: relative;
   }
 

@@ -135,6 +135,11 @@
     'Content-Type': 'application/json',
   };
 
+    
+  $: if($view){
+    console.log()
+  }
+
   async function CallWaiting(par: any) {
     par.func = 'callwaiting';
 

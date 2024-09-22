@@ -3,7 +3,7 @@
 
   import { getContext, onMount } from 'svelte';
 
-  import { nlang, llang, langs, dicts } from '$lib/js/stores.js';
+  import { nlang, llang, langs, dicts, view } from '$lib/js/stores.js';
 
   import List, { Item, Separator, Text } from '@smui/list';
   import Tab, { Label } from '@smui/tab';

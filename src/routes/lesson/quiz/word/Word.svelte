@@ -569,7 +569,7 @@
   onDestroy(() => {
     // Очищаем интервал при размонтировании компонента
     $llang = _llang;
-    console.log('Компонент размонтирован');
+     $lesson.data = { quiz: '' };
   });
 </script>
 
@@ -810,14 +810,14 @@
 
   .hint_button {
     display: inline-block;
-    border: solid 0.1em #9f3f3f;
+    border: solid 0.1em #80777791;
     border-radius: 5px;
     text-align: center;
     width: auto;
     padding-left: 8px;
     margin: 5px;
     color: #2196E6;
-    background-color: transparent;
+    background-color:transparent;
   }
 
   /* Стилизуйте компонент по вашему усмотрению */
@@ -888,7 +888,7 @@
     outline: none;
     border: none;
     background: rgba(0, 0, 0, 0.12);
-    text-align: left;
+    text-align: center;
   }
 
   .input:focus {

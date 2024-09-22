@@ -41,6 +41,7 @@
 
   const dict = $dicts;
 
+
   import {
     mdiRepeat,
     mdiArrowRight,
@@ -233,7 +234,7 @@
         dialog_data = data.data.dialog;
         total_cnt = dialog_data.content.length;
         if (data.data.html) {
-          dialog_data.html = data.data.html;//splitHtmlContent(data.data.html);
+          dialog_data.html = data.data.html; //splitHtmlContent(data.data.html);
         }
         dialog_data.name = name;
         Dialog();
@@ -327,6 +328,7 @@
     visibility_cnt = 1;
     display_audio = 'none';
     tip_hidden_text = '';
+    selectedSentence = ''
     setTimeout(() => {
       tip_hidden_text = 'hidden-text';
     }, 50);
@@ -345,6 +347,7 @@
     visibility[1] = 'hidden';
     visibility[2] = 'hidden';
     visibility_cnt = 1;
+    selectedSentence = ''
     Dialog();
     SendData();
     stt_text = '';
@@ -356,6 +359,7 @@
     // Обработчик нажатия на кнопку "share"
     share_mode = true;
     share_button_class = `button_shared_${share_mode}`;
+    selectedSentence = ''
     Dialog();
     SendData();
   }
@@ -551,8 +555,35 @@
       );
   }
 
+  let selectedSentence = '';
+
+  const getSentenceFromSelection = function (ev) {
+    const text = ev.currentTarget.outerText;
+    const selection = window.getSelection();
+    const selectedText = selection.toString();
+
+    console.log(selectedText);
+
+    if (selectedText) {
+      const sentenceRegex = /[^.!?]*[.!?]/g;
+      const sentences = text.match(sentenceRegex);
+
+      if (sentences) {
+        for (let sentence of sentences) {
+          if (sentence.includes(selectedText)) {
+            selectedSentence = sentence.trim();
+            const translateUrl = `https://translate.google.com/?sl=auto&tl=ru&text=${encodeURIComponent(selectedSentence)}&op=translate`;
+            window.open(translateUrl, '_blank');
+            break;
+          }
+        }
+      }
+    }
+  };
+
   onDestroy(() => {
     // voice.Cancel();
+    $lesson.data = { quiz: '' };
     dialog_data = '';
     data = '';
     stt_text = '';
@@ -662,7 +693,10 @@
   </div>
   <!-- Ваш контент для лицевой стороны -->
   <div class="card">
-    <span style="display:block;position:relative;color: lightgray;font-style: italic;font-size:smaller;font-family: serif;">{data.name}</span>
+    <span
+      style="display:block;position:relative;color: lightgray;font-style: italic;font-size:smaller;font-family: serif;"
+      >{data.name}</span
+    >
     {#if q || a}
       {#if !isFlipped}
         <div class="container">
@@ -692,8 +726,16 @@
           {/if}
         </div>
 
-        <div class="tip mdc-typography--headline6 {tip_hidden_text}">
-          {@html q[$llang].replace(/"([^"]*)"/g, '$1')}
+        <div
+          class="tip mdc-typography--headline6 {tip_hidden_text}"
+          on:mouseup={getSentenceFromSelection}
+          on:touchend={getSentenceFromSelection}
+        >
+          {#if selectedSentence}
+            <p><span class="highlight">{selectedSentence}</span></p>
+          {:else}
+            {@html q[$llang].replace(/"([^"]*)"/g, '$1')}
+          {/if}
           <div style="display: inline-flex; float: right; margin-right: 10px;}">
             <br />
             <!-- {#if showSpeakerButton} -->
@@ -1200,7 +1242,7 @@
     font-size: 0.8em;
     margin-bottom: 0px;
     color: #333;
-    z-index:-1
+    z-index: -1;
   }
 
   .tip {
@@ -1276,6 +1318,15 @@
     opacity: 0;
     animation: fadeIn 2s ease-in forwards;
     animation-delay: 2s;
+  }
+
+  p {
+    cursor: pointer;
+    user-select: text; /* Позволяет выделять текст на мобильных устройствах */
+  }
+
+  .highlight {
+    background-color: yellow;
   }
 
   @keyframes fadeIn {
