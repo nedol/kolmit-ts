@@ -35,7 +35,7 @@
   import CircularProgress from '@smui/circular-progress';
 
   // import {Dict} from '$lib/js/$dicts'
-  import Group from './group/Group.svelte';
+  import Group from '../user/group/Group.svelte';
   let group = getContext('group');
 
   import { RTCOperator } from './rtc/RTCOperator';
@@ -115,6 +115,10 @@
 
   $call_but_status = 'inactive';
 
+  $: if($call_but_status ==='active'){
+     CallWaiting(operator);
+  }
+
   import { editable } from '$lib/js/stores.js';
   import { Translate } from '../translate/Translate';
   $: if ($editable) {
@@ -143,6 +147,10 @@
   }
 
   async function CallWaiting(par: any) {
+
+    if($call_but_status ==='inactive')
+      return;
+
     par.func = 'callwaiting';
 
     fetch(`/operator`, {
@@ -171,10 +179,9 @@
   
 
       rtc = new RTCOperator(operator, uid, $signal);
-      initRTC();
+      initRTC();   
       rtc.SendCheck();
-      operator.rtc =  rtc;
-      CallWaiting(operator);
+
       try {
         // Fix up for prefixing
         if (!window.AudioContext) {

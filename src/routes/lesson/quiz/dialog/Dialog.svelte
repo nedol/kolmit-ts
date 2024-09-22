@@ -426,7 +426,7 @@
   }
 
   async function speak(text) {
-    if (text) isFlipped ? Speak($llang, text) : tts.Speak($llang, text);
+    if (text) tts.Speak($llang, text);
   }
 
   function onClickMicrophone() {

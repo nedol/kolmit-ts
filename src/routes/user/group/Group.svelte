@@ -23,7 +23,7 @@
 
   import { users, langs, msg_oper, msg_user } from '$lib/js/stores.js';
 
-  import User from '../../user/User.svelte';
+  import User from '../User.svelte';
 
   let operator = getContext('operator');
 
