@@ -631,6 +631,7 @@
   }
 
   function showHint() {
+     showCheckButton = true;
     const words = extractWords(currentWord.example[$llang]).join(' ');
 
     let i = 0,
