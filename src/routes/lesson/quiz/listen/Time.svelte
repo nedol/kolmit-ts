@@ -405,7 +405,7 @@
   }
 
   async function speak(text) {
-    tts.Speak($llang, text);
+    tts.Speak_server($llang, text);
   }
 
   function repeat() {

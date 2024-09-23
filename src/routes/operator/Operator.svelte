@@ -537,7 +537,7 @@
         </div>
       {/if}
     </Section>
-    <Section>
+    <Section align="end">
       <CallButton on:click={$click_call_func}>
         <b
           class="call_cnt"
@@ -551,7 +551,7 @@
         >
       </CallButton>
     </Section>
-    <Section>
+    <Section  align="end">
       <div
         class="video"
         on:click={OnClickVideoButton}

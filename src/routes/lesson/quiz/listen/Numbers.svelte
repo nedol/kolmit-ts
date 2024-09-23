@@ -216,7 +216,7 @@
 
   async function speak(text) {
     //Speak(text);
-    tts.Speak($llang,text)
+    tts.Speak_server($llang,text)
   }
 
   function repeat() {
