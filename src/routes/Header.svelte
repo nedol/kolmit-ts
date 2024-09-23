@@ -13,8 +13,7 @@
   // let langs_list = JSON.parse(localStorage.getItem('langs_list'));
   //ISO6391.getAllNames();
 
- import { Translate } from './translate/Transloc';
-
+  import { Translate } from './translate/Transloc';
 
   import List, { Item, Graphic, Separator, Text } from '@smui/list';
 
@@ -112,41 +111,22 @@
           <div class="sec_items">
             {#if $view !== 'login'}
               <Section>
-                {#await Translate('Quit the exercise?','en',$langs) then data}
-                <Title
-                  on:click={() => {
-                    if ($lesson.data?.quiz) {
-                      
-                      if (confirm(data)) {
-                        $view = 'group';
-                        $showBottomAppBar = true;
-                      }
-                   
-                    } else {
+                {#await Translate('Quit the exercise?', 'en', $langs) then data}
+                  <Title
+                    on:click={() => {
                       $view = 'group';
                       $showBottomAppBar = true;
-                    }
-                  }}>{$dicts ? $dicts['CLASS'][$langs] : 'CLASS'}</Title
-                >
-                 
-                <Title
-                  on:click={async () => {
-                    if ($lesson.data?.quiz) {
-                     
-                      if (confirm(data)) {
-                        $lesson.data = { quiz: '' };
-                        $view = 'lesson';
-                        $showBottomAppBar = true;
-                      }
-            
-                    } else {
+                    }}>{$dicts ? $dicts['CLASS'][$langs] : 'CLASS'}</Title
+                  >
+
+                  <Title
+                    on:click={async () => {
                       $lesson.data = { quiz: '' };
                       $view = 'lesson';
                       $showBottomAppBar = true;
-                    }
-                  }}>{$dicts ? $dicts['LESSON'][$langs] : 'LESSON'}</Title
-                >
-                  {/await}
+                    }}>{$dicts ? $dicts['LESSON'][$langs] : 'LESSON'}</Title
+                  >
+                {/await}
                 <!-- <IconButton class="material-icons" aria-label="Bookmark this page">bookmark</IconButton> -->
               </Section>
             {/if}

@@ -9,7 +9,7 @@
 
   onMount(async () => {});
 
-  export async function Speak(lang,text) {
+  export async function Speak_(lang,text) {
 
     // if ('speechSynthesis' in window) 
     try{

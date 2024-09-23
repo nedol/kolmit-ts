@@ -47,7 +47,7 @@
     msg_oper,
     call_but_status,
     showBottomAppBar,
-    OnCheckQU
+    OnCheckQU,
   } from '$lib/js/stores.js';
 
   let dict = $dicts;
@@ -55,6 +55,8 @@
   export let data;
 
   const abonent = getContext('abonent');
+
+  let msg;
 
   let words = [],
     word,
@@ -124,7 +126,6 @@
 
         if ($call_but_status !== 'active') {
           onShare();
-      
         }
 
         //   shuffle(hints);
@@ -152,8 +153,7 @@
       share_mode = true;
       showHints[isFlipped] = false;
 
-       $OnCheckQU(null, 'word', $msg_user.lesson.name);
-     
+      $OnCheckQU(null, 'word', $msg_user.lesson.name);
     } else if (
       ($msg_user.lesson.word_correct || $msg_user.lesson.word_correct == 0) &&
       hints
@@ -189,7 +189,8 @@
       hint_example = '';
       example = '';
     }
-  }
+  } 
+
 
   $: if ($msg_oper?.lesson?.quiz === 'word') {
     if ($msg_oper.lesson.word_index || $msg_oper.lesson.word_index == 0) {
@@ -200,7 +201,6 @@
       showHints[isFlipped] = true;
       level = $msg_oper.lesson.level;
       makeExample();
-
     } else if ($msg_oper?.lesson.words_data) {
       words = $msg_oper.lesson.words_data;
       hints[false] = JSON.parse(JSON.stringify(words));
@@ -210,7 +210,7 @@
       isFlipped = !$msg_oper.lesson.isFlipped;
       showHints[isFlipped] = false;
 
-       $OnCheckQU(null, 'word', $msg_oper.lesson.name) ;
+      $OnCheckQU(null, 'word', $msg_oper.lesson.name);
     } else if (
       ($msg_oper.lesson.word_correct || $msg_oper.lesson.word_correct == 0) &&
       hints
@@ -235,7 +235,19 @@
       hint_example = '';
       example = '';
     }
+  } 
+
+  $:if($msg_oper?.msg || $msg_user?.msg){
+    (async()=>{
+    alert(await Translate($msg_oper?.msg || $msg_user?.msg, 'ru', $langs));
+     if($msg_user)$msg_user.msg = '';
+     if($msg_oper)$msg_oper.msg = '';
+    })()
   }
+
+  onMount(async () => {
+
+  });
 
   function onShare() {
     // Обработчик нажатия на кнопку "share"
@@ -255,9 +267,8 @@
     // currentWord = words[currentWordIndex];
     // makeExample();
     SendData(lesson);
-      const dc = $dc_user?.dc.readyState === 'open' ? $dc_user : $dc_oper;
-     $OnCheckQU(dc.rtc.oper_uid, 'word', data.name);
-
+    const dc = $dc_user?.dc.readyState === 'open' ? $dc_user : $dc_oper;
+    $OnCheckQU(dc.rtc.oper_uid, 'word', data.name);
   }
 
   let topAppBar;
@@ -480,9 +491,7 @@
     }
   }
 
-  onMount(async () => {
 
-  });
 
   // function handleBackClick() {
   //   $lesson.data = { quiz: '' }; // При клике на "Back" показываем компонент Lesson
@@ -631,7 +640,7 @@
   }
 
   function showHint() {
-     showCheckButton = true;
+    showCheckButton = true;
     const words = extractWords(currentWord.example[$llang]).join(' ');
 
     let i = 0,
@@ -761,9 +770,10 @@
   onDestroy(() => {
     // Очищаем интервал при размонтировании компонента
     $llang = _llang;
+  
     $view = 'lesson';
-    $lesson.data = { quiz: '' };
-    console.log('Компонент размонтирован');
+    $lesson.data.quiz = ''
+
     $showBottomAppBar = true;
   });
 </script>

@@ -8,20 +8,22 @@
   import Word from './word/Word.svelte';
   import WordGame from './word/WordGame.svelte';
   import { dc_oper } from '$lib/js/stores.js';
-  import { dc_user } from '$lib/js/stores.js';
-  import { call_but_status } from '$lib/js/stores.js';
+  import { dc_user, lesson } from '$lib/js/stores.js';
+  import { call_but_status  } from '$lib/js/stores.js';
 
   export let data;
   let quiz = data.quiz;
+  let word_game;
+
+
+
 </script>
 
 <div />
 <!-- {@debug quiz} -->
 {#if quiz}
-  {#if quiz === 'sequence'}
-    <Volgorde data={data.zinnen} />
-  {:else if quiz.includes('dialog')}
-    <Dialog {data} />
+  {#if quiz.includes('dialog')}
+    <Dialog {data}/>
   {:else if quiz.includes('listen')}
     {#if data.name === 'Nummers'}
       <Numbers {data} ></Numbers>
@@ -31,12 +33,9 @@
         <Listen {data} />
     {/if}
 
-
-  {:else if quiz === 'text'}
-    <Text {data} />
   {:else if quiz === 'word'}
     {#if ($dc_user || $dc_oper) && $call_but_status === 'talk' }
-       <WordGame {data} />
+       <WordGame {data} bind:this={word_game}/>
     {:else}      
       <Word {data} /> 
     {/if}

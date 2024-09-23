@@ -41,7 +41,6 @@
 
   const dict = $dicts;
 
-
   import {
     mdiRepeat,
     mdiArrowRight,
@@ -56,7 +55,6 @@
 
   import pkg from 'lodash';
   const { maxBy } = pkg;
-
 
   let voice;
   import Tts from '../../../speech/tts/Tts.svelte';
@@ -147,6 +145,12 @@
           onNextQA();
         }
       }, 2000);
+    } else if ($msg_user.command === 'quit') {
+      $msg_user.command = '';
+      setTimeout(()=>{
+        $lesson.data = { quiz: '' };
+      },100)
+ 
     }
   }
 
@@ -172,7 +176,19 @@
       setTimeout(() => {
         isThumb = false;
       }, 2000);
+    } else if ($msg_oper.command === 'quit') {
+      $msg_oper.command = '';
+      setTimeout(()=>{
+        $lesson.data = { quiz: '' };
+      },100)
     }
+  }
+
+  $:if($msg_oper?.msg || $msg_user?.msg){
+    (async()=>{
+    alert(await Translate($msg_oper?.msg || $msg_user?.msg, 'ru', $langs));
+    $msg_user?$msg_user.msg = '': $msg_oper.msg = ''
+    })()
   }
 
   $: if (data.html) {
@@ -325,7 +341,7 @@
     visibility_cnt = 1;
     display_audio = 'none';
     tip_hidden_text = '';
-    selectedSentence = ''
+    selectedSentence = '';
     setTimeout(() => {
       tip_hidden_text = 'hidden-text';
     }, 50);
@@ -344,7 +360,7 @@
     visibility[1] = 'hidden';
     visibility[2] = 'hidden';
     visibility_cnt = 1;
-    selectedSentence = ''
+    selectedSentence = '';
     Dialog();
     SendData();
     stt_text = '';
@@ -356,7 +372,7 @@
     // Обработчик нажатия на кнопку "share"
     share_mode = true;
     share_button_class = `button_shared_${share_mode}`;
-    selectedSentence = ''
+    selectedSentence = '';
     Dialog();
     SendData();
   }
@@ -426,7 +442,7 @@
   }
 
   async function speak(text) {
-    if (text) tts.Speak($llang, text);
+    if (text) tts.Speak_server($llang, text);
   }
 
   function onClickMicrophone() {
@@ -537,19 +553,23 @@
       variant = 'outlined';
     }, 1000);
 
-    ev.target.style.color = 'red';
+    if (ev) ev.target.style.color = 'red';
 
     const dc = $dc_user?.dc.readyState === 'open' ? $dc_user : $dc_oper;
 
-    if (dc)
-      dc.SendData(
-        {
-          command: cmd,
-        },
-        () => {
-          console.log();
-        }
-      );
+    if (dc) {
+      return new Promise((resolve) => {
+        dc.SendData(
+          {
+            command: cmd,
+          },
+          () => {
+            console.log();
+             resolve();
+          }
+        );
+      });
+    }
   }
 
   let selectedSentence = '';
@@ -578,7 +598,7 @@
     }
   };
 
-  onDestroy(() => {
+  onDestroy(async () => {
     // voice.Cancel();
     $lesson.data = { quiz: '' };
     dialog_data = '';
@@ -587,6 +607,7 @@
     stt = '';
     tts = '';
     $showBottomAppBar = true;
+    await SendCommand('quit', null);
   });
 </script>
 

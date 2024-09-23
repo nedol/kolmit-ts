@@ -68,8 +68,8 @@ export class DataChannelUser {
 		this.dc.onmessage = async (event) => {
 			try {
 				let parsed = JSON.parse(event.data);
-				if (parsed.type === 'eom') {
-					that.rtc.OnMessage(JSON.parse(data), that);
+				if (parsed.type === 'eom' && parsed.from!=='user') {
+					//that.rtc.OnMessage(JSON.parse(data), that);
 
 					data = JSON.parse(data);
 					data.operator = this.rtc.operator;
@@ -82,7 +82,7 @@ export class DataChannelUser {
 				// if (parsed.file) {
 				// 	document.getElementById('dataProgress').attributes.max = parsed.length;
 				// }
-				if (parsed.type === 'eof') {
+				if (parsed.type === 'eof' && parsed.from!=='user') {
 					const received = new Blob(receiveBuffer);
 					receiveBuffer = [];
 
@@ -126,7 +126,7 @@ export class DataChannelUser {
 				let size = 16384;
 				const numChunks = Math.ceil(data.byteLength / size);
 
-				this.dc.send(JSON.stringify({ file: name, length: data.byteLength }), function (data) {
+				this.dc.send(JSON.stringify({ file: name, length: data.byteLength,from:'user' }), function (data) {
 					console.log(data);
 				});
 				for (let i = 0, o = 0; i < numChunks; ++i, o += size) {
@@ -142,7 +142,7 @@ export class DataChannelUser {
 				// }, 2000);
 
 				this.dc.send(
-					JSON.stringify({ type: 'eof', file: name, length: data.byteLength }),
+					JSON.stringify({ type: 'eof', file: name, length: data.byteLength, from:'user' }),
 					function (data) {
 						console.log(data);
 						resolve();
@@ -167,9 +167,9 @@ export class DataChannelUser {
 				const numChunks = Math.ceil(data.length / size);
 
 				for (let i = 0, o = 0; i < numChunks; ++i, o += size) {
-					this.dc.send(JSON.stringify({ slice: data.substr(o, size) }));
+					this.dc.send(JSON.stringify({ slice: data.substr(o, size),from:'user' }));
 				}
-				this.dc.send(JSON.stringify({ type: 'eom' }));
+				this.dc.send(JSON.stringify({ type: 'eom', from:'user' }));
 			}
 			if (cb) cb();
 		} catch (ex) {

@@ -440,7 +440,7 @@
   }
 
   function showHint() {
-    showCheckButton = true;
+
     const words = extractWords(currentWord.example[$llang]).join(' ');
 
     let i = 0,
@@ -526,7 +526,7 @@
     text = text.replace(/<<|>>/g, '');
     text = text.replace(/_/g, ' ');
     // Speak(text);
-    tts.Speak($llang, text);
+    tts.Speak_server($llang, text);
 
     // setFocus();
   }

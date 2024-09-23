@@ -25,6 +25,8 @@
     llang,
     dicts,
     msg_oper,
+    dc_oper,
+    dc_user,
     dc_user_state,
     showBottomAppBar,
     OnCheckQU,
@@ -49,7 +51,7 @@
   }));
 
   import tutor_src from '$lib/images/tutor.png';
-  // import { view } from '$lib/js/stores.js';
+  import { view } from '$lib/js/stores.js';
 
   import { lesson } from '$lib/js/stores.js';
 
@@ -69,8 +71,12 @@
     true,
   ];
 
+
   $: if ($lesson.data) {
-    // if (view !== 'lesson')
+    if ($lesson.data.quiz == '' && data.quiz) {
+      SendData({ msg: "Собеседник вышел из упражнения" });
+      data = $lesson.data;
+    }
     data = $lesson.data;
   }
 
@@ -206,8 +212,7 @@
     par.level = lesson_data.level;
     par.type = node?.attributes['type'].value || msg.type;
 
-    if(!checked[par.type])
-      return;
+    if (!checked[par.type]) return;
 
     checked[par.type][par.quiz] = false;
 
@@ -243,6 +248,23 @@
       quiz.name[$llang]
     );
   }
+
+  async function SendData(data) {
+    let dc = null;
+
+    if ($dc_user?.dc.readyState === 'open') {
+      dc = $dc_user;
+    } else if ($dc_oper?.dc.readyState === 'open') {
+      dc = $dc_oper;
+    }
+    if (dc) {
+      //  words.content[cur_qa].user2['a_shfl'] = a_shfl;
+      await dc.SendData(data, (ex) => {
+        console.log(ex);
+      });
+    }
+  }
+
   onDestroy(() => {
     data = '';
     lesson_data = '';
@@ -289,7 +311,7 @@
                     {#if lesson.quizes}
                       {#each lesson.quizes as quiz}
                         <!-- {@debug quiz} -->
-                         
+
                         {#if quiz.name[$llang] && quiz.published}
                           <div
                             class="quiz-container mdc-typography--caption"

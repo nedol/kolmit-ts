@@ -52,9 +52,9 @@ export class DataChannelOperator extends DataChannel {
 			try {
 				// debugger;
 				let parsed = JSON.parse(event.data);
-				if (parsed.type === 'eom') {
+				if (parsed.type === 'eom' && parsed.from!=='oper') {
 					if (data) {
-						that.rtc.OnMessage(JSON.parse(data), that);
+						//that.rtc.OnMessage(JSON.parse(data), that);
 						await msg_oper.set(JSON.parse(data));
 					}
 					data = '';
@@ -64,7 +64,7 @@ export class DataChannelOperator extends DataChannel {
 				if (parsed.file) {
 					// document.getElementById('dataProgress').attributes.max = parsed.length;
 				}
-				if (parsed.type === 'eof') {
+				if (parsed.type === 'eof'  && parsed.from!=='oper') {
 					const received = new Blob(receiveBuffer);
 					receiveBuffer = [];
 
@@ -119,7 +119,7 @@ export class DataChannelOperator extends DataChannel {
 				// }, 2000);
 
 				this.dc.send(
-					JSON.stringify({ type: 'eof', file: name, length: data.byteLength }),
+					JSON.stringify({ type: 'eof', file: name, length: data.byteLength,from:'oper' }),
 					function (data) {
 						console.log(data);
 					}
@@ -143,9 +143,9 @@ export class DataChannelOperator extends DataChannel {
 				const numChunks = Math.ceil(data.length / size);
 
 				for (let i = 0, o = 0; i < numChunks; ++i, o += size) {
-					this.dc.send(JSON.stringify({ slice: data.substr(o, size) }));
+					this.dc.send(JSON.stringify({ slice: data.substr(o, size),from:'oper' }));
 				}
-				this.dc.send(JSON.stringify({ type: 'eom' }));
+				this.dc.send(JSON.stringify({ type: 'eom',from:'oper' }));
 			}
 
 			if (cb) cb();
