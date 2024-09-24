@@ -123,6 +123,7 @@
       {/if}
     {/each}
   </div>
+  {#if false}
   <div class="flexy-dad tutor">
     <div class="mdc-elevation--z{1} flexy-boy">
       <Item style="text-align: center">
@@ -134,6 +135,7 @@
       </Item>
     </div>
   </div>
+  {/if}
   <!-- <div class="empty" style="height:100px" /> -->
 </div>
 <div style="height:100px"></div>

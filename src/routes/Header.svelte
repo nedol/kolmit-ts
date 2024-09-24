@@ -38,9 +38,6 @@
     edited_display = $editable;
   }
 
-  $: if ($dicts) {
-    console.log($dicts);
-  }
 
   let menu = 'menu';
 
@@ -114,16 +111,35 @@
                 {#await Translate('Quit the exercise?', 'en', $langs) then data}
                   <Title
                     on:click={() => {
+                    if ($lesson.data?.quiz) {
+                      
+                      if (confirm(data)) {
+                        $view = 'group';
+                        $showBottomAppBar = true;
+                      }
+                   
+                    } else {
                       $view = 'group';
                       $showBottomAppBar = true;
+                    }
                     }}>{$dicts ? $dicts['CLASS'][$langs] : 'CLASS'}</Title
                   >
 
                   <Title
                     on:click={async () => {
+                    if ($lesson.data?.quiz) {
+                     
+                      if (confirm(data)) {
+                        $lesson.data = { quiz: '' };
+                        $view = 'lesson';
+                        $showBottomAppBar = true;
+                      }
+            
+                    } else {
                       $lesson.data = { quiz: '' };
                       $view = 'lesson';
                       $showBottomAppBar = true;
+                    }
                     }}>{$dicts ? $dicts['LESSON'][$langs] : 'LESSON'}</Title
                   >
                 {/await}

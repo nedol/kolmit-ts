@@ -5,11 +5,6 @@
   import { view } from '$lib/js/stores.js';
 
   import { Dict } from '../dict/dict';
-  // $view = 'lesson';
-
-  $: if ($view) {
-    console.log($view);
-  }
 
  
   import { dicts } from '$lib/js/stores.js';

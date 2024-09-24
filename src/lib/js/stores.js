@@ -4,7 +4,7 @@ export let operatorst = writable();
 
 export let editable = writable(false);
 
-export let view = writable('lesson');
+export let view = writable('group');
 
 export let nlang = writable('en'); //native lang
 
