@@ -15,10 +15,10 @@
   let width, height, value;
   let formData = {
     func:'',
-    name: 'Kolmit',
-    email: 'kolmit.be@gmail.com',
-    psw: 'kolmit',
-    confirmPassword: 'kolmit',
+    name: '',
+    email: '',
+    psw: '',
+    confirmPassword: '',
     picture: '',
     lang: $langs,
   };
