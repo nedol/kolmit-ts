@@ -43,7 +43,7 @@ export async function CreatePool(resolve) {
 }
 
 export async function SetSQL(sql_) {
-  sql = await sql_;
+  sql = sql_;
 }
 
 export async function CreateAdmin(par) {
@@ -71,26 +71,28 @@ export async function GetGroups(par) {
   let groups, operators, admin;
   try {
     operators = await sql`
-			SELECT 
-			*
-			FROM operators
-			WHERE role<>'admin' AND operators.abonent=${par.abonent}`;
+      SELECT *
+      FROM operators
+      WHERE role <> 'admin' AND operators.abonent = ${par.abonent}`;
+
     admin = await sql`
-			SELECT 
-			*
-			FROM operators
-			WHERE role='admin' AND operators.abonent=${par.abonent}
-			`;
+      SELECT *
+      FROM operators
+      WHERE role = 'admin' AND operators.abonent = ${par.abonent}`;
+
     groups = await sql`
-     SELECT groups.name  FROM groups
-     INNER JOIN operators ON (operators.abonent = groups.owner)
-     WHERE operators.operator=${par.abonent} AND operators.role='admin' AND operators.psw = ${par.psw}
-     `;
+      SELECT groups.name::text 
+      FROM groups
+      INNER JOIN operators ON (operators.abonent = groups.owner)
+      WHERE operators.operator = ${par.abonent} 
+      AND operators.role = 'admin' 
+      AND operators.psw = ${par.psw}`;
   } catch (ex) {
     console.log(ex);
   }
   return { groups, operators, admin };
 }
+
 
 export async function DeleteUser(par) {
   let resp;

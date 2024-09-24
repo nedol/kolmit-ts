@@ -42,7 +42,7 @@ export async function load({ fetch, cookies, route, url, stuff }) {
 		CreatePool(resolve);
 	});
 
-	const pool = await prom;
+
 
 	const host = url.origin; //'http://localhost:3000'; //'https://kolmit-sveltekit-nedol.vercel.app'; //
 
