@@ -1,25 +1,9 @@
 <script>
   import { onMount, onDestroy, getContext } from 'svelte';
-  import EasySpeech from '../../speech/tts/EasySpeech.svelte';
-
-
-  let easyspeech;
 
   let audio;
 
-  onMount(async () => {});
-
-  export async function Speak_(lang,text) {
-
-    // if ('speechSynthesis' in window) 
-    try{
-      // await easyspeech.Speak(lang,text);
-      Speak_server(lang, text)
-
-    }catch(ex){    
-     await easyspeech.Speak(lang,text);
-    }
-  }
+  onMount(() => {});
 
   export async function Speak_server(lang, text) {
     if (!audio || (audio && text !== audio.text)) {
@@ -66,8 +50,6 @@
 
   onDestroy(() => {
     audio = '';
-    easyspeech = '';
   });
 </script>
 
-<EasySpeech bind:this={easyspeech}></EasySpeech>

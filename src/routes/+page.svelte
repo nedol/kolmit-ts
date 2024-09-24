@@ -5,10 +5,7 @@
   import Operator from './operator/Operator.svelte';
   import Login from './site/Login.svelte';
   import { SignalingChannel } from './signalingChannel.js';
-  import { signal } from '$lib/js/stores.js';
-  import { langs } from '$lib/js/stores.js';
-  import { ice_conf } from '$lib/js/stores.js';
-  import { dicts } from '$lib/js/stores.js';
+  import { signal, langs, ice_conf, dicts, view } from '$lib/js/stores.js';
 
   export let data;
   let operator, abonent, name, user_pic;
@@ -30,7 +27,7 @@
     // import wsConnector from './wsConnector.js';
     // $wss = new wsConnector(host.host_wss);
 
-    $langs = JSON.parse(data.cookies).lang// data.operator[0].lang;//
+    $langs = JSON.parse(data.cookies).lang; // data.operator[0].lang;//
 
     $ice_conf = data.ice_conf;
   }
@@ -41,10 +38,7 @@
 
   onMount(async () => {
 
-
   });
-
-
 </script>
 
 <Header></Header>

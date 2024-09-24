@@ -387,48 +387,49 @@
         }
     });
 
-    function addClone() {
-      const currentWordClone = JSON.parse(JSON.stringify(currentWord));
+        const addClone = function() {
+          const currentWordClone = JSON.parse(JSON.stringify(currentWord));
 
-      if (currentWordIndex + 10 < words.length) {
-        words.splice(currentWordIndex + 10, 0, currentWordClone);
-      } else {
-        if (currentWordIndex + words.length / 2 < words.length)
-          words.splice(
-            currentWordIndex + words.length / 2,
-            0,
-            currentWordClone
-          );
-        else words.push(currentWordClone);
+          if (currentWordIndex + 10 < words.length) {
+            words.splice(currentWordIndex + 10, 0, currentWordClone);
+          } else {
+            if (currentWordIndex + words.length / 2 < words.length)
+              words.splice(
+                currentWordIndex + words.length / 2,
+                0,
+                currentWordClone
+              );
+            else words.push(currentWordClone);
+          }
+
+          words = words;
       }
-
-      words = words;
-    }
 
     // console.log(targetWords.length)
 
-    if (thisErrorIndex < 1) {
-      if (hintIndex > 0) {
-        addClone();
-      }
 
+    if (hintIndex > 0) {
+      addClone();
+      hintIndex  = 0;
+      errorIndex = 0;
+    }
+
+    if (thisErrorIndex < 1) {  
+      if(errorIndex>0){
+        addClone();
+         errorIndex = 0;
+      }
       showCheckMark = true; // Показываем галочку
       showNextButton = true;
       speak(speak_text);
       currentWordIndex = currentWordIndex + 1;
-      errorIndex = 0;
-    } else {
-      if (hintIndex != 0 || errorIndex <= thisErrorIndex) {
-        // Перемещаем текущее слово в конец своей "десятки" в words
-        // words.splice(currentWordIndex, 1);
-        // words.splice(parseInt(currentWordIndex / 10) * 10 + 9, 0, currentWord);
+     
+    }
 
-        addClone();
-      }
       showCheckMark = false;
       focus_pos = 0;
       setFocus();
-    }
+    
   }
 
   function onChangeUserContent(ev) {

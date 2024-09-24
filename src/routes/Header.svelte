@@ -47,6 +47,7 @@
   onMount(async () => {
     let params = new URL(document.location).searchParams;
     abonent = params.get('abonent');
+ 
   });
 
   let lang_menu = false;

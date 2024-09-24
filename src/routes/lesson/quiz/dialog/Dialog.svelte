@@ -147,10 +147,9 @@
       }, 2000);
     } else if ($msg_user.command === 'quit') {
       $msg_user.command = '';
-      setTimeout(()=>{
+      setTimeout(() => {
         $lesson.data = { quiz: '' };
-      },100)
- 
+      }, 100);
     }
   }
 
@@ -178,17 +177,17 @@
       }, 2000);
     } else if ($msg_oper.command === 'quit') {
       $msg_oper.command = '';
-      setTimeout(()=>{
+      setTimeout(() => {
         $lesson.data = { quiz: '' };
-      },100)
+      }, 100);
     }
   }
 
-  $:if($msg_oper?.msg || $msg_user?.msg){
-    (async()=>{
-    alert(await Translate($msg_oper?.msg || $msg_user?.msg, 'ru', $langs));
-    $msg_user?$msg_user.msg = '': $msg_oper.msg = ''
-    })()
+  $: if ($msg_oper?.msg || $msg_user?.msg) {
+    (async () => {
+      alert(await Translate($msg_oper?.msg || $msg_user?.msg, 'ru', $langs));
+      $msg_user ? ($msg_user.msg = '') : ($msg_oper.msg = '');
+    })();
   }
 
   $: if (data.html) {
@@ -238,18 +237,17 @@
       return result;
     }
 
-    const name = data.name;
     fetch(
       `./lesson?dialog=${data.name}&owner=${operator.abonent}&level=${data.level}`
     )
       .then((response) => response.json())
-      .then((data) => {
-        dialog_data = data.data.dialog;
+      .then((dlg_data) => {
+        dialog_data = dlg_data.data.dialog;
         total_cnt = dialog_data.content.length;
-        if (data.data.html) {
-          dialog_data.html = data.data.html; //splitHtmlContent(data.data.html);
+        if (dlg_data.data.html) {
+          dialog_data.html = dlg_data.data.html; //splitHtmlContent(data.data.html);
         }
-        dialog_data.name = name;
+        dialog_data.name = data.name;
         Dialog();
       })
       .catch((error) => {
@@ -565,7 +563,7 @@
           },
           () => {
             console.log();
-             resolve();
+            resolve();
           }
         );
       });
@@ -650,7 +648,7 @@
         </Section>
         <Section></Section>
         <Section>
-          <div class="flip_button" on:click={onChangeUserClick}>
+          <div class="flip_button">
             <IconButton>
               <Icon tag="svg" viewBox="0 0 24 24">
                 <path fill="currentColor" d={mdiAccountConvertOutline} />
@@ -713,7 +711,7 @@
   <div class="card">
     <span
       style="display:block;position:relative;color: lightgray;font-style: italic;font-size:smaller;font-family: serif;"
-      >{data.name}</span
+      >{dialog_data?.name}</span
     >
     {#if q || a}
       {#if !isFlipped}
