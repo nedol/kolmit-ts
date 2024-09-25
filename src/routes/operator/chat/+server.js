@@ -46,6 +46,7 @@ export async function POST({ request, fetch }) {
 }
 
 async function chatLlama(system, task) {
+  return '';
   const app = await Client.connect('huggingface-projects/llama-2-7b-chat', {
     hf_token: HF_TOKEN,
   });

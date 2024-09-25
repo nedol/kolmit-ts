@@ -408,23 +408,18 @@
     // console.log(targetWords.length)
 
 
-    if (hintIndex > 0) {
+    if (hintIndex > 0 || (errorIndex>0 && thisErrorIndex<1))  {
       addClone();
-      hintIndex  = 0;
-      errorIndex = 0;
     }
-
-    if (thisErrorIndex < 1) {  
-      if(errorIndex>0){
-        addClone();
-         errorIndex = 0;
-      }
+    
+    if (thisErrorIndex<1){
       showCheckMark = true; // Показываем галочку
       showNextButton = true;
       speak(speak_text);
       currentWordIndex = currentWordIndex + 1;
-     
-    }
+      hintIndex  = 0;
+      errorIndex = 0;
+    }   
 
       showCheckMark = false;
       focus_pos = 0;
