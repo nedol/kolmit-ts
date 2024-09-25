@@ -508,14 +508,16 @@
         ? extractWords(currentWord.example[$llang]).join()
         : currentWord.example[$llang]
     );
-    // hintIndex++;
-    const currentWordClone = { ...currentWord };
+    
+    if( !showNextButton)
+    hintIndex++;
+    // const currentWordClone = { ...currentWord };
 
-    if (currentWordIndex + 10 < words.length) {
-      words.splice(currentWordIndex + 10, 0, currentWordClone);
-    } else {
-      words.push(currentWordClone);
-    }
+    // if (currentWordIndex + 10 < words.length) {
+    //   words.splice(currentWordIndex + 10, 0, currentWordClone);
+    // } else {
+    //   words.push(currentWordClone);
+    // }
   }
 
   function speak(text) {
