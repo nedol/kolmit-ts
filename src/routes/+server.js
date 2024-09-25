@@ -36,7 +36,7 @@ global.loop = function () {
   } catch (ex) {}
 };
 
-global.loop();
+// global.loop();
 
 /** @type {import('./$types').RequestHandler} */
 export async function GET({ url, fetch, cookies }) {
