@@ -25,7 +25,7 @@ global.loop = function () {
         const { statusCode, headers, trailers, body } = await request(
           `https://kolmit.onrender.com`
         );
-        // console.log('response received', statusCode);
+        console.log('unidici response received', statusCode);
         // console.log('headers', headers);
 
         for await (const data of body) {
@@ -36,7 +36,7 @@ global.loop = function () {
   } catch (ex) {}
 };
 
-// global.loop();
+global.loop();
 
 /** @type {import('./$types').RequestHandler} */
 export async function GET({ url, fetch, cookies }) {

@@ -148,7 +148,7 @@
       .then((data) => {
         prompt = data.resp.prompt.system + data.resp.prompt.user;
         prompt = prompt.replaceAll('${llang}', $llang);
-        prompt = prompt.replaceAll('${name[$llang]}', name[$llang]);
+        prompt = prompt.replaceAll('${name[$llang]}', dialog_data.name[$llang]);
         prompt = prompt.replaceAll('${langs}', $langs);
         prompt = prompt.replaceAll('${dialog_data.html}', dialog_data.html);
         prompt = prompt.replaceAll('${data.level}', data.level);
