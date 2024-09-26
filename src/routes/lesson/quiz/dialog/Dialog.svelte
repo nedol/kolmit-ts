@@ -51,6 +51,7 @@
     mdiAccountConvertOutline,
     mdiPlay,
     mdiThumbUpOutline,
+    mdiEarHearing
   } from '@mdi/js';
 
   import pkg from 'lodash';
@@ -70,6 +71,16 @@
 
   let isRepeat = false,
     isThumb = false;
+
+  let isPlayAuto = false;  
+
+  let playAutoColor = 'currentColor'
+
+  $: if(isPlayAuto){
+    playAutoColor = 'green'
+  }else{
+    playAutoColor = 'currentColor'
+  }
 
   const visibility = ['visible', 'hidden', 'hidden'];
   let visibility_cnt = 1;
@@ -270,9 +281,11 @@
       if (dialog_data.html && !dialog_data.html[cur_html]) {
         cur_html = 0;
       }
-      setTimeout(() => {
-        onChangeUserClick();
-      }, 0);
+
+      if(!isPlayAuto)
+        setTimeout(() => {
+          onChangeUserClick();
+        }, 0);
 
       return;
     }
@@ -294,7 +307,7 @@
 
     const dc = $dc_user?.dc.readyState === 'open' ? $dc_user : $dc_oper;
 
-    if (!dc && !isFlipped) speak(q[$llang]);
+    // if (!dc && !isFlipped) speak(q[$llang]);
 
     let ar = q_shfl
       .toLowerCase()
@@ -439,8 +452,8 @@
     return array;
   }
 
-  async function speak(text) {
-    if (text) tts.Speak_server($llang, text);
+  async function speak(text, cb_end) {
+    if (text) tts.Speak_server($llang, text, cb_end);
   }
 
   function onClickMicrophone() {
@@ -523,9 +536,6 @@
       return d[s.length][t.length];
     }
 
-    // str1 = str1.replace('...', '');
-    // str2 = str2.replace('...', '');
-
     // Вычисляем длины строк
     const len1 = str1.length;
     const len2 = str2.length;
@@ -596,6 +606,41 @@
     }
   };
 
+  function PlayAutoContent() {
+    isPlayAuto = !isPlayAuto;
+    if(!isPlayAuto)
+        return;
+    let active = q[$llang];
+    
+    function onEndSpeak() {
+      if(!isPlayAuto)
+        return;
+       visibility[1] = 'visible';
+      visibility[2] = 'visible';
+      if(active===q[$langs]){
+        active = a[$llang];
+        tts.Speak_server($llang, active, onEndSpeak);
+      
+      }else if (active === a[$llang]) {
+      
+        active = a[$langs];
+        tts.Speak_server($langs, active, onEndSpeak);
+        
+      } else if (active === q[$llang]) {
+        active = q[$langs]
+        tts.Speak_server($langs, active, onEndSpeak);
+
+      }else if(active===a[$langs]){
+        onNextQA();  
+        active = q[$llang];
+        tts.Speak_server($llang, active, onEndSpeak);
+      }
+    }
+
+    tts.Speak_server($llang, q[$llang], onEndSpeak);
+
+  }
+
   onDestroy(async () => {
     // voice.Cancel();
     $lesson.data = { quiz: '' };
@@ -623,7 +668,7 @@
   <div class="top-app-bar-container flexor">
     <TopAppBar bind:this={topAppBar} variant="fixed">
       <Row>
-        <Section>
+        <Section align="start">
           {#if !isFlipped}
             {#if cur_qa > 0}
               <Icon
@@ -646,8 +691,16 @@
             {/if}
           {/if}
         </Section>
-        <Section></Section>
-        <Section>
+        <Section  align="start">
+          {#if  !$dc_user && !$dc_oper }
+           <IconButton on:click={PlayAutoContent}>
+              <Icon tag="svg" viewBox="0 0 24 24">
+                <path fill={playAutoColor} d={mdiEarHearing}  />
+              </Icon>
+          </IconButton>
+          {/if}
+        </Section>
+        <Section align="start">
           <div class="flip_button">
             <IconButton>
               <Icon tag="svg" viewBox="0 0 24 24">
@@ -672,7 +725,7 @@
             </IconButton>
           </div>
         </Section>
-        <Section>
+        <Section align="start">
           <div class="counter">
             <p>
               <span class="mdc-typography--overline" style="position:relative"
@@ -687,7 +740,7 @@
             </p>
           </div>
         </Section>
-        <Section>
+        <Section align="end">
           <button class="hint-button" on:click={onClickQ}>
             <span class="material-symbols-outlined">?</span>
           </button>

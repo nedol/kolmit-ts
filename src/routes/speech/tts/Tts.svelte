@@ -5,7 +5,7 @@
 
   onMount(() => {});
 
-  export async function Speak_server(lang, text) {
+  export async function Speak_server( lang, text, cb_end) {
     if (!audio || (audio && text !== audio.text)) {
       text = text.replace(/<[^>]+>.*?<\/[^>]+>/g, '');
       const par = {
@@ -31,7 +31,9 @@
       audio.type='audio/mpeg';
       audio.text = text;
       audio.playbackRate = 0.9;
-     
+      audio.addEventListener('ended', function() {
+        cb_end();
+      });
     }
 
       audio.play();
