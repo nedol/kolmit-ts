@@ -453,7 +453,10 @@
   }
 
   async function speak(text, cb_end) {
-    if (text) tts.Speak_server($llang, text, cb_end);
+    function endSpeak(){
+      
+    }
+    if (text) tts.Speak_server($llang, text, endSpeak);
   }
 
   function onClickMicrophone() {

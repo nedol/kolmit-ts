@@ -31,10 +31,13 @@
       audio.type='audio/mpeg';
       audio.text = text;
       audio.playbackRate = 0.9;
+
+    }
+
+   if(cb_end)
       audio.addEventListener('ended', function() {
         cb_end();
       });
-    }
 
       audio.play();
    
