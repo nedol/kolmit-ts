@@ -1,5 +1,6 @@
 <script>
   import { onMount, onDestroy, getContext } from 'svelte';
+  import {langs} from '$lib/js/stores.js';
 
   let audio;
 
@@ -30,7 +31,7 @@
       audio = new Audio(url.resp.audio);
       audio.type='audio/mpeg';
       audio.text = text;
-      audio.playbackRate = 0.9;
+      audio.playbackRate = lang===$langs?1:.9;
 
     }
 
@@ -38,7 +39,7 @@
       audio.addEventListener('ended', function() {
         cb_end();
       });
-
+       audio.playbackRate = lang===$langs?1:.9;
       audio.play();
    
   }

@@ -15,6 +15,7 @@
     mdiHelp,
     mdiTextBoxCheckOutline,
     mdiPlay,
+    mdiEarHearing
   } from '@mdi/js';
 
   // import words from './80.json';
@@ -28,11 +29,22 @@
     dicts,
     lesson,
     showBottomAppBar,
+    dc_oper,
+    dc_user
   } from '$lib/js/stores.js';
 
   import langs_list from '$lib/dict/learn_langs_list.json';
 
   let lang_menu = false;
+  
+  let isPlayAuto = false;
+  let playAutoColor = 'currentColor'
+
+  $: if(isPlayAuto){
+    playAutoColor = 'green'
+  }else{
+    playAutoColor = 'currentColor'
+  }
 
   import ISO6391 from 'iso-google-locales';
 
@@ -567,6 +579,35 @@
     makeExample();
   }
 
+    function PlayAutoContent() {
+    isPlayAuto = !isPlayAuto;
+    if(!isPlayAuto)
+        return;
+   
+    
+    function onEndSpeak() {
+      if(!isPlayAuto)
+        return;
+ 
+
+      if(active===currentWord.example[$langs].replace( /<<|>>/g, "")){
+        active = currentWord.example[$llang].replace( /<<|>>/g, "");
+        tts.Speak_server($llang, active, onEndSpeak);
+      
+      }else if (active === currentWord.example[$llang].replace( /<<|>>/g, "")) {
+        currentWordIndex++;
+         nextWord(); 
+        active = currentWord.example[$langs].replace( /<<|>>/g, "");
+        tts.Speak_server($langs, active, onEndSpeak);
+        
+      } 
+    }
+
+    let active = currentWord.example[$langs].replace( /<<|>>/g, "");//currentWord.example[$langs];
+    tts.Speak_server($langs, active, onEndSpeak);
+
+  }
+
   onDestroy(() => {
     // Очищаем интервал при размонтировании компонента
     $llang = _llang;
@@ -613,6 +654,15 @@
             <button class="hint-button" on:click={showHint}>
               <span class="material-symbols-outlined">?</span>
             </button>
+          </Section>
+          <Section>
+          {#if  !$dc_user && !$dc_oper }
+           <IconButton on:click={PlayAutoContent}>
+              <Icon tag="svg" viewBox="0 0 24 24">
+                <path fill={playAutoColor} d={mdiEarHearing}  />
+              </Icon>
+          </IconButton>
+          {/if}
           </Section>
 
           <Section align="end">
