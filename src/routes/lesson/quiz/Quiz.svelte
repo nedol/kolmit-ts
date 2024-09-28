@@ -1,5 +1,6 @@
 <script>
-  import Volgorde from './Volgorde.svelte';
+    import CircularProgress from '@smui/circular-progress';
+
   import Dialog from './dialog/Dialog.svelte';
   import Listen from './listen/Listen.svelte';
   import Numbers from './listen/Numbers.svelte';
@@ -13,9 +14,11 @@
 
   export let data;
   let quiz = data.quiz;
-  let word_game;
 
 
+$: if($call_but_status || quiz){
+  console.log()
+}
 
 </script>
 
@@ -23,21 +26,29 @@
 <!-- {@debug quiz} -->
 {#if quiz}
   {#if quiz.includes('dialog')}
-    <Dialog {data}/>
+    <Dialog {data} />
   {:else if quiz.includes('listen')}
     {#if data.name === 'Nummers'}
-      <Numbers {data} ></Numbers>
+      <Numbers {data}></Numbers>
     {:else if data.name === 'Tijd'}
-      <Time {data} ></Time>
-    {:else}  
-        <Listen {data} />
+      <Time {data}></Time>
+    {:else}
+      <Listen {data} />
     {/if}
-
   {:else if quiz === 'word'}
-    {#if ($dc_user || $dc_oper) && $call_but_status === 'talk' }
-       <WordGame {data} bind:this={word_game}/>
-    {:else}      
-      <Word {data} /> 
+    {#if $call_but_status === 'talk'}
+      <WordGame {data} />
+    {:else if $call_but_status === 'inactive' || $call_but_status === 'active'}
+      <Word {data} />
+      {:else}
+        <div style="text-align:center">
+          <span
+            class="material-symbols-outlined"
+            style="position: relative;font-size: 20px; top:20vh; color: blue; scale:1.5;"
+          >
+            <CircularProgress style="height: 50px; width: 50px;" indeterminate />
+          </span>
+        </div>
     {/if}
   {/if}
 {/if}

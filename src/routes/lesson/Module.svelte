@@ -27,7 +27,7 @@
     msg_oper,
     dc_oper,
     dc_user,
-    dc_user_state,
+    call_but_status,
     showBottomAppBar,
     OnCheckQU,
   } from '$lib/js/stores.js';
@@ -37,6 +37,11 @@
 
   const group = getContext('group');
   const operator = getContext('operator');
+
+
+  $: if($call_but_status){
+    console.log($call_but_status)
+  }
 
   function findPic(operator: any) {
     const oper = find(group, { operator: operator });
@@ -184,7 +189,7 @@
     let obj = find(usersPic, { operator: user });
     obj.type = $msg_oper.type;
     remove(quiz_users[type][quiz], obj);
-    quiz_users[type][quiz] = quiz_users[type][quiz];
+    quiz_users = quiz_users
     $msg_oper.rem = '';
   };
 
@@ -200,6 +205,7 @@
     if (obj && !find(quiz_users[type][quiz], obj)) {
       quiz_users[type][quiz].push(obj);
       quiz_users[type][quiz] = quiz_users[type][quiz];
+      quiz_users = quiz_users
     }
   }
 
@@ -239,8 +245,9 @@
   }
 
   function OnClickUserCard(user, theme, module, quiz) {
-    console.log(user, quiz.name[$llang]);
+
     if ($users[user].status === 'active') $users[user]['OnClickCallButton']();
+    
     onClickQuiz(
       quiz.type,
       lesson_data.level,
@@ -396,7 +403,7 @@
                             {/if}
                           </div>
 
-                          {#if quiz_users[quiz.type] && quiz_users[quiz.type][quiz.name[$llang]]}
+                          {#if $call_but_status!=='inactive' &&  quiz_users[quiz.type] && quiz_users[quiz.type][quiz.name[$llang]]}
                             <div class="user-cards">
                               {#each quiz_users[quiz.type][quiz.name[$llang]] as qu, q}
                                 {#if $users[qu.operator].status !== 'inactive'}

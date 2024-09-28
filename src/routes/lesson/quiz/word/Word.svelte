@@ -803,28 +803,30 @@
       {#if hints?.length > 0}
         <Content style="line-height: 2.0; overflow-y:auto;">
           {#each hints as hint, i}
-            {#if hint?.example[$llang]}
-              <span
-                class="hint_button"
-                on:click={() => {
-                  OnClickHint(extractWords(hint?.example[$llang]).join(' '), i);
-                }}
-              >
-                {@html extractWords(hint?.example[$llang]).join(' ') +
-                  '&nbsp;' +
-                  '&nbsp;'}
-              </span>
-            {:else}
-              {#await Translate(hint?.example['ru'], 'ru', $llang) then data}
+            {#if i>currentWordIndex-5 && i<currentWordIndex+5}
+              {#if hint?.example[$llang]}
                 <span
                   class="hint_button"
                   on:click={() => {
-                    OnClickHint(extractWords(data).join(' '));
+                    OnClickHint(extractWords(hint?.example[$llang]).join(' '), i);
                   }}
                 >
-                  {@html extractWords(data).join(' ') + '&nbsp;' + '&nbsp;'}
+                  {@html extractWords(hint?.example[$llang]).join(' ') +
+                    '&nbsp;' +
+                    '&nbsp;'}
                 </span>
-              {/await}
+              {:else}
+                {#await Translate(hint?.example['ru'], 'ru', $llang) then data}
+                  <span
+                    class="hint_button"
+                    on:click={() => {
+                      OnClickHint(extractWords(data).join(' '));
+                    }}
+                  >
+                    {@html extractWords(data).join(' ') + '&nbsp;' + '&nbsp;'}
+                  </span>
+                {/await}
+              {/if}
             {/if}
           {/each}
           <div style="height:80px"></div>
