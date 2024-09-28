@@ -189,8 +189,7 @@
       hint_example = '';
       example = '';
     }
-  } 
-
+  }
 
   $: if ($msg_oper?.lesson?.quiz === 'word') {
     if ($msg_oper.lesson.word_index || $msg_oper.lesson.word_index == 0) {
@@ -235,19 +234,17 @@
       hint_example = '';
       example = '';
     }
-  } 
-
-  $:if($msg_oper?.msg || $msg_user?.msg){
-    (async()=>{
-    alert(await Translate($msg_oper?.msg || $msg_user?.msg, 'ru', $langs));
-     if($msg_user)$msg_user.msg = '';
-     if($msg_oper)$msg_oper.msg = '';
-    })()
   }
 
-  onMount(async () => {
+  $: if ($msg_oper?.msg || $msg_user?.msg) {
+    (async () => {
+      alert(await Translate($msg_oper?.msg || $msg_user?.msg, 'ru', $langs));
+      if ($msg_user) $msg_user.msg = '';
+      if ($msg_oper) $msg_oper.msg = '';
+    })();
+  }
 
-  });
+  onMount(async () => {});
 
   function onShare() {
     // Обработчик нажатия на кнопку "share"
@@ -401,6 +398,37 @@
       });
     }, 0);
 
+    function getSubArray(arr, index) {
+      const totalElements = 10;
+      const halfRange = Math.floor(totalElements / 2);
+
+      let startIndex = index - halfRange;
+      let endIndex = index + halfRange;
+
+      // Корректировка начала массива, если оно меньше 0
+      if (startIndex < 0) {
+        endIndex += Math.abs(startIndex);
+        startIndex = 0;
+      }
+
+      // Корректировка конца массива, если он больше длины массива
+      if (endIndex >= arr.length) {
+        startIndex -= endIndex - arr.length + 1;
+        endIndex = arr.length - 1;
+      }
+
+      // Убедиться, что начало не ушло ниже нуля после корректировки конца
+      startIndex = Math.max(startIndex, 0);
+
+      return arr.slice(startIndex, endIndex + 1); // Включить элемент с endIndex
+    }
+
+    if(isFlipped){
+
+      hints[isFlipped] = getSubArray([...words], currentWordIndex);
+      shuffle(hints[isFlipped]);
+    }
+
     // word = currentWord['original'].replace(/(de|het)\s*/gi, '');
     // let filteredExample = currentWord['example'].replace(
     //    new RegExp(`\\b(de |het )?(?=\\b${word}\\b)`, 'gi'), '');
@@ -490,8 +518,6 @@
       });
     }
   }
-
-
 
   // function handleBackClick() {
   //   $lesson.data = { quiz: '' }; // При клике на "Back" показываем компонент Lesson
@@ -770,9 +796,9 @@
   onDestroy(() => {
     // Очищаем интервал при размонтировании компонента
     $llang = _llang;
-  
+
     $view = 'lesson';
-    $lesson.data.quiz = ''
+    $lesson.data.quiz = '';
 
     $showBottomAppBar = true;
   });

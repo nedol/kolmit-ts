@@ -15,7 +15,7 @@
     mdiHelp,
     mdiTextBoxCheckOutline,
     mdiPlay,
-    mdiEarHearing
+    mdiEarHearing,
   } from '@mdi/js';
 
   // import words from './80.json';
@@ -30,20 +30,20 @@
     lesson,
     showBottomAppBar,
     dc_oper,
-    dc_user
+    dc_user,
   } from '$lib/js/stores.js';
 
   import langs_list from '$lib/dict/learn_langs_list.json';
 
   let lang_menu = false;
-  
-  let isPlayAuto = false;
-  let playAutoColor = 'currentColor'
 
-  $: if(isPlayAuto){
-    playAutoColor = 'green'
-  }else{
-    playAutoColor = 'currentColor'
+  let isPlayAuto = false;
+  let playAutoColor = 'currentColor';
+
+  $: if (isPlayAuto) {
+    playAutoColor = 'green';
+  } else {
+    playAutoColor = 'currentColor';
   }
 
   import ISO6391 from 'iso-google-locales';
@@ -236,16 +236,33 @@
       });
     }, 0);
 
-      function getSubArray(arr, index) {
-          const startIndex = Math.max(index - 5, 0); // Убедиться, что не уходим в отрицательные индексы
-          const endIndex = Math.min(index + 5, arr.length - 1); // Убедиться, что не выходим за границы массива
+    function getSubArray(arr, index) {
+      const totalElements = 10;
+      const halfRange = Math.floor(totalElements / 2);
 
-          return arr.slice(startIndex, endIndex + 1); // Включить элемент с endIndex
+      let startIndex = index - halfRange;
+      let endIndex = index + halfRange;
+
+      // Корректировка начала массива, если оно меньше 0
+      if (startIndex < 0) {
+        endIndex += Math.abs(startIndex);
+        startIndex = 0;
       }
 
-      hints = getSubArray([...words],currentWordIndex) ;
-      shuffle(hints);
+      // Корректировка конца массива, если он больше длины массива
+      if (endIndex >= arr.length) {
+        startIndex -= endIndex - arr.length + 1;
+        endIndex = arr.length - 1;
+      }
 
+      // Убедиться, что начало не ушло ниже нуля после корректировки конца
+      startIndex = Math.max(startIndex, 0);
+
+      return arr.slice(startIndex, endIndex + 1); // Включить элемент с endIndex
+    }
+
+    hints = getSubArray([...words], currentWordIndex);
+    shuffle(hints);
 
     // word = currentWord['original'].replace(/(de|het)\s*/gi, '');
     // let filteredExample = currentWord['example'].replace(
@@ -408,44 +425,42 @@
         }
     });
 
-        const addClone = function() {
-          const currentWordClone = JSON.parse(JSON.stringify(currentWord));
+    const addClone = function () {
+      const currentWordClone = JSON.parse(JSON.stringify(currentWord));
 
-          if (currentWordIndex + 10 < words.length) {
-            words.splice(currentWordIndex + 10, 0, currentWordClone);
-          } else {
-            if (currentWordIndex + words.length / 2 < words.length)
-              words.splice(
-                currentWordIndex + words.length / 2,
-                0,
-                currentWordClone
-              );
-            else words.push(currentWordClone);
-          }
-
-          words = words;
+      if (currentWordIndex + 10 < words.length) {
+        words.splice(currentWordIndex + 10, 0, currentWordClone);
+      } else {
+        if (currentWordIndex + words.length / 2 < words.length)
+          words.splice(
+            currentWordIndex + words.length / 2,
+            0,
+            currentWordClone
+          );
+        else words.push(currentWordClone);
       }
+
+      words = words;
+    };
 
     // console.log(targetWords.length)
 
-
-    if (hintIndex > 0 || (errorIndex>0 && thisErrorIndex<1))  {
+    if (hintIndex > 0 || (errorIndex > 0 && thisErrorIndex < 1)) {
       addClone();
     }
-    
-    if (thisErrorIndex<1){
+
+    if (thisErrorIndex < 1) {
       showCheckMark = true; // Показываем галочку
       showNextButton = true;
       speak(speak_text);
       currentWordIndex = currentWordIndex + 1;
-      hintIndex  = 0;
+      hintIndex = 0;
       errorIndex = 0;
-    }   
+    }
 
-      showCheckMark = false;
-      focus_pos = 0;
-      setFocus();
-    
+    showCheckMark = false;
+    focus_pos = 0;
+    setFocus();
   }
 
   function onChangeUserContent(ev) {
@@ -457,7 +472,6 @@
   }
 
   function showHint() {
-
     const words = extractWords(currentWord.example[$llang]).join(' ');
 
     let i = 0,
@@ -500,7 +514,7 @@
     currentWord = words[currentWordIndex];
     makeExample();
 
-    hints = hints
+    hints = hints;
 
     userContent[0] = '&nbsp;';
     userContent[1] = '&nbsp;';
@@ -531,9 +545,8 @@
         ? extractWords(currentWord.example[$llang]).join()
         : currentWord.example[$llang]
     );
-    
-    if( !showNextButton)
-    hintIndex++;
+
+    if (!showNextButton) hintIndex++;
     // const currentWordClone = { ...currentWord };
 
     // if (currentWordIndex + 10 < words.length) {
@@ -590,33 +603,26 @@
     makeExample();
   }
 
-    function PlayAutoContent() {
+  function PlayAutoContent() {
     isPlayAuto = !isPlayAuto;
-    if(!isPlayAuto)
-        return;
-   
-    
-    function onEndSpeak() {
-      if(!isPlayAuto)
-        return;
- 
+    if (!isPlayAuto) return;
 
-      if(active===currentWord.example[$langs].replace( /<<|>>/g, "")){
-        active = currentWord.example[$llang].replace( /<<|>>/g, "");
+    function onEndSpeak() {
+      if (!isPlayAuto) return;
+
+      if (active === currentWord.example[$langs].replace(/<<|>>/g, '')) {
+        active = currentWord.example[$llang].replace(/<<|>>/g, '');
         tts.Speak_server($llang, active, onEndSpeak);
-      
-      }else if (active === currentWord.example[$llang].replace( /<<|>>/g, "")) {
+      } else if (active === currentWord.example[$llang].replace(/<<|>>/g, '')) {
         currentWordIndex++;
-         nextWord(); 
-        active = currentWord.example[$langs].replace( /<<|>>/g, "");
+        nextWord();
+        active = currentWord.example[$langs].replace(/<<|>>/g, '');
         tts.Speak_server($langs, active, onEndSpeak);
-        
-      } 
+      }
     }
 
-    let active = currentWord.example[$langs].replace( /<<|>>/g, "");//currentWord.example[$langs];
+    let active = currentWord.example[$langs].replace(/<<|>>/g, ''); //currentWord.example[$langs];
     tts.Speak_server($langs, active, onEndSpeak);
-
   }
 
   onDestroy(() => {
@@ -667,13 +673,13 @@
             </button>
           </Section>
           <Section>
-          {#if  !$dc_user && !$dc_oper }
-           <IconButton on:click={PlayAutoContent}>
-              <Icon tag="svg" viewBox="0 0 24 24">
-                <path fill={playAutoColor} d={mdiEarHearing}  />
-              </Icon>
-          </IconButton>
-          {/if}
+            {#if !$dc_user && !$dc_oper}
+              <IconButton on:click={PlayAutoContent}>
+                <Icon tag="svg" viewBox="0 0 24 24">
+                  <path fill={playAutoColor} d={mdiEarHearing} />
+                </Icon>
+              </IconButton>
+            {/if}
           </Section>
 
           <Section align="end">
@@ -814,31 +820,29 @@
       {#if hints?.length > 0}
         <Content style="line-height: 2.0; overflow-y:auto;">
           {#each hints as hint, i}
-
-              {#if hint?.example[$llang]}
+            {#if hint?.example[$llang]}
+              <span
+                class="hint_button"
+                on:click={() => {
+                  OnClickHint(extractWords(hint?.example[$llang]).join(' '), i);
+                }}
+              >
+                {@html extractWords(hint?.example[$llang]).join(' ') +
+                  '&nbsp;' +
+                  '&nbsp;'}
+              </span>
+            {:else}
+              {#await Translate(hint?.example['ru'], 'ru', $llang) then data}
                 <span
                   class="hint_button"
                   on:click={() => {
-                    OnClickHint(extractWords(hint?.example[$llang]).join(' '), i);
+                    OnClickHint(extractWords(data).join(' '));
                   }}
                 >
-                  {@html extractWords(hint?.example[$llang]).join(' ') +
-                    '&nbsp;' +
-                    '&nbsp;'}
+                  {@html extractWords(data).join(' ') + '&nbsp;' + '&nbsp;'}
                 </span>
-              {:else}
-                {#await Translate(hint?.example['ru'], 'ru', $llang) then data}
-                  <span
-                    class="hint_button"
-                    on:click={() => {
-                      OnClickHint(extractWords(data).join(' '));
-                    }}
-                  >
-                    {@html extractWords(data).join(' ') + '&nbsp;' + '&nbsp;'}
-                  </span>
-                {/await}
-              {/if}
-       
+              {/await}
+            {/if}
           {/each}
           <div style="height:80px"></div>
         </Content>
