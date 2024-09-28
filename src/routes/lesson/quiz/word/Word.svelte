@@ -100,8 +100,6 @@
       words = data.data.data;
       if (!words[0]) return;
 
-      hints = [...words];
-      shuffle(hints);
       currentWord = words[currentWordIndex];
       makeExample();
     })
@@ -237,6 +235,17 @@
         resultElementWidth[i] = getTextWidth(wAr[i], '20px Arial');
       });
     }, 0);
+
+      function getSubArray(arr, index) {
+          const startIndex = Math.max(index - 5, 0); // Убедиться, что не уходим в отрицательные индексы
+          const endIndex = Math.min(index + 5, arr.length - 1); // Убедиться, что не выходим за границы массива
+
+          return arr.slice(startIndex, endIndex + 1); // Включить элемент с endIndex
+      }
+
+      hints = getSubArray([...words],currentWordIndex) ;
+      shuffle(hints);
+
 
     // word = currentWord['original'].replace(/(de|het)\s*/gi, '');
     // let filteredExample = currentWord['example'].replace(
@@ -490,6 +499,8 @@
     if (currentWordIndex >= words.length) currentWordIndex = 0;
     currentWord = words[currentWordIndex];
     makeExample();
+
+    hints = hints
 
     userContent[0] = '&nbsp;';
     userContent[1] = '&nbsp;';
@@ -803,7 +814,7 @@
       {#if hints?.length > 0}
         <Content style="line-height: 2.0; overflow-y:auto;">
           {#each hints as hint, i}
-            {#if i>currentWordIndex-5 && i<currentWordIndex+5}
+
               {#if hint?.example[$llang]}
                 <span
                   class="hint_button"
@@ -827,7 +838,7 @@
                   </span>
                 {/await}
               {/if}
-            {/if}
+       
           {/each}
           <div style="height:80px"></div>
         </Content>
