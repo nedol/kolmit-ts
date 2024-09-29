@@ -76,10 +76,6 @@
     // SendCheck({ func: 'check', type: 'user', abonent: operator.abonent, em: operator.em });
   });
 
-  function OnClickUser(user: any) {
-    // console.log(user);
-  }
-
   function OnClickUpload() {}
 
   $: if (Object.keys($users).length > 0) {

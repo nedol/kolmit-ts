@@ -73,7 +73,7 @@ export class DataChannelUser {
 
 					data = JSON.parse(data);
 					data.operator = this.rtc.operator;
-					console.log('$msg_user:', data);
+					// console.log('$msg_user:', data);
 					await msg_user.set(data);
 					data = '';
 					return;
@@ -98,9 +98,6 @@ export class DataChannelUser {
 						download_href.attributes.download = parsed.file;
 						download_href.click();
 					}
-					// setTimeout(function () {
-					// 	document.getElementById('dataProgress').style.display = 'none';
-					// }, 2000);
 
 					return;
 				}

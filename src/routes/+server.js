@@ -127,10 +127,10 @@ export async function GET({ url, fetch, cookies }) {
 export async function POST({ request, url, fetch, cookies }) {
   //debugger;
   let resp;
-  let abonent = url.searchParams.get('abonent');
+  const abonent = url.searchParams.get('abonent');
   const { par } = await request.json();
   const q = par;
-  let res = cookies.get('abonent:' + abonent);
+  const res = cookies.get('abonent:' + abonent);
   let kolmit;
   if (res) {
     kolmit = JSON.parse(res);
@@ -174,10 +174,10 @@ export async function POST({ request, url, fetch, cookies }) {
       SetParams(q);
 
       if (q.type === 'user') {
-        let cnt_queue = 0;
-        let item = global.rtcPool[q.type][q.abonent][q.operator][q.uid];
 
-        let operators = { [q.operator]: {} };
+        const item = global.rtcPool[q.type][q.abonent][q.operator][q.uid];
+
+        const operators = { [q.operator]: {} };
         for (let uid in global.rtcPool['operator'][q.abonent]) {
           if (uid !== 'resolve')
             operators[q.operator][uid] = {
@@ -199,12 +199,12 @@ export async function POST({ request, url, fetch, cookies }) {
         SendOperatorOffer(q);
         return new Response(JSON.stringify({ resp }));
       } else if (q.type === 'operator') {
-        let res = cookies.get('kolmit.operator:' + q.abonent);
-        let kolmit;
+        const res = cookies.get('kolmit.operator:' + q.abonent);
+        let kolmit
         if (res) {
           kolmit = JSON.parse(res);
-        }
-        q.psw = kolmit.psw;
+          q.psw = kolmit.psw;
+        }    
         // console.log(q.operator)
         resp = await CheckOperator(q);
         console.log(resp);
@@ -230,7 +230,7 @@ export async function POST({ request, url, fetch, cookies }) {
     case 'status':
       if (q.status === 'call') {
         if (q.type === 'operator') {
-          let item = global.rtcPool[q.type][q.abonent][q.operator][q.uid];
+          const item = global.rtcPool[q.type][q.abonent][q.operator][q.uid];
           if (item) item.status = 'busy';
           BroadcastOperatorStatus(q, 'busy');
           // global.rtcPool['operator'][q.abonent][q.operator].shift();
@@ -239,7 +239,7 @@ export async function POST({ request, url, fetch, cookies }) {
       }
       if (q.status === 'close') {
         try {
-          let item = global.rtcPool[q.type][q.abonent][q.operator][q.uid];
+          const item = global.rtcPool[q.type][q.abonent][q.operator][q.uid];
           if (item) {
             item.status = q.status;
             if (q.type === 'operator') BroadcastOperatorStatus(q, q.status);
@@ -389,9 +389,9 @@ function BroadcastOperatorStatus(q, check) {
           item.uid !== q.uid
         ) {
           if (item.status === 'wait') {
-            let oper = global.rtcPool['operator'][q.abonent][q.operator][q.uid];
+            const oper = global.rtcPool['operator'][q.abonent][q.operator][q.uid];
 
-            let remAr = [
+            const remAr = [
               {
                 func: q.func,
                 type: type,

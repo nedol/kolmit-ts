@@ -8,17 +8,10 @@
   import Text from './text/Text.svelte';
   import Word from './word/Word.svelte';
   import WordGame from './word/WordGame.svelte';
-  import { dc_oper } from '$lib/js/stores.js';
-  import { dc_user, lesson } from '$lib/js/stores.js';
-  import { call_but_status  } from '$lib/js/stores.js';
+  import { call_but_status } from '$lib/js/stores.js';
 
   export let data;
   let quiz = data.quiz;
-
-
-$: if($call_but_status || quiz){
-  console.log()
-}
 
 </script>
 

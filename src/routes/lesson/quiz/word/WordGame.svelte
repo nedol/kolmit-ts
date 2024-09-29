@@ -152,7 +152,6 @@
       level = $msg_user.lesson.level;
       share_mode = true;
       showHints[isFlipped] = false;
-
       $OnCheckQU(null, 'word', $msg_user.lesson.name);
     } else if (
       ($msg_user.lesson.word_correct || $msg_user.lesson.word_correct == 0) &&

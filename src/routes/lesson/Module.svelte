@@ -38,11 +38,6 @@
   const group = getContext('group');
   const operator = getContext('operator');
 
-
-  $: if($call_but_status){
-    console.log($call_but_status)
-  }
-
   function findPic(operator: any) {
     const oper = find(group, { operator: operator });
     return oper.picture || '/assets/operator.svg';
@@ -76,10 +71,11 @@
     true,
   ];
 
+  export let data;
 
   $: if ($lesson.data) {
     if ($lesson.data.quiz == '' && data.quiz) {
-      SendData({ msg: "Собеседник вышел из упражнения" });
+      SendData({ msg: 'Собеседник вышел из упражнения' });
       data = $lesson.data;
     }
     data = $lesson.data;
@@ -87,7 +83,6 @@
 
   let module;
 
-  export let data;
   let panel_disabled = true;
 
   let checked = { dialog: {}, word: {} };
@@ -101,13 +96,6 @@
   } else if ($msg_oper?.rem) {
     RemoveQuizUser($msg_oper.rem, $msg_oper.type, $msg_oper.quiz);
   }
-
-  (async () => {
-    const lessonData = await fetchLesson(operator.abonent, operator.operator);
-    lesson_data = lessonData.data;
-    module = lesson_data.module;
-    $llang = lesson_data.lang;
-  })();
 
   export async function fetchLesson(owner, operator) {
     try {
@@ -127,6 +115,11 @@
   }
 
   onMount(async () => {
+    const lessonData = await fetchLesson(operator.abonent, operator.operator);
+    lesson_data = lessonData.data;
+    module = lesson_data.module;
+    $llang = lesson_data.lang;
+
     $showBottomAppBar = true;
   });
 
@@ -189,23 +182,18 @@
     let obj = find(usersPic, { operator: user });
     obj.type = $msg_oper.type;
     remove(quiz_users[type][quiz], obj);
-    quiz_users = quiz_users
+    quiz_users = quiz_users;
     $msg_oper.rem = '';
   };
 
   function BuildQuizUsers(quiz, user, type) {
-    if (user === operator.operator) {
-      checked[type][quiz] = true;
-      return;
-    }
-
     let obj = find(usersPic, { operator: user });
     if (obj) obj.type = type;
 
     if (obj && !find(quiz_users[type][quiz], obj)) {
       quiz_users[type][quiz].push(obj);
       quiz_users[type][quiz] = quiz_users[type][quiz];
-      quiz_users = quiz_users
+      quiz_users = quiz_users;
     }
   }
 
@@ -234,7 +222,11 @@
       .then((data) => {
         if (data && data.resp) {
           data.resp[par.type].subscribers.map((user) => {
-            BuildQuizUsers(par.quiz, user, node.attributes['type'].value);
+            // BuildQuizUsers(par.quiz, user, node.attributes['type'].value);
+            if (user === operator.operator) {
+              checked[type][quiz] = true;
+              return;
+            }
           });
         }
       })
@@ -245,9 +237,8 @@
   }
 
   function OnClickUserCard(user, theme, module, quiz) {
-
     if ($users[user].status === 'active') $users[user]['OnClickCallButton']();
-    
+
     onClickQuiz(
       quiz.type,
       lesson_data.level,
@@ -287,6 +278,7 @@
 
 <main>
   {#if data.quiz}
+    <!-- {@debug data} -->
     <Quiz {data} />
   {:else if module}
     <div class="lesson-container">
@@ -363,8 +355,6 @@
                                 <path fill="grey" d={mdiEarHearing} />
                               </Icon>
                             {/if}
-                            <!-- svelte-ignore a11y-invalid-attribute -->
-
                             <a
                               href="#"
                               use:disablePanel
@@ -403,7 +393,7 @@
                             {/if}
                           </div>
 
-                          {#if $call_but_status!=='inactive' &&  quiz_users[quiz.type] && quiz_users[quiz.type][quiz.name[$llang]]}
+                          {#if $call_but_status !== 'inactive' && quiz_users[quiz.type] && quiz_users[quiz.type][quiz.name[$llang]]}
                             <div class="user-cards">
                               {#each quiz_users[quiz.type][quiz.name[$llang]] as qu, q}
                                 {#if $users[qu.operator].status !== 'inactive'}

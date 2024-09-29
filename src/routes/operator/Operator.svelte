@@ -62,7 +62,7 @@
 
   /*TODO: дает*/
   $: if ($dc_oper_state) {
-    console.log($dc_oper_state)
+
     switch ($dc_oper_state) {
       case 'open':
         $call_but_status = 'call';
@@ -142,10 +142,6 @@
   };
 
     
-  $: if($view){
-    console.log()
-  }
-
   async function CallWaiting(par: any) {
 
     if($call_but_status ==='inactive')
@@ -175,8 +171,7 @@
   }
 
   onMount(async () => {
-    try {
-  
+    try { 
 
       rtc = new RTCOperator(operator, uid, $signal);
       initRTC();   
