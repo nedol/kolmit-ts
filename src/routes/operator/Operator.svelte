@@ -77,6 +77,7 @@
         remote.text.name = '';
         remote.text.email = '';
         remote.text.display = 'none';
+        
         break;
     }
   }

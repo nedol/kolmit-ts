@@ -145,7 +145,6 @@ export class RTCOperator extends RTCBase {
 		}
 
 		this.SendStatus('talk');
-		console.log();
 
 		// $('i.video').css('display', 'inline-block');
 

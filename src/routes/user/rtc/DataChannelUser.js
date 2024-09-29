@@ -52,8 +52,13 @@ export class DataChannelUser {
 			
 			this.dc.onclose = () => {	
 				dc_user_state.set("close");
+				rtc.SendStatus('close');
 			};
 			
+			this.dc.onerror = () => {
+				dc_user_state.set('close');
+				rtc.SendStatus('close');
+			};
 		};
 
 		let data = '';

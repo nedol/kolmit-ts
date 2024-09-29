@@ -28,11 +28,13 @@ export class DataChannelOperator extends DataChannel {
 		this.dc.onclose = () => {
 			msg_oper.set({ func: 'mute' });
 			dc_oper_state.set("close");
+			rtc.SendStatus('close');
 		};
 
 		this.dc.onerror = () => {
 			msg_oper.set({ func: 'mute' });
 			dc_oper_state.set("close");
+			rtc.SendStatus('close');
 		};
 
 
