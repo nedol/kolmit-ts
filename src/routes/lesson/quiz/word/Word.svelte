@@ -524,7 +524,8 @@
       div_input[1].style.width = getTextWidth(words, '20px Arial') + 'px';
     }
 
-    userContent[0] = words
+    [userContent[0],userContent[1]] = words.split(' ')
+
   }
 
   function nextWord() {
