@@ -488,8 +488,10 @@
 
     for (let char of words) {
       // word = word.replace(/[.,\/#!?$%\^&\*;:{}=_`~()]/g, '');
-      if (char == ' ') {
+
+      if (char == ' ' && div_input[1].style.display !=='none') {
         w++;
+        //  div_input[1].style.display = 'inline-table'
         if (userContent[w] === '&nbsp;') userContent[w] = '';
         continue;
       }
@@ -507,6 +509,22 @@
 
       i++;
     }
+  }
+
+  
+  function showHintAuto() {
+    const words = extractWords(currentWord.example[$llang]).join(' ');
+
+    if (hintIndex == 0) {
+      userContent[0] = '&nbsp;';
+      userContent[1] = '&nbsp;';
+      div_input[0].style.color = '#2196f3';
+      div_input[1].style.color = '#2196f3';
+      div_input[0].style.width = getTextWidth(words, '20px Arial') + 'px';
+      div_input[1].style.width = getTextWidth(words, '20px Arial') + 'px';
+    }
+
+    userContent[0] = words
   }
 
   function nextWord() {
@@ -547,13 +565,7 @@
     );
 
     if (!showNextButton) hintIndex++;
-    // const currentWordClone = { ...currentWord };
 
-    // if (currentWordIndex + 10 < words.length) {
-    //   words.splice(currentWordIndex + 10, 0, currentWordClone);
-    // } else {
-    //   words.push(currentWordClone);
-    // }
   }
 
   function speak(text) {
@@ -616,11 +628,15 @@
       } else if (active === currentWord.example[$llang].replace(/<<|>>/g, '')) {
         currentWordIndex++;
         nextWord();
+        showHintAuto();
         active = currentWord.example[$langs].replace(/<<|>>/g, '');
         tts.Speak_server($langs, active, onEndSpeak);
       }
     }
 
+    div_input[0].style.color = '#2196f3';
+    div_input[1].style.color = '#2196f3';
+    showHintAuto();
     let active = currentWord.example[$langs].replace(/<<|>>/g, ''); //currentWord.example[$langs];
     tts.Speak_server($langs, active, onEndSpeak);
   }

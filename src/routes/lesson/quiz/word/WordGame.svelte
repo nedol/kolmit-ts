@@ -619,7 +619,7 @@
         }
     });
 
-    if (thisErrorIndex < 1) {
+    if (hintIndex < 1 && thisErrorIndex < 1) {
       if (errorIndex < 1) {
         doneWords++;
         const data = {

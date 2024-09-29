@@ -67,6 +67,10 @@
       });
   }
 
+  function OnClickUser(){
+
+  }
+
   onMount(async () => {
     OperatorWaiting({
       type: 'user',

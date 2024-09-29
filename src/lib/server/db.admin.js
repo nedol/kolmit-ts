@@ -209,6 +209,6 @@ export async function GetPrompt(prompt, quiz_name, owner, level, theme) {
   return {
     prompt: prompt_res[0],
     words: words_res,
-    grammar: gram?.grammar,
+    grammar: gram,
   };
 }

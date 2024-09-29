@@ -126,9 +126,13 @@
 
           dialog_data.html = resp.resp.words[0]?.context;
 
-          grammar = resp.resp.grammar;
+          let quiz_grammar = resp.resp.grammar.quizes[data.name[$llang]];
 
-          if (grammar) prompt = prompt.replaceAll('${grammar}', grammar);
+          grammar = resp.resp.grammar.grammar.concat(quiz_grammar);
+
+          if (grammar) prompt = prompt.replaceAll('${grammar}', grammar.map(element => {
+            return element
+          }));
 
           prompt = prompt;
         });
@@ -141,6 +145,11 @@
   onMount(async () => {});
 
   function LoadPrompt(name, data) {
+    if (name === 'context') {
+      active = `Context`;
+    } else if (name === 'grammar') {
+      active = `Grammar`;
+    }
     fetch(
       `/admin?prompt=dialog.${name}&quiz_name=${data.name[$llang]}&prompt_owner=${abonent}&prompt_level=${data.level}&prompt_theme=${data.theme}`
     )
@@ -153,7 +162,7 @@
         prompt = prompt.replaceAll('${dialog_data.html}', dialog_data.html);
         prompt = prompt.replaceAll('${data.level}', data.level);
         prompt = prompt.replaceAll('${num}', num);
-        prompt = prompt.replaceAll('${grammar}', data.resp.grammar);
+        prompt = prompt.replaceAll('${grammar}', data.resp.grammar.grammar.map((el)=>{return el}));
         prompt = prompt;
       })
       .catch((error) => {

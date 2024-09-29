@@ -34,7 +34,6 @@
     click_call_func,
     user_placeholder,
     msg_user,
-
   } from '$lib/js/stores.js';
 
   $click_call_func = null;
@@ -42,9 +41,6 @@
   import pkg from 'lodash';
   const { groupBy, find } = pkg;
 
-  // import './lib/icofont/icofont.min.css';
-
-  import {} from '$lib/js/stores.js';
   $: if ($msg_user) {
     // if ($msg_user.operator) {
     // 	if ($msg_user.operator === operator) OnMessage($msg_user);
@@ -56,16 +52,26 @@
   let dc = false;
 
   $: switch ($dc_user_state) {
-      case 'open':
-        $call_but_status = 'call';
-        break;
-      case 'close':
-        $call_but_status = 'inactive';
-        // $users_status[operator] = 'inactive';
-        // parent_div.appendChild(card);
-        break;
-    }
-  
+    case 'open':
+      $call_but_status = 'call';
+      break;
+    case 'close':
+      $call_but_status = 'inactive';
+      local.video.display = 'none';
+      // remote.video.display = 'none';
+      local.audio.paused = true;
+
+      //rtc.abonent = url.searchParams.get('abonent');
+      status = 'inactive';
+      user_.display = 'none';
+      // $call_but_status = 'inactive';
+      $click_call_func = null; //operator -> OnClickCallButton
+      parent_div.appendChild(card);
+      rtc.OnInactive();
+      video_element.src = '';
+
+      break;
+  }
 
   $: if (status) {
     $users[operator].status = status;
@@ -204,7 +210,6 @@
               rtc.DC.dc.readyState !== 'connecting')
           )
             status = 'busy';
-            
         } else if (res['close']) {
           local.video.display = 'none';
           // remote.video.display = 'none';
@@ -264,7 +269,6 @@
     }
 
     if (data.func === 'talk') {
-
       if (data.operator === operator) {
         $call_but_status = 'talk';
         status = 'talk';
@@ -289,8 +293,6 @@
 
     // $call_but_status = status;
   }
-
-
 
   let OnClickCallButton = function () {
     // if (email && email !== rtc.operator) return;
@@ -340,7 +342,7 @@
         break;
       case 'call':
         status = 'inactive';
-        user_.display = 'none'
+        user_.display = 'none';
         $call_but_status = 'inactive';
 
         local.audio.paused = true;
@@ -354,7 +356,7 @@
         break;
       case 'talk':
         status = 'inactive';
-        user_.display = 'none'
+        user_.display = 'none';
         $call_but_status = 'inactive';
 
         local.video.display = 'none';
@@ -370,7 +372,7 @@
         break;
       case 'muted':
         status = 'inactive';
-        user_.display = 'none'
+        user_.display = 'none';
         // $call_but_status = 'inactive';
         video_button_display = 'none';
         $click_call_func = null; //operator -> OnClickCallButton
@@ -380,7 +382,7 @@
         // rtc.Call();
         if ($call_but_status === 'talk') {
           status = 'inactive';
-          user_.display = 'none'
+          user_.display = 'none';
           $call_but_status = 'inactive';
           rtc.OnInactive();
         }
@@ -396,8 +398,7 @@
     }
   };
 
-  $users[operator] = {'OnClickCallButton': OnClickCallButton}
-
+  $users[operator] = { OnClickCallButton: OnClickCallButton };
 
   function toggle_remote_audio() {
     isRemoteAudioMute = !isRemoteAudioMute;

@@ -32,7 +32,7 @@ export class DataChannelOperator extends DataChannel {
 
 		this.dc.onerror = () => {
 			msg_oper.set({ func: 'mute' });
-			dc_oper_state.set("mute");
+			dc_oper_state.set("close");
 		};
 
 

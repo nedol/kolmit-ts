@@ -27,10 +27,7 @@
     dicts,
     langs,
     showBottomAppBar,
-    
   } from '$lib/js/stores.js';
-
-
 
   import CircularProgress from '@smui/circular-progress';
 
@@ -62,13 +59,24 @@
 
   /*TODO: дает*/
   $: if ($dc_oper_state) {
-
     switch ($dc_oper_state) {
       case 'open':
         $call_but_status = 'call';
         break;
       case 'close':
         $call_but_status = 'inactive';
+        local.audio.paused = true;
+
+        video_button_display = false;
+        local.video.display = 'none';
+        local.video.srcObject = '';
+        // local.video.display = 'block';
+        remote.video.srcObject = '';
+        remote.video.poster = '';
+        remote.video.display = 'none';
+        remote.text.name = '';
+        remote.text.email = '';
+        remote.text.display = 'none';
         break;
     }
   }
@@ -115,8 +123,8 @@
 
   $call_but_status = 'inactive';
 
-  $: if($call_but_status ==='active'){
-     CallWaiting(operator);
+  $: if ($call_but_status === 'active') {
+    CallWaiting(operator);
   }
 
   import { editable } from '$lib/js/stores.js';
@@ -128,7 +136,6 @@
   let operator = getContext('operator');
   operator.type = 'operator';
 
-
   const abonent = operator.abonent;
   const name = operator.name;
 
@@ -136,16 +143,12 @@
 
   let container;
 
-
   const headers = {
     'Content-Type': 'application/json',
   };
 
-    
   async function CallWaiting(par: any) {
-
-    if($call_but_status ==='inactive')
-      return;
+    if ($call_but_status === 'inactive') return;
 
     par.func = 'callwaiting';
 
@@ -171,10 +174,9 @@
   }
 
   onMount(async () => {
-    try { 
-
+    try {
       rtc = new RTCOperator(operator, uid, $signal);
-      initRTC();   
+      initRTC();
       rtc.SendCheck();
 
       try {
@@ -195,7 +197,6 @@
 
       // Добавьте слушателя событий для скрытия списка команд при клике за его пределами
       // document.addEventListener('click', handleOutsideClick);
-        
     } catch (ex) {
       console.log();
     }
@@ -221,7 +222,7 @@
   let remote = {
     text: {
       display: 'none',
-      msg:  '',
+      msg: '',
       name: '',
       email: '',
     },
@@ -525,9 +526,9 @@
       {#if remote.text.display && remote.text.name}
         <div class="remote_text_display" style="display:{remote.text.display};">
           {#await Translate('Тебя вызывает - ', 'ru', $langs) then data}
-          <p class="remote_msg">
-            {data}{remote.text.name}
-          </p>
+            <p class="remote_msg">
+              {data}{remote.text.name}
+            </p>
           {/await}
         </div>
       {/if}
@@ -546,7 +547,7 @@
         >
       </CallButton>
     </Section>
-    <Section  align="end">
+    <Section align="end">
       <div
         class="video"
         on:click={OnClickVideoButton}
