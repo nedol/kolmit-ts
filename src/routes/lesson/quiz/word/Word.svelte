@@ -179,99 +179,100 @@
     );
   }
 
-  async function makeExample() {
-    if (!currentWord) return;
+  function makeExample() {
+    return new Promise(async (resolve, reject) => {
 
-    if (currentWord?.example[$langs]) {
-      example = currentWord.example[$langs];
-    } else if (currentWord.example[$llang]) {
-      example = await Translate(currentWord.example[$llang], $llang, $langs);
-    }
+      if (!currentWord) reject();
 
-    const regex = /(<<\w+>>)\s+(<<\w+>>)/;
-    const match = currentWord?.example[$llang]
-      ? currentWord?.example[$llang].match(regex)
-      : '';
-    let original = '';
-    if (match) {
-      original = `${match[0]} ${match[1]}`;
-    }
-    // else original = `${currentWord.original}`;
-
-    resultElement = replaceWordWithInput(
-      (speak_text = currentWord?.example[$llang]
-        ? currentWord?.example[$llang]
-        : (currentWord.example[$llang] = await Translate(
-            currentWord.example['ru'],
-            'ru',
-            $llang
-          ))),
-      `${original}`
-    );
-
-    if (example.includes('<<') && example.includes('>>')) {
-      example = example?.replace(
-        /<<([^<>]+)>>/gu,
-        data.level.includes('A1')
-          ? '<span style="color:green" onclick=OnClickInput><b>$1</b></span>'
-          : '$1'
-      );
-    } else if (example.includes('"')) {
-      example = example?.replace(
-        /"([^"]+)"/gu,
-        data.level.includes('A1')
-          ? '<span style="color:green" onclick=OnClickInput><b>$1</b></span>'
-          : '$1'
-      );
-    }
-
-    setTimeout(() => {
-      const wAr = extractWords(currentWord?.example[$llang]);
-      const spanElements = document.querySelectorAll('.sentence_span');
-      spanElements.forEach((spanElement, i) => {
-        if (div_input) div_input[i].style.display = '';
-        spanElement.appendChild(div_input[i]); // Используем cloneNode, чтобы не удалить div_input из DOM
-        // spanElement.style.width = "50px";
-        resultElementWidth[i] = getTextWidth(wAr[i], '20px Arial');
-      });
-    }, 0);
-
-    function getSubArray(arr, index) {
-      const totalElements = 10;
-      const halfRange = Math.floor(totalElements / 2);
-
-      let startIndex = index - halfRange;
-      let endIndex = index + halfRange;
-
-      // Корректировка начала массива, если оно меньше 0
-      if (startIndex < 0) {
-        endIndex += Math.abs(startIndex);
-        startIndex = 0;
+      if (currentWord?.example[$langs]) {
+        example = currentWord.example[$langs];
+      } else if (currentWord.example[$llang]) {
+        example = await Translate(currentWord.example[$llang], $llang, $langs);
       }
 
-      // Корректировка конца массива, если он больше длины массива
-      if (endIndex >= arr.length) {
-        startIndex -= endIndex - arr.length + 1;
-        endIndex = arr.length - 1;
+      currentWord.example[$langs] = example;
+
+      const regex = /(<<\w+>>)\s+(<<\w+>>)/;
+      const match = currentWord?.example[$llang]
+        ? currentWord?.example[$llang].match(regex)
+        : '';
+      let original = '';
+      if (match) {
+        original = `${match[0]} ${match[1]}`;
+      }
+      // else original = `${currentWord.original}`;
+
+      resultElement = replaceWordWithInput(
+        (speak_text = currentWord?.example[$llang]
+          ? currentWord?.example[$llang]
+          : (currentWord.example[$llang] = await Translate(
+              currentWord.example['ru'],
+              'ru',
+              $llang
+            ))),
+        `${original}`
+      );
+
+      if (example.includes('<<') && example.includes('>>')) {
+        example = example?.replace(
+          /<<([^<>]+)>>/gu,
+          data.level.includes('A1')
+            ? '<span style="color:green" onclick=OnClickInput><b>$1</b></span>'
+            : '$1'
+        );
+      } else if (example.includes('"')) {
+        example = example?.replace(
+          /"([^"]+)"/gu,
+          data.level.includes('A1')
+            ? '<span style="color:green" onclick=OnClickInput><b>$1</b></span>'
+            : '$1'
+        );
       }
 
-      // Убедиться, что начало не ушло ниже нуля после корректировки конца
-      startIndex = Math.max(startIndex, 0);
+      setTimeout(() => {
+        const wAr = extractWords(currentWord?.example[$llang]);
+        const spanElements = document.querySelectorAll('.sentence_span');
+        spanElements.forEach((spanElement, i) => {
+          if (div_input) div_input[i].style.display = '';
+          spanElement.appendChild(div_input[i]); // Используем cloneNode, чтобы не удалить div_input из DOM
+          // spanElement.style.width = "50px";
+          resultElementWidth[i] = getTextWidth(wAr[i], '20px Arial');
+        });
+      }, 0);
 
-      return arr.slice(startIndex, endIndex + 1); // Включить элемент с endIndex
-    }
+      function getSubArray(arr, index) {
+        const totalElements = 10;
+        const halfRange = Math.floor(totalElements / 2);
 
-    hints = getSubArray([...words], currentWordIndex);
-    shuffle(hints);
+        let startIndex = index - halfRange;
+        let endIndex = index + halfRange;
 
-    // word = currentWord['original'].replace(/(de|het)\s*/gi, '');
-    // let filteredExample = currentWord['example'].replace(
-    //    new RegExp(`\\b(de |het )?(?=\\b${word}\\b)`, 'gi'), '');
-    // resultElement = filteredExample.split(new RegExp(word, 'i'));
-    // console.log(resultElement)
+        // Корректировка начала массива, если оно меньше 0
+        if (startIndex < 0) {
+          endIndex += Math.abs(startIndex);
+          startIndex = 0;
+        }
 
-    // Устанавливаем фокус в конец строки
-    // setFocus();
+        // Корректировка конца массива, если он больше длины массива
+        if (endIndex >= arr.length) {
+          startIndex -= endIndex - arr.length + 1;
+          endIndex = arr.length - 1;
+        }
+
+        // Убедиться, что начало не ушло ниже нуля после корректировки конца
+        startIndex = Math.max(startIndex, 0);
+
+        return arr.slice(startIndex, endIndex + 1); // Включить элемент с endIndex
+      }
+
+      hints = getSubArray([...words], currentWordIndex);
+      shuffle(hints);
+
+      resolve();
+
+      // Устанавливаем фокус в конец строки
+      // setFocus();
+    });
   }
 
   function getTextWidth(text, font) {
@@ -308,7 +309,6 @@
 
     div_input[0].style.width = '';
     div_input[1].style.width = '';
-    
 
     arSpan.forEach((el, i) => {
       if (word === el.attributes.value.nodeValue.toLowerCase()) {
@@ -491,7 +491,7 @@
     for (let char of words) {
       // word = word.replace(/[.,\/#!?$%\^&\*;:{}=_`~()]/g, '');
 
-      if (char == ' ' && div_input[1].style.display !=='none') {
+      if (char == ' ' && div_input[1].style.display !== 'none') {
         w++;
         //  div_input[1].style.display = 'inline-table'
         if (userContent[w] === '&nbsp;') userContent[w] = '';
@@ -513,7 +513,6 @@
     }
   }
 
-  
   function showHintAuto() {
     const words = extractWords(currentWord.example[$llang]).join(' ');
 
@@ -529,16 +528,15 @@
 
     const splited = words.split(' ');
 
-    if( div_input[1] && div_input[1].style.display==='')
-      [userContent[0],userContent[1]] = splited
-    else
-      userContent[0] = words
+    if (div_input[1] && div_input[1].style.display === '')
+      [userContent[0], userContent[1]] = splited;
+    else userContent[0] = words;
   }
 
-  function nextWord() {
+  async function nextWord() {
     if (currentWordIndex >= words.length) currentWordIndex = 0;
     currentWord = words[currentWordIndex];
-    makeExample();
+    await makeExample();
 
     hints = hints;
 
@@ -573,7 +571,6 @@
     );
 
     if (!showNextButton) hintIndex++;
-
   }
 
   function speak(text) {
@@ -627,7 +624,7 @@
     isPlayAuto = !isPlayAuto;
     if (!isPlayAuto) return;
 
-    function onEndSpeak() {
+    async function onEndSpeak() {
       if (!isPlayAuto) return;
 
       if (active === currentWord.example[$langs].replace(/<<|>>/g, '')) {
@@ -635,11 +632,11 @@
         tts.Speak_server($llang, active, onEndSpeak);
       } else if (active === currentWord.example[$llang].replace(/<<|>>/g, '')) {
         currentWordIndex++;
-        nextWord();
-        setTimeout(()=>{
+        await nextWord();
+        setTimeout(() => {
           showHintAuto();
-        },100)
-     
+        }, 100);
+
         active = currentWord.example[$langs].replace(/<<|>>/g, '');
         tts.Speak_server($langs, active, onEndSpeak);
       }
@@ -647,9 +644,9 @@
 
     div_input[0].style.color = '#2196f3';
     div_input[1].style.color = '#2196f3';
-        setTimeout(()=>{
-          showHintAuto();
-        },100)
+    setTimeout(() => {
+      showHintAuto();
+    }, 100);
     let active = currentWord.example[$langs].replace(/<<|>>/g, ''); //currentWord.example[$langs];
     tts.Speak_server($langs, active, onEndSpeak);
   }
