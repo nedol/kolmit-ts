@@ -671,6 +671,15 @@
     let i = 0,
       w = 0;
 
+    if (hintIndex == 0) {
+      userContent[0] = '&nbsp;';
+      userContent[1] = '&nbsp;';
+      div_input[0].style.color = '#2196f3';
+      div_input[1].style.color = '#2196f3';
+      div_input[0].style.width = getTextWidth(words, '20px Arial') + 'px';
+      div_input[1].style.width = getTextWidth(words, '20px Arial') + 'px';
+    }
+
     for (let char of words) {
       // word = word.replace(/[.,\/#!?$%\^&\*;:{}=_`~()]/g, '');
       if (char == ' ') {
