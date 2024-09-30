@@ -55,8 +55,9 @@
   $: if ($dicts && !$dicts['CLASS'][$langs]) {
     (async () => {
       try {
-        $dicts['CLASS'][$langs] = await translate(
-          $dicts['CLASS']['en'],
+        $dicts['CLASS'][$langs] = await Translate(
+          'CLASS',
+          'en',
           $langs
         );
       } catch (ex) {
@@ -64,7 +65,7 @@
         let ind = langs_list.indexOf(name);
         if (ind !== -1) {
           let ar = langs_list.splice(ind, 1);
-          $langs = 'en';
+          // $langs = 'en';
         }
       }
     })();
@@ -73,13 +74,14 @@
   $: if ($dicts && !$dicts['LESSON'][$langs]) {
     (async () => {
       try {
-        $dicts['LESSON'][$langs] = await translate(
-          $dicts['LESSON']['en'],
+        $dicts['LESSON'][$langs] = await Translate(
+          'LESSON',
+          'en',
           $langs
         );
       } catch (ex) {
         console.log(ex);
-        $langs = 'en';
+        // $langs = 'en';
       }
     })();
   }

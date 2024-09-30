@@ -180,9 +180,9 @@
   }
 
   function makeExample() {
-    return new Promise(async (resolve, reject) => {
+          if (!currentWord) return;
 
-      if (!currentWord) reject();
+    return new Promise(async (resolve, reject) => {
 
       if (currentWord?.example[$langs]) {
         example = currentWord.example[$langs];
