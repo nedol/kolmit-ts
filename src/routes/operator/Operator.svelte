@@ -174,6 +174,18 @@
       });
   }
 
+   let isHidden = false;
+
+  function handleVisibilityChange() {
+    isHidden = document.hidden;
+    if (isHidden) {
+      console.log('Страница ушла в фоновый режим');
+      location.reload(); // Перезагрузка страницы
+    } else {
+      console.log('Страница активна');
+    }
+  }
+
   onMount(async () => {
     try {
       rtc = new RTCOperator(operator, uid, $signal);
@@ -198,6 +210,8 @@
 
       // Добавьте слушателя событий для скрытия списка команд при клике за его пределами
       // document.addEventListener('click', handleOutsideClick);
+      document.addEventListener('visibilitychange', handleVisibilityChange);
+
     } catch (ex) {
       console.log();
     }
@@ -478,6 +492,7 @@
 
   onDestroy(() => {
     group = '';
+    document.removeEventListener('visibilitychange', handleVisibilityChange);
   });
 </script>
 
