@@ -140,7 +140,7 @@ export async function GetGroup(par) {
         AND operators.group=(
         SELECT "group" FROM operators
         WHERE operators.abonent=${par.abonent} 
-        AND operator=${par.operator}
+        AND operator=${par.operator} AND psw=${par.psw}
       )`;
 
   const oper = await sql`
@@ -179,13 +179,7 @@ export async function GetUsers(par) {
 			FROM operators
 			WHERE role='admin' AND operators.abonent=${par.abonent}
 			`;
-    } else {
-      users = await sql`SELECT  users, quiz_users
-			FROM operators
-			INNER JOIN users ON (operators.abonent = users.operator = operators.operator) 
-			WHERE operators.operator=users.operators.operator AND operators.operator=${par.operator} 
-				AND operators.psw=${par.psw};`;
-    }
+    } 
   } catch (ex) {
     console.log();
   }

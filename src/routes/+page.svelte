@@ -37,13 +37,13 @@
   }
 
   onMount(async () => {
-     (!operator || !data?.group)?$view='login':''
+     (!operator || data?.group?.length===0)?$view='login':''
   });
 </script>
 
 <Header></Header>
 
-{#if operator && data.group}
+{#if operator && data?.group?.length>0}
   <Operator {operator} {abonent} {name} />
 {:else if $view==='login'}
   <Login {operator} {abonent} {user_pic} />
