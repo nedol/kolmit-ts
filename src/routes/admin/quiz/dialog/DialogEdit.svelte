@@ -118,11 +118,13 @@
           //     .join(',')
           // );
 
-          if (dialog_data.words)
+          if (resp.resp.words[0].data){            
+
             prompt = prompt.replaceAll(
               '[${dialog_data_words}]',
-              dialog_data.words
+              resp.resp.words[0].data.map(item => item.infinitive)
             );
+          }
 
           dialog_data.html = resp.resp.words[0]?.context;
 

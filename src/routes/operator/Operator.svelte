@@ -115,7 +115,7 @@
   let synthesis;
   let isRemoteAudioMute = false;
   let commandsList;
-
+  let rtcSupportText = '' ;
   let debug_div: any;
 
   let cc_display: string,
@@ -186,7 +186,38 @@
     }
   }
 
+  let isMobile = false;
+  function detectDevice() {
+    const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+
+    // Проверяем наличие строки, характерной для мобильных устройств
+    if (/android/i.test(userAgent)) {
+      isMobile = true;
+    } else if (/iPhone|iPad|iPod/i.test(userAgent)) {
+      isMobile = true;
+    } else {
+      isMobile = false; // Если не мобильное устройство
+    }
+  }
+
+
+
+  function checkWebRTCSupport() {
+    const isWebRTCSupported = !!(navigator.mediaDevices && 
+          navigator.mediaDevices.getUserMedia && 
+          window.RTCPeerConnection && 
+          window.RTCDataChannel);
+    if(!isWebRTCSupported){
+      rtcSupportText = "WebRTC не поддерживается вашим браузером"
+    } else{
+      rtcSupportText  = ' '
+    }                      
+  }
+
   onMount(async () => {
+    checkWebRTCSupport();
+
+
     try {
       rtc = new RTCOperator(operator, uid, $signal);
       initRTC();
@@ -210,7 +241,8 @@
 
       // Добавьте слушателя событий для скрытия списка команд при клике за его пределами
       // document.addEventListener('click', handleOutsideClick);
-      document.addEventListener('visibilitychange', handleVisibilityChange);
+      if(detectDevice())
+        document.addEventListener('visibilitychange', handleVisibilityChange);
 
     } catch (ex) {
       console.log();
@@ -417,6 +449,7 @@
   }
 
   function OnMessage(data: any, resolve: any) {
+
     if (data.call || data.func === 'call') {
       if ($call_but_status === 'active') {
         $call_but_status = 'call';
@@ -510,7 +543,7 @@
 </div>
 
 <div class="bottom-app-bar-wrapper" class:hide={!$showBottomAppBar}>
-  <BottomAppBar slot="oper" bind:this={bottomAppBar}>
+  <BottomAppBar variant="static" slot="oper" bind:this={bottomAppBar}>
     <Section>
       <div class="remote_div">
         <div class="user_placeholder" bind:this={$user_placeholder}></div>
@@ -543,13 +576,13 @@
         <div class="remote_text_display" style="display:{remote.text.display};">
           {#await Translate('Тебя вызывает - ', 'ru', $langs) then data}
             <p class="remote_msg">
-              {data}{remote.text.name}
+              {data} {remote.text.name}
             </p>
           {/await}
         </div>
       {/if}
     </Section>
-    <Section align="end">
+    <Section>
       <CallButton on:click={$click_call_func}>
         <b
           class="call_cnt"
@@ -596,6 +629,11 @@
       </div>
     </Section>
   </BottomAppBar>
+      
+  {#await Translate(rtcSupportText, 'ru', $langs) then data}
+  <span style="position:fixed;bottom:0;font-size:smaller;color:red">{data}</span>
+  {/await}
+
   <!-- <VideoLocal {...local.video} /> -->
   <AudioLocal {...local.audio} bind:paused={local.audio.paused} />
   <!-- {@debug $call_but_status} -->

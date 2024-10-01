@@ -974,6 +974,7 @@
             {@html stt_text}
           </span>
         </div>
+
       {:else}
         {#if isThumb}
           <div class="thumb_alert">
@@ -1146,8 +1147,11 @@
           />
         </span>
       </div>
+   
     {/if}
+        <div style="height:200px"/> 
   </div>
+
 </main>
 
 <style scoped>
