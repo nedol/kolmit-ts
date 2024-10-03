@@ -221,7 +221,7 @@
     try {
       rtc = new RTCOperator(operator, uid, $signal);
       initRTC();
-      rtc.SendCheck();
+      // rtc.SendCheck();
 
       try {
         // Fix up for prefixing

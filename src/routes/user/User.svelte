@@ -229,11 +229,19 @@
       }
     }
 
-    if (data.operator && data.operator === operator) {
-      console.log(status);
-      status = 'active';
-      // $call_but_status = 'active';
+    if (data.func === 'offer' && status=='active' && $call_but_status =='active') {
+      if (data.operators[user_.operator]) {
+        user_.display = 'block';
+      }
+    }else{
+      user_.display = 'none';
     }
+
+    // if (data.operator && data.operator === operator) {
+    //   console.log(status);
+    //   status = 'active';
+    //   // $call_but_status = 'active';
+    // }
 
     // TODO: to delete
     if (data.desc && data.cand) {
@@ -245,9 +253,7 @@
       }
     }
 
-    if (data.func === 'offer') {
-      if (user_.operator === data.operator) user_.display = 'block';
-    }
+
 
     if (data.func === 'call') {
       // $muted = true;

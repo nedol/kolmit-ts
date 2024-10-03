@@ -51,7 +51,7 @@
     mdiAccountConvertOutline,
     mdiPlay,
     mdiThumbUpOutline,
-    mdiEarHearing
+    mdiEarHearing,
   } from '@mdi/js';
 
   import pkg from 'lodash';
@@ -72,14 +72,14 @@
   let isRepeat = false,
     isThumb = false;
 
-  let isPlayAuto = false;  
+  let isPlayAuto = false;
 
-  let playAutoColor = 'currentColor'
+  let playAutoColor = 'currentColor';
 
-  $: if(isPlayAuto){
-    playAutoColor = 'green'
-  }else{
-    playAutoColor = 'currentColor'
+  $: if (isPlayAuto) {
+    playAutoColor = 'green';
+  } else {
+    playAutoColor = 'currentColor';
   }
 
   const visibility = ['visible', 'hidden', 'hidden'];
@@ -273,70 +273,85 @@
     if (!dialog_data.content[0]) {
       return;
     }
-    let qa = dialog_data.content[cur_qa];
-    if (!qa) {
-      cur_qa = 0;
-      qa = dialog_data.content[cur_qa];
-      cur_html++;
-      if (dialog_data.html && !dialog_data.html[cur_html]) {
-        cur_html = 0;
+    return new Promise(async (resolve, reject) => {
+
+      let qa = dialog_data.content[cur_qa];
+      if (!qa) {
+        cur_qa = 0;
+        qa = dialog_data.content[cur_qa];
+        cur_html++;
+        if (dialog_data.html && !dialog_data.html[cur_html]) {
+          cur_html = 0;
+        }
+
+        if (!isPlayAuto)
+          setTimeout(() => {
+            onChangeUserClick();
+          }, 0);
+
+        return;
       }
 
-      if(!isPlayAuto)
-        setTimeout(() => {
-          onChangeUserClick();
-        }, 0);
+      q = isFlipped ? qa.user2 : qa.user1;
 
-      return;
-    }
+      if(!q[$langs])
+        q[$langs] = await Translate(q[$llang], $llang, $langs);
 
-    q = isFlipped ? qa.user2 : qa.user1;
 
-    q[$llang] = q[$llang]?.replace(
-      '${user1_name}',
-      $dc_user ? 'user_name' : 'Kolmit'
-    );
-    q[$langs] = q[$langs]?.replace(
-      '${user1_name}',
-      $dc_user ? 'user_name' : 'Kolmit'
-    );
-    q[$llang] = q[$llang]?.replace('${user2_name}', operator.name);
-    q[$langs] = q[$langs]?.replace('${user2_name}', operator.name);
+      q[$llang] = q[$llang]?.replace(
+        '${user1_name}',
+        $dc_user ? 'user_name' : 'Kolmit'
+      );
+      q[$langs] = q[$langs]?.replace(
+        '${user1_name}',
+        $dc_user ? 'user_name' : 'Kolmit'
+      );
+      q[$llang] = q[$llang]?.replace('${user2_name}', operator.name);
+      q[$langs] = q[$langs]?.replace('${user2_name}', operator.name);
 
-    q_shfl = q[$llang].slice(0);
+      q_shfl = q[$llang].slice(0);
 
-    const dc = $dc_user?.dc.readyState === 'open' ? $dc_user : $dc_oper;
+      const dc = $dc_user?.dc.readyState === 'open' ? $dc_user : $dc_oper;
 
-    // if (!dc && !isFlipped) speak(q[$llang]);
+      // if (!dc && !isFlipped) speak(q[$llang]);
 
-    let ar = q_shfl
-      .toLowerCase()
-      .replaceAll('?', '')
-      .replaceAll(',', ' ')
-      .split(' ');
-    // q_shfl = shuffle(ar).toString().replaceAll(',', ' ');
-    a = isFlipped ? qa.user1 : qa.user2;
-    a[$llang] = a[$llang]?.replace('${user2_name}', operator.name);
-    a[$langs] = a[$langs]?.replace('${user2_name}', operator.name);
-    a[$llang] = a[$llang]?.replace(
-      '${user1_name}',
-      $dc_user ? 'user_name' : 'Kolmit'
-    );
-    a[$langs] = a[$langs]?.replace(
-      '${user1_name}',
-      $dc_user ? 'user_name' : 'Kolmit'
-    );
+      let ar = q_shfl
+        .toLowerCase()
+        .replaceAll('?', '')
+        .replaceAll(',', ' ')
+        .split(' ');
+      // q_shfl = shuffle(ar).toString().replaceAll(',', ' ');
+      a = isFlipped ? qa.user1 : qa.user2;
+            
+      if(!a[$langs])
+        a[$langs] = await Translate(a[$llang], $llang, $langs);
 
-    hints = a.hints;
-    dialog_data.hints = a.hints;
 
-    a_shfl = a[$llang].slice(0);
-    ar = a_shfl
-      .toLowerCase()
-      .replaceAll('?', '')
-      .replaceAll(',', ' ')
-      .split(' ');
-    // a_shfl = shuffle(ar).toString().replaceAll(',', ' ');
+      a[$llang] = a[$llang]?.replace('${user2_name}', operator.name);
+      a[$langs] = a[$langs]?.replace('${user2_name}', operator.name);
+      a[$llang] = a[$llang]?.replace(
+        '${user1_name}',
+        $dc_user ? 'user_name' : 'Kolmit'
+      );
+      a[$langs] = a[$langs]?.replace(
+        '${user1_name}',
+        $dc_user ? 'user_name' : 'Kolmit'
+      );
+
+      hints = a.hints;
+      dialog_data.hints = a.hints;
+
+      a_shfl = a[$llang].slice(0);
+      ar = a_shfl
+        .toLowerCase()
+        .replaceAll('?', '')
+        .replaceAll(',', ' ')
+        .split(' ');
+      // a_shfl = shuffle(ar).toString().replaceAll(',', ' ');
+
+      resolve();
+
+    });
   }
 
   function handleBackClick() {
@@ -344,7 +359,7 @@
     // $lesson.visible = true;
   }
 
-  function onNextQA() {
+  async function onNextQA() {
     // voice.Cancel();
     cur_qa++;
     visibility[1] = 'hidden';
@@ -357,10 +372,12 @@
       tip_hidden_text = 'hidden-text';
     }, 50);
 
-    Dialog();
     SendData();
     stt_text = '';
     showSpeakerButton = false;
+
+    
+    return Dialog();
 
     // speak(q[$llang])
   }
@@ -453,9 +470,7 @@
   }
 
   async function speak(text, cb_end) {
-    function endSpeak(){
-      
-    }
+    function endSpeak() {}
     if (text) tts.Speak_server($llang, text, endSpeak);
   }
 
@@ -611,74 +626,59 @@
 
   function PlayAutoContent() {
     isPlayAuto = !isPlayAuto;
-    if(!isPlayAuto)
-        return;
-   
-    
-    function onEndSpeak() {
-      if(!isPlayAuto)
-        return;
- 
+    if (!isPlayAuto) return;
+
+    async function onEndSpeak() {
+      if (!isPlayAuto) return;
+
       visibility[2] = 'visible';
-      if(active===q[$langs]){
+      if (active === q[$langs]) {
         active = q[$llang];
         tts.Speak_server($llang, active, onEndSpeak);
-      
-      }else if (active === a[$llang]) {
-         onNextQA(); 
+      } else if (active === a[$llang]) {
+        await onNextQA();
         visibility[1] = 'visible';
         active = q[$langs];
         tts.Speak_server($langs, active, onEndSpeak);
-        
       } else if (active === q[$llang]) {
-        active = a[$langs]
+        active = a[$langs];
         tts.Speak_server($langs, active, onEndSpeak);
-
-      }else if(active===a[$langs]){
-      
+      } else if (active === a[$langs]) {
         active = a[$llang];
         tts.Speak_server($llang, active, onEndSpeak);
       }
     }
-     visibility[1] = 'visible';
+    visibility[1] = 'visible';
     let active = q[$langs];
     tts.Speak_server($langs, active, onEndSpeak);
-
   }
 
-    function PlayAutoContent_() {
+  function PlayAutoContent_() {
     isPlayAuto = !isPlayAuto;
-    if(!isPlayAuto)
-        return;
+    if (!isPlayAuto) return;
     let active = q[$llang];
-    
+
     function onEndSpeak() {
-      if(!isPlayAuto)
-        return;
-       visibility[1] = 'visible';
+      if (!isPlayAuto) return;
+      visibility[1] = 'visible';
       visibility[2] = 'visible';
-      if(active===q[$langs]){
+      if (active === q[$langs]) {
         active = a[$llang];
         tts.Speak_server($llang, active, onEndSpeak);
-      
-      }else if (active === a[$llang]) {
-      
+      } else if (active === a[$llang]) {
         active = a[$langs];
         tts.Speak_server($langs, active, onEndSpeak);
-        
       } else if (active === q[$llang]) {
-        active = q[$langs]
+        active = q[$langs];
         tts.Speak_server($langs, active, onEndSpeak);
-
-      }else if(active===a[$langs]){
-        onNextQA();  
+      } else if (active === a[$langs]) {
+        onNextQA();
         active = q[$llang];
         tts.Speak_server($llang, active, onEndSpeak);
       }
     }
 
     tts.Speak_server($llang, q[$llang], onEndSpeak);
-
   }
 
   onDestroy(async () => {
@@ -731,13 +731,13 @@
             {/if}
           {/if}
         </Section>
-        <Section  align="start">
-          {#if  !$dc_user && !$dc_oper }
-           <IconButton on:click={PlayAutoContent}>
+        <Section align="start">
+          {#if !$dc_user && !$dc_oper}
+            <IconButton on:click={PlayAutoContent}>
               <Icon tag="svg" viewBox="0 0 24 24">
-                <path fill={playAutoColor} d={mdiEarHearing}  />
+                <path fill={playAutoColor} d={mdiEarHearing} />
               </Icon>
-          </IconButton>
+            </IconButton>
           {/if}
         </Section>
         <Section align="start">
@@ -862,8 +862,8 @@
         <div style="text-align: center;">
           <div class="user1" style="visibility:{visibility[1]}">
             <span>
-              {#if !dialog_data.content[cur_qa].user1[$langs]}
-                {#await Translate(q[$llang].replace(/"([^"]*)"/g, '$1'), $llang, $langs) then data}
+              {#if !q[$langs]}
+                {#await Translate(q['ru'].replace(/"([^"]*)"/g, '$1'),'ru', $langs) then data}
                   {@html data}
                 {/await}
               {:else}
@@ -917,7 +917,7 @@
           <div class="user2_tr">
             {#if a && visibility[0] === 'visible'}
               {#if !a[$langs]}
-                {#await Translate(a[$llang].replace(/"([^"]*)"/g, '$1'), $llang, $langs) then data}
+                {#await Translate(a['ru'].replace(/"([^"]*)"/g, '$1'), 'ru', $langs) then data}
                   {data}
                 {/await}
               {:else}
@@ -974,7 +974,6 @@
             {@html stt_text}
           </span>
         </div>
-
       {:else}
         {#if isThumb}
           <div class="thumb_alert">
@@ -1147,11 +1146,9 @@
           />
         </span>
       </div>
-   
     {/if}
-        <div style="height:200px"/> 
+    <div style="height:200px" />
   </div>
-
 </main>
 
 <style scoped>

@@ -79,7 +79,7 @@
       role: 'operator',
       class_name: class_name,
       name: name,
-      email: email,
+      email: email.trim(),
       operator: operator,
       abonent: abonent,
       lang: user_lang,

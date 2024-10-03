@@ -13,48 +13,7 @@ export const config = {
 	// }
 };
 
-/** @type {import('./$types').RequestHandler} */
-export async function GET(event) {
-	// let global.rtcPool = get('global.rtcPool');
 
-	let q = {};
-	q.func = event.url.searchParams.get('func');
-	q.role = event.url.searchParams.get('role');
-	q.uid = event.url.searchParams.get('uid');
-	q.abonent = event.url.searchParams.get('abonent');
-	q.type = event.url.searchParams.get('type');
-	q.operator = event.url.searchParams.get('operator');
-
-	let resp;
-	switch (q.func) {
-		case 'callwaiting':
-			try {
-				let promise = new Promise((resolve, reject) => {
-					// if (global.rtcPool[q.type][q.abonent][q.operator].post_resolve)
-					// 	global.rtcPool[q.type][q.abonent][q.operator].post_resolve(resolve);
-					// console.log('oper global.rtcPool' + JSON.stringify(global.rtcPool));
-					CallWaiting(q, resolve);
-					if (global.rtcPool[q.type][q.abonent][q.operator].resolve_post)
-						global.rtcPool[q.type][q.abonent][q.operator].resolve_post();
-					// set('global.rtcPool', global.rtcPool);
-					rtcPool_st.set(global.rtcPool);
-				});
-				resp = await promise;
-				global.rtcPool[q.type][q.abonent][q.operator].promise = new Promise((resolve, reject) => {
-					global.rtcPool[q.type][q.abonent][q.operator].resolve_post = resolve;
-					// set('global.rtcPool', global.rtcPool);
-					rtcPool_st.set(global.rtcPool);
-				});
-			} catch (ex) {
-				console.log('callwaiting' + ex);
-			}
-			break;
-	}
-
-	let response = new Response(JSON.stringify({ resp }));
-	response.headers.append('Access-Control-Allow-Origin', `*`);
-	return response;
-}
 
 /** @type {import('./$types').RequestHandler} */
 export async function POST(event) {

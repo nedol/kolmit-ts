@@ -21,7 +21,7 @@
   import pkg from 'lodash';
   const { mapValues } = pkg;
 
-  import { users, langs, msg_oper, msg_user } from '$lib/js/stores.js';
+  import { users, langs, msg_oper, msg_user,  call_but_status } from '$lib/js/stores.js';
 
   import User from '../User.svelte';
 
@@ -71,12 +71,16 @@
 
   }
 
-  onMount(async () => {
+  $: if(  $call_but_status==='active'){
     OperatorWaiting({
       type: 'user',
       abonent: operator.abonent,
       operator: operator.operator,
     });
+  }
+
+  onMount(async () => {
+
     // SendCheck({ func: 'check', type: 'user', abonent: operator.abonent, em: operator.em });
   });
 
