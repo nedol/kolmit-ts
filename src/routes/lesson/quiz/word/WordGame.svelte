@@ -177,6 +177,7 @@
       label[false] = 'Твой ход. Выбери слово';
       level = $msg_user.lesson.level;
       makeExample();
+      $msg_user.lesson.quiz = ''
     } else if ($msg_user?.lesson.word_flip) {
       isFlipped = $msg_user.lesson.word_flip;
       $msg_user.lesson.word_flip = null;
@@ -337,6 +338,7 @@
   function replaceWord(text, targetWord) {
     const threshold = 0.8; // 90% порог
 
+    if(text)
     return text.replace(
       /<<([^>]*)>>/g,
       `<span  value="$1" class="sentence_span" style="position: relative;width:20px;  left: 0px; color:green; font-weight:bold">$1</span>`
@@ -651,6 +653,7 @@
       }
     } else {
       errorIndex++;
+      // errorIndex = 0;
       label[true] = 'Исправь ошибку';
     }
     // console.log(targetWords.length)
