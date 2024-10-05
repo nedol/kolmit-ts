@@ -51,44 +51,41 @@
 
   let dc = false;
 
-  $: switch ($dc_user_state) {
-    case 'open':
-      $call_but_status = 'call';
-      break;
-    case 'close':
-      $call_but_status = 'inactive';
-      local.video.display = 'none';
-      // remote.video.display = 'none';
-      local.audio.paused = true;
+  // $: switch ($dc_user_state) {
+  //   case 'open':
+  //     $call_but_status = 'call';
+  //     break;
+  //   case 'close':
+  //     $call_but_status = 'inactive';
+  //     local.video.display = 'none';
+  //     // remote.video.display = 'none';
+  //     local.audio.paused = true;
 
-      //rtc.abonent = url.searchParams.get('abonent');
-      status = 'inactive';
-      user_.display = 'none';
-      // $call_but_status = 'inactive';
-      $click_call_func = null; //operator -> OnClickCallButton
-      parent_div.appendChild(card);
-      rtc.OnInactive();
-      video_element.src = '';
+  //     //rtc.abonent = url.searchParams.get('abonent');
+  //     status = 'inactive';
+  //     user_.display = 'none';
+  //     // $call_but_status = 'inactive';
+  //     $click_call_func = null; //operator -> OnClickCallButton
+  //     // parent_div.appendChild(card);
+  //     rtc.OnInactive();
+  //     video_element.src = '';
 
-      break;
-  }
+  //     break;
+  // }
 
-  $: if (status) {
-    $users[operator].status = status;
-  }
+  // $: if (status) {
+  //   $users[operator].status = status;
+  // }
 
   let checked = false;
 
   let isRemoteAudioMute = false;
 
-  const uid = md5(abonent + operator.operator + operator);
+  const uid = operator;
 
-  let rtc;
-
-  let call_cnt;
-  let selected,
+  let rtc, call_cnt, selected,
     inter,
-    status = 'inactive',
+    status = 'active',
     profile = false,
     card;
 
@@ -192,6 +189,12 @@
   }
 
   function OnMessage(data) {
+    if($call_but_status==='inactive' ){
+      user_.display = 'none';
+      return;
+
+    }
+
     if (data.operators && data.operators[operator]) {
       let res = groupBy(data.operators[operator], 'status');
       try {
@@ -228,6 +231,8 @@
         console.log(ex);
       }
     }
+
+
 
     if (data.func === 'offer' && status=='active' && $call_but_status =='active') {
       if (data.operators[user_.operator]) {
@@ -319,7 +324,7 @@
     switch (status) {
       case 'inactive':
         // status = 'wait';
-        //user_.display = 'none'
+        // user_.display = 'none'
         // Call();
         // remote.video.srcObject = null;
         break;
@@ -330,6 +335,8 @@
       // 	rtc.SendCheck();
       // 	break;
       case 'active':
+        if($call_but_status==='call' || $call_but_status==='talk')
+          break;
         user_.display = 'block';
         $click_call_func = OnClickCallButton;
         function call() {

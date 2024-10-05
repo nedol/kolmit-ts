@@ -136,7 +136,7 @@ export async function GetGroup(par) {
 			SELECT "group", abonent, role, operator, picture, lang, name
       	FROM operators
         WHERE operators.abonent=${par.abonent} 
-        AND  operators.operator<>${par.operator}
+        AND  operators.operator=${par.operator}
         AND operators.group=(
         SELECT "group" FROM operators
         WHERE operators.abonent=${par.abonent} 

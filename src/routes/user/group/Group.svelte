@@ -19,7 +19,7 @@
   import Button, { Label } from '@smui/button';
 
   import pkg from 'lodash';
-  const { mapValues } = pkg;
+  const { mapValues, find } = pkg;
 
   import { users, langs, msg_oper, msg_user,  call_but_status } from '$lib/js/stores.js';
 
@@ -42,7 +42,14 @@
     // Authorization: `Bearer ${token}`
   };
 
+  $: if ($msg_user) {
+    onMessage($msg_user);
+  }
+
+  let isOperatorWaiting = false
+
   async function OperatorWaiting(par: any) {
+    if(isOperatorWaiting)
     fetch(`./user`, {
       method: 'POST',
       // mode: 'no-cors',
@@ -55,10 +62,13 @@
         if (Array.isArray(data.resp)) {
           data.resp.map((resp) => {
             $msg_user = resp;
+            onMessage(resp)
           });
         }
-
-        OperatorWaiting(par);
+        if(isOperatorWaiting){
+          par.func = 'operatorwaiting';
+          OperatorWaiting(par);
+        }
       })
       .catch((error) => {
         console.log(error);
@@ -72,11 +82,15 @@
   }
 
   $: if(  $call_but_status==='active'){
+    isOperatorWaiting = true
     OperatorWaiting({
       type: 'user',
+      func:'operators',
       abonent: operator.abonent,
       operator: operator.operator,
     });
+  }else{
+    isOperatorWaiting = false
   }
 
   onMount(async () => {
@@ -96,6 +110,49 @@
 
     users_online = 0;
   }
+
+  function onMessage(data){
+
+    if(data.operators){
+     Object.keys(data.operators).map((el)=>{
+      if(data.operators[el].status==='offer' && !find(group, {operator:el})){
+        group.push(data.operators[el])
+     }else{
+        const ind = group.indexOf(data.operators[el]);
+        group.splice(ind, 1);
+      }
+      })
+      group = group
+      
+    }
+
+    if(data.status ==='offer'){
+
+      // if(data.operator===uid){
+      //   return;
+      // }
+
+      const el = {
+        display:'block',
+        abonent:data.abonent,
+        operator:data.operator,
+        name:data.name,
+        uid:data.uid,
+        picture:data.picture
+      };
+      if(!find(group, {operator:data.operator})){
+        group?.push(el);
+        group=group;
+      }
+      $msg_user = ''
+    }else if(data.status ==='close'){
+      let el = find(group,{'uid':data.operator})
+      const ind = group.indexOf(el)
+      group.splice(ind,1);
+      group=group;
+      $msg_user = ''
+    }
+  }
 </script>
 
 <!-- {@debug operator} -->
@@ -108,17 +165,17 @@
   {/await}
   <div class="flexy-dad">
     {#each group as user, i}
-      {#if user}
+      {#if user && user.operator!==operator.operator}
         <br />
         <div
           class="mdc-elevation--z{i + 1} flexy-boy"
-          style="display:{user.display}"
+          style="display:block"
           on:click={(ev) => {
             OnClickUser({ user });
           }}
         >
           <Item style="text-align: center">
-            <User {group} bind:user_={user} {OnClickUpload} />
+            <User bind:user_={user} {OnClickUpload} />
             <Supporting>
               <Label>{user.name}</Label>
             </Supporting>

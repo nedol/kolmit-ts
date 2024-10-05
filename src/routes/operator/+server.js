@@ -22,6 +22,9 @@ export async function POST(event) {
 	let resp;
 
 	switch (q.func) {
+		case 'operators':
+
+			break;
 		case 'callwaiting':
 			try {
 				let promise = new Promise((resolve, reject) => {

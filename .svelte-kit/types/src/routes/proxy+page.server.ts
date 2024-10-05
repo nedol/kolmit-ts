@@ -13,17 +13,17 @@ import { CreatePool, GetUsers, GetGroup } from '$lib/server/db.js'; //src\lib\se
 
 let kolmit;
 
-if (!global.turn_server) {
-	global.turn_server = new Turn({
-		// set options
-		authMech: 'long-term',
-		listeningPort: 443
-	});
-	global.turn_server.start();
-	global.turn_server.addUser('username', 'password');
-	global.turn_server.log();
-	console.log('Turn server started on ' + global.turn_server.listeningPort);
-}
+// if (!global.turn_server) {
+// 	global.turn_server = new Turn({
+// 		// set options
+// 		authMech: 'long-term',
+// 		listeningPort: 443
+// 	});
+// 	global.turn_server.start();
+// 	global.turn_server.addUser('username', 'password');
+// 	global.turn_server.log();
+// 	console.log('Turn server started on ' + global.turn_server.listeningPort);
+// }
 
 /** @param {Parameters<import('./$types').PageServerLoad>[0]} event */
 export async function load({ fetch, cookies, route, url, stuff }) {
@@ -41,8 +41,6 @@ export async function load({ fetch, cookies, route, url, stuff }) {
 	let prom = new Promise((resolve, reject) => {
 		CreatePool(resolve);
 	});
-
-
 
 	const host = url.origin; //'http://localhost:3000'; //'https://kolmit-sveltekit-nedol.vercel.app'; //
 
@@ -79,10 +77,10 @@ export async function load({ fetch, cookies, route, url, stuff }) {
 		psw: kolmit.psw
 	};
 
-	let { operators, admin } = await GetUsers(params); //cc[0]; //
+	// let { operators, admin } = await GetUsers(params); //cc[0]; //
 	let { group, oper } = await GetGroup(params);
 	
-	
+	// global.rtcPool['user'][abonent][kolmit.operator]
 
 
 	return {

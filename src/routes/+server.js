@@ -1,5 +1,5 @@
 import { json } from '@sveltejs/kit';
-import { CreateOperator, CheckOperator } from '$lib/server/db.js'; //src\lib\server\server.db.js
+import { CreateOperator, CheckOperator, GetUsers } from '$lib/server/db.js'; //src\lib\server\server.db.js
 
 import pkg from 'nodemailer';
 const { Email } = pkg;
@@ -174,7 +174,6 @@ export async function POST({ request, url, fetch, cookies }) {
       SetParams(q);
 
       if (q.type === 'user') {
-
         const item = global.rtcPool[q.type][q.abonent][q.operator][q.uid];
 
         const operators = { [q.operator]: {} };
@@ -193,18 +192,18 @@ export async function POST({ request, url, fetch, cookies }) {
           func: q.func,
           type: q.type,
           check: true,
-          operators: operators,
+          // operators: operators,
         };
 
         SendOperatorOffer(q);
         return new Response(JSON.stringify({ resp }));
       } else if (q.type === 'operator') {
         const res = cookies.get('kolmit.operator:' + q.abonent);
-        let kolmit
+        let kolmit;
         if (res) {
           kolmit = JSON.parse(res);
           q.psw = kolmit.psw;
-        }    
+        }
         // console.log(q.operator)
         resp = await CheckOperator(q);
         console.log(resp);
@@ -214,8 +213,11 @@ export async function POST({ request, url, fetch, cookies }) {
     case 'offer':
       try {
         SetParams(q);
-        const operators = BroadcastOperatorStatus(q, 'offer');
-        resp = { result: operators};
+        BroadcastOperatorStatus(q, 'offer');
+        const operators = await getOperators(q, 'offer');
+        resp = {
+          operators: operators,
+        };
       } catch (ex) {
         console.log();
       }
@@ -353,99 +355,113 @@ function SetParams(q) {
   // };
 }
 
-function getOperators() {
 
+
+async function getOperators(q, func) {
+   const users = await GetUsers(q);
   let operators = { [q.operator]: {} };
-  for (let uid in global.rtcPool['operator'][q.abonent][q.operator]) {
-    if (uid !== 'resolve')
-      operators[q.operator][uid] = {
+  for (let oper in global.rtcPool['operator'][q.abonent]) {
+    const user = find(users.operators, { operator: oper });
+    
+      operators[oper] = {
         type: q.type,
         abonent: q.abonent,
-        operator: q.operator,
-        uid: q.uid,
-        status: global.rtcPool['operator'][q.abonent][q.operator][uid].status,
-        queue: queue,
+        operator: oper,
+        status: global.rtcPool['operator'][q.abonent][oper][oper].status,
+        picture: user.picture,
+        name: user.name,
       };
   }
 
   return operators;
 }
 
-function BroadcastOperatorStatus(q, check) {
+
+
+
+async function GetOperators(q, check) {
+
+  let operators = {};
   try {
-    let queue = 0;
-    if (!global.rtcPool['user'][q.abonent]) return;
-    for (let uid in global.rtcPool['user'][q.abonent][q.operator]) {
-      if (q.uid && global.rtcPool['user'][q.abonent][q.operator][uid]) {
-        queue++;
-      }
-    }
+
+  const users = await GetUsers(q);
+       
     let type = q.type === 'operator' ? 'user' : 'operator';
 
-    let operators = { };
+
     for (let oper in global.rtcPool['operator'][q.abonent]) {
-        operators[oper] =  {} ;
-        for (let uid in global.rtcPool['operator'][q.abonent][oper]) {
-          if (uid !== 'resolve')
-            operators[oper][uid] = {
-              type: q.type,
-              abonent: q.abonent,
-              operator: oper,
-              uid: q.uid,
-              status: global.rtcPool['operator'][q.abonent][oper][uid].status,
-              queue: queue,
-            };
+      operators[oper] = {};
+      for (let uid in global.rtcPool['operator'][q.abonent][oper]) {
+        if (
+          uid !== 'resolve' &&
+          global.rtcPool['operator'][q.abonent][oper][uid].status
+        ) {
+          const user = find(users.operators, { operator: q.operator });
+           
+          operators[oper] = {
+            type: q.type,
+            abonent: q.abonent,
+            operator: oper,
+            uid: q.uid,
+            status: global.rtcPool['operator'][q.abonent][oper][uid].status,
+            picture: user.picture,
+            name: user.name,
+          }
         }
-       }
+      }
+    }
+
+
+  } catch (ex) {
+    // console.log(ex);
+  }
+      return operators;
+}
+
+async function BroadcastOperatorStatus(q, status) {
+  try {
+    let type = q.type === 'operator' ? 'user' : 'operator';
 
     for (let operator in global.rtcPool[type][q.abonent]) {
       if (operator === q.operator && q.status === 'call')
         //not to send to yourself
         continue;
       for (let uid in global.rtcPool[type][q.abonent][operator]) {
-        let item = global.rtcPool[type][q.abonent][operator][uid];
-        let offer = find(operators[q.operator], { status: 'offer' });
-        if (
-          offer &&
-            // && item.abonent === q.operator
-          item.uid !== q.uid
-        ) {
-          if (global.rtcPool[type][q.abonent][operator].resolve)
-            global.rtcPool[type][q.abonent][operator].resolve([
-              {
-                func: q.func,
-                type: type,
-                abonent: q.abonent,
-                operator: q.operator,
-                uid: q.uid,
-                operators: operators,
-              },
-            ]);
-        } else {
-          try {
-            if (global.rtcPool[type][q.abonent][operator].resolve)
-              global.rtcPool[type][q.abonent][operator].resolve([
-                {
-                  func: q.func,
-                  type: type,
-                  abonent: q.abonent,
-                  operator: operator,
-                  uid: q.uid,
-                  operators: operators,
-                },
-              ]);
-          } catch (ex) {}
-        }
       }
     }
 
-    return   [{
-                  operators: operators,
-              }]
+    for (let operator in global.rtcPool[type][q.abonent]) {
+      if (operator === q.operator && q.status === 'call')
+        //not to send to yourself
+        continue;
 
+      // global.rtcPool[type][q.abonent][operator][item.uid].status
+      if (global.rtcPool[type][q.abonent][operator].resolve) {
+        const par = {
+          abonent: q.abonent,
+          operator: q.operator,
+        };
+        const res = await GetUsers(par);
+        const oper = find(res.operators, { operator: q.operator });
+
+        global.rtcPool[type][q.abonent][operator].resolve([
+          {
+            func: q.func,
+            type: type,
+            abonent: oper.abonent,
+            operator: oper.operator,
+            uid: q.uid,
+            name: oper.name,
+            status: status,
+            picture: oper.picture,
+          },
+        ]);
+      }
+    }
   } catch (ex) {
     // console.log(ex);
   }
+  return;
 }
 
 function SendOperatorOffer(q) {

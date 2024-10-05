@@ -140,7 +140,7 @@
   const abonent = operator.abonent;
   const name = operator.name;
 
-  const uid = md5(operator);
+  const uid = operator.operator;
 
   let container;
 

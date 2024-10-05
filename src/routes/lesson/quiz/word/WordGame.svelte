@@ -621,9 +621,10 @@
         }
     });
 
-    if (hintIndex < 1 && thisErrorIndex < 1) {
-      if (errorIndex < 1) {
+    if (thisErrorIndex < 1) {
+      if (errorIndex < 1 && hintIndex < 1 ) 
         doneWords++;
+
         const data = {
           lesson: {
             quiz: 'word',
@@ -634,26 +635,16 @@
         SendData(data);
 
         errorIndex = 0;
+         hintIndex = 0;
         label[true] = 'Нажми "Вперед"';
         // speak(currentWord.example[$llang]);TODO: для fr
         showHints[isFlipped] = false;
         showNextButton = true;
-      } else {
-        const data = {
-          lesson: {
-            quiz: 'word',
-            word_error: currentWordIndex,
-            done_words: doneWords,
-          },
-        };
-        SendData(data);
-        label[true] = 'Нажми "Вперед"';
-        showHints[isFlipped] = false;
-        showNextButton = true;
-      }
+       
+      
     } else {
       errorIndex++;
-      // errorIndex = 0;
+      errorIndex = 0;
       label[true] = 'Исправь ошибку';
     }
     // console.log(targetWords.length)
