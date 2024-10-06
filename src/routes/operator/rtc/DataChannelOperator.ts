@@ -21,22 +21,20 @@ export class DataChannelOperator extends DataChannel {
 			if (that.dc.readyState === 'open') {
 				console.log(that.pc.pc_key + ' datachannel open');
 				dc_oper_state.set(that.dc.readyState);
+
+				this.dc.onclose = () => {
+					// msg_oper.set({ func: 'mute' });
+					dc_oper_state.set("close");					
+					rtc.SendStatus('close');
+				};
+
+				this.dc.onerror = () => {
+					// msg_oper.set({ func: 'mute' });
+					dc_oper_state.set("close");
+					rtc.SendStatus('close');
+				};
 			}
-
 		};
-		
-		this.dc.onclose = () => {
-			msg_oper.set({ func: 'mute' });
-			dc_oper_state.set("close");
-			rtc.SendStatus('close');
-		};
-
-		this.dc.onerror = () => {
-			msg_oper.set({ func: 'mute' });
-			dc_oper_state.set("close");
-			rtc.SendStatus('close');
-		};
-
 
 		pc.StartEvents();
 

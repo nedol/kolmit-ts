@@ -106,6 +106,7 @@ export default class RTCUser extends RTCBase {
 			// that.pcPull[data.operator.abonent].params['rem_cand'] = data.operator.cand;
 		}
 
+
 		if (data.func === 'mute') {
 			that.RemoveTracks();
 			// that.Init(() => {

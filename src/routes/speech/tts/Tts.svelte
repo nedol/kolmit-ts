@@ -38,8 +38,9 @@
    if(cb_end)
       audio.addEventListener('ended', function() {
         cb_end();
+        audio = ''
       });
-       audio.playbackRate = lang===$langs?1:.9;
+      audio.playbackRate = lang===$langs?1:.9;
       audio.play();
    
   }

@@ -31,6 +31,7 @@
     signal,
     call_but_status,
     dc_user_state,
+    dc_user,
     click_call_func,
     user_placeholder,
     msg_user,
@@ -42,18 +43,17 @@
   const { groupBy, find } = pkg;
 
   $: if ($msg_user) {
-    // if ($msg_user.operator) {
-    // 	if ($msg_user.operator === operator) OnMessage($msg_user);
-    // } else {
-    // console.log('$msg_user:', $msg_user);
-    OnMessage($msg_user);
+     OnMessage($msg_user);
   }
 
-  let dc = false;
+  $: if( $call_but_status==='inactive'){
+    if(parent_div)
+    parent_div.appendChild(card)
+  }
 
   // $: switch ($dc_user_state) {
   //   case 'open':
-  //     $call_but_status = 'call';
+  //     // $call_but_status = 'call';
   //     break;
   //   case 'close':
   //     $call_but_status = 'inactive';
@@ -62,13 +62,13 @@
   //     local.audio.paused = true;
 
   //     //rtc.abonent = url.searchParams.get('abonent');
-  //     status = 'inactive';
+  //     status = 'active';
   //     user_.display = 'none';
   //     // $call_but_status = 'inactive';
-  //     $click_call_func = null; //operator -> OnClickCallButton
+  //     // $click_call_func = null; //operator -> OnClickCallButton
   //     // parent_div.appendChild(card);
-  //     rtc.OnInactive();
-  //     video_element.src = '';
+  //     // rtc.OnInactive();
+  //     // video_element.src = '';
 
   //     break;
   // }
@@ -135,7 +135,7 @@
 
   onMount(async () => {
     rtc = new RTCUser(user, uid, $signal, oper);
-    rtc.SendCheck();
+    // rtc.SendCheck();
 
     rtc.OnOpenDataChannel = () => {
       console.log('OnOpenDataChannel');
@@ -188,49 +188,84 @@
     } catch (ex) {}
   }
 
-  function OnMessage(data) {
-    if($call_but_status==='inactive' ){
-      user_.display = 'none';
-      return;
 
-    }
+    function OnMessage(data) {
 
-    if (data.operators && data.operators[operator]) {
-      let res = groupBy(data.operators[operator], 'status');
-      try {
-        if (res && res['offer']) {
-          if (status !== 'call') {
-            status = 'active';
-            // $call_but_status = 'active';
-          }
-          // user_.display = 'block'
-        } else if (res['busy']) {
-          // if ($click_call_func === null)
-          if (
-            !rtc.DC ||
-            (rtc.DC &&
-              rtc.DC.dc.readyState !== 'open' &&
-              rtc.DC.dc.readyState !== 'connecting')
-          )
-            status = 'busy';
-        } else if (res['close']) {
-          local.video.display = 'none';
-          // remote.video.display = 'none';
-          local.audio.paused = true;
-
-          //rtc.abonent = url.searchParams.get('abonent');
-          status = 'inactive';
-          user_.display = 'none';
-          // $call_but_status = 'inactive';
-          $click_call_func = null; //operator -> OnClickCallButton
-          parent_div.appendChild(card);
-          rtc.OnInactive();
-          video_element.src = '';
+      if (data.func === 'offer' && status=='active' && $call_but_status =='active') {
+        if (data.operators[user_.operator]) {
+          user_.display = 'block';
         }
-      } catch (ex) {
-        console.log(ex);
+      }else{
+        user_.display = 'none';
       }
+
+      if (data.func === 'talk') {
+        if (data.operator === operator) {
+          $call_but_status = 'talk';
+          status = 'talk';
+          //user_.display = 'block'
+          video_button_display = true;
+          local.audio.paused = true;
+          $muted = false;
+          video_button_display = 'block';
+          // local.video.display = "block";
+          remote.video.display = 'block';
+        }
+      }
+
+      if (data.func === 'close') {
+
+			  rtc.OnInactive(); 
+        $call_but_status = 'inactive';
+
+      }
+
     }
+
+  function OnMessage_(data) {
+
+    // if($call_but_status==='inactive' ){
+    //   user_.display = 'none';
+    //   return;
+
+    // }
+
+    // if (data.operators && data.operators[operator]) {
+    //   let res = groupBy(data.operators[operator], 'status');
+    //   try {
+    //     if (res && res['offer']) {
+    //       if (status !== 'call') {
+    //         status = 'active';
+    //         // $call_but_status = 'active';
+    //       }
+    //       // user_.display = 'block'
+    //     } else if (res['busy']) {
+    //       // if ($click_call_func === null)
+    //       if (
+    //         !rtc.DC ||
+    //         (rtc.DC &&
+    //           rtc.DC.dc.readyState !== 'open' &&
+    //           rtc.DC.dc.readyState !== 'connecting')
+    //       )
+    //         status = 'busy';
+    //     } else if (res['close']) {
+    //       local.video.display = 'none';
+    //       // remote.video.display = 'none';
+    //       local.audio.paused = true;
+
+    //       //rtc.abonent = url.searchParams.get('abonent');
+    //       status = 'inactive';
+    //       user_.display = 'none';
+    //       // $call_but_status = 'inactive';
+    //       $click_call_func = null; //operator -> OnClickCallButton
+    //       parent_div.appendChild(card);
+    //       rtc.OnInactive();
+    //       video_element.src = '';
+    //     }
+    //   } catch (ex) {
+    //     console.log(ex);
+    //   }
+    // }
 
 
 
@@ -258,11 +293,6 @@
       }
     }
 
-
-
-    if (data.func === 'call') {
-      // $muted = true;
-    }
 
     if (data.func === 'mute') {
       local.audio.paused = true;
@@ -365,7 +395,7 @@
         call_cnt = 10;
         rtc.OnInactive();
         $click_call_func = null; //operator -> OnClickCallButton
-        parent_div.appendChild(card);
+        parent_div?.appendChild(card);
         break;
       case 'talk':
         status = 'inactive';
@@ -377,11 +407,11 @@
         video_button_display = 'none';
         rtc.OnInactive();
         $click_call_func = null; //operator -> OnClickCallButton
-        parent_div.appendChild(card);
+        parent_div?.appendChild(card);
         video_element.poster = '';
         video_element.load();
 
-        video_element.poster = remote.video.poster;
+        video_element.poster = remote.video?.poster;
         break;
       case 'muted':
         status = 'inactive';
@@ -389,7 +419,7 @@
         // $call_but_status = 'inactive';
         video_button_display = 'none';
         $click_call_func = null; //operator -> OnClickCallButton
-        parent_div.appendChild(card);
+        parent_div?.appendChild(card);
         break;
       case 'busy':
         // rtc.Call();

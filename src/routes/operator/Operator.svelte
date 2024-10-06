@@ -448,6 +448,8 @@
     video_progress = false;
   }
 
+
+
   function OnMessage(data: any, resolve: any) {
 
     if (data.call || data.func === 'call') {
@@ -494,10 +496,6 @@
       // local.video.poster = UserSvg;
       // console.log('rtc', rtc);
       rtc.OnInactive();
-
-      setTimeout(() => {
-        // $call_but_status = 'inactive';
-      }, 100);
 
       if ($call_but_status === 'talk') {
         rtc.OnInactive();

@@ -89,8 +89,9 @@
       abonent: operator.abonent,
       operator: operator.operator,
     });
-  }else{
-    isOperatorWaiting = false
+  }else if( $call_but_status==='inactive'){
+    isOperatorWaiting = false;
+    group = group = []
   }
 
   onMount(async () => {

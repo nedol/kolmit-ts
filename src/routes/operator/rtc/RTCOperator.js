@@ -171,10 +171,14 @@ export class RTCOperator extends RTCBase {
 	}
 
 	OnInactive() {
+
 		if (this.DC && (this.DC.dc.readyState === 'open' || this.DC.dc.readyState === 'connecting')) {
 			this.RemoveTracks();
-			this.DC.dc.close();
+			this.DC.SendDCClose()
 			this.SendStatus('close');
+			// setTimeout(()=>{
+			// 	this.DC.dc.close();
+			// }, 100)
 		}
 	}
 
