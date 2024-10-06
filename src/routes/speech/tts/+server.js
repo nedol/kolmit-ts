@@ -1,7 +1,13 @@
 import path from 'path';
+import { dirname, join } from 'path'; // Импортируем join вместе с dirname
 import { fileURLToPath } from 'url';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+// import { fileURLToPath } from 'url';
 
 import * as googleTTS from 'google-tts-api';
+import  md5  from 'md5'; // Импортируем библиотеку для генерации md5
+import fs from 'fs-extra'; // Импортируем fs-extra для работы с файловой системой
 
 import { json } from '@sveltejs/kit';
 
@@ -15,7 +21,9 @@ const HF_TOKEN = process.env.HF_TOKEN_3;
 import ISO6391 from 'iso-google-locales';
 
 const https = require('https');
-const fs = require('fs');
+// const fs = require('fs');
+
+const audioDir = path.join(__dirname, 'audio'); // Директория для сохранения аудиофайлов
 
 import { client } from '@gradio/client';
 
@@ -81,8 +89,18 @@ async function tts_sm4(text, from_lang, to_lang) {
 
 async function tts_google(text, lang) {
   try {
-    const url = await googleTTS.
-      getAudioBase64(text, {
+    // Генерируем md5-хеш для текста
+    const fileName = md5(text) + '.mp3';
+    const filePath = join(audioDir, fileName); // Полный путь к файлу
+
+    // Проверяем наличие файла
+    if (await fs.pathExists(filePath)) {
+      console.log(`Файл уже существует: ${filePath}`);
+      const f = await fs.readFile(filePath, { encoding: 'base64' }); // Возвращаем содержимое существующего файла
+      return 'data:audio/mpeg;base64,' + f;
+    }
+
+    const url = await googleTTS.getAudioBase64(text, {
       //getAudioUrl(text, {
       lang: lang,
       slow: false,
@@ -90,7 +108,14 @@ async function tts_google(text, lang) {
       timeout: 10000,
     });
 
-    return  "data:audio/mpeg;base64," + url;
+    // Записываем аудиофайл в директорию
+    await fs.outputFile(filePath, Buffer.from(url, 'base64')); // Запись файла в папку audio
+    console.log(`Файл сохранён: ${filePath}`);
+
+    // Читаем содержимое только что сохранённого файла и возвращаем его в формате base64
+    return 'data:audio/mpeg;base64,' + await fs.readFile(filePath, { encoding: 'base64' });
+
+    
   } catch (error) {
     console.error('Error converting text to speech:', error);
   }
