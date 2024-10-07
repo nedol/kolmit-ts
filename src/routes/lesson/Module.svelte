@@ -179,11 +179,15 @@
   };
 
   let RemoveQuizUser = function (user, type, quiz) {
-    let obj = find(usersPic, { operator: user });
-    obj.type = $msg_oper.type;
-    remove(quiz_users[type][quiz], obj);
-    quiz_users = quiz_users;
-    $msg_oper.rem = '';
+    try{
+      let obj = find(quiz_users[type][quiz], { operator: user });
+      obj.type = $msg_oper.type;
+      remove(quiz_users[type][quiz], obj);
+      quiz_users = quiz_users;
+      $msg_oper.rem = '';
+    }catch(ex){
+
+    }
   };
 
   function BuildQuizUsers(quiz, user, type) {
