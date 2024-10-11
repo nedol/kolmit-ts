@@ -1,17 +1,34 @@
 <script lang="ts">
   import { onMount, getContext, onDestroy } from 'svelte';
-  import translate from 'translate';
+  import { Translate } from '../../../translate/Transloc';
 
+  import IconButton, { Icon } from '@smui/icon-button';
   import Paper, { Title, Subtitle } from '@smui/paper';
   import Accordion, { Panel, Header, Content } from '@smui-extra/accordion';
 
-  import { langs, llang, dicts } from '$lib/js/stores.js';
+  import {
+    langs,
+    llang,
+    dicts,
+    dc_oper_state,
+    dc_user_state,
+  } from '$lib/js/stores.js';
 
-  export let data;
+  import { mdiEarHearing } from '@mdi/js';
+
+  export let data, tts;
 
   let trans = '';
 
   let touchStartTime = 0;
+  let playAutoColor = 'currentColor';
+
+  $: if (isPlayAuto) {
+    playAutoColor = 'green';
+  } else {
+    playAutoColor = 'currentColor';
+  }
+  let isPlayAuto = false;
 
   function onTouchStart(event) {
     // Запомните время начала касания
@@ -52,28 +69,83 @@
     }
   }
 
-  async function Translate(text: string, from_lang: string, to_lang: string) {
-    try {
-      translate.from = from_lang;
+  function PlayAutoText(text) {
+    isPlayAuto = !isPlayAuto;
+    if (!isPlayAuto) return;
 
-      return (
-        ($dicts[text] && $dicts[text][to_lang]) ||
-        (await translate(text.trim(), to_lang))
-      );
-    } catch (error) {
-      console.error('Translation error:', error);
-      return text; // или другое подходящее значение по умолчанию
+    const textAr = htmlToText(text).split(/(?<=[.!?])\s+/);
+    let ind = 0;
+
+    // Запуск последовательного процесса озвучивания
+    playNext();
+
+    // Функция для преобразования HTML в текст
+    function htmlToText(html) {
+      let tempDiv = document.createElement('div');
+      tempDiv.innerHTML = html;
+      return tempDiv.textContent || tempDiv.innerText || '';
+    }
+
+    async function playNext() {
+      if (!isPlayAuto || ind >= textAr.length) return;
+
+      let originalSentence = textAr[ind];
+      let translatedSentence = await Translate(
+        originalSentence,
+        $llang,
+        $langs
+      ); // Вызов функции перевода
+
+      // Озвучить перевод
+      tts.Speak_server($langs, translatedSentence, onEndSpeakTranslated);
+
+      async function onEndSpeakTranslated() {
+        // Озвучить оригинал после перевода
+        tts.Speak_server($llang, originalSentence, onEndSpeakOriginal);
+      }
+
+      async function onEndSpeakOriginal() {
+        ind++; // Переходим к следующему предложению
+        if (ind < textAr.length) {
+          playNext(); // Рекурсивно вызываем playNext для следующего предложения
+        }
+      }
     }
   }
 </script>
 
+  <div class="speaker-button">
+  <IconButton
+    on:click={() => {
+      PlayAutoText(data.html);
+    }}
+  >
+    <Icon tag="svg" viewBox="0 0 24 24">
+      <path fill={playAutoColor} d={mdiEarHearing} />
+    </Icon>
+  </IconButton>
+
+</div>
+
 <div style="height:300vh; overflow-y:auto;font-size:smaller;color:#2196f3">
   {@html data.html}
-</div>
+  </div>
+
+
 
 <style>
   ::selection {
     /* color: rgb(27, 155, 49); */
     background: rgb(190, 201, 205);
+  }
+
+   .speaker-button {
+    display: inline-flex;
+    float: right;
+    font-size: large;
+    border-radius: 25px;
+    margin-right: 0px;
+    margin-left: 10px;
+    z-index: 2;
   }
 </style>

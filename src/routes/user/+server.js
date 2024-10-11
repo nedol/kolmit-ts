@@ -88,7 +88,7 @@ async function getOperators(q, func) {
       type: q.type,
       abonent: q.abonent,
       operator: oper,
-      status: global.rtcPool['operator'][q.abonent][oper][oper].status,
+      status: global.rtcPool['operator'][q.abonent][oper][oper].status?global.rtcPool['operator'][q.abonent][oper][oper].status:'',
       picture: user.picture,
       name: user.name,
     };

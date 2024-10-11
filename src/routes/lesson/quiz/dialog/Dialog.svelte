@@ -274,7 +274,6 @@
       return;
     }
     return new Promise(async (resolve, reject) => {
-
       let qa = dialog_data.content[cur_qa];
       if (!qa) {
         cur_qa = 0;
@@ -294,9 +293,7 @@
 
       q = isFlipped ? qa.user2 : qa.user1;
 
-      if(!q[$langs])
-        q[$langs] = await Translate(q[$llang], $llang, $langs);
-
+      if (!q[$langs]) q[$langs] = await Translate(q[$llang], $llang, $langs);
 
       q[$llang] = q[$llang]?.replace(
         '${user1_name}',
@@ -322,10 +319,8 @@
         .split(' ');
       // q_shfl = shuffle(ar).toString().replaceAll(',', ' ');
       a = isFlipped ? qa.user1 : qa.user2;
-            
-      if(!a[$langs])
-        a[$langs] = await Translate(a[$llang], $llang, $langs);
 
+      if (!a[$langs]) a[$langs] = await Translate(a[$llang], $llang, $langs);
 
       a[$llang] = a[$llang]?.replace('${user2_name}', operator.name);
       a[$langs] = a[$langs]?.replace('${user2_name}', operator.name);
@@ -350,7 +345,6 @@
       // a_shfl = shuffle(ar).toString().replaceAll(',', ' ');
 
       resolve();
-
     });
   }
 
@@ -376,7 +370,6 @@
     stt_text = '';
     showSpeakerButton = false;
 
-    
     return Dialog();
 
     // speak(q[$llang])
@@ -653,33 +646,7 @@
     tts.Speak_server($langs, active, onEndSpeak);
   }
 
-  function PlayAutoContent_() {
-    isPlayAuto = !isPlayAuto;
-    if (!isPlayAuto) return;
-    let active = q[$llang];
 
-    function onEndSpeak() {
-      if (!isPlayAuto) return;
-      visibility[1] = 'visible';
-      visibility[2] = 'visible';
-      if (active === q[$langs]) {
-        active = a[$llang];
-        tts.Speak_server($llang, active, onEndSpeak);
-      } else if (active === a[$llang]) {
-        active = a[$langs];
-        tts.Speak_server($langs, active, onEndSpeak);
-      } else if (active === q[$llang]) {
-        active = q[$langs];
-        tts.Speak_server($langs, active, onEndSpeak);
-      } else if (active === a[$langs]) {
-        onNextQA();
-        active = q[$llang];
-        tts.Speak_server($llang, active, onEndSpeak);
-      }
-    }
-
-    tts.Speak_server($llang, q[$llang], onEndSpeak);
-  }
 
   onDestroy(async () => {
     // voice.Cancel();
@@ -732,7 +699,7 @@
           {/if}
         </Section>
         <Section align="start">
-          {#if !$dc_user && !$dc_oper}
+          {#if $dc_user_state !== 'open' && $dc_oper_state !== 'open'}
             <IconButton on:click={PlayAutoContent}>
               <Icon tag="svg" viewBox="0 0 24 24">
                 <path fill={playAutoColor} d={mdiEarHearing} />
@@ -863,7 +830,7 @@
           <div class="user1" style="visibility:{visibility[1]}">
             <span>
               {#if !q[$langs]}
-                {#await Translate(q['ru'].replace(/"([^"]*)"/g, '$1'),'ru', $langs) then data}
+                {#await Translate(q['ru'].replace(/"([^"]*)"/g, '$1'), 'ru', $langs) then data}
                   {@html data}
                 {/await}
               {:else}
@@ -1132,7 +1099,8 @@
       <br />
 
       {#if dialog_data.html}
-        <ConText data={dialog_data} />
+ 
+        <ConText data={dialog_data} {tts}/>
       {/if}
     {:else}
       <div style="text-align:center">
