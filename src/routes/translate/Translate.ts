@@ -61,7 +61,7 @@ export async function Translate(text, from, to) {
       
       try {
      
-          res = await translate(chunk, to);
+          res = await translate(chunk, { to: to, from: from });
         } catch (error) {
           console.error('Translation error:', error);
 

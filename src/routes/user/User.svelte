@@ -24,7 +24,7 @@
 
   user_.display = 'none'; //видимость в группе
 
-  // const operator = getContext('operator')
+  const operator_ = getContext('operator');
 
   import {
     users,
@@ -40,15 +40,10 @@
   $click_call_func = null;
 
   import pkg from 'lodash';
-  const { groupBy, find } = pkg;
+  const { groupBy, find, findIndex } = pkg;
 
-  $: if ($msg_user) {
-     OnMessage($msg_user);
-  }
-
-  $: if( $call_but_status==='inactive'){
-    if(parent_div)
-    parent_div.appendChild(card)
+  $: if ($call_but_status === 'inactive') {
+    if (parent_div) parent_div.appendChild(card);
   }
 
   // $: switch ($dc_user_state) {
@@ -81,9 +76,11 @@
 
   let isRemoteAudioMute = false;
 
-  const uid = operator;
+  const uid = md5(operator);
 
-  let rtc, call_cnt, selected,
+  let rtc,
+    call_cnt,
+    selected,
     inter,
     status = 'active',
     profile = false,
@@ -188,42 +185,110 @@
     } catch (ex) {}
   }
 
+  const headers = {
+    'Content-Type': 'application/json',
+    // Authorization: `Bearer ${token}`
+  };
 
-    function OnMessage(data) {
+  $: if ($call_but_status === 'active') {
+    isOperatorWaiting = true;
+    OperatorWaiting({
+      type: 'user',
+      func: 'operatorwaiting',
+      abonent: abonent,
+      operator: operator_.operator,
+    });
+  } else if ($call_but_status === 'inactive') {
+    // isOperatorWaiting = false;
+    // group = [];
+    // group = group;
+  }
 
-      if (data.func === 'offer' && status=='active' && $call_but_status =='active') {
-        if (data.operators[user_.operator]) {
-          user_.display = 'block';
-        }
-      }else{
-        user_.display = 'none';
-      }
+  let isOperatorWaiting = false;
 
-      if (data.func === 'talk') {
-        if (data.operator === operator) {
-          $call_but_status = 'talk';
-          status = 'talk';
-          //user_.display = 'block'
-          video_button_display = true;
-          local.audio.paused = true;
-          $muted = false;
-          video_button_display = 'block';
-          // local.video.display = "block";
-          remote.video.display = 'block';
-        }
-      }
+  async function OperatorWaiting(par: any) {
+    if (isOperatorWaiting)
+      fetch(`./user`, {
+        method: 'POST',
+        // mode: 'no-cors',
+        body: JSON.stringify({ par }),
+        headers: { headers },
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (isOperatorWaiting) {
+            OperatorWaiting(par);
+          }
+          // console.log('cc from oper:', data);
+          if (Array.isArray(data.resp)) {
+            data.resp.map((resp) => {
+              if (resp.status == 'offer') {
+                // group.push(resp);
+              } else if(resp.status == 'close'){
+                // if(resp.operator!==operator){
+                  const ind = findIndex(group, { operator: resp.operator });
+                  group.splice(ind, 1);
+                // }
+              }
+              group = group;
+              rtc.OnMessage(resp);
+            });
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+          OperatorWaiting(par);
+          return [];
+        });
+  }
 
-      if (data.func === 'close') {
+  $: if ($msg_user) {
+    OnMessage($msg_user);
+    // $msg_user = ''
+  }
 
-			  rtc.OnInactive(); 
-        $call_but_status = 'inactive';
+  function OnMessage(data) {
 
-      }
-
+    if (data.func === 'talk') {
+      $call_but_status = 'talk';
     }
 
-  function OnMessage_(data) {
+    if (
+      data.func === 'offer' &&
+      status == 'active' &&
+      $call_but_status == 'active'
+    ) {
+      if (data.operators[user_.operator]) {
+        user_.display = 'block';
+     
+      }
+    } else {
+      user_.display = 'none';
+    }
 
+    local.audio.paused = true;
+
+    // if (data.func === 'talk') {
+    //   if (data.operator === operator) {
+    //     $call_but_status = 'talk';
+    //     status = 'talk';
+    //     //user_.display = 'block'
+    //     video_button_display = true;
+    //     local.audio.paused = true;
+    //     $muted = false;
+    //     video_button_display = 'block';
+    //     // local.video.display = "block";
+    //     remote.video.display = 'block';
+    //   }
+    // }
+
+    // if (data.func === 'close') {
+    //   rtc?.OnInactive();
+    //   $call_but_status = 'inactive';
+    // }
+  }
+
+  function OnMessage_(data) {
     // if($call_but_status==='inactive' ){
     //   user_.display = 'none';
     //   return;
@@ -267,13 +332,15 @@
     //   }
     // }
 
-
-
-    if (data.func === 'offer' && status=='active' && $call_but_status =='active') {
+    if (
+      data.func === 'offer' &&
+      status == 'active' &&
+      $call_but_status == 'active'
+    ) {
       if (data.operators[user_.operator]) {
         user_.display = 'block';
       }
-    }else{
+    } else {
       user_.display = 'none';
     }
 
@@ -292,7 +359,6 @@
         // status = 'call';
       }
     }
-
 
     if (data.func === 'mute') {
       local.audio.paused = true;
@@ -341,9 +407,11 @@
       // Fix up for prefixing
       if (!window.AudioContext) {
         window.AudioContext = window.AudioContext || window.webkitAudioContext;
-        let audioCtx = new AudioContext();
-        rtc.localSoundSrc = audioCtx.createMediaElementSource(rtc.localSound);
-        rtc.localSoundSrc.connect(audioCtx.destination);
+        window.AudioContext = new AudioContext();
+        rtc.localSoundSrc = window.AudioContext.createMediaElementSource(
+          rtc.localSound
+        );
+        rtc.localSoundSrc.connect(window.AudioContext.destination);
       }
     } catch (ex) {
       console.log('Web Audio API is not supported in this browser');
@@ -365,8 +433,7 @@
       // 	rtc.SendCheck();
       // 	break;
       case 'active':
-        if($call_but_status==='call' || $call_but_status==='talk')
-          break;
+        if ($call_but_status === 'call' || $call_but_status === 'talk') break;
         user_.display = 'block';
         $click_call_func = OnClickCallButton;
         function call() {
@@ -447,6 +514,10 @@
     isRemoteAudioMute = !isRemoteAudioMute;
     $muted = isRemoteAudioMute;
   }
+
+  onDestroy(() => {
+    console.log();
+  });
 </script>
 
 <VideoRemote

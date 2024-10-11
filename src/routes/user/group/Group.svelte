@@ -21,7 +21,13 @@
   import pkg from 'lodash';
   const { mapValues, find } = pkg;
 
-  import { users, langs, msg_oper, msg_user,  call_but_status } from '$lib/js/stores.js';
+  import {
+    users,
+    langs,
+    msg_oper,
+    msg_user,
+    call_but_status,
+  } from '$lib/js/stores.js';
 
   import User from '../User.svelte';
 
@@ -44,42 +50,69 @@
 
   $: if ($msg_user) {
     onMessage($msg_user);
+
   }
 
-  let isOperatorWaiting = false
+  $: if ($call_but_status === 'active') {
+    GetOperators({
+      type: 'user',
+      func: 'operators',
+      abonent: operator.abonent,
+      operator: operator.operator,
+    });
+  }else if($call_but_status === 'inactive'){
+    group =  group = [];
+  }
 
-  async function OperatorWaiting(par: any) {
-    if(isOperatorWaiting)
-    fetch(`./user`, {
-      method: 'POST',
-      // mode: 'no-cors',
-      body: JSON.stringify({ par }),
-      headers: { headers },
-    })
+  async function GetOperators(par: any) {
+    fetch(
+      `./user/?func=${par.func}&abonent=${par.abonent}&operator=${par.operator}`
+    )
       .then((response) => response.json())
       .then((data) => {
         // console.log('cc from oper:', data);
-        if (Array.isArray(data.resp)) {
-          data.resp.map((resp) => {
-            $msg_user = resp;
-            onMessage(resp)
-          });
-        }
-        if(isOperatorWaiting){
-          par.func = 'operatorwaiting';
-          OperatorWaiting(par);
-        }
+
+        onMessage({ operators: data.resp });
       })
       .catch((error) => {
         console.log(error);
-        OperatorWaiting(par);
+
         return [];
       });
   }
 
-  function OnClickUser(){
+  let isOperatorWaiting = false;
 
+  async function OperatorWaiting(par: any) {
+    if (isOperatorWaiting)
+      fetch(`./user`, {
+        method: 'POST',
+        // mode: 'no-cors',
+        body: JSON.stringify({ par }),
+        headers: { headers },
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          // console.log('cc from oper:', data);
+          if (Array.isArray(data.resp)) {
+            data.resp.map((resp) => {
+              $msg_user = resp;
+              onMessage(resp);
+            });
+          }
+          if (isOperatorWaiting) {
+            par.func = 'operatorwaiting';
+            OperatorWaiting(par);
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+          OperatorWaiting(par);
+          return [];
+        });
   }
+
+  function OnClickUser() {}
 
   $: if(  $call_but_status==='active'){
     isOperatorWaiting = true
@@ -95,7 +128,6 @@
   }
 
   onMount(async () => {
-
     // SendCheck({ func: 'check', type: 'user', abonent: operator.abonent, em: operator.em });
   });
 
@@ -112,46 +144,49 @@
     users_online = 0;
   }
 
-  function onMessage(data){
-
-    if(data.operators){
-     Object.keys(data.operators).map((el)=>{
-      if(data.operators[el].status==='offer' && !find(group, {operator:el})){
-        group.push(data.operators[el])
-     }else{
-        const ind = group.indexOf(data.operators[el]);
-        group.splice(ind, 1);
-      }
-      })
-      group = group
-      
+  function onMessage(data) {
+    if (data.operators) {
+      Object.keys(data.operators).map((el) => {
+        if (
+          data.operators[el].status === 'offer' &&
+          !find(group, { operator: el })
+        ) {
+          group.push(data.operators[el]);
+        } else {
+          const ind = group.indexOf(data.operators[el]);
+          group.splice(ind, 1);
+        }
+      });
+      group = group;
     }
 
-    if(data.status ==='offer'){
 
+
+    if (data.status === 'offer') {
       // if(data.operator===uid){
       //   return;
       // }
 
       const el = {
-        display:'block',
-        abonent:data.abonent,
-        operator:data.operator,
-        name:data.name,
-        uid:data.uid,
-        picture:data.picture
+        display: 'block',
+        abonent: data.abonent,
+        operator: data.operator,
+        name: data.name,
+        uid: data.uid,
+        picture: data.picture,
       };
-      if(!find(group, {operator:data.operator})){
+      if (!find(group, { operator: data.operator })) {
         group?.push(el);
-        group=group;
+        group = group;
       }
-      $msg_user = ''
-    }else if(data.status ==='close'){
-      let el = find(group,{'uid':data.operator})
-      const ind = group.indexOf(el)
-      group.splice(ind,1);
-      group=group;
-      $msg_user = ''
+      $msg_user = '';
+    } else if (data.status === 'close') {
+      console.log()
+      let el = find(group, { uid: data.operator });
+      const ind = group.indexOf(el);
+      group.splice(ind, 1);
+      group = group;
+      $msg_user = '';
     }
   }
 </script>
@@ -166,7 +201,7 @@
   {/await}
   <div class="flexy-dad">
     {#each group as user, i}
-      {#if user && user.operator!==operator.operator}
+      {#if user && user.operator !== operator.operator}
         <br />
         <div
           class="mdc-elevation--z{i + 1} flexy-boy"
@@ -176,7 +211,7 @@
           }}
         >
           <Item style="text-align: center">
-            <User bind:user_={user} {OnClickUpload} />
+            <User bind:user_={user} bind:group {OnClickUpload} />
             <Supporting>
               <Label>{user.name}</Label>
             </Supporting>
@@ -186,17 +221,17 @@
     {/each}
   </div>
   {#if false}
-  <div class="flexy-dad tutor">
-    <div class="mdc-elevation--z{1} flexy-boy">
-      <Item style="text-align: center">
-        <Tutor name="AI Tutor"></Tutor>
+    <div class="flexy-dad tutor">
+      <div class="mdc-elevation--z{1} flexy-boy">
+        <Item style="text-align: center">
+          <Tutor name="AI Tutor"></Tutor>
 
-        <Supporting>
-          <Label>AI Tutor</Label>
-        </Supporting>
-      </Item>
+          <Supporting>
+            <Label>AI Tutor</Label>
+          </Supporting>
+        </Item>
+      </div>
     </div>
-  </div>
   {/if}
   <!-- <div class="empty" style="height:100px" /> -->
 </div>

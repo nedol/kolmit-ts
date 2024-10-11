@@ -73,8 +73,12 @@ export class DataChannelUser {
           data = JSON.parse(data);
           data.operator = this.rtc.operator;
           // console.log('$msg_user:', data);
-          await msg_user.set(data);
-          data = '';
+          msg_user.set(data);
+          setTimeout(() => {
+            msg_user.set('');
+            data = '';
+          },100)
+   
           return;
         }
         data += parsed.slice;

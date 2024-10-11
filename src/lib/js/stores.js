@@ -14,7 +14,7 @@ export let llang = writable('en'); //learning
 
 export let pswd = writable();
 
-export let server_path = writable();
+// export let server_path = writable();
 
 export let posterst = writable();
 
@@ -36,7 +36,7 @@ export let call_but_status = writable('inactive');
 
 export let ice_conf = writable();
 
-export let pool = writable();
+// export let pool = writable();
 
 export let rtcPool_st = writable();
 rtcPool_st.set({ user: {}, operator: {} });
@@ -56,7 +56,7 @@ export let user_placeholder = writable();
 
 export let muted = writable(true);
 
-export let audioCtx = writable();
+// export let audioCtx = writable();
 
 export let showBottomAppBar = writable(true);
 

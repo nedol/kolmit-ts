@@ -12,17 +12,17 @@ import { CreatePool, GetUsers, GetGroup } from '$lib/server/db.js'; //src\lib\se
 
 let kolmit;
 
-// if (!global.turn_server) {
-// 	global.turn_server = new Turn({
-// 		// set options
-// 		authMech: 'long-term',
-// 		listeningPort: 443
-// 	});
-// 	global.turn_server.start();
-// 	global.turn_server.addUser('username', 'password');
-// 	global.turn_server.log();
-// 	console.log('Turn server started on ' + global.turn_server.listeningPort);
-// }
+if (!global.turn_server) {
+	global.turn_server = new Turn({
+		// set options
+		authMech: 'long-term',
+		listeningPort: 443
+	});
+	global.turn_server.start();
+	global.turn_server.addUser('username', 'password');
+	global.turn_server.log();
+	console.log('Turn server started on ' + global.turn_server.listeningPort);
+}
 
 /** @type {import('./$types').PageServerLoad} */
 export async function load({ fetch, cookies, route, url, stuff }) {

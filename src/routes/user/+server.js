@@ -2,15 +2,35 @@ import { json } from '@sveltejs/kit';
 
 import Turn from 'node-turn';
 
+import { CreateOperator, CheckOperator, GetUsers } from '$lib/server/db.js'; 
+
+import pkg_l from 'lodash';
+const { find, findKey } = pkg_l;
+
 global.rtcPool;
 import { rtcPool_st } from '$lib/js/stores.js';
+import { opendir } from 'fs';
 rtcPool_st.subscribe((data) => {
 	global.rtcPool = data;
 });
 
 /** @type {import('./$types').RequestHandler} */
-export async function GET(event, fetch) {
-	let q = {};
+
+export async function GET({ url, fetch, cookies }) {
+  const abonent = url.searchParams.get('abonent');
+  const operator = url.searchParams.get('operator');
+  const func = url.searchParams.get('func');
+
+  let data;
+  let q = {};
+  let resp = {};
+
+  	switch (func) {
+      case 'operators':
+        resp = await getOperators({operator:operator,abonent:abonent});
+        break;
+    }
+
 
 	let response = new Response(JSON.stringify({ resp }));
 	response.headers.append('Access-Control-Allow-Origin', `*`);
@@ -40,7 +60,7 @@ export async function POST(event) {
 			} catch (ex) {
 				console.log(par.func, ex);
 			}
-			break;
+      break;
 	}
 
 	let response = new Response(JSON.stringify({ resp }));
@@ -58,56 +78,56 @@ function OperatorWaiting(q, resolve) {
 	}
 }
 
-function getOperators(q, func) {
+async function getOperators(q, func) {
+  const users = await GetUsers(q);
   let operators = { [q.operator]: {} };
-  for (let uid in global.rtcPool['operator'][q.abonent][q.operator]) {
-    if (uid !== 'resolve')
-      operators[q.operator][uid] = {
-        type: q.type,
-        abonent: q.abonent,
-        operator: q.operator,
-        uid: q.uid,
-        status: global.rtcPool['operator'][q.abonent][q.operator][uid].status
-      };
+  for (let oper in global.rtcPool['operator'][q.abonent]) {
+    const user = find(users.operators, { operator: oper });
+
+    operators[oper] = {
+      type: q.type,
+      abonent: q.abonent,
+      operator: oper,
+      status: global.rtcPool['operator'][q.abonent][oper][oper].status,
+      picture: user.picture,
+      name: user.name,
+    };
   }
 
   return operators;
 }
 
 
-function GetOperators(q, check) {
+async function GetOperators(q, check) {
+  let operators = {};
   try {
-    let uids = [];
-    let queue = 0;
-    if (!global.rtcPool['user'][q.abonent]) return;
-    for (let uid in global.rtcPool['user'][q.abonent][q.operator]) {
-      if (q.uid && global.rtcPool['user'][q.abonent][q.operator][uid]) {
-        queue++;
-      }
-    }
+    const users = await GetUsers(q);
+
     let type = q.type === 'operator' ? 'user' : 'operator';
 
-    let operators = {};
     for (let oper in global.rtcPool['operator'][q.abonent]) {
       operators[oper] = {};
       for (let uid in global.rtcPool['operator'][q.abonent][oper]) {
         if (
           uid !== 'resolve' &&
           global.rtcPool['operator'][q.abonent][oper][uid].status
-        )
-          operators[oper][uid] = {
+        ) {
+          const user = find(users.operators, { operator: q.operator });
+
+          operators[oper] = {
             type: q.type,
             abonent: q.abonent,
             operator: oper,
             uid: q.uid,
-            status: global.rtcPool['operator'][q.abonent][oper][uid].status,
-            queue: queue,
+            status: global.rtcPool['operator'][q.abonent][oper][oper].status,
+            picture: user.picture,
+            name: user.name,
           };
+        }
       }
     }
-
-    return operators;
   } catch (ex) {
     // console.log(ex);
   }
+  return operators;
 }

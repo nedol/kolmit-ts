@@ -1,4 +1,5 @@
-// import {log} from './utils'
+// import {log} from './utils'n
+  import { msg_user} from '$lib/js/stores';
 
 export class Peer {
 	constructor(rtc, pc_config, pc_key) {
@@ -54,7 +55,13 @@ export class Peer {
 		par.cand = this.params['loc_cand'];
 		par.status = 'offer';
 
-		return await this.signal.SendMessage(par);
+		const res = await this.signal.SendMessage(par, (data) => {
+			if(data?.resp.operators) {
+				msg_user.set({operators:data?.resp.operators})
+			}
+		});
+	
+		return res;
 	}
 
 	StartEvents() {

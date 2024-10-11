@@ -23,7 +23,6 @@
     call_but_status,
     muted,
     user_placeholder,
-    audioCtx,
     dicts,
     langs,
     showBottomAppBar,
@@ -89,6 +88,7 @@
   import { msg_oper } from '$lib/js/stores.js';
   $: if ($msg_oper) {
     OnMessage($msg_oper, null);
+    // $msg_oper = ''
   }
 
   let dlg_display = 'none';
@@ -228,12 +228,12 @@
         if (!window.AudioContext) {
           window.AudioContext =
             window.AudioContext || window.webkitAudioContext;
-          $audioCtx = new AudioContext();
+          window.AudioContext = new AudioContext();
 
-          rtc.localSoundSrc = $audioCtx.createMediaElementSource(
+          rtc.localSoundSrc = window.AudioContext.createMediaElementSource(
             window.user.localSound
           );
-          rtc.localSoundSrc.connect($audioCtx.destination);
+          rtc.localSoundSrc.connect(window.AudioContext.destination);
         }
       } catch (ex) {
         console.log('Web Audio API is not supported in this browser');

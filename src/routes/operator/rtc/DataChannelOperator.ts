@@ -55,9 +55,12 @@ export class DataChannelOperator extends DataChannel {
 				if (parsed.type === 'eom' && parsed.from!=='oper') {
 					if (data) {
 						//that.rtc.OnMessage(JSON.parse(data), that);
-						await msg_oper.set(JSON.parse(data));
+						msg_oper.set(JSON.parse(data));
 					}
-					data = '';
+					setTimeout(()=>{
+						msg_oper.set('');
+						data = '';
+					})
 					return;
 				}
 				data += parsed.slice;
