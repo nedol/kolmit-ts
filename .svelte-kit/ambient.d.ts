@@ -131,7 +131,6 @@ declare module '$env/static/private' {
 	export const VSCODE_INSPECTOR_OPTIONS: string;
 	export const WebStorm: string;
 	export const windir: string;
-	export const __COMPAT_LAYER: string;
 	export const __PSLockDownPolicy: string;
 }
 
@@ -269,7 +268,6 @@ declare module '$env/dynamic/private' {
 		VSCODE_INSPECTOR_OPTIONS: string;
 		WebStorm: string;
 		windir: string;
-		__COMPAT_LAYER: string;
 		__PSLockDownPolicy: string;
 		[key: `PUBLIC_${string}`]: undefined;
 		[key: `${string}`]: string | undefined;
