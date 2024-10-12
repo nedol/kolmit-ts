@@ -6,6 +6,8 @@ const __dirname = dirname(__filename);
 // import { fileURLToPath } from 'url';
 
 import * as googleTTS from 'google-tts-api';
+import { speak } from 'google-translate-api-x';
+  
 import  md5  from 'md5'; // Импортируем библиотеку для генерации md5
 import fs from 'fs-extra'; // Импортируем fs-extra для работы с файловой системой
 
@@ -100,13 +102,15 @@ async function tts_google(text, lang) {
       return 'data:audio/mpeg;base64,' + f;
     }
 
-    const url = await googleTTS.getAudioBase64(text, {
-      //getAudioUrl(text, {
-      lang: lang,
-      slow: false,
-      host: 'https://translate.google.com',
-      timeout: 10000,
-    });
+    // const url = await googleTTS.getAudioBase64(text, {
+    //   //getAudioUrl(text, {
+    //   lang: lang,
+    //   slow: false,
+    //   host: 'https://translate.google.com',
+    //   timeout: 10000,
+    // });
+
+    const url = await speak(text, { to: lang });
 
     // Записываем аудиофайл в директорию
     await fs.outputFile(filePath, Buffer.from(url, 'base64')); // Запись файла в папку audio
