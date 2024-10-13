@@ -129,7 +129,7 @@ async function tts_google(text, lang, abonent) {
 
     // const [url] = await tts.synthesizeSpeech(request);
 
-    WriteSpeech({ owner: abonent, key: md5(text), text: text, data: url });
+    WriteSpeech({ lang: lang, key: md5(text), text: text, data: url });
 
     // Записываем аудиофайл в директорию
     // await fs.outputFile(filePath, Buffer.from(url, 'base64')); // Запись файла в папку audio

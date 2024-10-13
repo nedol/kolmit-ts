@@ -553,7 +553,7 @@ export async function GetDict(q) {
 export async function WriteSpeech(q) {
   await sql.begin(async (sql) => {
     let res = await sql`INSERT INTO speech
-		(key, text, data) VALUES ( ${q.key}, ${q.text}, ${q.data})`;
+		(lang, key, text, data) VALUES ( ${q.lang},${q.key}, ${q.text}, ${q.data})`;
   });
 }
 
