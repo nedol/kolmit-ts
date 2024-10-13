@@ -14,7 +14,7 @@ export let llang = writable('en'); //learning
 
 export let pswd = writable();
 
-// export let server_path = writable();
+export let audioCtx = writable();
 
 export let posterst = writable();
 
