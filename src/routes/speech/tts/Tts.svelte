@@ -76,8 +76,6 @@
 
   onDestroy(() => {
     audio = '';
-    // easyspeech = ''
   });
 </script>
 
-<!-- <EasySpeech bind:this={easyspeech}></EasySpeech> -->

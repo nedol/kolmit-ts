@@ -9,6 +9,9 @@ import * as googleTTS from 'google-tts-api';
 import { speak } from 'google-translate-api-x';
 import textToSpeech from '@google-cloud/text-to-speech';
 
+import { WriteSpeech, ReadSpeech } from '$lib/server/db.js'; //src\lib\server\server.db.js
+
+
 const tts = new textToSpeech.TextToSpeechClient();
   
 import  md5  from 'md5'; // Импортируем библиотеку для генерации md5
@@ -43,7 +46,7 @@ export async function POST({ url, fetch, cookies, request, response }) {
 
   switch (q.func) {
     case 'tts':
-      resp = { audio: await tts_google(q.text, q.lang) };
+      resp = { audio: await tts_google(q.text, q.lang, abonent) };
       break;
   }
 
@@ -92,17 +95,18 @@ async function tts_sm4(text, from_lang, to_lang) {
   );
 }
 
-async function tts_google(text, lang) {
+async function tts_google(text, lang, abonent) {
   try {
     // Генерируем md5-хеш для текста
     const fileName = md5(text) + '.mp3';
     const filePath = join(audioDir, fileName); // Полный путь к файлу
 
     // Проверяем наличие файла
-    if (await fs.pathExists(filePath)) {
-      console.log(`Файл уже существует: ${filePath}`);
-      const f = await fs.readFile(filePath, { encoding: 'base64' }); // Возвращаем содержимое существующего файла
-      return 'data:audio/mpeg;base64,' + f;
+    const data = await ReadSpeech({ key: md5(text) });
+    if (data) {
+      console.log(`Файл уже существует`);
+      // const f = await fs.readFile(filePath, { encoding: 'base64' }); // Возвращаем содержимое существующего файла
+      return 'data:audio/mpeg;base64,' + data;
     }
 
     const url = await googleTTS.getAudioBase64(text, {
@@ -125,12 +129,14 @@ async function tts_google(text, lang) {
 
     // const [url] = await tts.synthesizeSpeech(request);
 
+    WriteSpeech({ owner: abonent, key: md5(text), text: text, data: url });
+
     // Записываем аудиофайл в директорию
-    await fs.outputFile(filePath, Buffer.from(url, 'base64')); // Запись файла в папку audio
-    console.log(`Файл сохранён: ${filePath}`);
+    // await fs.outputFile(filePath, Buffer.from(url, 'base64')); // Запись файла в папку audio
+    console.log(`Файл сохранён`);
 
     // Читаем содержимое только что сохранённого файла и возвращаем его в формате base64
-    return 'data:audio/mpeg;base64,' + await fs.readFile(filePath, { encoding: 'base64' });
+    return 'data:audio/mpeg;base64,' + url;
 
     
   } catch (error) {
