@@ -76,7 +76,7 @@
 
   onDestroy(() => {
     audio = '';
-    easyspeech = ''
+    // easyspeech = ''
   });
 </script>
 
