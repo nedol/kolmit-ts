@@ -132,7 +132,6 @@
 
   onMount(async () => {
     rtc = new RTCUser(user, uid, $signal, oper);
-    // rtc.SendCheck();
 
     rtc.OnOpenDataChannel = () => {
       console.log('OnOpenDataChannel');
@@ -258,7 +257,7 @@
       status == 'active' &&
       $call_but_status == 'active'
     ) {
-      if (data.operators[user_.operator]) {
+      if (data.operators && data.operators[user_.operator]) {
         user_.display = 'block';
      
       }
@@ -282,10 +281,13 @@
     //   }
     // }
 
-    // if (data.func === 'close') {
-    //   rtc?.OnInactive();
-    //   $call_but_status = 'inactive';
-    // }
+    if (data.func === 'close') {
+      if(data.operator === user_.operator){
+        rtc?.OnInactive();
+        $call_but_status = 'inactive';
+        parent_div.appendChild(card);
+      }
+    }
   }
 
   function OnMessage_(data) {
@@ -397,8 +399,6 @@
       remote.video.srcObject = null;
       remote.video.display = 'none';
     }
-
-    // $call_but_status = status;
   }
 
   let OnClickCallButton = function () {

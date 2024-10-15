@@ -420,11 +420,11 @@
     }
   }
 
-  // $click_call_func = OnClickCallButton;
+  $click_call_func = OnClickCallButton;
 
-  $: if (!$click_call_func) {
-    $click_call_func = OnClickCallButton;
-  }
+  // $: if (!$click_call_func) {
+  //   $click_call_func = OnClickCallButton;
+  // }
 
   function openProfile(id) {
     profile.display = 'block';
@@ -581,7 +581,7 @@
       {/if}
     </Section>
     <Section>
-      <CallButton on:click={$click_call_func}>
+      <CallButton on:click={OnClickCallButton}>
         <b
           class="call_cnt"
           style="display:none;position: relative;left:22px;top:10px;color:#0e0cff;font-size: 12px;"

@@ -154,6 +154,7 @@
           group.push(data.operators[el]);
         } else {
           const ind = group.indexOf(data.operators[el]);
+          if(ind!==-1)
           group.splice(ind, 1);
         }
       });
@@ -162,7 +163,7 @@
 
 
 
-    if (data.status === 'offer') {
+    if (data.status === 'offer' && $call_but_status === 'active') {
       // if(data.operator===uid){
       //   return;
       // }

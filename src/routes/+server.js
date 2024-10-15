@@ -379,7 +379,7 @@ async function getOperators(q, func) {
   return operators;
 }
 
-function BroadcastOperatorStatus(q, check) {
+async function BroadcastOperatorStatus(q, check) {
   try {
 
     let type = q.type === 'operator' ? 'user' : 'operator';
@@ -399,7 +399,9 @@ function BroadcastOperatorStatus(q, check) {
           // && item.abonent === q.operator
           item.uid !== q.uid
         ) {
-            if (global.rtcPool[type][q.abonent][item.operator].resolve)
+          const users = await GetUsers({ abonent: q.abonent, operator: q.operator });
+          const oper = find(users.operators, { operator: q.operator });
+            if (global.rtcPool[type][q.abonent][item.operator]?.resolve)
               global.rtcPool[type][q.abonent][item.operator].resolve([
                 {
                   func: q.func,
@@ -408,6 +410,8 @@ function BroadcastOperatorStatus(q, check) {
                   operator: q.operator,
                   uid: q.uid,
                   status: check,
+                  picture: oper.picture,
+                  name: oper.name
                 },
               ]);          
         }
