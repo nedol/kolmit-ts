@@ -1,11 +1,17 @@
 <script lang="ts">
   import { onMount, onDestroy, setContext, getContext } from 'svelte';
 
+  import moment from 'moment';
+  moment.locale('nl-be');
+
+
+
   import { Translate } from '../translate/Transloc.js';
 
   import pkg from 'lodash';
   const { find, findIndex, remove } = pkg;
   import IconButton, { Icon } from '@smui/icon-button';
+  import Badge from '@smui-extra/badge';
   import Card, { PrimaryAction, Media, MediaContent } from '@smui/card';
   import {
     mdiAccountMultiple,
@@ -380,7 +386,15 @@
                               highlight={quiz.highlight || ''}
                               >{quiz.name[$llang]}
                             </a><span />
+
                             {#if quiz.type === 'dialog' || quiz.type === 'word'}
+
+                              <span
+                                style="position: relative;  right:90vw;color:red; top:-20px;"
+                              >
+                               {Date.now() - new Date(quiz.published).getTime() < (10 * 24 * 60 * 60 * 1000)?'new':''}
+                              </span>
+                
                               <div class="form-field-container">
                                 <FormField>
                                   <Checkbox

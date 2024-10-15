@@ -70,7 +70,7 @@ export async function Speak(lang, text, cb) {
         text: text, //dialog_data.content[cur_qa].question['nl'],
         voice: tts.voice,
         volume: 9,
-        rate: tts.voice.lang.includes($lang)?1:0.7,
+        rate: tts.voice.lang.includes($lang)?1:0.5,
         pitch: 1,
         boundary: (e) => console.debug('boundary reached'),
         end: async (e) => {

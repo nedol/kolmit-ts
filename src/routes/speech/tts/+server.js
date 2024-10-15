@@ -11,10 +11,9 @@ import textToSpeech from '@google-cloud/text-to-speech';
 
 import { WriteSpeech, ReadSpeech } from '$lib/server/db.js'; //src\lib\server\server.db.js
 
-
 const tts = new textToSpeech.TextToSpeechClient();
-  
-import  md5  from 'md5'; // Импортируем библиотеку для генерации md5
+
+import md5 from 'md5'; // Импортируем библиотеку для генерации md5
 import fs from 'fs-extra'; // Импортируем fs-extra для работы с файловой системой
 
 import { json } from '@sveltejs/kit';
@@ -109,7 +108,7 @@ async function tts_google(text, lang, abonent) {
       return 'data:audio/mpeg;base64,' + data;
     }
 
-    const url = await googleTTS.getAudioBase64(text, {
+    const url = await googleTTS.getAllAudioBase64(text, {
       //getAudioUrl(text, {
       lang: lang,
       slow: false,
@@ -129,16 +128,20 @@ async function tts_google(text, lang, abonent) {
 
     // const [url] = await tts.synthesizeSpeech(request);
 
-    WriteSpeech({ lang: lang, key: md5(text), text: text, data: url });
+    let base64 = '';
+
+    url.map((e) => {
+      base64 += e.base64;
+    });
+
+    WriteSpeech({ lang: lang, key: md5(text), text: text, data: base64 });
 
     // Записываем аудиофайл в директорию
     // await fs.outputFile(filePath, Buffer.from(url, 'base64')); // Запись файла в папку audio
     console.log(`Файл сохранён`);
 
     // Читаем содержимое только что сохранённого файла и возвращаем его в формате base64
-    return 'data:audio/mpeg;base64,' + url;
-
-    
+    return 'data:audio/mpeg;base64,' + base64;
   } catch (error) {
     console.error('Error converting text to speech:', error);
   }

@@ -31,6 +31,10 @@ export default defineConfig({
 
   server: {
     //port: 3478, // Измените этот порт по вашему усмотрению
+
+    host: '0.0.0.0',
+    port: 5173,  // Проверьте, что этот порт соответствует порту, на котором работает ваше приложение
+  
     https: {
       key: path.resolve("./key.pem"),
       cert: path.resolve("./cert.pem"),
@@ -45,6 +49,7 @@ export default defineConfig({
     // 	})
     // ]
   },
+
 
   css: {
     preprocessorOptions: {

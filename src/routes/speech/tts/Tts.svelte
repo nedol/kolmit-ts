@@ -52,15 +52,16 @@
   export async  function Speak_server(lang, text, cb_end) {
 
     async function onEnd(res){
-      if(!res){
-        await Speak_google(lang, text, cb_end);
+      // if(!res){
+      //   await Speak_google(lang, text, cb_end);
+      //   text=''
        
-      }
-      else{
+      // }
+      // else{
         cb_end();
-      }
+      //}
     }
-    await Speak(lang, text, onEnd);
+    await Speak_google(lang, text, onEnd);
      
   }
 
