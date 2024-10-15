@@ -113,7 +113,7 @@
     }
   }
 </script>
-
+{#if $dc_user_state === 'close' && $dc_oper_state === 'close'}
   <div class="speaker-button">
   <IconButton
     on:click={() => {
@@ -126,6 +126,7 @@
   </IconButton>
 
 </div>
+{/if}
 
 <div style="height:300vh; overflow-y:auto;font-size:smaller;color:#2196f3">
   {@html data.html}

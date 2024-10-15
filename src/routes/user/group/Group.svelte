@@ -24,6 +24,7 @@
   import {
     users,
     langs,
+    dc_user,
     msg_oper,
     msg_user,
     call_but_status,
@@ -123,6 +124,7 @@
       operator: operator.operator,
     });
   }else if( $call_but_status==='inactive'){
+
     isOperatorWaiting = false;
     group = group = []
   }

@@ -452,6 +452,11 @@
 
   function OnMessage(data: any, resolve: any) {
 
+    if (data.func === 'close') {
+        rtc?.OnInactive();
+        $call_but_status = 'inactive';
+    }
+
     if (data.call || data.func === 'call') {
       if ($call_but_status === 'active') {
         $call_but_status = 'call';

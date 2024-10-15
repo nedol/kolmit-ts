@@ -42,31 +42,28 @@
   import pkg from 'lodash';
   const { groupBy, find, findIndex } = pkg;
 
-  $: if ($call_but_status === 'inactive') {
-    if (parent_div) parent_div.appendChild(card);
+  $: switch ($dc_user_state) {
+    case 'open':
+      // $call_but_status = 'call';
+      break;
+    case 'close':
+      // $call_but_status = 'inactive';
+      // local.video.display = 'none';
+      // remote.video.display = 'none';
+      // local.audio.paused = true;
+
+      //rtc.abonent = url.searchParams.get('abonent');
+      // status = 'active';
+      // user_.display = 'none';
+      // $call_but_status = 'inactive';
+      // $click_call_func = null; //operator -> OnClickCallButton
+      // parent_div.appendChild(card);
+
+      // rtc?.OnInactive();
+      // video_element.src = '';
+
+      break;
   }
-
-  // $: switch ($dc_user_state) {
-  //   case 'open':
-  //     // $call_but_status = 'call';
-  //     break;
-  //   case 'close':
-  //     $call_but_status = 'inactive';
-  //     local.video.display = 'none';
-  //     // remote.video.display = 'none';
-  //     local.audio.paused = true;
-
-  //     //rtc.abonent = url.searchParams.get('abonent');
-  //     status = 'active';
-  //     user_.display = 'none';
-  //     // $call_but_status = 'inactive';
-  //     // $click_call_func = null; //operator -> OnClickCallButton
-  //     // parent_div.appendChild(card);
-  //     // rtc.OnInactive();
-  //     // video_element.src = '';
-
-  //     break;
-  // }
 
   // $: if (status) {
   //   $users[operator].status = status;
@@ -223,10 +220,10 @@
             data.resp.map((resp) => {
               if (resp.status == 'offer') {
                 // group.push(resp);
-              } else if(resp.status == 'close'){
+              } else if (resp.status == 'close') {
                 // if(resp.operator!==operator){
-                  const ind = findIndex(group, { operator: resp.operator });
-                  group.splice(ind, 1);
+                const ind = findIndex(group, { operator: resp.operator });
+                group.splice(ind, 1);
                 // }
               }
               group = group;
@@ -247,7 +244,6 @@
   }
 
   function OnMessage(data) {
-
     if (data.func === 'talk') {
       $call_but_status = 'talk';
     }
@@ -259,7 +255,6 @@
     ) {
       if (data.operators && data.operators[user_.operator]) {
         user_.display = 'block';
-     
       }
     } else {
       user_.display = 'none';
@@ -282,7 +277,7 @@
     // }
 
     if (data.func === 'close') {
-      if(data.operator === user_.operator){
+      if (data.operator === user_.operator) {
         rtc?.OnInactive();
         $call_but_status = 'inactive';
         parent_div.appendChild(card);
@@ -401,6 +396,7 @@
     }
   }
 
+
   let OnClickCallButton = function () {
     // if (email && email !== rtc.operator) return;
     try {
@@ -469,6 +465,8 @@
         user_.display = 'none';
         $call_but_status = 'inactive';
 
+        
+
         local.video.display = 'none';
         // remote.video.display = 'none';
         video_button_display = 'none';
@@ -516,6 +514,10 @@
   }
 
   onDestroy(() => {
+
+    $dc_user?.SendDCClose(() => {});
+    if (parent_div) parent_div.appendChild(card);
+
     console.log();
   });
 </script>

@@ -699,7 +699,7 @@
           {/if}
         </Section>
         <Section align="start">
-          {#if $dc_user_state !== 'open' && $dc_oper_state !== 'open'}
+          {#if $dc_user_state === 'close' && $dc_oper_state === 'close'}
             <IconButton on:click={PlayAutoContent}>
               <Icon tag="svg" viewBox="0 0 24 24">
                 <path fill={playAutoColor} d={mdiEarHearing} />
