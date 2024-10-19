@@ -30,6 +30,7 @@
     $langs = JSON.parse(data.cookies).lang; // data.operator[0].lang;//
 
     $ice_conf = data.ice_conf;
+
   }
 
   if (data.operator) {
@@ -37,7 +38,9 @@
   }
 
   onMount(async () => {
-     (!operator || data?.group?.length===0)?$view='login':''
+     (!operator || data?.group?.length===0)?$view='login':''; 
+
+
   });
 </script>
 

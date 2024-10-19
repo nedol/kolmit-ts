@@ -320,6 +320,7 @@
   }
 
   onMount(async () => {
+     window.scrollTo({ top: 0, behavior: 'smooth' });
     setTimeout(() => {
       //  $showBottomAppBar = false;//test
     }, 3000);

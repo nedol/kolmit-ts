@@ -2,34 +2,48 @@ import { msg_oper, msg_user } from '$lib/js/stores.js';
 
 // const token = 'CPkJ1MYWC7DMlvw6MvtV0yBw';
 const headers = {
-	'Content-Type': 'application/json'
-	// Authorization: `Bearer ${token}`
+  'Content-Type': 'application/json',
+  // Authorization: `Bearer ${token}`
 };
 
 export class SignalingChannel {
-	constructor(operator) {
-		this.msg_oper = msg_oper;
-		this.msg_user = msg_user;
-		this.operator = operator;
-	}
+  constructor(operator) {
+    this.msg_oper = msg_oper;
+    this.msg_user = msg_user;
+    this.operator = operator;
 
-	async SendMessage(par, cb) {
-		par.operator = this.operator;
-		fetch('./', {
-			method: 'POST',
-			// mode: 'no-cors',
-			body: JSON.stringify({ par }),
-			headers: { headers }
-		})
-			.then((response) => response.json())
-			.then((data) => {
-				// console.log(data);
-				// msg_user.set(data.resp);
-				if (cb) cb(data);
-			})
-			.catch((error) => {
-				console.log(error);
-				return [];
-			});
-	}
+    this.socket = new WebSocket('ws://localhost:3001'); // URL вашего WebSocket сервера
+
+    // Обработка события при открытии соединения
+    this.socket.onopen = () => {
+      console.log('WebSocket соединение установлено');
+    };
+
+    // Обработка сообщений от WebSocket сервера
+
+    // Обработка закрытия соединения
+    this.socket.onclose = () => {
+      console.log('WebSocket соединение закрыто');
+    };
+
+    // Обработка ошибок
+    this.socket.onerror = (error) => {
+      console.error('WebSocket ошибка:', error);
+    };
+  }
+
+  async SendMessage(par, cb) {
+    if (this.socket && this.socket.readyState === WebSocket.OPEN) {
+      this.socket.onmessage = (event) => {
+        console.log('Получено сообщение:', event.data);
+		  if (cb) cb(JSON.parse(event.data));
+		   this.msg_oper.set(JSON.parse(event.data));
+       this.msg_user.set(JSON.parse(event.data));
+      };
+      this.socket.send(JSON.stringify({ par }));
+      par = '';
+    } else {
+      console.log('Соединение с WebSocket не установлено');
+    }
+  }
 }

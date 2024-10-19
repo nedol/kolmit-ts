@@ -60,5 +60,8 @@
 	],
 	"/user": [
 		"src/routes/user/+server.js"
+	],
+	"/user/group": [
+		"src/routes/user/group/+server.js"
 	]
 }

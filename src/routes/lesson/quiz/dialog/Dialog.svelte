@@ -197,7 +197,8 @@
   $: if ($msg_oper?.msg || $msg_user?.msg) {
     (async () => {
       alert(await Translate($msg_oper?.msg || $msg_user?.msg, 'ru', $langs));
-      $msg_user ? ($msg_user.msg = '') : ($msg_oper.msg = '');
+      // $msg_oper?.msg = ''; $msg_user?.msg =  '';
+      // $msg_user ? ($msg_user.msg = '') : ($msg_oper.msg = '');
     })();
   }
 
@@ -222,6 +223,8 @@
   }
 
   onMount(async () => {
+
+     window.scrollTo({ top: 0, behavior: 'smooth' });
     setTimeout(() => {
       if (!share_mode) {
         // $showBottomAppBar = false; //test

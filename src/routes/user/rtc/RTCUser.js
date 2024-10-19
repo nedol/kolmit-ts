@@ -66,6 +66,7 @@ export default class RTCUser extends RTCBase {
 				par.user = this.operator.toLowerCase();
 				par.uid = this.uid;
 				par.name = 'user';
+				par.operator = this.oper.operator;
 				this.signal.SendMessage(par, () => {
 					this.status = 'call';
 				});

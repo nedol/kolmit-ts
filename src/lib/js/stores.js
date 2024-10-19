@@ -1,5 +1,6 @@
 import { writable } from 'svelte/store';
 
+
 export let operatorst = writable();
 
 export let editable = writable(false);

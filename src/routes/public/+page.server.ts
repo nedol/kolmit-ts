@@ -6,7 +6,7 @@ import Turn from 'node-turn';
 
 // import cc from '$lib/json/cc.json';
 
-global.rtcPull = { user: {}, operator: {} };
+// global.rtcPull = { user: {}, operator: {} };
 
 import { CreatePool, GetUsers, GetGroup } from '$lib/server/db.js'; //src\lib\server\server.db.js
 

@@ -1,8 +1,8 @@
 'use strict';
 
-var nodemailer = require('nodemailer');
+import nodemailer from 'nodemailer';
 
-module.exports = class Email {
+export default class Email {
   constructor() {
     // this.transporter = nodemailer.createTransport({
     //     service: 'yandex',
@@ -32,10 +32,10 @@ module.exports = class Email {
 
   SendMail(from, to, subj, html, cb) {
     let mailOptions = {
-      from: from,//from, //'youremail@gmail.com',
-      to:  to, //'myfriend@yahoo.com',
-      subject: subj, 
-      html:  html,
+      from: from, //from, //'youremail@gmail.com',
+      to: to, //'myfriend@yahoo.com',
+      subject: subj,
+      html: html,
     };
     this.transporter.sendMail(mailOptions, function (error, info) {
       if (error) {

@@ -8,6 +8,7 @@ export class Peer {
 		this.rtc = rtc;
 		this.pc_key = pc_key;
 		this.params = {};
+		this.pc_config = pc_config;
 	}
 
 	async SendDesc(desc) {
@@ -56,9 +57,7 @@ export class Peer {
 		par.status = 'offer';
 
 		const res = await this.signal.SendMessage(par, (data) => {
-			if(data?.resp.operators) {
-				msg_user.set({operators:data?.resp.operators})
-			}
+
 		});
 	
 		return res;
@@ -154,8 +153,12 @@ export class Peer {
 						.then((desc) => that.onCreateAnswerSuccess(desc), that.onCreateAnswerError);
 				}
 			},
-			function (error) {
+			 (error)=> {
 				console.log('Failed to set remote description: ' + error.toString(), this);
+				//  this.con.close();
+				// this.con = new RTCPeerConnection(this.pc_config);
+				// this.setRemoteDesc(desc); 
+				// this.StartEvents(); 
 			}
 		);
 	}

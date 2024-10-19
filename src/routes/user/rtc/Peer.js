@@ -4,6 +4,7 @@ export class Peer {
 		this.rtc = rtc;
 		this.pc_key = pc_key;
 		this.params = {};
+		this.pc_config = pc_config;
 	}
 
 	SendDesc(desc, cb) {
@@ -87,7 +88,7 @@ export class Peer {
 							this.SendAnswer();
 							console.log('user send answer', this.params['loc_cand'].length);
 							clearTimeout(timr);
-						}, 2000);
+						}, 1000);
 					}
 				}
 			};
@@ -150,8 +151,12 @@ export class Peer {
 						.then((desc) => that.onCreateAnswerSuccess(desc), that.onCreateAnswerError);
 				}
 			},
-			function (error) {
+			(error)=> {
 				console.log('Failed to set remote description: ' + error.toString(), this);
+				// this.con.close();
+				// this.con = new RTCPeerConnection(this.pc_config);
+				// this.setRemoteDesc(desc); 
+				// this.StartEvents(); 
 			}
 		);
 	}

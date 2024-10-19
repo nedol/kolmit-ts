@@ -20,6 +20,7 @@
     signal,
     click_call_func,
     dc_oper_state,
+    dc_user_state,
     call_but_status,
     muted,
     user_placeholder,
@@ -61,6 +62,7 @@
     switch ($dc_oper_state) {
       case 'open':
         $call_but_status = 'call';
+        local.audio.paused = false;
         break;
       case 'close':
         $call_but_status = 'inactive';
@@ -76,14 +78,14 @@
         remote.text.name = '';
         remote.text.email = '';
         remote.text.display = 'none';
-        
+
         break;
     }
   }
 
-  $: if ($users[uid] && $users[uid].msg) {
-    OnMessage($users[uid].msg, null);
-  }
+  // $: if ($users[uid] && $users[uid].msg) {
+  //   OnMessage($users[uid].msg, null);
+  // }
 
   import { msg_oper } from '$lib/js/stores.js';
   $: if ($msg_oper) {
@@ -115,7 +117,7 @@
   let synthesis;
   let isRemoteAudioMute = false;
   let commandsList;
-  let rtcSupportText = '' ;
+  let rtcSupportText = '';
   let debug_div: any;
 
   let cc_display: string,
@@ -123,10 +125,6 @@
     chat_display = 'block';
 
   $call_but_status = 'inactive';
-
-  $: if ($call_but_status === 'active') {
-    CallWaiting(operator);
-  }
 
   import { editable } from '$lib/js/stores.js';
   import { Translate } from '../translate/Translate';
@@ -148,33 +146,7 @@
     'Content-Type': 'application/json',
   };
 
-  async function CallWaiting(par: any) {
-    if ($call_but_status === 'inactive') return;
-
-    par.func = 'callwaiting';
-
-    fetch(`/operator`, {
-      method: 'POST',
-      // mode: 'no-cors',
-      body: JSON.stringify({ par }),
-      headers: headers,
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        data.resp.map((resp: string) => {
-          $msg_oper = resp;
-        });
-
-        CallWaiting(par);
-      })
-      .catch((error) => {
-        CallWaiting(par);
-        console.log(error);
-        return [];
-      });
-  }
-
-   let isHidden = false;
+  let isHidden = false;
 
   function handleVisibilityChange() {
     isHidden = document.hidden;
@@ -200,27 +172,26 @@
     }
   }
 
-
-
   function checkWebRTCSupport() {
-    const isWebRTCSupported = !!(navigator.mediaDevices && 
-          navigator.mediaDevices.getUserMedia && 
-          window.RTCPeerConnection && 
-          window.RTCDataChannel);
-    if(!isWebRTCSupported){
-      rtcSupportText = "WebRTC не поддерживается вашим браузером"
-    } else{
-      rtcSupportText  = ' '
-    }                      
+    const isWebRTCSupported = !!(
+      navigator.mediaDevices &&
+      navigator.mediaDevices.getUserMedia &&
+      window.RTCPeerConnection &&
+      window.RTCDataChannel
+    );
+    if (!isWebRTCSupported) {
+      rtcSupportText = 'WebRTC не поддерживается вашим браузером';
+    } else {
+      rtcSupportText = ' ';
+    }
   }
 
   onMount(async () => {
     checkWebRTCSupport();
 
-
     try {
       rtc = new RTCOperator(operator, uid, $signal);
-      initRTC();
+
       // rtc.SendCheck();
 
       try {
@@ -241,9 +212,8 @@
 
       // Добавьте слушателя событий для скрытия списка команд при клике за его пределами
       // document.addEventListener('click', handleOutsideClick);
-      if(detectDevice())
+      if (detectDevice())
         document.addEventListener('visibilitychange', handleVisibilityChange);
-
     } catch (ex) {
       console.log();
     }
@@ -358,11 +328,30 @@
     selected.display = true;
   }
 
+    $: switch ($dc_user_state) {
+    case 'open':
+      $call_but_status = 'call';
+      break;
+  }
+
   function OnClickCallButton() {
     // if($call_but_status==undefined)
     //   $call_but_status = 'inactive'
+    console.log();
     switch ($call_but_status) {
       case 'inactive':
+            try {
+              rtc = new RTCOperator(operator, uid, $signal);
+              initRTC();
+              // rtc.SendCheck();
+
+              // Добавьте слушателя событий для скрытия списка команд при клике за его пределами
+              // document.addEventListener('click', handleOutsideClick);
+              if (detectDevice())
+                document.addEventListener('visibilitychange', handleVisibilityChange);
+            } catch (ex) {
+              console.log();
+            }
         rtc.Offer();
 
         $call_but_status = 'active';
@@ -374,14 +363,20 @@
 
         break;
       case 'call':
-        $call_but_status = 'talk';
+        if ($dc_oper_state) {
+          $call_but_status = 'talk';
+
+          local.audio.paused = true;
+          // $muted = false;
+          rtc.OnTalk();
+          video_button_display = true;
+          remote.text.display = 'none';
+        } else {
+          $call_but_status = 'inactive';
+        }
+
         clearInterval(inter);
         call_cnt = 10;
-        local.audio.paused = true;
-        // $muted = false;
-        rtc.OnTalk();
-        video_button_display = true;
-        remote.text.display = 'none';
 
         // const dispatch = createEventDispatcher();
         // dispatch('talk');
@@ -422,9 +417,9 @@
 
   $click_call_func = OnClickCallButton;
 
-  // $: if (!$click_call_func) {
-  //   $click_call_func = OnClickCallButton;
-  // }
+  $: if ($call_but_status) {
+    console.log($call_but_status)
+  }
 
   function openProfile(id) {
     profile.display = 'block';
@@ -448,19 +443,16 @@
     video_progress = false;
   }
 
-
-
   function OnMessage(data: any, resolve: any) {
-
     if (data.func === 'close') {
-        rtc?.OnInactive();
-        $call_but_status = 'inactive';
+      rtc?.OnInactive();
+      $call_but_status = 'inactive';
     }
 
     if (data.call || data.func === 'call') {
       if ($call_but_status === 'active') {
-        $call_but_status = 'call';
-        local.audio.paused = false;
+        // $call_but_status = 'call';
+        // local.audio.paused = false;
       }
 
       rtc.OnCall();
@@ -504,8 +496,10 @@
 
       if ($call_but_status === 'talk') {
         rtc.OnInactive();
+        remote.video.poster =''
       } else if ($call_but_status === 'call') {
         rtc.OnHangup();
+        remote.video.poster = ''
         // Group.GetUsers();
       }
       if (resolve) resolve();
@@ -529,13 +523,14 @@
   onDestroy(() => {
     group = '';
     document.removeEventListener('visibilitychange', handleVisibilityChange);
+
   });
 </script>
 
 <!-- {@debug $view} -->
 
 <!-- {#if $view === 'group'} -->
-<Group />
+<Group bind:oper_display={remote.video.display} />
 
 {#if $view === 'lesson'}
   <Module data={group} />
@@ -579,7 +574,8 @@
         <div class="remote_text_display" style="display:{remote.text.display};">
           {#await Translate('Тебя вызывает - ', 'ru', $langs) then data}
             <p class="remote_msg">
-              {data} {remote.text.name}
+              {data}
+              {remote.text.name}
             </p>
           {/await}
         </div>
@@ -632,9 +628,11 @@
       </div>
     </Section>
   </BottomAppBar>
-      
+
   {#await Translate(rtcSupportText, 'ru', $langs) then data}
-  <span style="position:fixed;bottom:0;font-size:smaller;color:red">{data}</span>
+    <span style="position:fixed;bottom:0;font-size:smaller;color:red"
+      >{data}</span
+    >
   {/await}
 
   <!-- <VideoLocal {...local.video} /> -->

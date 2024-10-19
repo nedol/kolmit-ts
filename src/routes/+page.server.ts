@@ -8,6 +8,12 @@ import Turn from 'node-turn';
 
 global.rtcPull = { user: {}, operator: {} };
 
+// global.rtcPool;
+// import { rtcPool_st } from '$lib/js/stores.js';
+// rtcPool_st.subscribe((data) => {
+//   global.rtcPool = data;
+// });
+
 import { CreatePool, GetUsers, GetGroup } from '$lib/server/db.js'; //src\lib\server\server.db.js
 
 let kolmit;

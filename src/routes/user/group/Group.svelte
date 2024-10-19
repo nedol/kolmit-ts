@@ -21,7 +21,11 @@
   import pkg from 'lodash';
   const { mapValues, find } = pkg;
 
+  export let oper_display;
+
+
   import {
+    signal,
     users,
     langs,
     dc_user,
@@ -55,6 +59,7 @@
   }
 
   $: if ($call_but_status === 'active') {
+
     GetOperators({
       type: 'user',
       func: 'operators',
@@ -66,68 +71,16 @@
   }
 
   async function GetOperators(par: any) {
-    fetch(
-      `./user/?func=${par.func}&abonent=${par.abonent}&operator=${par.operator}`
-    )
-      .then((response) => response.json())
-      .then((data) => {
-        // console.log('cc from oper:', data);
-
-        onMessage({ operators: data.resp });
-      })
-      .catch((error) => {
-        console.log(error);
-
-        return [];
-      });
+    $signal.SendMessage(par,(data)=>{
+     onMessage({ operators: data.resp });
+    });
   }
 
-  let isOperatorWaiting = false;
 
-  async function OperatorWaiting(par: any) {
-    if (isOperatorWaiting)
-      fetch(`./user`, {
-        method: 'POST',
-        // mode: 'no-cors',
-        body: JSON.stringify({ par }),
-        headers: { headers },
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          // console.log('cc from oper:', data);
-          if (Array.isArray(data.resp)) {
-            data.resp.map((resp) => {
-              $msg_user = resp;
-              onMessage(resp);
-            });
-          }
-          if (isOperatorWaiting) {
-            par.func = 'operatorwaiting';
-            OperatorWaiting(par);
-          }
-        })
-        .catch((error) => {
-          console.log(error);
-          OperatorWaiting(par);
-          return [];
-        });
-  }
+
 
   function OnClickUser() {}
 
-  $: if(  $call_but_status==='active'){
-    isOperatorWaiting = true
-    OperatorWaiting({
-      type: 'user',
-      func:'operators',
-      abonent: operator.abonent,
-      operator: operator.operator,
-    });
-  }else if( $call_but_status==='inactive'){
-
-    isOperatorWaiting = false;
-    group = group = []
-  }
 
   onMount(async () => {
     // SendCheck({ func: 'check', type: 'user', abonent: operator.abonent, em: operator.em });
@@ -147,6 +100,7 @@
   }
 
   function onMessage(data) {
+    console.log()
     if (data.operators) {
       Object.keys(data.operators).map((el) => {
         if (
@@ -196,12 +150,12 @@
 
 <!-- {@debug operator} -->
 <div class="deps_div">
-  {#await Translate('Нет пользователей онлайн', 'ru', $langs) then data}
+  <!-- {#await Translate('Нет пользователей онлайн', 'ru', $langs) then data}
     <span
       style="display:{no_users_display};position: relative;top:0px;text-align: center; font-size: smaller;
       font-family: monospace;">{data}</span
     >
-  {/await}
+  {/await} -->
   <div class="flexy-dad">
     {#each group as user, i}
       {#if user && user.operator !== operator.operator}
