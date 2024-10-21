@@ -412,7 +412,7 @@ export async function GetListen(q) {
 
 export async function GetWords(q) {
   try {
-    let res = await sql`SELECT data, context, subscribe  FROM word
+    let res = await sql`SELECT data, name, context, subscribe  FROM word
 		WHERE name=${q.name} AND owner=${q.owner} AND level=${q.level}`;
     //debugger;
     return res[0];

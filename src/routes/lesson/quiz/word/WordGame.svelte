@@ -39,12 +39,9 @@
     llang,
     view,
     dicts,
-    dc_oper,
-    dc_user,
-    dc_oper_state,
-    dc_user_state,
-    msg_user,
-    msg_oper,
+    dc,
+    dc_state,
+    msg,
     call_but_status,
     showBottomAppBar,
     OnCheckQU,
@@ -55,8 +52,6 @@
   export let data;
 
   const abonent = getContext('abonent');
-
-  let msg;
 
   let words = [],
     word,
@@ -124,7 +119,7 @@
 
         showHints[isFlipped] = true;
 
-        if ($call_but_status !== 'active') {
+        if ($call_but_status !== 'active' && !isFlipped) {
           onShare();
         }
 
@@ -143,45 +138,94 @@
     makeExample();
   }
 
-  $: if ($msg_user?.lesson?.quiz === 'word') {
-    if ($msg_user.lesson.words_data) {
-      words = $msg_user.lesson.words_data;
-      hints[false] = JSON.parse(JSON.stringify(words));
-      hints[true] = JSON.parse(JSON.stringify(words));
-      isFlipped = !$msg_user.lesson.isFlipped;
-      level = $msg_user.lesson.level;
-      share_mode = true;
-      showHints[isFlipped] = false;
-      $OnCheckQU(null, 'word', $msg_user.lesson.name);
-    } else if (
-      ($msg_user.lesson.word_correct || $msg_user.lesson.word_correct == 0) &&
-      hints
-    ) {
-      hints[isFlipped][$msg_user.lesson.word_correct].disabled = 'disabled';
-      hint_example = '';
-      doneWords_2 = $msg_user.lesson.done_words;
-    } else if (
-      ($msg_user.lesson.word_error || $msg_user.lesson.word_error == 0) &&
-      hints
-    ) {
-      // hints[isFlipped][$msg_user.lesson.word_correct].disabled = 'disabled';
-      hint_example = '';
-    } else if (
-      $msg_user.lesson.word_index ||
-      $msg_user.lesson.word_index == 0
-    ) {
-      currentWord = words[$msg_user.lesson.word_index];
-      currentWordIndex = $msg_user.lesson.word_index;
-      showHints[isFlipped] = true;
+  $: if ($msg?.lesson?.quiz === 'word' && !$msg.lesson.isFlipped) {
+    try {
+      if ($msg.lesson.words_data) {
+        words = $msg.lesson.words_data;
+        hints[false] = JSON.parse(JSON.stringify(words));
+        hints[true] = JSON.parse(JSON.stringify(words));
+        isFlipped = !$msg.lesson.isFlipped;
+        level = $msg.lesson.level;
+        share_mode = true;
+        showHints[isFlipped] = false;
+        $OnCheckQU(null, 'word', $msg.lesson.name);
+      } else if (
+        ($msg.lesson.word_correct || $msg.lesson.word_correct == 0) &&
+        hints
+      ) {
+        hints[isFlipped][$msg.lesson.word_correct].disabled = 'disabled';
+        hint_example = '';
+        doneWords_2 = $msg.lesson.done_words;
+      } else if (
+        ($msg.lesson.word_error || $msg.lesson.word_error == 0) &&
+        hints
+      ) {
+        // hints[isFlipped][$msg.lesson.word_correct].disabled = 'disabled';
+        hint_example = '';
+      } else if ($msg.lesson.word_index || $msg.lesson.word_index == 0) {
+        currentWord = words[$msg.lesson.word_index];
+        currentWordIndex = $msg.lesson.word_index;
+        showHints[isFlipped] = true;
+        label[true] = 'Заполни пропуски';
+        label[false] = 'Твой ход. Выбери слово';
+        level = $msg.lesson.level;
+        makeExample();
+        setTimeout(()=>{
+         $msg = '';
+        },10)
+    
+      } else if ($msg?.lesson.word_flip) {
+        isFlipped = $msg.lesson.word_flip;
+        $msg.lesson.word_flip = null;
+        hints[isFlipped] = hints[isFlipped];
+        showHints[isFlipped] = false;
+        label[true] = 'Ожидай вопрос';
+        resultElement = '';
+        result = '';
+        hint_example = '';
+        example = '';
+      }
+    } catch (ex) {
+      console.log(ex);
+    }
+  }
+
+  $: if ($msg?.lesson?.quiz === 'word' && $msg.lesson.isFlipped) {
+    if ($msg.lesson.word_index || $msg.lesson.word_index == 0) {
+      currentWord = words[$msg.lesson.word_index];
+      currentWordIndex = $msg.lesson.word_index;
       label[true] = 'Заполни пропуски';
       label[false] = 'Твой ход. Выбери слово';
-      level = $msg_user.lesson.level;
+      showHints[isFlipped] = true;
+      level = $msg.lesson.level;
       makeExample();
-      $msg_user.lesson.quiz = ''
-    } else if ($msg_user?.lesson.word_flip) {
-      isFlipped = $msg_user.lesson.word_flip;
-      $msg_user.lesson.word_flip = null;
+    } else if ($msg?.lesson.words_data) {
+      words = $msg.lesson.words_data;
+      hints[false] = JSON.parse(JSON.stringify(words));
+      hints[true] = JSON.parse(JSON.stringify(words));
+      level = $msg.lesson.level;
+      share_mode = true;
+      isFlipped = !$msg.lesson.isFlipped;
+      showHints[isFlipped] = false;
+
+      $OnCheckQU(null, 'word', $msg.lesson.name);
+    } else if (
+      ($msg.lesson.word_correct || $msg.lesson.word_correct == 0) &&
+      hints
+    ) {
+      hints[isFlipped][$msg.lesson.word_correct].disabled = 'disabled';
+      hint_example = '';
+      doneWords_2 = $msg.lesson.done_words;
+    } else if (
+      ($msg.lesson.word_error || $msg.lesson.word_error == 0) &&
+      hints
+    ) {
+      // hints[isFlipped][$msg.lesson.word_correct].disabled = 'disabled';
+      hint_example = '';
+    } else if ($msg.lesson.word_flip) {
+      isFlipped = $msg.lesson.word_flip;
       hints[isFlipped] = hints[isFlipped];
+      $msg.lesson.word_flip = null;
       showHints[isFlipped] = false;
       label[true] = 'Ожидай вопрос';
       resultElement = '';
@@ -191,56 +235,10 @@
     }
   }
 
-  $: if ($msg_oper?.lesson?.quiz === 'word') {
-    if ($msg_oper.lesson.word_index || $msg_oper.lesson.word_index == 0) {
-      currentWord = words[$msg_oper.lesson.word_index];
-      currentWordIndex = $msg_oper.lesson.word_index;
-      label[true] = 'Заполни пропуски';
-      label[false] = 'Твой ход. Выбери слово';
-      showHints[isFlipped] = true;
-      level = $msg_oper.lesson.level;
-      makeExample();
-    } else if ($msg_oper?.lesson.words_data) {
-      words = $msg_oper.lesson.words_data;
-      hints[false] = JSON.parse(JSON.stringify(words));
-      hints[true] = JSON.parse(JSON.stringify(words));
-      level = $msg_oper.lesson.level;
-      share_mode = true;
-      isFlipped = !$msg_oper.lesson.isFlipped;
-      showHints[isFlipped] = false;
-
-      $OnCheckQU(null, 'word', $msg_oper.lesson.name);
-    } else if (
-      ($msg_oper.lesson.word_correct || $msg_oper.lesson.word_correct == 0) &&
-      hints
-    ) {
-      hints[isFlipped][$msg_oper.lesson.word_correct].disabled = 'disabled';
-      hint_example = '';
-      doneWords_2 = $msg_oper.lesson.done_words;
-    } else if (
-      ($msg_oper.lesson.word_error || $msg_oper.lesson.word_error == 0) &&
-      hints
-    ) {
-      // hints[isFlipped][$msg_user.lesson.word_correct].disabled = 'disabled';
-      hint_example = '';
-    } else if ($msg_oper.lesson.word_flip) {
-      isFlipped = $msg_oper.lesson.word_flip;
-      hints[isFlipped] = hints[isFlipped];
-      $msg_oper.lesson.word_flip = null;
-      showHints[isFlipped] = false;
-      label[true] = 'Ожидай вопрос';
-      resultElement = '';
-      result = '';
-      hint_example = '';
-      example = '';
-    }
-  }
-
-  $: if ($msg_oper?.msg || $msg_user?.msg) {
+  $: if ($msg?.msg) {
     (async () => {
-      alert(await Translate($msg_oper?.msg || $msg_user?.msg, 'ru', $langs));
-      if ($msg_user) $msg_user.msg = '';
-      if ($msg_oper) $msg_oper.msg = '';
+      alert(await Translate($msg?.msg, 'ru', $langs));
+      if ($msg) $msg.msg = '';
     })();
   }
 
@@ -264,8 +262,7 @@
     // currentWord = words[currentWordIndex];
     // makeExample();
     SendData(lesson);
-    const dc = $dc_user?.dc.readyState === 'open' ? $dc_user : $dc_oper;
-    $OnCheckQU(dc.rtc.oper_uid, 'word', data.name);
+    // $OnCheckQU($dc?.rtc.oper_uid, 'word', data.name);
   }
 
   let topAppBar;
@@ -338,11 +335,11 @@
   function replaceWord(text, targetWord) {
     const threshold = 0.8; // 90% порог
 
-    if(text)
-    return text.replace(
-      /<<([^>]*)>>/g,
-      `<span  value="$1" class="sentence_span" style="position: relative;width:20px;  left: 0px; color:green; font-weight:bold">$1</span>`
-    );
+    if (text)
+      return text.replace(
+        /<<([^>]*)>>/g,
+        `<span  value="$1" class="sentence_span" style="position: relative;width:20px;  left: 0px; color:green; font-weight:bold">$1</span>`
+      );
   }
 
   async function makeExample() {
@@ -424,8 +421,7 @@
       return arr.slice(startIndex, endIndex + 1); // Включить элемент с endIndex
     }
 
-    if(isFlipped){
-
+    if (isFlipped) {
       hints[isFlipped] = getSubArray([...words], currentWordIndex);
       shuffle(hints[isFlipped]);
     }
@@ -505,16 +501,9 @@
   }
 
   async function SendData(data) {
-    let dc = null;
-
-    if ($dc_user?.dc.readyState === 'open') {
-      dc = $dc_user;
-    } else if ($dc_oper?.dc.readyState === 'open') {
-      dc = $dc_oper;
-    }
-    if (share_mode && dc) {
+    if (share_mode && $dc) {
       //  words.content[cur_qa].user2['a_shfl'] = a_shfl;
-      await dc.SendData(data, (ex) => {
+      await $dc?.SendData(data, (ex) => {
         console.log(ex);
       });
     }
@@ -622,26 +611,23 @@
     });
 
     if (thisErrorIndex < 1) {
-      if (errorIndex < 1 && hintIndex < 1 ) 
-        doneWords++;
+      if (errorIndex < 1 && hintIndex < 1) doneWords++;
 
-        const data = {
-          lesson: {
-            quiz: 'word',
-            word_correct: currentWordIndex,
-            done_words: doneWords,
-          },
-        };
-        SendData(data);
+      const data = {
+        lesson: {
+          quiz: 'word',
+          word_correct: currentWordIndex,
+          done_words: doneWords,
+        },
+      };
+      SendData(data);
 
-        errorIndex = 0;
-         hintIndex = 0;
-        label[true] = 'Нажми "Вперед"';
-        // speak(currentWord.example[$llang]);TODO: для fr
-        showHints[isFlipped] = false;
-        showNextButton = true;
-       
-      
+      errorIndex = 0;
+      hintIndex = 0;
+      label[true] = 'Нажми "Вперед"';
+      // speak(currentWord.example[$llang]);TODO: для fr
+      showHints[isFlipped] = false;
+      showNextButton = true;
     } else {
       errorIndex++;
       errorIndex = 0;
@@ -799,17 +785,17 @@
     // Очищаем интервал при размонтировании компонента
     $llang = _llang;
 
-    $view = 'lesson';
+    // $view = 'lesson';
     $lesson.data.quiz = '';
 
     $showBottomAppBar = true;
   });
 </script>
 
-<link
+<!-- <link
   rel="stylesheet"
   href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0"
-/>
+/> -->
 
 <TTS bind:this={tts}></TTS>
 

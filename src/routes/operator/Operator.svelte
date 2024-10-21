@@ -19,11 +19,9 @@
     lesson,
     signal,
     click_call_func,
-    dc_oper_state,
-    dc_user_state,
+    dc_state,
     call_but_status,
     muted,
-    user_placeholder,
     dicts,
     langs,
     showBottomAppBar,
@@ -58,11 +56,12 @@
   import md5 from 'md5';
 
   /*TODO: дает*/
-  $: if ($dc_oper_state) {
-    switch ($dc_oper_state) {
+  $: switch ($dc_state) {
       case 'open':
         $call_but_status = 'call';
         local.audio.paused = false;
+
+
         break;
       case 'close':
         $call_but_status = 'inactive';
@@ -81,16 +80,12 @@
 
         break;
     }
-  }
+  
 
-  // $: if ($users[uid] && $users[uid].msg) {
-  //   OnMessage($users[uid].msg, null);
-  // }
-
-  import { msg_oper } from '$lib/js/stores.js';
-  $: if ($msg_oper) {
-    OnMessage($msg_oper, null);
-    // $msg_oper = ''
+  import { msg } from '$lib/js/stores.js';
+  $: if ($msg) {
+    OnMessage($msg, null);
+    // $msg = ''
   }
 
   let dlg_display = 'none';
@@ -100,6 +95,7 @@
   }
 
   setContext('SetDlgDisplay', SetDlgDisplay);
+ 
 
   $: if ($view === 'chat') dlg_display = 'block';
   else dlg_display = 'none';
@@ -107,6 +103,7 @@
   $posterst = '/assets/operator.svg';
 
   let rtc: any;
+
   let topAppBar;
   let bottomAppBar;
   let selected: any;
@@ -186,13 +183,14 @@
     }
   }
 
+
+
   onMount(async () => {
     checkWebRTCSupport();
 
     try {
-      rtc = new RTCOperator(operator, uid, $signal);
-
-      // rtc.SendCheck();
+      rtc = new RTCOperator(operator, name, $signal);
+      initRTC();
 
       try {
         // Fix up for prefixing
@@ -328,7 +326,7 @@
     selected.display = true;
   }
 
-    $: switch ($dc_user_state) {
+  $: switch ($dc_state) {
     case 'open':
       $call_but_status = 'call';
       break;
@@ -340,18 +338,17 @@
     console.log();
     switch ($call_but_status) {
       case 'inactive':
-            try {
-              rtc = new RTCOperator(operator, uid, $signal);
-              initRTC();
-              // rtc.SendCheck();
-
-              // Добавьте слушателя событий для скрытия списка команд при клике за его пределами
-              // document.addEventListener('click', handleOutsideClick);
-              if (detectDevice())
-                document.addEventListener('visibilitychange', handleVisibilityChange);
-            } catch (ex) {
-              console.log();
-            }
+        try {
+          // Добавьте слушателя событий для скрытия списка команд при клике за его пределами
+          // document.addEventListener('click', handleOutsideClick);
+          if (detectDevice())
+            document.addEventListener(
+              'visibilitychange',
+              handleVisibilityChange
+            );
+        } catch (ex) {
+          console.log();
+        }
         rtc.Offer();
 
         $call_but_status = 'active';
@@ -363,10 +360,8 @@
 
         break;
       case 'call':
-        if ($dc_oper_state) {
-          $call_but_status = 'talk';
-
-          local.audio.paused = true;
+        if ($dc_state && !$click_call_func) {
+          $call_but_status = 'talk';         
           // $muted = false;
           rtc.OnTalk();
           video_button_display = true;
@@ -374,6 +369,7 @@
         } else {
           $call_but_status = 'inactive';
         }
+         local.audio.paused = true;
 
         clearInterval(inter);
         call_cnt = 10;
@@ -386,6 +382,7 @@
         break;
       case 'talk':
         local.video.display = 'none';
+        local.audio.paused = true;
         video_button_display = false;
         remote.video.display = 'none';
         remote.video.srcObject = '';
@@ -393,8 +390,12 @@
         remote.text.display = 'none';
         remote.text.name = '';
         remote.text.email = '';
-        $call_but_status = 'inactive';
-        rtc.OnInactive();
+
+          $call_but_status = 'inactive';
+          rtc.DC.SendDCClose();
+          rtc.OnInactive();
+
+        
         $users = $users;
 
         break;
@@ -408,6 +409,7 @@
         remote.video.poster = '';
         remote.text.display = 'none';
         // local.video.poster = UserSvg;
+        rtc.DC.SendDCClose();
         rtc.OnInactive();
         break;
       default:
@@ -415,10 +417,12 @@
     }
   }
 
-  $click_call_func = OnClickCallButton;
+  $: if($click_call_func){
+    console.log()
+  }
 
   $: if ($call_but_status) {
-    console.log($call_but_status)
+    console.log($call_but_status);
   }
 
   function openProfile(id) {
@@ -447,6 +451,7 @@
     if (data.func === 'close') {
       rtc?.OnInactive();
       $call_but_status = 'inactive';
+      remote.video.display = 'none'
     }
 
     if (data.call || data.func === 'call') {
@@ -454,9 +459,7 @@
         // $call_but_status = 'call';
         // local.audio.paused = false;
       }
-
-      rtc.OnCall();
-
+   
       $showBottomAppBar = true;
 
       remote.text.display = 'block';
@@ -469,10 +472,13 @@
         remote.text.name = data.profile.name;
         remote.text.email = data.profile.email;
       }
+
+      if($click_call_func)
+        rtc.OnCall()
     }
     if (data.func === 'talk') {
       $call_but_status = 'talk';
-
+      local.audio.paused = true;
       video_button_display = true;
       remote.text.display = 'none';
     }
@@ -496,10 +502,10 @@
 
       if ($call_but_status === 'talk') {
         rtc.OnInactive();
-        remote.video.poster =''
+        remote.video.poster = '';
       } else if ($call_but_status === 'call') {
         rtc.OnHangup();
-        remote.video.poster = ''
+        remote.video.poster = '';
         // Group.GetUsers();
       }
       if (resolve) resolve();
@@ -523,14 +529,13 @@
   onDestroy(() => {
     group = '';
     document.removeEventListener('visibilitychange', handleVisibilityChange);
-
   });
 </script>
 
 <!-- {@debug $view} -->
 
 <!-- {#if $view === 'group'} -->
-<Group bind:oper_display={remote.video.display} />
+<Group  {rtc}/>
 
 {#if $view === 'lesson'}
   <Module data={group} />
@@ -544,7 +549,7 @@
   <BottomAppBar variant="static" slot="oper" bind:this={bottomAppBar}>
     <Section>
       <div class="remote_div">
-        <div class="user_placeholder" bind:this={$user_placeholder}></div>
+        <div class="user_placeholder"></div>
 
         <VideoRemote
           {...remote.video}

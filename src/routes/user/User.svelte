@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount, onDestroy, getContext, setContext } from 'svelte';
   import md5 from 'md5';
-  import RTCUser from './rtc/RTCUser';
+
   import Profile from './modal/Profile.svelte';
   import DropdownList from './DropdownList.svelte';
   import VideoLocal from './Video.local.svelte';
@@ -24,17 +24,12 @@
 
   user_.display = 'none'; //видимость в группе
 
-  const operator_ = getContext('operator');
-
   import {
     users,
-    signal,
     call_but_status,
-    dc_user_state,
-    dc_user,
+    dc,
     click_call_func,
-    user_placeholder,
-    msg_user,
+    msg,
   } from '$lib/js/stores.js';
 
   $click_call_func = null;
@@ -42,20 +37,15 @@
   import pkg from 'lodash';
   const { groupBy, find, findIndex } = pkg;
 
-
-
-  // $: if (status) {
-  //   $users[operator].status = status;
-  // }
+ export let rtc = '';
 
   let checked = false;
 
   let isRemoteAudioMute = false;
 
-  const uid = md5(operator);
+  // const uid = md5(operator);
 
-  let rtc,
-    call_cnt,
+  let call_cnt,
     selected,
     inter,
     status = 'active',
@@ -107,33 +97,6 @@
   let oper = getContext('operator');
 
   onMount(async () => {
-    rtc = new RTCUser(user, uid, $signal, oper);
-
-    rtc.OnOpenDataChannel = () => {
-      console.log('OnOpenDataChannel');
-    };
-
-    rtc.SendToComponent = OnMessage;
-
-    rtc.SetLocalVideo = (src) => {
-      local.video.srcObject = src;
-    };
-
-    rtc.GetRemoteVideo = () => {
-      return remote.video.srcObject;
-    };
-
-    rtc.SetRemoteVideo = (src) => {
-      remote.video.srcObject = src;
-      remote.video.display = 'block';
-      // status = 'talk';
-      // $call_but_status = 'talk';
-    };
-
-    rtc.PlayCallCnt = () => {
-      local.audio.paused = false;
-    };
-
     // $call_but_status = status;
   });
 
@@ -179,9 +142,9 @@
   //   // group = group;
   // }
 
-  $: if ($msg_user) {
-    OnMessage($msg_user);
-    // $msg_user = ''
+  $: if ($msg) {
+    OnMessage($msg);
+    // $msg = ''
   }
 
   function OnMessage(data) {
@@ -212,11 +175,9 @@
     }
   }
 
-
-  $: switch($call_but_status){
+  $: switch ($call_but_status) {
     case 'inactive':
-
-      // parent_div.removeChild(card) 
+      // parent_div.removeChild(card)
       // else parent_div.style.display  = 'none'
 
       break;
@@ -224,19 +185,6 @@
 
   let OnClickCallButton = function () {
     // if (email && email !== rtc.operator) return;
-    try {
-      // Fix up for prefixing
-      if (!window.AudioContext) {
-        window.AudioContext = window.AudioContext || window.webkitAudioContext;
-        window.AudioContext = new AudioContext();
-        rtc.localSoundSrc = window.AudioContext.createMediaElementSource(
-          rtc.localSound
-        );
-        rtc.localSoundSrc.connect(window.AudioContext.destination);
-      }
-    } catch (ex) {
-      console.log('Web Audio API is not supported in this browser');
-    }
 
     console.log();
 
@@ -257,18 +205,14 @@
         if ($call_but_status === 'call' || $call_but_status === 'talk') break;
         user_.display = 'block';
         $click_call_func = OnClickCallButton;
-        function call() {
-          rtc.Call();
+        (()=> {
+          rtc.Call(operator);
           status = 'call';
-          // $call_but_status = 'call';
+
           video_element.load();
 
-          $user_placeholder.appendChild(card); //звонок
-
           window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        call();
+        })();
 
         break;
       case 'call':
@@ -283,21 +227,19 @@
         call_cnt = 10;
         rtc.OnInactive();
         $click_call_func = null; //operator -> OnClickCallButton
-        parent_div?.appendChild(card);
+        // parent_div?.appendChild(card);
         break;
       case 'talk':
         status = 'inactive';
         user_.display = 'none';
         // $call_but_status = 'inactive';
 
-        
-
         local.video.display = 'none';
         // remote.video.display = 'none';
         video_button_display = 'none';
         rtc.OnInactive();
         $click_call_func = null; //operator -> OnClickCallButton
-        parent_div?.appendChild(card);
+        // parent_div?.appendChild(card);
         video_element.poster = '';
         video_element.load();
 
@@ -309,7 +251,7 @@
         // $call_but_status = 'inactive';
         video_button_display = 'none';
         $click_call_func = null; //operator -> OnClickCallButton
-        parent_div?.appendChild(card);
+        // parent_div?.appendChild(card);
         break;
       case 'busy':
         // rtc.Call();
@@ -338,13 +280,12 @@
     $muted = isRemoteAudioMute;
   }
 
-  onDestroy(async() => {
-
-    $dc_user?.SendDCClose(() => {});
+  onDestroy(async () => {
+    $dc?.SendDCClose(() => {});
 
     // $call_but_status = 'inactive';
-      local.video.display = 'none';
-      remote.video.display = 'none';
+    local.video.display = 'none';
+    remote.video.display = 'none';
     console.log();
   });
 </script>

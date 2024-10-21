@@ -26,13 +26,12 @@
   import Quiz from './quiz/Quiz.svelte';
 
   import {
+    signal,
     users,
     langs,
     llang,
-    dicts,
-    msg_oper,
-    dc_oper,
-    dc_user,
+    msg,
+    dc,
     call_but_status,
     showBottomAppBar,
     OnCheckQU,
@@ -81,7 +80,7 @@
 
   $: if ($lesson.data) {
     if ($lesson.data.quiz == '' && data.quiz) {
-      SendData({ msg: 'Собеседник вышел из упражнения' });
+      SendDataDC({ msg: 'Собеседник вышел из упражнения' });
       data = $lesson.data;
     }
     data = $lesson.data;
@@ -94,13 +93,13 @@
   let checked = { dialog: {}, word: {} };
   let quiz_users = { dialog: {}, word: {} };
 
-  $: if ($msg_oper?.add) {
+  $: if ($msg?.add) {
     try {
-      BuildQuizUsers($msg_oper.quiz, $msg_oper.add, $msg_oper.type);
+      BuildQuizUsers($msg.quiz, $msg.add, $msg.type);
     } catch (ex) {}
-    $msg_oper.add = '';
-  } else if ($msg_oper?.rem) {
-    RemoveQuizUser($msg_oper.rem, $msg_oper.type, $msg_oper.quiz);
+    $msg.add = '';
+  } else if ($msg?.rem) {
+    RemoveQuizUser($msg.rem, $msg.type, $msg.quiz);
   }
 
   export async function fetchLesson(owner, operator) {
@@ -168,29 +167,18 @@
       par.rem = operator.operator;
     }
 
-    fetch('/lesson', {
-      method: 'POST',
-      // mode: 'no-cors',
-      body: JSON.stringify({ par }),
-      headers: { 'Content-Type': 'application/json' },
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        console.log(data.resp);
-      })
-      .catch((error) => {
-        console.log(error);
-        return [];
-      });
+    $signal.SendMessage(par,(data)=>{
+      console.log(data.resp);
+    }); 
   };
 
   let RemoveQuizUser = function (user, type, quiz) {
     try{
       let obj = find(quiz_users[type][quiz], { operator: user });
-      obj.type = $msg_oper.type;
+      obj.type = $msg.type;
       remove(quiz_users[type][quiz], obj);
       quiz_users = quiz_users;
-      $msg_oper.rem = '';
+      $msg.rem = '';
     }catch(ex){
 
     }
@@ -222,28 +210,19 @@
 
     if (!quiz_users[par.type][par.quiz]) quiz_users[par.type][par.quiz] = [];
 
-    fetch('/lesson', {
-      method: 'POST',
-      // mode: 'no-cors',
-      body: JSON.stringify({ par }),
-      headers: { 'Content-Type': 'application/json' },
-    })
-      .then((response) => response.json())
-      .then((data) => {
+    $signal.SendMessage(par,(data)=>{
         if (data && data.resp) {
-          data.resp[par.type].subscribers.map((user) => {
+          const key = Object.keys(data.resp)[0]
+          data.resp[key].subscribers.map((user) => {
             // BuildQuizUsers(par.quiz, user, node.attributes['type'].value);
             if (user === operator.operator) {
-              checked[type][quiz] = true;
+              checked[key][data.resp[key].quiz] = true;
               return;
             }
-          });
-        }
-      })
-      .catch((error) => {
-        console.log(error);
-        return [];
-      });
+            });
+          }
+            
+    });
   }
 
   function OnClickUserCard(user, theme, module, quiz) {
@@ -257,18 +236,12 @@
     );
   }
 
-  async function SendData(data) {
-    let dc = null;
+  function SendDataDC(data, cb) {
 
-    if ($dc_user?.dc.readyState === 'open') {
-      dc = $dc_user;
-    } else if ($dc_oper?.dc.readyState === 'open') {
-      dc = $dc_oper;
-    }
-    if (dc) {
+    if ($dc?.dc.readyState === 'open') {
       //  words.content[cur_qa].user2['a_shfl'] = a_shfl;
-      await dc.SendData(data, (ex) => {
-        console.log(ex);
+      $dc.SendData(data, (res) => {
+        if(cb) cb(res)
       });
     }
   }

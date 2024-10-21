@@ -7,7 +7,7 @@ operatorst.subscribe((data) => {
   oper = data;
 });
 
-import { dc_user, dc_user_state, msg_user, posterst } from '$lib/js/stores.js';
+import { dc_user, dc_user_state, msg, posterst } from '$lib/js/stores.js';
 let poster;
 posterst.subscribe((data) => {
   poster = data;
@@ -27,7 +27,7 @@ export class DataChannelUser {
     that.cnt_call = 0;
 
     // this.dc.onclose = () => {
-    // 	msg_user.set({ func: 'mute' });
+    // 	msg.set({ func: 'mute' });
     // };
 
     // dc_user_state.set(that.dc.readyState);
@@ -72,13 +72,13 @@ export class DataChannelUser {
 
           data = JSON.parse(data);
           data.operator = this.rtc.operator;
-          // console.log('$msg_user:', data);
-          msg_user.set(data);
+          // console.log('$msg:', data);
+          msg.set(data);
           setTimeout(() => {
-            msg_user.set('');
+            msg.set('');
             data = '';
-          },100)
-   
+          }, 100);
+
           return;
         }
         data += parsed.slice;

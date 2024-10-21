@@ -5,15 +5,12 @@
   import {
     langs,
     llang,
-    dc_oper,
-    dc_user,
-    msg_oper,
-    msg_user,
+    dc,
+    msg,
   } from '$lib/js/stores.js';
 
   $llang = 'nl';
 
-  $: dc = $dc_oper || $dc_user;
 
   import {
     mdiPagePreviousOutline,
@@ -41,8 +38,8 @@
   let showHint:number;
   let to;
 
-  $: if ($msg_oper || $msg_user) {
-    const msg = $msg_oper || $msg_user;
+  $: if ($msg || $msg) {
+    const msg = $msg || $msg;
     if (msg.func === 'chat') {
       // console.log(msg.text[$llang]);
       messages.unshift({ text: msg.text, isQuestion: 'answer' });
@@ -135,9 +132,9 @@
   }
 
   function SendDC(text: string) {
-    const dc = $dc_user || $dc_oper;
-    if (dc) {
-      dc.SendData(
+
+    if ($dc) {
+      $dc.SendData(
         {
           func: 'chat',
           lang: $llang,

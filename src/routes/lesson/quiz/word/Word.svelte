@@ -29,8 +29,8 @@
     dicts,
     lesson,
     showBottomAppBar,
-    dc_oper,
-    dc_user,
+    dc,
+
   } from '$lib/js/stores.js';
 
   import langs_list from '$lib/dict/learn_langs_list.json';
@@ -659,10 +659,10 @@
   });
 </script>
 
-<link
+<!-- <link
   rel="stylesheet"
   href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0"
-/>
+/> -->
 
 <TTS bind:this={tts}></TTS>
 
@@ -700,7 +700,7 @@
             </button>
           </Section>
           <Section>
-            {#if !$dc_user && !$dc_oper}
+            {#if !$dc}
               <IconButton on:click={PlayAutoContent}>
                 <Icon tag="svg" viewBox="0 0 24 24">
                   <path fill={playAutoColor} d={mdiEarHearing} />

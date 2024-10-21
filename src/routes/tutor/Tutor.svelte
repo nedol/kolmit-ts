@@ -14,7 +14,7 @@
 
   import poster from '$lib/images/tutor.png';
 
-  import { users, call_but_status, click_call_func, user_placeholder } from '$lib/js/stores.js';
+  import { users, call_but_status, click_call_func} from '$lib/js/stores.js';
 
   $click_call_func = null;
 

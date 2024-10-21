@@ -1,4 +1,4 @@
-import { msg_oper, msg_user } from '$lib/js/stores.js';
+import { msg} from '$lib/js/stores.js';
 
 // const token = 'CPkJ1MYWC7DMlvw6MvtV0yBw';
 const headers = {
@@ -8,8 +8,7 @@ const headers = {
 
 export class SignalingChannel {
   constructor(operator) {
-    this.msg_oper = msg_oper;
-    this.msg_user = msg_user;
+    this.msg = msg;
     this.operator = operator;
 
     this.socket = new WebSocket('ws://localhost:3001'); // URL вашего WebSocket сервера
@@ -36,9 +35,8 @@ export class SignalingChannel {
     if (this.socket && this.socket.readyState === WebSocket.OPEN) {
       this.socket.onmessage = (event) => {
         console.log('Получено сообщение:', event.data);
-		  if (cb) cb(JSON.parse(event.data));
-		   this.msg_oper.set(JSON.parse(event.data));
-       this.msg_user.set(JSON.parse(event.data));
+        if (cb) cb(JSON.parse(event.data));
+        this.msg.set(JSON.parse(event.data));
       };
       this.socket.send(JSON.stringify({ par }));
       par = '';

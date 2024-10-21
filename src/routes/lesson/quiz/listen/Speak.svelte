@@ -7,15 +7,9 @@
 	import { mdiPagePreviousOutline } from '@mdi/js';
 
 	import { lesson } from '$lib/js/stores.js';
-	import { dc_oper } from '$lib/js/stores.js';
-	$: if ($dc_oper && $dc_oper.dc) {
-		$dc_oper.dc.onmessage = (event) => {
-			console.log(event.data);
-		};
-	}
-	import { dc_user } from '$lib/js/stores.js';
-	$: if ($dc_user && $dc_user.dc) {
-		$dc_user.dc.onmessage = (event) => {
+	import { dc } from '$lib/js/stores.js';
+	$: if ($dc && $dc.dc) {
+		$dc.dc.onmessage = (event) => {
 			console.log(event.data);
 		};
 	}
@@ -24,11 +18,6 @@
 	const { find, findKey, mapValues } = pkg;
 
 	let bottomAppBar;
-
-	import { msg_oper } from '$lib/js/stores.js';
-	$: if ($msg_oper) {
-		console.log($msg_oper);
-	}
 
 	$: if (data.question) {
 		q_visibility = 'hidden';

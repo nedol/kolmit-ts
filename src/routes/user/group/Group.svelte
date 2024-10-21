@@ -21,16 +21,14 @@
   import pkg from 'lodash';
   const { mapValues, find } = pkg;
 
-  export let oper_display;
-
+  export let rtc, oper_display;
 
   import {
     signal,
     users,
     langs,
-    dc_user,
-    msg_oper,
-    msg_user,
+    dc,
+    msg,
     call_but_status,
   } from '$lib/js/stores.js';
 
@@ -53,34 +51,28 @@
     // Authorization: `Bearer ${token}`
   };
 
-  $: if ($msg_user) {
-    onMessage($msg_user);
-
+  $: if ($msg) {
+    onMessage($msg);
   }
 
   $: if ($call_but_status === 'active') {
-
     GetOperators({
       type: 'user',
       func: 'operators',
       abonent: operator.abonent,
       operator: operator.operator,
     });
-  }else if($call_but_status === 'inactive'){
-    group =  group = [];
+  } else if ($call_but_status === 'inactive') {
+    group = group = [];
   }
 
   async function GetOperators(par: any) {
-    $signal.SendMessage(par,(data)=>{
-     onMessage({ operators: data.resp });
+    $signal.SendMessage(par, (data) => {
+      onMessage({ operators: data.resp });
     });
   }
 
-
-
-
   function OnClickUser() {}
-
 
   onMount(async () => {
     // SendCheck({ func: 'check', type: 'user', abonent: operator.abonent, em: operator.em });
@@ -100,7 +92,7 @@
   }
 
   function onMessage(data) {
-    console.log()
+    console.log();
     if (data.operators) {
       Object.keys(data.operators).map((el) => {
         if (
@@ -110,14 +102,11 @@
           group.push(data.operators[el]);
         } else {
           const ind = group.indexOf(data.operators[el]);
-          if(ind!==-1)
-          group.splice(ind, 1);
+          if (ind !== -1) group.splice(ind, 1);
         }
       });
       group = group;
     }
-
-
 
     if (data.status === 'offer' && $call_but_status === 'active') {
       // if(data.operator===uid){
@@ -136,14 +125,14 @@
         group?.push(el);
         group = group;
       }
-      $msg_user = '';
+      $msg = '';
     } else if (data.status === 'close') {
-      console.log()
+      console.log();
       let el = find(group, { uid: data.operator });
       const ind = group.indexOf(el);
       group.splice(ind, 1);
       group = group;
-      $msg_user = '';
+      $msg = '';
     }
   }
 </script>
@@ -168,7 +157,7 @@
           }}
         >
           <Item style="text-align: center">
-            <User bind:user_={user} bind:group {OnClickUpload} />
+            <User bind:user_={user} bind:group {OnClickUpload} {rtc}/>
             <Supporting>
               <Label>{user.name}</Label>
             </Supporting>

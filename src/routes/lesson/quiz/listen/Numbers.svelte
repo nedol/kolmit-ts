@@ -1,8 +1,8 @@
 <script lang="ts">
   import { onMount, onDestroy } from 'svelte';
 
-  // import Speak from './Speak.svelte';
-  
+  import Speak from './Speak.svelte';
+
   import moment from 'moment';
   moment.locale('nl-be');
   // import 'moment/locale/nl';
@@ -15,20 +15,12 @@
     mdiShuffle,
   } from '@mdi/js';
 
-  import { NumberString,numberToDutchString } from './Listen.numbers';
+  import { NumberString, numberToDutchString } from './Listen.numbers';
 
   import TTS from '../../../speech/tts/Tts.svelte';
   let tts;
 
-
-  import { lesson } from '$lib/js/stores.js';
-  import { dc_user } from '$lib/js/stores.js';
-  import { dc_oper } from '$lib/js/stores.js';
-  import { dc_oper_state } from '$lib/js/stores.js';
-  import { dc_user_state } from '$lib/js/stores.js';
-  import { langs, llang } from '$lib/js/stores.js';
-
-  import { dicts } from '$lib/js/stores.js';
+  import { dicts, lesson, dc_state, dc, langs, llang } from '$lib/js/stores.js';
 
   let dict = $dicts;
 
@@ -67,8 +59,8 @@
     onChangeClick();
   }
 
-  $: if ($dc_oper_state) {
-    switch ($dc_oper_state) {
+  $: if ($dc_state) {
+    switch ($dc_state) {
       case 'open':
         share_button = true;
         break;
@@ -80,7 +72,7 @@
     }
   }
 
-  $: if ($dc_user_state) {
+  $: if ($dc_state) {
     share_button = true;
   }
 
@@ -101,14 +93,11 @@
   let digit = 10;
   let div_input;
 
-  onMount(async () => {
-
-  });
+  onMount(async () => {});
 
   async function SendToPartner() {
-    if (share_mode && ($dc_user || $dc_oper)) {
-      let dc = $dc_user || $dc_oper;
-      await dc.SendData(
+    if (share_mode && dc) {
+      await $dc.SendData(
         {
           lesson: { quiz: 'dialog.client' },
         },
@@ -122,12 +111,8 @@
   // Пример использования
   // console.log(numberToEnglishString(42)); // Вывод: "forty-two"
 
-
-
   function Generate() {
-
-      generateNumber();
-    
+    generateNumber();
   }
 
   function generateAlphabet() {
@@ -154,8 +139,6 @@
 
     div_input.focus();
   }
-
-
 
   function checkInput() {
     userContent = userContent
@@ -216,7 +199,7 @@
 
   async function speak(text) {
     //Speak(text);
-    tts.Speak_server($llang,text)
+    tts.Speak_server($llang, text);
   }
 
   function repeat() {
@@ -224,7 +207,7 @@
     // Например, можно использовать Text-to-Speech API или библиотеку для озвучивания
 
     speak(numberToDutchString(generatedValue));
-    
+
     div_input.focus();
   }
 
@@ -239,9 +222,9 @@
     data.quiz = data.quiz === 'dialog.client' ? 'dialog' : 'dialog.client';
     let client_quiz =
       data.quiz === 'dialog.client' ? 'dialog' : 'dialog.client';
-    let dc = $dc_user || $dc_oper;
-    if (dc)
-      dc.SendData({ lesson: data }, () => {
+
+    if ($dc)
+      $dc.SendData({ lesson: data }, () => {
         console.log();
       });
   }
@@ -305,10 +288,10 @@
   });
 </script>
 
-<link
+<!-- <link
   rel="stylesheet"
   href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0"
-/>
+/> -->
 
 <TTS bind:this={tts}></TTS>
 <!-- <RV bind:this={voice}></RV> -->

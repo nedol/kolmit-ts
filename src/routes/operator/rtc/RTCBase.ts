@@ -6,13 +6,12 @@ import { ice_conf } from '$lib/ice_conf';
 import { call_but_status } from '$lib/js/stores.js';
 
 export class RTCBase {
-	constructor(operator, uid, signal) {
+	constructor(operator, name, signal) {
 		this.signal = signal;
-		this.type = operator.type;
 		this.abonent = operator.abonent;
 		this.operator = operator.operator;
-		this.role = operator.role;
-		this.uid = uid;
+		this.name = name;
+		this.target = '';
 		this.status;
 
 		this.pcPull = {};
@@ -30,20 +29,6 @@ export class RTCBase {
 		// this.vr.open();
 	}
 
-	async SendCheck() {
-		let par = {};
-		par.proj = 'kolmit';
-		par.func = 'check';
-		par.status = 'check';
-		par.type = this.type;
-		par.abonent = this.abonent;
-		par.operator = this.operator;
-		par.uid = this.uid;
-		// par.abonent = this.abonent.toLowerCase();
-		this.signal.SendMessage(par, (resp) => {
-			this.status = 'check';
-		});
-	}
 
 	SendVideoOffer(key) {
 		this.pcPull[key].params['loc_desc'] = '';

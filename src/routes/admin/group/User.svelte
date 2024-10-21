@@ -9,7 +9,10 @@
     MediaContent,
   } from '@smui/card';
 
-  export let abonent, operator, poster  = '/assets/operator.svg', name;
+  export let abonent,
+    operator,
+    poster = '/assets/operator.svg',
+    name;
 
   import { click_call_func } from '$lib/js/stores.js';
 
@@ -20,12 +23,12 @@
   import pkg from 'lodash';
   const { groupBy, find } = pkg;
 
-  import { msg_user } from '$lib/js/stores.js';
-  $: if ($msg_user) {
-    // if ($msg_user.operator) {
-    // 	if ($msg_user.operator === operator) OnMessage($msg_user);
+  import { msg } from '$lib/js/stores.js';
+  $: if ($msg) {
+    // if ($msg.operator) {
+    // 	if ($msg.operator === operator) OnMessage($msg);
     // } else {
-    // console.log('$msg_user:', $msg_user);
+    // console.log('$msg:', $msg);
     OnMessage($msg_user);
   }
 
@@ -118,8 +121,6 @@
     position: relative;
     scale: 0.8;
     bottom: 20px;
-
-
   }
   video {
     display: block;

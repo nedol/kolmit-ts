@@ -1,5 +1,5 @@
 // import {log} from './utils'n
-  import { msg_user} from '$lib/js/stores';
+  import { msg} from '$lib/js/stores';
 
 export class Peer {
 	constructor(rtc, pc_config, pc_key) {
@@ -9,6 +9,7 @@ export class Peer {
 		this.pc_key = pc_key;
 		this.params = {};
 		this.pc_config = pc_config;
+		this.answer = false;
 	}
 
 	async SendDesc(desc) {
@@ -17,12 +18,9 @@ export class Peer {
 		par.proj = 'kolmit';
 		par.func = 'call';
 		par.abonent = that.rtc.abonent;
-		par.type = this.rtc.type;
 		par.operator = this.rtc.operator;
-		par.uid = this.rtc.uid;
 		par.desc = desc; //.sdp.replace(/max-message-size:([0-9]+)/g, 'max-message-size:'+262144+'\r\n');
 		par.status = 'call';
-		par.oper_uid = this.rtc.oper_uid;
 
 		return await this.signal.SendMessage(par);
 	}
@@ -32,13 +30,11 @@ export class Peer {
 		let par = {};
 		par.proj = 'kolmit';
 		par.func = 'call';
-		par.type = this.rtc.type;
-		par.uid = this.rtc.uid;
 		par.operator = this.rtc.operator;
 		par.cand = cand;
 		par.status = 'call';
 		par.abonent = that.rtc.abonent;
-		par.oper_uid = this.rtc.oper_uid;
+
 
 		return await this.signal.SendMessage(par);
 	}
@@ -49,8 +45,6 @@ export class Peer {
 		par.proj = 'kolmit';
 		par.func = 'offer';
 		par.abonent = this.rtc.abonent;
-		par.type = this.rtc.type;
-		par.uid = this.rtc.uid;
 		par.operator = this.rtc.operator;
 		par.desc = this.params['loc_desc']; //.sdp.replace(/max-message-size:([0-9]+)/g, 'max-message-size:'+262144+'\r\n');
 		par.cand = this.params['loc_cand'];
@@ -62,6 +56,7 @@ export class Peer {
 	
 		return res;
 	}
+
 
 	StartEvents() {
 		let that = this;
@@ -105,7 +100,12 @@ export class Peer {
 
 				if (!timr) {
 					timr = setTimeout(() => {
-						this.SendOffer();
+						if (this.answer){
+							this.rtc.SendAnswer();
+							this.answer = false;
+						} else{
+							this.SendOffer();							
+						}
 						clearTimeout(timr);
 					}, 1000);
 				}
@@ -132,6 +132,7 @@ export class Peer {
 		let that = this;
 		console.log('Answer from pcPull 2:' /* + desc.sdp*/, this);
 		console.log('setLocalDescription start', that);
+		this.answer = true;
 		that.con.setLocalDescription(desc).then(function () {
 			that.params['loc_desc'] = that.con.localDescription;
 			console.log('onSetLocalDescriptionSuccess', that);
@@ -165,6 +166,7 @@ export class Peer {
 
 	onCreateAnswerError(error) {
 		console.log('Failed to create answer: ' + error.toString(), this);
+		this.answer = false;
 	}
 
 	onCreateOfferSuccess(desc) {

@@ -24,10 +24,8 @@
   //  import { Speak } from '/src/routes/speech/tts/VoiceRSS';
 
   import { lesson } from '$lib/js/stores.js';
-  import { dc_user } from '$lib/js/stores.js';
-  import { dc_oper } from '$lib/js/stores.js';
-  import { dc_oper_state } from '$lib/js/stores.js';
-  import { dc_user_state } from '$lib/js/stores.js';
+  import { dc} from '$lib/js/stores.js'
+  import { dc_state } from '$lib/js/stores.js';
   import { langs, llang } from '$lib/js/stores.js';
 
   import { dicts } from '$lib/js/stores.js';
@@ -71,8 +69,8 @@
     onChangeClick();
   }
 
-  $: if ($dc_oper_state) {
-    switch ($dc_oper_state) {
+  $: if ($dc_state) {
+    switch ($dc_state) {
       case 'open':
         share_button = true;
         break;
@@ -84,7 +82,7 @@
     }
   }
 
-  $: if ($dc_user_state) {
+  $: if ($dc_state) {
     share_button = true;
   }
 
@@ -123,9 +121,8 @@
     });
 
   async function SendToPartner() {
-    if (share_mode && ($dc_user || $dc_oper)) {
-      let dc = $dc_user || $dc_oper;
-      await dc.SendData(
+    if (share_mode && $dc) {
+      await $dc.SendData(
         {
           lesson: { quiz: 'dialog.client' },
         },
@@ -206,7 +203,7 @@
   }
 
   async function speak(text) {
-    tts.Speak($llang,text);
+    tts.Speak($llang, text);
   }
 
   function repeat() {
@@ -297,10 +294,10 @@
   });
 </script>
 
-<link
+<!-- <link
   rel="stylesheet"
   href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0"
-/>
+/> -->
 
 <TTS bind:this={tts}></TTS>
 <!-- <RV bind:this={rv}></RV> -->

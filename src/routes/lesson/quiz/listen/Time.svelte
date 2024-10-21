@@ -21,15 +21,7 @@
   import TTS from '../../../speech/tts/Tts.svelte';
   let tts;
 
-
-  import { lesson } from '$lib/js/stores.js';
-  import { dc_user } from '$lib/js/stores.js';
-  import { dc_oper } from '$lib/js/stores.js';
-  import { dc_oper_state } from '$lib/js/stores.js';
-  import { dc_user_state } from '$lib/js/stores.js';
-  import { langs, llang } from '$lib/js/stores.js';
-
-  import { dicts } from '$lib/js/stores.js';
+  import { lesson , dc, dc_state ,langs, llang , dicts } from '$lib/js/stores.js';
 
   let dict = $dicts;
 
@@ -68,8 +60,8 @@
     onChangeClick();
   }
 
-  $: if ($dc_oper_state) {
-    switch ($dc_oper_state) {
+  $: if ($dc_state) {
+    switch ($dc_state) {
       case 'open':
         share_button = true;
         break;
@@ -494,10 +486,10 @@
   });
 </script>
 
-<link
+<!-- <link
   rel="stylesheet"
   href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0"
-/>
+/> -->
 
 <TTS bind:this={tts}></TTS>
 <!-- <RV bind:this={voice}></RV> -->

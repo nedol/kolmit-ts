@@ -10,8 +10,7 @@
     langs,
     llang,
     dicts,
-    dc_oper_state,
-    dc_user_state,
+    dc_state,
   } from '$lib/js/stores.js';
 
   import { mdiEarHearing } from '@mdi/js';
@@ -113,26 +112,25 @@
     }
   }
 </script>
-{#if $dc_user_state === 'close' && $dc_oper_state === 'close'}
-  <div class="speaker-button">
-  <IconButton
-    on:click={() => {
-      PlayAutoText(data.html);
-    }}
-  >
-    <Icon tag="svg" viewBox="0 0 24 24">
-      <path fill={playAutoColor} d={mdiEarHearing} />
-    </Icon>
-  </IconButton>
 
-</div>
-{/if}
+
 
 <div style="height:300vh; overflow-y:auto;font-size:smaller;color:#2196f3">
-  {@html data.html}
+  {#if $dc_state === 'close'}
+  <div class="speaker-button">
+    <IconButton
+      on:click={() => {
+        PlayAutoText(data.html);
+      }}
+    >
+      <Icon tag="svg" viewBox="0 0 24 24">
+        <path fill={playAutoColor} d={mdiEarHearing} />
+      </Icon>
+    </IconButton>
   </div>
-
-
+   { data.html}
+{/if}
+</div>
 
 <style>
   ::selection {
@@ -140,7 +138,7 @@
     background: rgb(190, 201, 205);
   }
 
-   .speaker-button {
+  .speaker-button {
     display: inline-flex;
     float: right;
     font-size: large;

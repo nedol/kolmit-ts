@@ -28,12 +28,9 @@
     dicts,
     llang,
     view,
-    dc_oper,
-    dc_user,
-    dc_oper_state,
-    dc_user_state,
-    msg_user,
-    msg_oper,
+    dc,
+    dc_state,
+    msg,
     call_but_status,
     showBottomAppBar,
     OnCheckQU,
@@ -132,23 +129,23 @@
 
   let variant = 'outlined';
 
-  $: if ($msg_user) {
-    if ($msg_user.lesson?.quiz === 'dialog') {
-      dialog_data = $msg_user.lesson.dialog_data;
-      isFlipped = !$msg_user.lesson.isFlipped;
-      cur_qa = $msg_user.lesson.cur_qa;
+  $: if ($msg) {
+    if ($msg.lesson?.quiz === 'dialog') {
+      dialog_data = $msg.lesson.dialog_data;
+      isFlipped = !$msg.lesson.isFlipped;
+      cur_qa = $msg.lesson.cur_qa;
       visibility[1] = 'hidden';
       visibility[2] = 'hidden';
       visibility_cnt = 1;
       Dialog();
       $OnCheckQU(null, 'dialog', dialog_data.name);
     }
-    if ($msg_user.command === 'repeat') {
+    if ($msg.command === 'repeat') {
       isRepeat = true;
       setTimeout(() => {
         isRepeat = false;
       }, 2000);
-    } else if ($msg_user.command === 'thumb') {
+    } else if ($msg.command === 'thumb') {
       isThumb = true;
       setTimeout(() => {
         isThumb = false;
@@ -156,49 +153,49 @@
           onNextQA();
         }
       }, 2000);
-    } else if ($msg_user.command === 'quit') {
-      $msg_user.command = '';
+    } else if ($msg.command === 'quit') {
+      $msg.command = '';
       setTimeout(() => {
         $lesson.data = { quiz: '' };
       }, 100);
     }
   }
 
-  $: if ($msg_oper) {
-    // console.log($msg_oper);
-    if ($msg_oper.lesson?.quiz === 'dialog') {
-      dialog_data = $msg_oper.lesson.dialog_data;
-      isFlipped = !$msg_oper.lesson.isFlipped;
-      cur_qa = $msg_oper.lesson.cur_qa;
+  $: if ($msg) {
+    // console.log($msg);
+    if ($msg.lesson?.quiz === 'dialog') {
+      dialog_data = $msg.lesson.dialog_data;
+      isFlipped = !$msg.lesson.isFlipped;
+      cur_qa = $msg.lesson.cur_qa;
       visibility[1] = 'hidden';
       visibility[2] = 'hidden';
       visibility_cnt = 1;
       Dialog();
       $OnCheckQU(null, 'dialog', dialog_data.name);
     }
-    if ($msg_oper.command === 'repeat') {
+    if ($msg.command === 'repeat') {
       isRepeat = true;
       setTimeout(() => {
         isRepeat = false;
       }, 2000);
-    } else if ($msg_oper.command === 'thumb') {
+    } else if ($msg.command === 'thumb') {
       isThumb = true;
       setTimeout(() => {
         isThumb = false;
       }, 2000);
-    } else if ($msg_oper.command === 'quit') {
-      $msg_oper.command = '';
+    } else if ($msg.command === 'quit') {
+      $msg.command = '';
       setTimeout(() => {
         $lesson.data = { quiz: '' };
       }, 100);
     }
   }
 
-  $: if ($msg_oper?.msg || $msg_user?.msg) {
+  $: if ($msg?.msg || $msg?.msg) {
     (async () => {
-      alert(await Translate($msg_oper?.msg || $msg_user?.msg, 'ru', $langs));
-      // $msg_oper?.msg = ''; $msg_user?.msg =  '';
-      // $msg_user ? ($msg_user.msg = '') : ($msg_oper.msg = '');
+      alert(await Translate($msg?.msg || $msg?.msg, 'ru', $langs));
+      // $msg?.msg = ''; $msg?.msg =  '';
+      // $msg ? ($msg.msg = '') : ($msg.msg = '');
     })();
   }
 
@@ -223,8 +220,7 @@
   }
 
   onMount(async () => {
-
-     window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
     setTimeout(() => {
       if (!share_mode) {
         // $showBottomAppBar = false; //test
@@ -300,18 +296,18 @@
 
       q[$llang] = q[$llang]?.replace(
         '${user1_name}',
-        $dc_user ? 'user_name' : 'Kolmit'
+        $dc ? 'user_name' : 'Kolmit'
       );
       q[$langs] = q[$langs]?.replace(
         '${user1_name}',
-        $dc_user ? 'user_name' : 'Kolmit'
+        $dc ? 'user_name' : 'Kolmit'
       );
       q[$llang] = q[$llang]?.replace('${user2_name}', operator.name);
       q[$langs] = q[$langs]?.replace('${user2_name}', operator.name);
 
       q_shfl = q[$llang].slice(0);
 
-      const dc = $dc_user?.dc.readyState === 'open' ? $dc_user : $dc_oper;
+      const dc = $dc?.dc.readyState === 'open' ? $dc : '';
 
       // if (!dc && !isFlipped) speak(q[$llang]);
 
@@ -329,11 +325,11 @@
       a[$langs] = a[$langs]?.replace('${user2_name}', operator.name);
       a[$llang] = a[$llang]?.replace(
         '${user1_name}',
-        $dc_user ? 'user_name' : 'Kolmit'
+        $dc ? 'user_name' : 'Kolmit'
       );
       a[$langs] = a[$langs]?.replace(
         '${user1_name}',
-        $dc_user ? 'user_name' : 'Kolmit'
+        $dc ? 'user_name' : 'Kolmit'
       );
 
       hints = a.hints;
@@ -402,12 +398,12 @@
   }
 
   async function SendData() {
-    const dc = $dc_user?.dc.readyState === 'open' ? $dc_user : $dc_oper;
+    const dc = $dc?.dc.readyState === 'open' ? $dc : '';
 
     if (share_mode && dc) {
       dialog_data.content[cur_qa].user2['a_shfl'] = a_shfl;
 
-      $msg_user = $msg_oper = null; //предотвр.повтор isFlipped
+      $msg = $msg = null; //предотвр.повтор isFlipped
 
       await dc.SendData(
         {
@@ -444,7 +440,7 @@
     const client_quiz =
       data.quiz === 'dialog.client' ? 'dialog' : 'dialog.client';
 
-    const dc = $dc_user?.dc.readyState === 'open' ? $dc_user : $dc_oper;
+    const dc = $dc?.dc.readyState === 'open' ? $dc : '';
 
     dialog_data.content[cur_qa].user2['a_shfl'] = a_shfl;
     if (dc && share_mode) SendData();
@@ -577,7 +573,7 @@
 
     if (ev) ev.target.style.color = 'red';
 
-    const dc = $dc_user?.dc.readyState === 'open' ? $dc_user : $dc_oper;
+    const dc = $dc?.dc.readyState === 'open' ? $dc : '';
 
     if (dc) {
       return new Promise((resolve) => {
@@ -649,8 +645,6 @@
     tts.Speak_server($langs, active, onEndSpeak);
   }
 
-
-
   onDestroy(async () => {
     // voice.Cancel();
     $lesson.data = { quiz: '' };
@@ -664,10 +658,10 @@
   });
 </script>
 
-<link
+<!-- <link
   rel="stylesheet"
   href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0"
-/>
+/> -->
 
 <Tts bind:this={tts}></Tts>
 
@@ -702,7 +696,7 @@
           {/if}
         </Section>
         <Section align="start">
-          {#if $dc_user_state === 'close' && $dc_oper_state === 'close'}
+          {#if $dc_state === 'close'}
             <IconButton on:click={PlayAutoContent}>
               <Icon tag="svg" viewBox="0 0 24 24">
                 <path fill={playAutoColor} d={mdiEarHearing} />
@@ -1102,8 +1096,7 @@
       <br />
 
       {#if dialog_data.html}
- 
-        <ConText data={dialog_data} {tts}/>
+        <ConText data={dialog_data} {tts} />
       {/if}
     {:else}
       <div style="text-align:center">

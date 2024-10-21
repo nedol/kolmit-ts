@@ -1,252 +1,218 @@
 import { writable } from 'svelte/store';
 import { DataChannelOperator } from './DataChannelOperator';
 import { RTCBase } from './RTCBase';
-
-// import {log} from './utils'
-
 import { langs } from '$lib/js/stores.js';
-
-import { msg_oper } from '$lib/js/stores.js';
-
-// export const msg = writable('');
+import { msg } from '$lib/js/stores.js';
 
 export class RTCOperator extends RTCBase {
-	constructor(operator, uid, signal) {
-		super(operator, uid, signal);
+  constructor(operator, name, signal) {
+    super(operator, name, signal);
 
-		this.checking_tmr;
+    this.checking_tmr;
 
-		msg_oper.subscribe((data) => {
-			try {
-				if (data) {
-					this.OnMessage(data);
-				}
-			} catch (ex) {
-				console.log(ex);
-			}
-		});
-	}
+    msg.subscribe((data) => {
+      try {
+        if (data) {
+          this.OnMessage(data);
+        }
+      } catch (ex) {
+        console.log(ex);
+      }
+    });
+  }
 
-	Init(cb) {
-		let that = this;
+  Init(cb) {
+    let that = this;
+    this.mode = '';
+    let transAr = [that.abonent];
+    that.main_pc = '';
+    for (let i in transAr) {
+      that.InitRTC(transAr[i], function () {
+        cb();
+      });
+    }
+  }
 
-		this.mode = '';
-		let transAr = [that.abonent];
-		that.main_pc = '';
-		for (let i in transAr) {
-			that.InitRTC(transAr[i], function () {
-				cb();
-			});
-		}
-	}
+  SendStatus(status) {
+    let par = {};
+    par.proj = 'kolmit';
+    par.func = 'status';
+    par.abonent = this.abonent.toLowerCase();
+    par.operator = this.operator.toLowerCase();
+    par.status = status;
+    this.signal.SendMessage(par, () => {
+      this.status = status;
+    });
+  }
 
-	SendOffer(key) {
-		let that = this;
+  SendOffer(key) {
+    let that = this;
+    that.pcPull[key].params['loc_desc'] = '';
+    that.pcPull[key].params['loc_cand'] = '';
 
-		that.pcPull[key].params['loc_desc'] = '';
-		that.pcPull[key].params['loc_cand'] = '';
+    that.pcPull[key].con
+      .createOffer(
+        (this.mode = {
+          offerToReceiveAudio: 1,
+          offerToReceiveVideo: 0,
+        })
+      )
+      .then(
+        (desc) => that.pcPull[key].onCreateOfferSuccess(desc),
+        that.pcPull[key].onCreateOfferError
+      );
+  }
 
-		//log('pcPull createOffer start', that);
-		that.pcPull[key].con
-			.createOffer(
-				(this.mode = {
-					offerToReceiveAudio: 1,
-					offerToReceiveVideo: 0 // test 0
-					// iceRestart: 1
-				})
-			)
-			.then(
-				(desc) => that.pcPull[key].onCreateOfferSuccess(desc),
-				that.pcPull[key].onCreateOfferError
-			);
-	}
+  SendVideoOffer(key) {
+    this.SendOffer(key); // или можно вызвать SendVideoOffer из базового класса при необходимости
+  }
 
-	SendStatus(status) {
-		let par = {};
-		par.proj = 'kolmit';
-		par.func = 'status';
-		par.type = this.type;
-		par.abonent = this.abonent;
-		par.uid = this.uid;
-		par.operator = this.operator;
-		par.status = status;
-		this.status = status;
-		return new Promise((resolve, reject) => {
-			this.signal.SendMessage(par, (data) => {
-				resolve(data);
-			});
-		});
-	}
+  async Offer() {
+    this.Init(() => {
+      if (this.pcPull[this.abonent].con.signalingState !== 'closed') {
+        this.GetUserMedia({ audio: 1, video: 0 }, () => {
+          this.SendOffer(this.abonent);
+        });
+      }
+    });
+  }
 
-	SendVideoOffer(key) {
-		let that = this;
-		that.pcPull[key].params['loc_desc'] = '';
-		that.pcPull[key].params['loc_cand'] = '';
+  async SendAnswer() {
+    let that = this;
+    let par = {};
+    par.proj = 'kolmit';
+    par.func = 'call';
+    par.abonent = this.abonent;
+    par.target = this.target;
+    par.desc = this.pcPull[this.abonent].params['loc_desc']; //.sdp.replace(/max-message-size:([0-9]+)/g, 'max-message-size:'+262144+'\r\n');
+    par.cand = this.pcPull[this.abonent].params['loc_cand'];
+    par.status = 'call';
 
-		that.pcPull[key].con
-			.createOffer(
-				(that.mode = {
-					offerToReceiveAudio: 1,
-					offerToReceiveVideo: 1,
-					iceRestart: 1
-				})
-			)
-			.then(
-				(desc) => that.pcPull[key].onCreateVideoOfferSuccess(desc),
-				that.pcPull[key].onCreateOfferError
-			);
-	}
+    return await this.signal.SendMessage(par);
+  }
 
-	async Offer() {
-		this.Init(() => {
-			if (this.pcPull[this.abonent].con.signalingState !== 'closed') {
-				this.GetUserMedia({ audio: 1, video: 0 }, () => {
-					this.SendOffer(this.abonent);
-				});
-			}
-		});
-	}
+  Call(user) {
+    this.Init(() => {
+      this.GetUserMedia({ audio: 1, video: 0 }, () => {
+        // document.getElementsByClassName('browser_container')[0].style.display = 'none';
+        let par = {};
+        par.proj = 'kolmit';
+        par.func = 'call';
+        par.status = 'call';
+        par.type = 'user';
+        par.abonent = this.abonent.toLowerCase();
+        par.operator = this.operator.toLowerCase();
+        par.user = user;
+        par.name = 'user';
+        this.signal.SendMessage(par, () => {
+          this.status = 'call';
+        });
+      });
+    });
+  }
 
-	OnActive() {
-		this.Init(() => {
-			if (this.pcPull[this.abonent].con.signalingState !== 'closed') {
-				this.GetUserMedia({ audio: 1, video: 0 }, (res) => {
-					if (res) {
-						this.SendOffer(this.abonent);
-					}
-				});
-			}
-		});
-	}
+  OnActive() {
+    this.Init(() => {
+      if (this.pcPull[this.abonent].con.signalingState !== 'closed') {
+        this.GetUserMedia({ audio: 1, video: 0 }, (res) => {
+          if (res) {
+            this.SendOffer(this.abonent);
+          }
+        });
+      }
+    });
+  }
 
-	OnCall() {
-		if (this.DC) {
-			//this.DC.SendDCTalk();
-			clearInterval(this.DC.inter);
-		}
+  OnCall() {
 
-		this.SendStatus('call');
+    setTimeout(() => {
+      this.DC.SendDCCall();
+    }, 2000);
+    // this.SendStatus('call');
+  }
 
-		// $('i.video').on('click', () => {
-		//     $('i.video').off('click');
-		//     that.localSound.muted = 'true';
-		//     $(that.localVideo).css('display', 'inline-block');
-		//     if (that.DC.dc.readyState === 'open') {
-		//         that.GetUserMedia({video: 1}, function () {
-		//             that.SendVideoOffer(that.main_pc);
-		//         });
-		//     }
-		// });
-	}
+  OnTalk() {
+    if (this.DC) {
+      this.DC.SendDCTalk();
+    }
 
-	OnTalk() {
-		if (this.DC) {
-			this.DC.SendDCTalk();
-		}
+    this.SendStatus('talk');
+  }
 
-		this.SendStatus('talk');
+  OnHangup() {
+    this.RemoveTracks();
+    if (this.DC) {
+      this.DC.SendDCHangup(() => {});
+    }
+  }
 
-		// $('i.video').css('display', 'inline-block');
+  OnInactive() {
+    if (
+      this.DC &&
+      (this.DC.dc.readyState === 'open' ||
+        this.DC.dc.readyState === 'connecting')
+    ) {
+      this.RemoveTracks();
+      // this.DC.SendDCClose();
+      this.SendStatus('close');
+    }
+  }
 
-		// $('i.video').on('click', () => {
-		//     $('i.video').off('click');
-		//     that.localSound.muted = 'true';
-		//     $(that.localVideo).css('display', 'inline-block');
-		//     if (that.DC.dc.readyState === 'open') {
-		//         that.GetUserMedia({video: 1}, function () {
-		//             that.SendVideoOffer(that.main_pc);
-		//         });
-		//     }
-		// });
-	}
+  OnMessage(data) {
+    let that = this;
 
-	OnHangup() {
-		this.RemoveTracks();
-		if (this.DC)
-			this.DC.SendDCHangup(() => {
-				//this.OnInit();
-			});
+    if (data.func === 'call') {
+    }
 
-		// $(ev.target).trigger('click');
-	}
+    if (data.func === 'mute') {
+      this.RemoveTracks();
+    }
 
-	OnInactive() {
+    if (data.func === 'talk') {
 
-		if (this.DC && (this.DC.dc.readyState === 'open' || this.DC.dc.readyState === 'connecting')) {
-			this.RemoveTracks();
-			this.DC.SendDCClose()
-			this.SendStatus('close');
-			// setTimeout(()=>{
-			// 	this.DC.dc.close();
-			// }, 100)
-		}
-	}
+    }
 
-	OnMessage(data) {
-		let that = this;
+    if (data.func === 'redirect') {
+    }
 
-		if (data.func === 'call') {
-		}
+    if (data.func === 'video') {
+    }
 
-		if (data.func === 'mute') {
-			this.RemoveTracks();
-			// this.OnInit();
-		}
+    if (data.desc && that.pcPull[data.abonent]) {
+      if (
+        that.pcPull[data.abonent].con &&
+        (that.pcPull[data.abonent].con.connectionState === 'failed' ||
+          that.pcPull[data.abonent].con.connectionState === 'disconnected')
+      )
+        that.pcPull[data.abonent].con.restartIce();
 
-		if (data.func === 'talk') {
-			clearInterval(that.DC.inter);
-		}
+		that.target = data.target;	
+      that.pcPull[data.abonent].params['rem_desc'] = data.desc;
+      that.pcPull[data.abonent].setRemoteDesc(data.desc);
+    }
 
-		if (data.func === 'redirect') {
-		}
-
-		if (data.func === 'video') {
-		}
-
-		if (data.desc && that.pcPull[data.abonent]) {
-			if (
-				that.pcPull[data.abonent].con &&
-				(that.pcPull[data.abonent].con.connectionState === 'failed' ||
-					that.pcPull[data.abonent].con.connectionState === 'disconnected')
-			)
-				that.pcPull[data.abonent].con.restartIce();
-
-			if (that.pcPull[data.abonent]) {
-				that.pcPull[data.abonent].params['rem_desc'] = data.desc;
-				that.pcPull[data.abonent].setRemoteDesc(data.desc);
-			}
-		}
-
-		if (data.cand && that.pcPull[data.abonent]) {
-			if (that.pcPull[data.abonent]) {
-				if (
-					!that.pcPull[data.abonent].con ||
-					that.pcPull[data.abonent].con.signalingState === 'closed'
-				) {
-					return;
-				}
-				try {
-					that.pcPull[data.abonent].params['rem_cand'] = data.cand;
-					if (Array.isArray(data.cand)) {
-						for (let c in data.cand) {
-							if (data.cand[c]) that.pcPull[data.abonent].con.addIceCandidate(data.cand[c]);
-							console.log(
-								' Remote ICE candidate: \n' +
-									(data.cand[c] ? JSON.stringify(data.cand[c]) : '(null)'),
-								that
-							);
-						}
-					} else {
-						if (data.cand) that.pcPull[data.abonent].con.addIceCandidate(data.cand);
-						console.log(
-							' Remote ICE candidate: \n' + (data.cand ? JSON.stringify(data.cand) : '(null)'),
-							that
-						);
-					}
-				} catch (ex) {
-					log(ex);
-				}
-			}
-		}
-	}
+    if (data.cand && that.pcPull[data.abonent]) {
+      if (
+        !that.pcPull[data.abonent].con ||
+        that.pcPull[data.abonent].con.signalingState === 'closed'
+      ) {
+        return;
+      }
+		try {
+		  	that.target = data.target;	
+        that.pcPull[data.abonent].params['rem_cand'] = data.cand;
+        if (Array.isArray(data.cand)) {
+          for (let c in data.cand) {
+            if (data.cand[c])
+              that.pcPull[data.abonent].con.addIceCandidate(data.cand[c]);
+          }
+        } else {
+          if (data.cand)
+            that.pcPull[data.abonent].con.addIceCandidate(data.cand);
+        }
+      } catch (ex) {
+        log(ex);
+      }
+    }
+  }
 }
