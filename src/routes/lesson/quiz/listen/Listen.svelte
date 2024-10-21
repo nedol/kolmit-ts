@@ -23,12 +23,7 @@
 
   //  import { Speak } from '/src/routes/speech/tts/VoiceRSS';
 
-  import { lesson } from '$lib/js/stores.js';
-  import { dc} from '$lib/js/stores.js'
-  import { dc_state } from '$lib/js/stores.js';
-  import { langs, llang } from '$lib/js/stores.js';
-
-  import { dicts } from '$lib/js/stores.js';
+  import { lesson, dc, dc_state , langs, llang , dicts } from '$lib/js/stores.js';
 
   const operator = getContext('operator');
 
@@ -226,9 +221,8 @@
     data.quiz = data.quiz === 'dialog.client' ? 'dialog' : 'dialog.client';
     let client_quiz =
       data.quiz === 'dialog.client' ? 'dialog' : 'dialog.client';
-    let dc = $dc_user || $dc_oper;
-    if (dc)
-      dc.SendData({ lesson: data }, () => {
+
+      $dc?.SendData({ lesson: data }, () => {
         console.log();
       });
   }

@@ -6,10 +6,7 @@
   import TextEdit from './text/TextEdit.svelte';
   import WordEdit from './word/WordEdit.svelte';
   import WordGameEdit from './word/WordGameEdit.svelte';
-  import { dc_state } from '$lib/js/stores.js';
-  import { dc_user_state } from '$lib/js/stores.js';
-  import { call_but_status } from '$lib/js/stores.js';
-  const dc = $dc_user_state || $dc_oper_state;
+  import { dc_state , call_but_status } from '$lib/js/stores.js';
 
   export let data;
   export let ChangeQuizName;
@@ -26,7 +23,7 @@
   {:else if data.quiz === 'text'}
     <TextEdit {data} />
   {:else if data.quiz === 'word'}
-    {#if dc && $call_but_status === 'talk'}
+    {#if $dc_state==="open" && $call_but_status === 'talk'}
       <WordGameEdit {data} />
     {:else}
       <WordEdit />

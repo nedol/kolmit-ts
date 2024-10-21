@@ -73,7 +73,7 @@
     }
   }
 
-  $: if ($dc_user_state) {
+  $: if ($dc_state) {
     share_button = true;
   }
 
@@ -97,9 +97,8 @@
   onMount(async () => {});
 
   async function SendToPartner() {
-    if (share_mode && ($dc_user || $dc_oper)) {
-      let dc = $dc_user || $dc_oper;
-      await dc.SendData(
+    if (share_mode && $dc) {
+      await $dc.SendData(
         {
           lesson: { quiz: 'dialog.client' },
         },
@@ -420,9 +419,8 @@
     data.quiz = data.quiz === 'dialog.client' ? 'dialog' : 'dialog.client';
     let client_quiz =
       data.quiz === 'dialog.client' ? 'dialog' : 'dialog.client';
-    let dc = $dc_user || $dc_oper;
-    if (dc)
-      dc.SendData({ lesson: data }, () => {
+
+      $dc?.SendData({ lesson: data }, () => {
         console.log();
       });
   }

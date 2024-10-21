@@ -7,7 +7,7 @@ operatorst.subscribe((data) => {
   oper = data;
 });
 
-import { dc_user, dc_user_state, msg, posterst } from '$lib/js/stores.js';
+import { dc_user, dc_state, msg, posterst } from '$lib/js/stores.js';
 let poster;
 posterst.subscribe((data) => {
   poster = data;
@@ -44,17 +44,17 @@ export class DataChannelUser {
         console.log('set dc_user');
         if (that.dc.readyState === 'open') {
           console.log(that.pc.pc_key + ' datachannel open');
-          dc_user_state.set('open');
+          dc_state.set('open');
         }
         that.SendDCCall();
 
         this.dc.onclose = () => {
-          dc_user_state.set('close');
+          dc_state.set('close');
           rtc.SendStatus('close');
         };
 
         this.dc.onerror = () => {
-          dc_user_state.set('close');
+          dc_state.set('close');
           rtc.SendStatus('close');
         };
       };
