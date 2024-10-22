@@ -91,13 +91,18 @@
   let checked = { dialog: {}, word: {} };
   let quiz_users = { dialog: {}, word: {} };
 
-  $: if ($msg?.add) {
+  $: if (Array.isArray($msg)) {
     try {
-      BuildQuizUsers($msg.quiz, $msg.add, $msg.type);
+      $msg.map((el) => {
+        if (el.add) {
+          BuildQuizUsers(el.quiz, el.add, el.type);
+
+          $msg = '';
+        } else if (el.rem) {
+          RemoveQuizUser(el.rem, el.type, el.quiz);
+        }
+      });
     } catch (ex) {}
-    $msg.add = '';
-  } else if ($msg?.rem) {
-    RemoveQuizUser($msg.rem, $msg.type, $msg.quiz);
   }
 
   export async function fetchLesson(owner, operator) {
@@ -361,7 +366,7 @@
 
                             {#if quiz.type === 'dialog' || quiz.type === 'word'}
                               <span
-                                style="position: relative;  right:90vw;color:red; top:-20px;"
+                                style="position: absolute; right:90vw;color:red; top:-2px;"
                               >
                                 {Date.now() -
                                   new Date(quiz.published).getTime() <
@@ -495,6 +500,7 @@
   }
   .quiz-container {
     display: flex;
+    position: relative;
     justify-content: start;
     align-items: center;
     padding: 0px; /* Установите желаемый отступ вокруг элемента */

@@ -153,7 +153,7 @@ async function HandleMessage(q, ws) {
       break;
 
     case 'quiz_users':
-      resp = await BroadcastQuizUsers(q);
+      resp = await BroadcastQuizUsers(q, ws);
       break;
 
     case 'get_subscribers':
@@ -325,7 +325,7 @@ async function getOperators(q, func) {
   return operators;
 }
 
-async function BroadcastQuizUsers(q) {
+async function BroadcastQuizUsers(q, ws) {
   let qu = await UpdateQuizUsers(q);
 
   let remAr = [q];
@@ -335,7 +335,6 @@ async function BroadcastQuizUsers(q) {
       //not to send to yourself
       continue;
 
-    if(global.rtcPool[q.abonent][operator].ws)
-      global.rtcPool[q.abonent][operator].ws.send(remAr);
+      global.rtcPool[q.abonent][operator].ws.send(JSON.stringify(remAr));
   }
 }
