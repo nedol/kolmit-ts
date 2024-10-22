@@ -175,18 +175,18 @@
     }
   }
 
+  let res_talk;
+
   $: switch ($call_but_status) {
-    case 'inactive':
-      // parent_div.removeChild(card)
-      // else parent_div.style.display  = 'none'
+    case 'talk':
+      if(typeof res_talk === "function") res_talk();
 
       break;
   }
 
-  let OnClickCallButton = function () {
+  let OnClickCallButton = function (resolve:any) {
     // if (email && email !== rtc.operator) return;
-
-    console.log();
+    res_talk = resolve;
 
     switch (status) {
       case 'inactive':
@@ -270,7 +270,7 @@
         break;
       default:
         break;
-    }
+    };
   };
 
   $users[operator] = { OnClickCallButton: OnClickCallButton };

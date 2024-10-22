@@ -4,8 +4,6 @@
   import moment from 'moment';
   moment.locale('nl-be');
 
-
-
   import { Translate } from '../translate/Transloc.js';
 
   import pkg from 'lodash';
@@ -40,7 +38,7 @@
   // import lesson_data from './lesson.json';
   let lesson_data: any;
 
-  const group = getContext('group');
+  export let group;
   const operator = getContext('operator');
 
   function findPic(operator: any) {
@@ -167,21 +165,19 @@
       par.rem = operator.operator;
     }
 
-    $signal.SendMessage(par,(data)=>{
+    $signal.SendMessage(par, (data) => {
       console.log(data.resp);
-    }); 
+    });
   };
 
   let RemoveQuizUser = function (user, type, quiz) {
-    try{
+    try {
       let obj = find(quiz_users[type][quiz], { operator: user });
       obj.type = $msg.type;
       remove(quiz_users[type][quiz], obj);
       quiz_users = quiz_users;
       $msg.rem = '';
-    }catch(ex){
-
-    }
+    } catch (ex) {}
   };
 
   function BuildQuizUsers(quiz, user, type) {
@@ -210,23 +206,27 @@
 
     if (!quiz_users[par.type][par.quiz]) quiz_users[par.type][par.quiz] = [];
 
-    $signal.SendMessage(par,(data)=>{
-        if (data && data.resp) {
-          const key = Object.keys(data.resp)[0]
-          data.resp[key].subscribers.map((user) => {
-            // BuildQuizUsers(par.quiz, user, node.attributes['type'].value);
-            if (user === operator.operator) {
-              checked[key][data.resp[key].quiz] = true;
-              return;
-            }
-            });
+    $signal.SendMessage(par, (data) => {
+      if (data && data.resp) {
+        const key = Object.keys(data.resp)[0];
+        data.resp[key].subscribers.map((user) => {
+          const quiz = data.resp.word?.quiz || data.resp.dialog?.quiz;
+          const key = Object.keys(data.resp)[0];
+          BuildQuizUsers(quiz, user, key);
+          if (user === operator.operator) {
+            checked[key][data.resp[key].quiz] = true;
+            return;
           }
-            
+        });
+        if (data.resp[key].operators) console.log(data.resp[key].operators);
+      }
     });
   }
 
-  function OnClickUserCard(user, theme, module, quiz) {
-    if ($users[user].status === 'active') $users[user]['OnClickCallButton']();
+  async function OnClickUserCard(user, theme, module, quiz) {
+    await new Promise((resolve) => {
+      $users[user]['OnClickCallButton'](resolve);
+    });
 
     onClickQuiz(
       quiz.type,
@@ -237,11 +237,10 @@
   }
 
   function SendDataDC(data, cb) {
-
     if ($dc?.dc.readyState === 'open') {
       //  words.content[cur_qa].user2['a_shfl'] = a_shfl;
       $dc.SendData(data, (res) => {
-        if(cb) cb(res)
+        if (cb) cb(res);
       });
     }
   }
@@ -361,13 +360,16 @@
                             </a><span />
 
                             {#if quiz.type === 'dialog' || quiz.type === 'word'}
-
                               <span
                                 style="position: relative;  right:90vw;color:red; top:-20px;"
                               >
-                               {Date.now() - new Date(quiz.published).getTime() < (10 * 24 * 60 * 60 * 1000)?'new':''}
+                                {Date.now() -
+                                  new Date(quiz.published).getTime() <
+                                10 * 24 * 60 * 60 * 1000
+                                  ? 'new'
+                                  : ''}
                               </span>
-                
+
                               <div class="form-field-container">
                                 <FormField>
                                   <Checkbox
@@ -387,7 +389,7 @@
                           {#if $call_but_status !== 'inactive' && quiz_users[quiz.type] && quiz_users[quiz.type][quiz.name[$llang]]}
                             <div class="user-cards">
                               {#each quiz_users[quiz.type][quiz.name[$llang]] as qu, q}
-                                {#if $users[qu.operator].status !== 'inactive'}
+                                {#if qu.operator !== operator.operator && find( group, { operator: qu.operator } )}
                                   <div
                                     on:click={() => {
                                       OnClickUserCard(

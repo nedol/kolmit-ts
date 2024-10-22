@@ -31,7 +31,8 @@
 
   // import {Dict} from '$lib/js/$dicts'
   import Group from '../user/group/Group.svelte';
-  let group = getContext('group');
+  let group_data = getContext('group_data');
+  let group = [];
 
   import { RTCOperator } from './rtc/RTCOperator';
 
@@ -535,10 +536,10 @@
 <!-- {@debug $view} -->
 
 <!-- {#if $view === 'group'} -->
-<Group  {rtc}/>
+<Group  {rtc} bind:group={group}/>
 
 {#if $view === 'lesson'}
-  <Module data={group} />
+  <Module data={group_data} bind:group={group}/>
 {/if}
 
 <div class="dialog" style="display: {dlg_display};">

@@ -165,7 +165,10 @@ async function HandleMessage(q, ws) {
         });
         if (dlg.subscribe?.length > 0) {
           resp = {
-            [q.type]: { quiz: q.quiz, subscribers: dlg.subscribe },
+            [q.type]: {
+              quiz: q.quiz,
+              subscribers: dlg.subscribe
+            },
           };
           ws?.send(JSON.stringify({ resp }));
         }

@@ -13,7 +13,7 @@
   $dicts = data.dict[0];
 
   function Init() {
-    setContext('group', data.group);
+    setContext('group_data', data.group);
     setContext('operator', data.operator[0]);
     setContext('abonent', data.abonent);
 

@@ -1,7 +1,7 @@
 <script lang="ts">
   // import RTCOperator from '../js/RTCOperator.js';
   // import { getContext } from 'svelte';
-  import { getContext, onMount } from 'svelte';
+  import { setContext,getContext, onMount } from 'svelte';
 
   import { Translate } from '../../translate/Transloc.js';
 
@@ -40,7 +40,11 @@
 
   let lang = $langs;
 
-  let group = getContext('group');
+  let group_data = getContext('group_data');
+
+  export let group = [];
+
+  setContext('group', group);
 
   let no_users_display = 'block';
 
