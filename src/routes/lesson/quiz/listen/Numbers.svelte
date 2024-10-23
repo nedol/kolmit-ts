@@ -350,7 +350,7 @@
       {/if}
       {#if isFirst}
         <button on:click={showHint} class="hint-button">
-          <span class="material-symbols-outlined"> question_mark </span>
+          <span class="material-symbols-outlined"> ? </span>
         </button>
       {/if}
 
