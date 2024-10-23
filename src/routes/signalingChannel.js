@@ -11,8 +11,8 @@ export class SignalingChannel {
     this.msg = msg;
     this.operator = operator;
 
-    this.socket = new WebSocket('ws://localhost:3000'); // URL вашего WebSocket сервера
-    //  this.socket = new WebSocket('wss://kolmit-server.onrender.com')
+    // this.socket = new WebSocket('ws://localhost:3000'); // URL вашего WebSocket сервера
+     this.socket = new WebSocket('wss://kolmit-server.onrender.com')
 
     // Обработка события при открытии соединения
     https: this.socket.onopen = () => {
