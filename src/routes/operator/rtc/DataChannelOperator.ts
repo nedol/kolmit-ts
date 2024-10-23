@@ -2,6 +2,7 @@ import { writable } from 'svelte/store';
 
 import { DataChannel } from './DataChannel';
 import { msg, dc, dc_state, posterst ,operatorst } from '$lib/js/stores.js';
+import md5 from 'md5';
 
 
 let oper;
@@ -69,7 +70,16 @@ export class DataChannelOperator {
 			try {
 				// debugger;
 				let parsed = JSON.parse(event.data);
+		
 				if (parsed.type === 'eom') {
+					if (parsed.received) {
+						console.log(parsed.received);
+					}
+					if (parsed.hash) {						
+						setTimeout(() => {
+							this.dc.send(JSON.stringify({ type: 'eom', received: parsed.hash }));
+						}, 0);	
+					}
 					if (data) {
 						//that.rtc.OnMessage(JSON.parse(data), that);			
 				
@@ -77,6 +87,7 @@ export class DataChannelOperator {
 							msg.set(JSON.parse(data));
 							// msg.set('');
 							data = '';
+						
 						}, 0);
 					}
 					
@@ -87,7 +98,7 @@ export class DataChannelOperator {
 				if (parsed.file) {
 					// document.getElementById('dataProgress').attributes.max = parsed.length;
 				}
-				if (parsed.type === 'eof'  && parsed.from!=='oper') {
+				if (parsed.type === 'eof') {
 					const received = new Blob(receiveBuffer);
 					receiveBuffer = [];
 
@@ -137,7 +148,8 @@ export class DataChannelOperator {
 				for (let i = 0, o = 0; i < numChunks; ++i, o += size) {
 					this.dc.send(JSON.stringify({ slice: data.substr(o, size),from:'oper' }));
 				}
-				this.dc.send(JSON.stringify({ type: 'eom',from:'oper' }));
+				this.dc.send(JSON.stringify({ type: 'eom', hash: md5(data)  }));
+				
 			}
 
 			if (cb) cb();

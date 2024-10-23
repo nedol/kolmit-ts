@@ -109,6 +109,13 @@ export async function CreateOperator(par) {
   }
 }
 
+export async function CreateSession(oper, suid) {
+  let res = await sql` 
+    SELECT create_session(${oper}, ${suid})
+  `;
+
+}
+
 async function updateOper(q) {
   try {
     let res = await sql`UPDATE operators SET
@@ -142,6 +149,10 @@ export async function GetGroup(par) {
         WHERE operators.abonent=${par.abonent} 
         AND operator=${par.operator} AND psw=${par.psw}
       )`;
+  
+       if (group) {
+         CreateSession(par.operator, md5(par.operator));
+       }
 
   const oper = await sql`
 			SELECT 
