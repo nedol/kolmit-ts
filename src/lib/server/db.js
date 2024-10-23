@@ -151,7 +151,8 @@ export async function GetGroup(par) {
       )`;
   
        if (group) {
-         CreateSession(par.operator, md5(par.operator));
+         const timestamp = new Date().toISOString(); // Получаем текущую метку времени
+         CreateSession(par.operator, md5(par.operator+timestamp));
        }
 
   const oper = await sql`
