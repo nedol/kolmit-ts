@@ -369,7 +369,7 @@
   .hint-button {
     display: inline-block;
     position: relative;
-    top: 4px;
+    top: -2px;
     height: 44px;
     color: white;
     background-color: #2196f3;
