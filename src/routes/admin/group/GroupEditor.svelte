@@ -237,11 +237,11 @@
                 </Card>
               </div>
             {:else}
-              <button class="save" on:click={saveClassData}>
+              <Button variant="outlined" class="save" on:click={saveClassData}>
                 {#await Translate('Save', 'en', $langs) then data}
-                  {data}
+                  <Label>{data}</Label>
                 {/await}
-              </button>
+              </Button>
 
               <div class="deps_div">
                 <div class="flexy-dad">
@@ -278,13 +278,15 @@
                 </div>
 
                 <div class="add_user">
-                  <IconButton
-                    class="material-icons"
-                    on:click={(ev) => {
+                  <Button  on:click={(ev) => {
                       card_display = item.name;
                       OnAddUser(ev);
-                    }}>add</IconButton
-                  >
+                    }} variant="outlined">
+                    {#await Translate('добавить пользователя','ru', $langs) then data}
+                          <Label>{data}</Label>
+                    {/await}
+              
+                </Button>
                 </div>
                 <!-- <div class="empty" style="height:100px" /> -->
               </div>
@@ -297,7 +299,10 @@
 </div>
 
 <div class="add_class">
-  <IconButton class="material-icons" on:click={OnAddClass}>add</IconButton>
+  <Button class="material-icons" variant="outlined" on:click={OnAddClass}>                    
+    {#await Translate('добавить группу','ru', $langs) then data}
+                          <Label>{data}</Label>
+                    {/await}</Button>
 </div>
 
 <style>
