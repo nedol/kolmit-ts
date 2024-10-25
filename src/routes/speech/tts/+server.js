@@ -45,7 +45,7 @@ export async function POST({ url, fetch, cookies, request, response }) {
 
   switch (q.func) {
     case 'tts':
-      resp = { audio: await tts_google(q.text, q.lang, abonent) };
+      resp = { audio: await tts_google(q.text, q.lang, abonent, q.quiz) };
       break;
   }
 
@@ -94,7 +94,7 @@ async function tts_sm4(text, from_lang, to_lang) {
   );
 }
 
-async function tts_google(text, lang, abonent) {
+async function tts_google(text, lang, abonent, quiz) {
   try {
     // Генерируем md5-хеш для текста
     const fileName = md5(text) + '.mp3';
@@ -134,7 +134,7 @@ async function tts_google(text, lang, abonent) {
       base64 += e.base64;
     });
 
-    WriteSpeech({ lang: lang, key: md5(text), text: text, data: base64 });
+    WriteSpeech({ lang: lang, key: md5(text), text: text, data: base64, quiz });
 
     // Записываем аудиофайл в директорию
     // await fs.outputFile(filePath, Buffer.from(url, 'base64')); // Запись файла в папку audio

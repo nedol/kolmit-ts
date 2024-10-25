@@ -3,7 +3,7 @@ import md5 from 'md5';
 import dict from '$lib/dict/dict.json';
 import { ice_conf } from '$lib/ice_conf';
 import os from 'os';
-import Turn from 'node-turn';
+
 
 // import cc from '$lib/json/cc.json';
 
@@ -19,17 +19,7 @@ import { CreatePool, GetUsers, GetGroup } from '$lib/server/db.js'; //src\lib\se
 
 let kolmit;
 
-if (!global.turn_server) {
-	global.turn_server = new Turn({
-		// set options
-		authMech: 'long-term',
-		listeningPort: 443
-	});
-	global.turn_server.start();
-	global.turn_server.addUser('username', 'password');
-	global.turn_server.log();
-	console.log('Turn server started on ' + global.turn_server.listeningPort);
-}
+
 
 /** @param {Parameters<import('./$types').PageServerLoad>[0]} event */
 export async function load({ fetch, cookies, route, url, stuff }) {

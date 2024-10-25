@@ -463,7 +463,7 @@
 
   async function speak(text, cb_end) {
     function endSpeak() {}
-    if (text) tts.Speak_server($llang, text, endSpeak);
+    if (text) tts.Speak_server($llang, text, data.name, endSpeak);
   }
 
   function onClickMicrophone() {

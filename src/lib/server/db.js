@@ -563,15 +563,21 @@ export async function GetDict(q) {
 
 export async function WriteSpeech(q) {
   await sql.begin(async (sql) => {
-    let res = await sql`INSERT INTO speech
-		(lang, key, text, data) VALUES ( ${q.lang},${q.key}, ${q.text}, ${q.data})`;
+    await sql`INSERT INTO speech (lang, key, text, data, quiz)
+              VALUES (${q.lang}, ${q.key}, ${q.text}, ${q.data}, ${q.quiz})
+              ON CONFLICT (key) 
+              DO UPDATE SET 
+                  lang = ${q.lang}, 
+                  text = ${q.text}, 
+                  data = ${q.data}, 
+                  quiz = ${q.quiz}`;
   });
 }
 
 export async function ReadSpeech(q) {
   try {
     let res = await sql`SELECT data FROM speech
-		WHERE key= ${q.key}`;
+		WHERE key= ${q.key} AND quiz<>NULL`;
     if (res[0]) {
       return res[0].data;
     }

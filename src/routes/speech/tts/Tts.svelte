@@ -12,13 +12,14 @@
     // await easyspeech.initSpeech();
   });
 
-  export async function Speak_google(lang, text, cb_end) {
+  export async function Speak_google(lang, text,quiz, cb_end) {
     if (!audio || (audio && text !== audio.text)) {
       text = text.replace(/<[^>]+>.*?<\/[^>]+>/g, '');
       const par = {
         func: 'tts',
         text: text,
         lang: lang, //(lang=='nl'?lang+'-BE':lang)
+        quiz: quiz
       };
 
       const response = await fetch('/speech/tts', {
@@ -49,7 +50,7 @@
     audio.play();
   }
 
-  export async  function Speak_server(lang, text, cb_end) {
+  export async  function Speak_server(lang, text, quiz, cb_end) {
 
     async function onEnd(res){
       // if(!res){
@@ -61,7 +62,7 @@
         cb_end();
       //}
     }
-    await Speak_google(lang, text, onEnd);
+    await Speak_google(lang, text, quiz, onEnd);
      
   }
 

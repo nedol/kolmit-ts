@@ -2,12 +2,19 @@ import { sveltekit } from "@sveltejs/kit/vite";
 import { defineConfig } from "vite";
 import path from "path";
 import { createProxyMiddleware } from "http-proxy-middleware";
+// import { terser } from 'vite-plugin-terser';
 
 import commonjs from "vite-plugin-commonjs";
 // import nodeGlobals from 'rollup-plugin-node-globals';
 
 export default defineConfig({
-  plugins: [sveltekit(),commonjs()],
+  plugins: [sveltekit(), commonjs()
+    // ,terser({
+    //   format: {
+    //     comments: false
+    //   }
+    // })
+  ],
   assetsInclude: ["**/*.html"],
 
   resolve: {

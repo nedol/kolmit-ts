@@ -1,5 +1,6 @@
 import { WebSocketServer } from 'ws';
 import express from 'express';
+import Turn from 'node-turn';
 
 import { json } from '@sveltejs/kit';
 
@@ -15,6 +16,19 @@ import {
   GetDialog,
   GetWords,
 } from './db.js'; //src\lib\server\server.db.js
+
+if (!global.turn_server) {
+  global.turn_server = new Turn({
+    // set options
+    authMech: 'long-term',
+    listeningPort: 3000,
+  });
+  global.turn_server.start();
+  global.turn_server.addUser('username', 'password');
+  global.turn_server.log();
+  console.log('Turn server started on ' + global.turn_server.listeningPort);
+}
+
 
 const app = express();
 
