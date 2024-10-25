@@ -577,7 +577,7 @@ export async function WriteSpeech(q) {
 export async function ReadSpeech(q) {
   try {
     let res = await sql`SELECT data FROM speech
-		WHERE key= ${q.key} AND quiz<>NULL`;
+		WHERE key= ${q.key} AND quiz IS NOT NULL`;
     if (res[0]) {
       return res[0].data;
     }
