@@ -217,7 +217,10 @@
       console.log();
     }
 
-    OnClickCallButton();//активировать
+    setTimeout(()=>{
+      OnClickCallButton();//активировать
+    },1000)
+
   });
 
   let progress = {
