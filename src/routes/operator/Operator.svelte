@@ -216,6 +216,8 @@
     } catch (ex) {
       console.log();
     }
+
+    OnClickCallButton();//активировать
   });
 
   let progress = {
