@@ -225,7 +225,7 @@ export class DataChannelOperator {
     par.profile = {
       email: this.rtc.operator,
       name: this.rtc.name,
-      img: poster
+      img: this.rtc.poster
     };
 
     if (that.dc.readyState === 'open') {

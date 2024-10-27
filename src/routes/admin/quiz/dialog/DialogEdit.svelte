@@ -112,11 +112,11 @@
           prompt = prompt.replaceAll('${data.level}', data.level);
           prompt = prompt.replaceAll('${num}', num);
 
-          // dialog_data.words = JSON.stringify(
-          //   resp.resp.words.data
-          //     .map((item) => extractWords(item.example[$llang]))
-          //     .join(',')
-          // );
+          dialog_data.words = JSON.stringify(
+            resp.resp.words[0].data
+              .map((item) => extractWords(item.example[$llang]))
+              .join(',')
+          );
 
           if (resp.resp.words[0].data){            
 
@@ -128,9 +128,9 @@
 
           dialog_data.html = resp.resp.words[0]?.context;
 
-          let quiz_grammar = resp.resp.grammar.quizes[data.name[$llang]];
+          let quiz_grammar = resp.resp.grammar?.quizes[data.name[$llang]];
 
-          grammar = resp.resp.grammar.grammar.concat(quiz_grammar);
+          grammar = resp.resp.grammar?.grammar.concat(quiz_grammar);
 
           if (grammar) prompt = prompt.replaceAll('${grammar}', grammar.map(element => {
             return element

@@ -278,15 +278,17 @@
                 </div>
 
                 <div class="add_user">
-                  <Button  on:click={(ev) => {
+                  <Button
+                    on:click={(ev) => {
                       card_display = item.name;
                       OnAddUser(ev);
-                    }} variant="outlined">
-                    {#await Translate('добавить пользователя','ru', $langs) then data}
-                          <Label>{data}</Label>
+                    }}
+                    variant="outlined"
+                  >
+                    {#await Translate('добавить пользователя', 'ru', $langs) then data}
+                      <Label>{data}</Label>
                     {/await}
-              
-                </Button>
+                  </Button>
                 </div>
                 <!-- <div class="empty" style="height:100px" /> -->
               </div>
@@ -299,10 +301,11 @@
 </div>
 
 <div class="add_class">
-  <Button class="material-icons" variant="outlined" on:click={OnAddClass}>                    
-    {#await Translate('добавить группу','ru', $langs) then data}
-                          <Label>{data}</Label>
-                    {/await}</Button>
+  <Button class="material-icons" variant="outlined" on:click={OnAddClass}>
+    {#await Translate('добавить группу', 'ru', $langs) then data}
+      <Label>{data}</Label>
+    {/await}</Button
+  >
 </div>
 
 <style>

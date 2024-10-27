@@ -8,6 +8,8 @@ export class RTCOperator extends RTCBase {
   constructor(operator, name, signal) {
     super(operator, name, signal);
 
+    this.user = ''
+
     this.checking_tmr;
 
     msg.subscribe((data) => {
@@ -92,6 +94,7 @@ export class RTCOperator extends RTCBase {
   }
 
   Call(user) {
+    this.user = user;
     this.Init(() => {
       this.GetUserMedia({ audio: 1, video: 0 }, () => {
         // document.getElementsByClassName('browser_container')[0].style.display = 'none';
@@ -106,6 +109,7 @@ export class RTCOperator extends RTCBase {
         par.name = 'user';
         this.signal.SendMessage(par, () => {
           this.status = 'call';
+ 
         });
       });
     });

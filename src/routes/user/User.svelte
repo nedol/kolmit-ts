@@ -13,11 +13,10 @@
   import RecordedVideo from './RecordedVideo.svelte';
   import IconButton, { Icon } from '@smui/icon-button';
   import { mdiAccountBox, mdiVolumeHigh } from '@mdi/js';
-  import { muted } from '$lib/js/stores.js';
 
   export let user_, group: [];
 
-  let poster = user_.picture ? user_.picture : '/assets/operator.svg';
+
   let name = user_.name;
   let operator = user_.operator;
   let abonent = user_.abonent;
@@ -26,11 +25,17 @@
 
   import {
     users,
+    muted,
     call_but_status,
     dc,
     click_call_func,
     msg,
+    posterst
+  
   } from '$lib/js/stores.js';
+
+  let poster = user_.picture ? user_.picture : '/assets/operator.svg';
+
 
   $click_call_func = null;
 
@@ -189,23 +194,13 @@
     res_talk = resolve;
 
     switch (status) {
-      case 'inactive':
-        // status = 'wait';
-        // user_.display = 'none'
-        // Call();
-        // remote.video.srcObject = null;
-        break;
 
-      // case 'wait':
-      // 	status = 'inactive';
-      // 	// $call_but_status = 'inactive';
-      // 	rtc.SendCheck();
-      // 	break;
       case 'active':
         if ($call_but_status === 'call' || $call_but_status === 'talk') break;
         user_.display = 'block';
         $click_call_func = OnClickCallButton;
         (()=> {
+          $posterst = poster;
           rtc.Call(operator);
           status = 'call';
 
@@ -215,7 +210,7 @@
         })();
 
         break;
-      case 'call':
+      case 'call_':
         status = 'inactive';
         user_.display = 'none';
         // $call_but_status = 'inactive';
@@ -229,7 +224,7 @@
         $click_call_func = null; //operator -> OnClickCallButton
         // parent_div?.appendChild(card);
         break;
-      case 'talk':
+      case 'talk_':
         status = 'inactive';
         user_.display = 'none';
         // $call_but_status = 'inactive';
@@ -245,7 +240,7 @@
 
         video_element.poster = remote.video?.poster;
         break;
-      case 'muted':
+      case 'muted_':
         status = 'inactive';
         user_.display = 'none';
         // $call_but_status = 'inactive';
@@ -253,7 +248,7 @@
         $click_call_func = null; //operator -> OnClickCallButton
         // parent_div?.appendChild(card);
         break;
-      case 'busy':
+      case 'busy_':
         // rtc.Call();
         if ($call_but_status === 'talk') {
           status = 'inactive';
@@ -261,12 +256,6 @@
           // $call_but_status = 'inactive';
           rtc.OnInactive();
         }
-
-        // $click_call_func = null; //operator -> OnClickCallButton
-        // parent_div.appendChild(card);
-        // video_element.load();
-        // video_element.src = '';
-        // video_element.poster = remote.video.poster;
         break;
       default:
         break;

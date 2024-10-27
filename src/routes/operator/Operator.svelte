@@ -64,22 +64,6 @@
 
 
         break;
-      case 'close':
-        $call_but_status = 'inactive';
-        local.audio.paused = true;
-
-        video_button_display = false;
-        local.video.display = 'none';
-        local.video.srcObject = '';
-        // local.video.display = 'block';
-        remote.video.srcObject = '';
-        remote.video.poster = '';
-        remote.video.display = 'none';
-        remote.text.name = '';
-        remote.text.email = '';
-        remote.text.display = 'none';
-
-        break;
     }
   
 
@@ -101,7 +85,7 @@
   $: if ($view === 'chat') dlg_display = 'block';
   else dlg_display = 'none';
 
-  $posterst = '/assets/operator.svg';
+  $posterst = 'assets/operator.svg';
 
   let rtc: any;
 
@@ -319,7 +303,7 @@
 
     rtc.SetRemoteVideo = (src: string) => {
       // if ($call_but_status === 'talk') {
-      // remote.video.poster = $posterst;
+      remote.video.poster = $posterst;
       // local.audio.paused = true;
       remote.video.srcObject = src;
       remote.video.display = 'block';
@@ -339,9 +323,7 @@
   }
 
   function OnClickCallButton() {
-    // if($call_but_status==undefined)
-    //   $call_but_status = 'inactive'
-    console.log();
+
     switch ($call_but_status) {
       case 'inactive':
         try {
@@ -375,8 +357,8 @@
         } else {
           $call_but_status = 'inactive';
         }
-         local.audio.paused = true;
-
+         
+        local.audio.paused = true;
         clearInterval(inter);
         call_cnt = 10;
 
@@ -397,15 +379,14 @@
         remote.text.name = '';
         remote.text.email = '';
 
-          $call_but_status = 'inactive';
-          rtc.DC.SendDCClose();
-          rtc.OnInactive();
-
+        $call_but_status = 'inactive';
+        rtc.DC.SendDCClose();
+        rtc.OnInactive();
         
         $users = $users;
 
         break;
-      case 'muted':
+      case 'muted_':
         $call_but_status = 'inactive';
 
         local.video.srcObject = '';
@@ -458,13 +439,10 @@
       rtc?.OnInactive();
       $call_but_status = 'inactive';
       remote.video.display = 'none'
+      local.audio.paused = true;
     }
 
     if (data.call || data.func === 'call') {
-      if ($call_but_status === 'active') {
-        // $call_but_status = 'call';
-        // local.audio.paused = false;
-      }
    
       $showBottomAppBar = true;
 
@@ -472,7 +450,7 @@
       video_button_display = false;
 
       if (data.profile) {
-        $posterst = data.profile.img;
+        // remote.video.poster = data.profile.img;
         if (data.profile.img) remote.video.display = 'block';
 
         remote.text.name = data.profile.name;
@@ -489,33 +467,6 @@
       remote.text.display = 'none';
     }
 
-    if (data.func === 'mute') {
-      local.audio.paused = true;
-
-      video_button_display = false;
-      local.video.display = 'none';
-      local.video.srcObject = '';
-      // local.video.display = 'block';
-      remote.video.srcObject = '';
-      remote.video.poster = '';
-      remote.video.display = 'none';
-      remote.text.name = '';
-      remote.text.email = '';
-      remote.text.display = 'none';
-      // local.video.poster = UserSvg;
-      // console.log('rtc', rtc);
-      rtc.OnInactive();
-
-      if ($call_but_status === 'talk') {
-        rtc.OnInactive();
-        remote.video.poster = '';
-      } else if ($call_but_status === 'call') {
-        rtc.OnHangup();
-        remote.video.poster = '';
-        // Group.GetUsers();
-      }
-      if (resolve) resolve();
-    }
 
     if (data.camera) {
       local.video.src = that.localStream;

@@ -17,7 +17,6 @@
   export let name;
   export let poster;
 
-  import { posterst } from '$lib/js/stores.js';
 
   let rv, video;
   onMount(async () => {
@@ -67,7 +66,7 @@
             muted={$muted}
             autoplay
             playsinline
-            poster={$posterst}
+            poster={poster}
           >
             <track kind="captions" />
           </video>

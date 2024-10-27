@@ -216,14 +216,14 @@
       if (example.includes('<<') && example.includes('>>')) {
         example = example?.replace(
           /<<([^<>]+)>>/gu,
-          data.level.includes('A1')
+          !data.level.includes('C1')
             ? '<span style="color:green" onclick=OnClickInput><b>$1</b></span>'
             : '$1'
         );
       } else if (example.includes('"')) {
         example = example?.replace(
           /"([^"]+)"/gu,
-          data.level.includes('A1')
+          !data.level.includes('C1')
             ? '<span style="color:green" onclick=OnClickInput><b>$1</b></span>'
             : '$1'
         );

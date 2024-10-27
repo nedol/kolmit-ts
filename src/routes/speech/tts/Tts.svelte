@@ -59,6 +59,7 @@
        
       // }
       // else{
+      if(cb_end)
         cb_end();
       //}
     }
