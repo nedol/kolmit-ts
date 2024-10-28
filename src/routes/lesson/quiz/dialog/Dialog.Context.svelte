@@ -15,7 +15,7 @@
 
   import { mdiEarHearing } from '@mdi/js';
 
-  export let data, tts;
+  export let data, quiz, tts;
 
   let trans = '';
 
@@ -96,11 +96,11 @@
       ); // Вызов функции перевода
 
       // Озвучить перевод
-      tts.Speak_server($langs, translatedSentence, onEndSpeakTranslated);
+      tts.Speak_server($langs, translatedSentence, data.name, onEndSpeakTranslated);
 
       async function onEndSpeakTranslated() {
         // Озвучить оригинал после перевода
-        tts.Speak_server($llang, originalSentence, onEndSpeakOriginal);
+        tts.Speak_server($llang, originalSentence, data.name, onEndSpeakOriginal);
       }
 
       async function onEndSpeakOriginal() {
@@ -120,7 +120,7 @@
   <div class="speaker-button">
     <IconButton
       on:click={() => {
-        PlayAutoText(data.html);
+        PlayAutoText(data.html, quiz);
       }}
     >
       <Icon tag="svg" viewBox="0 0 24 24">

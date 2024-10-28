@@ -350,7 +350,7 @@
       case 'call':
         if ($dc_state && !$click_call_func) {
           $call_but_status = 'talk';         
-          // $muted = false;
+          $muted = false;
           rtc.OnTalk();
           video_button_display = true;
           remote.text.display = 'none';

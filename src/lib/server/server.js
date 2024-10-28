@@ -177,7 +177,7 @@ async function HandleMessage(q, ws) {
           owner: q.abonent,
           level: q.level,
         });
-        if (dlg.subscribe?.length > 0) {
+        if (dlg?.subscribe?.length > 0) {
           resp = {
             [q.type]: {
               quiz: q.quiz,
@@ -192,7 +192,7 @@ async function HandleMessage(q, ws) {
           owner: q.abonent,
           level: q.level,
         });
-        if (dlg.subscribe?.length > 0) {
+        if (dlg?.subscribe?.length > 0) {
           resp = {
             [q.type]: { quiz: q.quiz, subscribers: dlg.subscribe },
           };

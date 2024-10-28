@@ -15,9 +15,9 @@ let socketUrl;
 
 if (window.location.hostname === 'localhost') {
   socketUrl = 'ws://localhost:3000';
-} else {
+} else 
   socketUrl = 'wss://kolmit-server.onrender.com';
-}
+
 
 this.socket = new WebSocket(socketUrl);
 

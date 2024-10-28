@@ -34,7 +34,7 @@
 						poster={poster}
 						autoplay
 						playsinline
-						muted
+						
 						style="display: {display}"
 					/>
 				</MediaContent>
