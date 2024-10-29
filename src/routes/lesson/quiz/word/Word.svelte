@@ -630,7 +630,7 @@
 
       if (active === currentWord.example[$langs].replace(/<<|>>/g, '')) {
         active = currentWord.example[$llang].replace(/<<|>>/g, '');
-        tts.Speak_server($llang, active, onEndSpeak);
+        tts.Speak_server($llang, active, data.name, onEndSpeak);
       } else if (active === currentWord.example[$llang].replace(/<<|>>/g, '')) {
         currentWordIndex++;
         await nextWord();
@@ -639,7 +639,7 @@
         }, 100);
 
         active = currentWord.example[$langs].replace(/<<|>>/g, '');
-        tts.Speak_server($langs, active, onEndSpeak);
+        tts.Speak_server($langs, active, data.name, onEndSpeak);
       }
     }
 
@@ -649,7 +649,7 @@
       showHintAuto();
     }, 100);
     let active = currentWord.example[$langs].replace(/<<|>>/g, ''); //currentWord.example[$langs];
-    tts.Speak_server($langs, active, onEndSpeak);
+    tts.Speak_server($langs, active, data.name,onEndSpeak);
   }
 
   onDestroy(() => {

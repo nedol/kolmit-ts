@@ -45,13 +45,7 @@ let prom = new Promise((resolve, reject) => {
 
 const pool = await prom;
 
-global.rtcPool;
-import { rtcPool_st } from '../../lib/js/stores.js';
-rtcPool_st.subscribe((data) => {
-  global.rtcPool = data;
-});
-
-// const wsStore = {};
+global.rtcPool = {};
 
 // Настраиваем WebSocket сервер
 const wss = new WebSocketServer({ server });
@@ -204,9 +198,10 @@ async function HandleMessage(q, ws) {
 }
 
 function SetParams(q) {
+
   if (!global.rtcPool[q.abonent]) {
     global.rtcPool[q.abonent] = {};
-  }
+  }  
 
   const item = global.rtcPool[q.abonent][q.operator] || {};
 

@@ -11,15 +11,14 @@ export class SignalingChannel {
     this.msg = msg;
     this.operator = operator;
 
-let socketUrl;
+    this.socketUrl;
 
-if (window.location.hostname === 'localhost') {
-  socketUrl = 'ws://localhost:3000';
-} else 
-  socketUrl = 'wss://kolmit-server.onrender.com';
+    if (window.location.hostname === 'localhost') {
+      this.socketUrl = 'ws://localhost:3000';
+    } else
+    this.socketUrl = 'wss://kolmit-server.onrender.com';
 
-
-this.socket = new WebSocket(socketUrl);
+    this.socket = new WebSocket(this.socketUrl);
 
     // Обработка события при открытии соединения
     https: this.socket.onopen = () => {
@@ -31,6 +30,7 @@ this.socket = new WebSocket(socketUrl);
     // Обработка закрытия соединения
     this.socket.onclose = () => {
       console.log('WebSocket соединение закрыто');
+      this.socket = ''
     };
 
     // Обработка ошибок
@@ -50,6 +50,14 @@ this.socket = new WebSocket(socketUrl);
       par = '';
     } else {
       console.log('Соединение с WebSocket не установлено');
+      this.socket = new WebSocket(this.socketUrl);
+      // Обработка события при открытии соединения
+      this.socket.onopen = () => {
+        if (this.socket && this.socket.readyState === WebSocket.OPEN) {
+          console.log('WebSocket соединение установлено');
+          this.SendMessage(par, cb);
+        }
+      };
     }
   }
 }
