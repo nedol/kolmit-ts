@@ -84,8 +84,12 @@ export class DataChannelOperator {
 						//that.rtc.OnMessage(JSON.parse(data), that);			
 				
 						setTimeout(() => {
-							msg.set(JSON.parse(data));
-							// msg.set('');
+							try {
+								msg.set(JSON.parse(data));
+								// msg.set('');
+							} catch (error) {
+								console.error('Msg ошибка:', error);
+							}
 							data = '';
 						
 						}, 0);

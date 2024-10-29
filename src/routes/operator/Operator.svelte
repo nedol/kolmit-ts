@@ -544,6 +544,9 @@
       {/if}
     </Section>
     <Section>
+
+    </Section>
+    <Section align="end">
       <CallButton on:click={OnClickCallButton}>
         <b
           class="call_cnt"
@@ -556,8 +559,6 @@
           >0</span
         >
       </CallButton>
-    </Section>
-    <Section align="end">
       <div
         class="video"
         on:click={OnClickVideoButton}

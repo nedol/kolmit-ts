@@ -1,63 +1,88 @@
 import { msg } from '$lib/js/stores.js';
 
-// const token = 'CPkJ1MYWC7DMlvw6MvtV0yBw';
 const headers = {
   'Content-Type': 'application/json',
-  // Authorization: `Bearer ${token}`
 };
 
 export class SignalingChannel {
   constructor(operator) {
     this.msg = msg;
     this.operator = operator;
+    this.isOpen = false;
+    this.socketUrl = //'wss://kolmit-server.onrender.com';
+    window.location.hostname === 'localhost'
+      ? 'ws://localhost:3000'
+      : 'wss://kolmit-server.onrender.com';
+    this.socket = null;
+    this.messageQueue = [];
+    this.initializeWebSocket();
+  }
 
-    this.socketUrl;
-
-    if (window.location.hostname === 'localhost') {
-      this.socketUrl = 'ws://localhost:3000';
-    } else
-    this.socketUrl = 'wss://kolmit-server.onrender.com';
-
+  initializeWebSocket() {
     this.socket = new WebSocket(this.socketUrl);
+    this.isOpen = true;
 
-    // Обработка события при открытии соединения
-    https: this.socket.onopen = () => {
+    this.socket.onopen = () => {
       console.log('WebSocket соединение установлено');
+
+      this.processQueue();
     };
 
-    // Обработка сообщений от WebSocket сервера
+    this.socket.onmessage = (event) => {
+      console.log('Получено сообщение:', event.data);
+      const data = JSON.parse(event.data);
+      if (this.callback) this.callback(data);
+      setTimeout(() => {    this.msg.set(data) },10)
+  
+    };
 
-    // Обработка закрытия соединения
     this.socket.onclose = () => {
       console.log('WebSocket соединение закрыто');
-      this.socket = ''
+      if (this.isOpen) setTimeout(() => this.initializeWebSocket(), 1000); // Попытка переподключения через 3 секунды
     };
 
-    // Обработка ошибок
     this.socket.onerror = (error) => {
       console.error('WebSocket ошибка:', error);
     };
   }
 
-  async SendMessage(par, cb) {
+  SendMessage(par, cb) {
+    this.callback = cb;
+
     if (this.socket && this.socket.readyState === WebSocket.OPEN) {
-      this.socket.onmessage = (event) => {
-        console.log('Получено сообщение:', event.data);
-        if (cb) cb(JSON.parse(event.data));
-        this.msg.set(JSON.parse(event.data));
-      };
       this.socket.send(JSON.stringify({ par }));
-      par = '';
     } else {
-      console.log('Соединение с WebSocket не установлено');
-      this.socket = new WebSocket(this.socketUrl);
-      // Обработка события при открытии соединения
-      this.socket.onopen = () => {
-        if (this.socket && this.socket.readyState === WebSocket.OPEN) {
-          console.log('WebSocket соединение установлено');
-          this.SendMessage(par, cb);
-        }
-      };
+      console.log(
+        'Соединение с WebSocket не установлено, добавление сообщения в очередь'
+      );
+      this.messageQueue.push(par);
+      if (!this.socket || this.socket.readyState >= WebSocket.CLOSING) {
+        this.initializeWebSocket();
+      }
+    }
+
+    if (par.status === 'close') {
+      this.closeConnection();
+    } else if (par.status === 'open' && !this.isOpen) {
+      this.initializeWebSocket();
+    }
+  }
+
+  closeConnection() {
+    this.isOpen = false;
+    if (this.socket && this.socket.readyState !== 0) {
+      this.socket.close();
+    }
+  }
+
+  processQueue() {
+    while (
+      this.messageQueue.length > 0 &&
+      this.socket &&
+      this.socket.readyState === WebSocket.OPEN
+    ) {
+      const par = this.messageQueue.shift();
+      this.socket.send(JSON.stringify({ par }));
     }
   }
 }

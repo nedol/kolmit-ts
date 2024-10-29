@@ -56,10 +56,10 @@ wss.on('connection', (ws) => {
   ws.on('message', (message) => {
     // console.log(`Получено сообщение: ${message}`);
     const msg = JSON.parse(message);
-    if (msg.par.operator && msg.par.abonent) {
+    if (msg.par?.operator && msg.par?.abonent) {
       msg.par.ws = ws;
       SetParams(msg.par);
-    }
+    } 
 
     HandleMessage(msg.par, ws);
     // ws.send(`Echo: ${message}`);
@@ -141,7 +141,7 @@ async function HandleMessage(q, ws) {
           const item = global.rtcPool[q.abonent][q.operator];
           // if (item) item.status = 'call';
           BroadcastOperatorStatus(q, 'close');
-          // global.rtcPool[q.abonent][q.operator].shift();
+          global.rtcPool[q.abonent][q.operator].shift();
         }
         break;
       }
@@ -152,6 +152,7 @@ async function HandleMessage(q, ws) {
             item.status = q.status;
             BroadcastOperatorStatus(q, q.status);
             //delete global.rtcPool[q.abonent][q.operator];
+            global.rtcPool[q.abonent][q.operator].shift();
           }
         } catch (ex) {}
         //this.RemoveAbonent(q);
