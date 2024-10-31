@@ -86,7 +86,7 @@ export async function GET({ url, fetch, cookies }) {
       operator: operator,
       level: lvl
     });
-    console.log(data)
+    // console.log(data)
     let response = new Response(JSON.stringify({ data, lang, level, levels }));
     response.headers.append('Access-Control-Allow-Origin', `*`);
     return response;

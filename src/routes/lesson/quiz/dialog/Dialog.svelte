@@ -1117,14 +1117,14 @@
 
 <style scoped>
   main {
-    overflow-y: clip;
+    overflow-y: auto;
     transition: transform 0.3s ease-in-out;
     width: 100vw;
     margin: 0 auto;
     position: relative;
     transform-style: preserve-3d;
     transition: transform 0.5s;
-    height: 90vh;
+    height: 120vh;
   }
 
   .repeat_alert {

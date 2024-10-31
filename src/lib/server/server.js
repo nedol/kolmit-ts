@@ -1,8 +1,13 @@
 import { WebSocketServer } from 'ws';
 import express from 'express';
 import Turn from 'node-turn';
+import cron from 'node-cron';
+
+import Translate from '../../routes/translate/Translate.js';
 
 import { json } from '@sveltejs/kit';
+
+import Email from './email.js';
 
 import pkg_l from 'lodash';
 const { find, findKey } = pkg_l;
@@ -15,6 +20,9 @@ import {
   GetUsers,
   GetDialog,
   GetWords,
+  GetLessonsByDate,
+  GetUsersEmail,
+  SendEmailTodayPublished,
 } from './db.js'; //src\lib\server\server.db.js
 
 if (!global.turn_server) {
@@ -28,7 +36,6 @@ if (!global.turn_server) {
   global.turn_server.log();
   console.log('Turn server started on ' + global.turn_server.listeningPort);
 }
-
 
 const app = express();
 
@@ -59,7 +66,7 @@ wss.on('connection', (ws) => {
     if (msg.par?.operator && msg.par?.abonent) {
       msg.par.ws = ws;
       SetParams(msg.par);
-    } 
+    }
 
     HandleMessage(msg.par, ws);
     // ws.send(`Echo: ${message}`);
@@ -176,7 +183,7 @@ async function HandleMessage(q, ws) {
           resp = {
             [q.type]: {
               quiz: q.quiz,
-              subscribers: dlg.subscribe
+              subscribers: dlg.subscribe,
             },
           };
           ws?.send(JSON.stringify({ resp }));
@@ -199,10 +206,9 @@ async function HandleMessage(q, ws) {
 }
 
 function SetParams(q) {
-
   if (!global.rtcPool[q.abonent]) {
     global.rtcPool[q.abonent] = {};
-  }  
+  }
 
   const item = global.rtcPool[q.abonent][q.operator] || {};
 
@@ -345,6 +351,162 @@ async function BroadcastQuizUsers(q, ws) {
       //not to send to yourself
       continue;
 
-      global.rtcPool[q.abonent][operator].ws.send(JSON.stringify(remAr));
+    global.rtcPool[q.abonent][operator].ws.send(JSON.stringify(remAr));
   }
+}
+
+// Пример cron-задачи, которая запускается каждый день в полночь
+cron.schedule('45 23 * * *', () => {
+  /* 
+  0 — минуты (0-я минута часа)
+  0 — час (полночь)
+  * — день месяца (каждый день)
+  * — месяц (каждый месяц)
+  * — день недели (каждый день недели)
+  * 
+  * Каждые 5 минут: *\/5 * * * *
+    Каждую субботу в полдень: 0 12 * * 6
+    Каждый час: 0 * * * *
+*/
+  console.log('Задача выполняется каждый день в полночь');
+  // Здесь можно вызвать нужные функции или выполнить операции
+  SendEmailForUpdates();
+});
+
+// SendEmailForUpdates();
+
+async function SendEmailForUpdates() {
+  const email = new Email();
+
+  const res = await GetLessonsByDate({
+    date: new Date().toISOString().split('T')[0],
+  });
+
+  function filterTodayPublished(data) {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Устанавливаем время на начало текущего дня
+    const tomorrow = new Date(today);
+    tomorrow.setDate(today.getDate() + 1); // Время на начало следующего дня
+
+    const result = [];
+
+    data.module.themes.forEach((theme) => {
+      theme.lessons.forEach((lesson) => {
+        lesson.quizes.forEach((quiz) => {
+          if (quiz.published) {
+            const quizDate = new Date(quiz.published);
+            if (quizDate >= today && quizDate < tomorrow) {
+              quiz.theme = theme;
+              result.push(quiz);
+            }
+          }
+        });
+      });
+    });
+
+    return result;
+  }
+
+  res.map(async (res) => {
+    const emailAr = await GetUsersEmail(res.owner, res.level);
+    emailAr.map(async(user) => {
+    // let user = emailAr[0];
+    const quizes = filterTodayPublished(res.data);
+    let html = await generateEmailTemplate(
+      res.owner,
+      user.name,
+      quizes,
+      user.lang
+    );
+    if (quizes.length > 0)
+      SendEmailTodayPublished({
+        send_email: 'kolmit.be@gmail.com',
+        lang: user.lang,
+        html: html,
+        head: await Translate('Обновления в Kolmit', 'ru', user.lang),
+      });
+
+    });
+  });
+}
+
+async function generateEmailTemplate(owner, userName, quizes, lang) {
+  let head = await Translate(`Новости и обновления`, 'ru', lang);
+
+  let content =
+    (await Translate(
+      `<p>Здравствуйте, <strong>${userName}</strong>!</p>
+      <p>Мы рады сообщить вам о последних обновлениях и новых упражнениях в Kolmit. Проверьте, что нового доступно для вас!</p>
+
+      <div class="updates">
+          <h2>Добавленные или обновленные упражнения:</h2>
+          <ul>
+              ${quizes
+                .map(
+                  (quiz) => `
+                  <li><strong>Тема:</strong> ${quiz.theme.name.nl}<br>
+                  <li><strong>Название:</strong> ${quiz.name.nl}<br>
+                  <strong>Грамматика:</strong> ${quiz.grammar}</li>
+              `
+                )
+                .join('')}
+          </ul>
+      </div>
+      <p>Зайдите в Kolmit, чтобы попробовать новые упражнения и улучшить свои навыки!</p>
+      `,
+      'ru',
+      lang
+    )) +
+    `<a href='https://kolmit.onrender.com/?abonent=${owner}' class="button">` +
+    (await Translate('Перейти в приложение Kolmit', 'ru', lang)) +
+    `</a>`;
+
+  let contact = await Translate(
+    'Если у вас возникли вопросы, свяжитесь с нами по адресу ',
+    'ru',
+    lang
+  );
+
+  // HTML-шаблон с placeholder для динамической вставки данных
+  const htmlTemplate = `
+    <!DOCTYPE html>
+    <html lang="ru">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Kolmit Updates</title>
+        <style>
+            body { font-family: Arial, sans-serif; background-color: #f4f4f9; color: #333; margin: 0; padding: 0; }
+            .container { width: 100%; max-width: 600px; margin: 0 auto; background-color: #ffffff; padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); }
+            .header { background-color: #4075a6; color: #ffffff; padding: 20px; text-align: center; border-top-left-radius: 8px; border-top-right-radius: 8px; }
+            .header h1 { margin: 0; font-size: 24px; }
+            .content { padding: 20px; }
+            .content h2 { font-size: 18px; color: #4075a6; }
+            .content p { line-height: 1.6; }
+            .updates { background-color: #f9f9f9; padding: 15px; border-radius: 5px; margin: 20px 0; }
+            .updates ul { padding: 0; list-style-type: none; }
+            .updates li { padding: 10px 0; border-bottom: 1px solid #ddd; }
+            .updates li:last-child { border-bottom: none; }
+            .footer { text-align: center; font-size: 12px; color: #666; padding: 20px; border-top: 1px solid #eaeaea; }
+            .button { display: inline-block; padding: 10px 20px; background-color:  #ffffff; color: blue; text-decoration: none; border-radius: 5px; font-weight: bold; margin-top: 10px; }
+            .button:hover { background-color: #4075a6; }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="header">
+                <h1>Kolmit: ${head}</h1>
+            </div>
+            <div class="content">
+            ${content}
+            </div>
+            <div class="footer">
+                <p>${contact} <a href="mailto:kolmit.be@gmail.com">kolmit.be@gmail.com</a></p>
+                <p>Kolmit © 2024</p>
+            </div>
+        </div>
+    </body>
+    </html>`;
+
+  return htmlTemplate;
 }

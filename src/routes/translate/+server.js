@@ -1,4 +1,4 @@
-import { Translate } from './Translate';
+import { Translate } from './Translate.ts';
 
 /** @type {import('./$types').RequestHandler} */
 export async function POST({ url, fetch, cookies, request }) {

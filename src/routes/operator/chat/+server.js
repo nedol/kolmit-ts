@@ -5,7 +5,7 @@ import { Client, client } from '@gradio/client';
 
 import { GetPrompt } from '../../../lib/server/db';
 
-import { Translate } from './../../translate/Translate';
+import { Translate } from './../../translate/Translate.ts';
 
 import Groq from 'groq-sdk';
 

@@ -1,4 +1,5 @@
 import { json } from '@sveltejs/kit';
+import WebSocket from 'ws';  
 import { CreateOperator, CheckOperator, GetUsers } from '$lib/server/db.js'; //src\lib\server\server.db.js
 
 import pkg from 'nodemailer';
@@ -9,7 +10,7 @@ import md5 from 'md5';
 import pkg_l from 'lodash';
 const { find, findKey } = pkg_l;
 
-import { request } from 'undici';
+
 
 global.rtcPool;
 import { rtcPool_st } from '$lib/js/stores.js';
@@ -17,26 +18,7 @@ rtcPool_st.subscribe((data) => {
   global.rtcPool = data;
 });
 
-global.interval;
-global.loop = function () {
-  try {
-    if (!global.interval)
-      global.interval = setInterval(async () => {
-        const { statusCode, headers, trailers, body } = await request(
-          `https://kolmit.onrender.com`
-        );
-        console.log('unidici response received', statusCode);
-        // console.log('headers', headers);
 
-        for await (const data of body) {
-          // console.log('data', data);
-        }
-        //let resp = fetch('https://kolmit-service.onrender.com/?abonent=nedooleg@gmail.com');
-      }, 1000 * 60 * 10);
-  } catch (ex) {}
-};
-
-global.loop();
 
 /** @type {import('./$types').RequestHandler} */
 export async function GET({ url, fetch, cookies }) {

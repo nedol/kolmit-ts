@@ -130,14 +130,15 @@ export async function UpdateLesson(q) {
     });
 
     let res = await sql`INSERT INTO lessons
-			(level , owner, data, lang )
-			VALUES(${q.level},${q.owner},${JSON.parse(q.data)}, ${q.lang})
+			(level , owner, data, lang, timestamp )
+			VALUES(${q.level},${q.owner},${JSON.parse(q.data)}, ${q.lang}, NOW())
 			ON CONFLICT (level, owner, lang)
 			DO UPDATE SET
 			owner = EXCLUDED.owner,
 			level = EXCLUDED.level,
       lang = EXCLUDED.lang,
-			data = EXCLUDED.data`;
+			data = EXCLUDED.data,
+      timestamp = NOW()`;
     return { res };
   } catch (ex) {
     return JSON.stringify({ func: q.func, res: ex });
@@ -157,7 +158,8 @@ export async function UpdateDialog(q) {
 			DO UPDATE SET
 			name = EXCLUDED.name,
       html = EXCLUDED.html,
-			dialog = EXCLUDED.dialog`;
+			dialog = EXCLUDED.dialog,
+      timestamp = NOW()`;
     return { res };
   } catch (ex) {
     return JSON.stringify({ func: q.func, res: ex });
@@ -188,7 +190,8 @@ export async function UpdateWords(q) {
 			name = EXCLUDED.name,
       level = EXCLUDED.level,
 			data = EXCLUDED.data,
-      context = EXCLUDED.context`;
+      context = EXCLUDED.context,
+      timestamp = NOW()`;
     return { res };
   } catch (ex) {
     return JSON.stringify({ func: q.func, res: ex });

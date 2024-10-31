@@ -84,6 +84,24 @@ export function SendEmail(q, new_email) {
   );
 }
 
+export function SendEmailTodayPublished(q) {
+  let operator = new Email();
+  const mail = q.send_email;
+  const hash = getHash(mail);
+  let html = q.html;
+  let head = q.head;
+
+  operator.SendMail(
+    `nedooleg@gmail.com`,
+    mail,    
+    head,
+    html,
+    (result) => {
+      console.log();
+    }
+  );
+}
+
 export async function CreateOperator(par) {
   try {
     // if (par.abonent === par.email) return false;
@@ -163,6 +181,23 @@ export async function GetGroup(par) {
       `;
 
   return { group, oper };
+}
+
+export async function GetUsersEmail(owner, level) {
+  const group = await sql`
+    SELECT 
+    name
+    FROM groups
+    WHERE owner=${owner} AND level=${level}
+  `;
+  
+  const emails = await sql`
+    SELECT 
+    email, name, lang
+    FROM operators
+    WHERE "group"=${group[0].name}
+    `;
+  return emails;
 }
 
 export async function GetUsers(par) {
@@ -463,6 +498,19 @@ export async function getLevels(owner) {
   });
 }
 
+export async function GetLessonsByDate() {
+  const startOfDay = new Date();
+  startOfDay.setHours(0, 0, 0, 0); // Начало текущего дня
+
+  const endOfDay = new Date();
+  endOfDay.setHours(23, 59, 59, 999); // Конец текущего дня
+
+  return await sql`SELECT owner, data, level, lang 
+    FROM lessons 
+    WHERE timestamp BETWEEN ${startOfDay} AND ${endOfDay} 
+    ORDER BY level DESC`;
+}
+
 export async function GetLesson(q) {
   try {
     let res = '';
@@ -474,12 +522,11 @@ export async function GetLesson(q) {
         JOIN groups ON (groups.name = operators.group and groups.level=lessons.level)
         WHERE  groups.owner=${q.owner} AND lessons.owner=${q.owner}
         ORDER BY level desc`;
-    } else if (q.level) {
+      
+     } else if (q.level) {
       res =
         await sql`SELECT data, level, lang FROM lessons WHERE owner=${q.owner} AND level=${q.level}  ORDER BY level desc`;
-    } else {
-
-      
+    } else {      
       res =
         await sql`SELECT data, level, lang FROM lessons WHERE owner=${q.owner}  ORDER BY level desc`;
       

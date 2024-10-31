@@ -109,7 +109,7 @@
   $call_but_status = 'inactive';
 
   import { editable } from '$lib/js/stores.js';
-  import { Translate } from '../translate/Translate';
+  import { Translate } from '../translate/Translate.ts';
   $: if ($editable) {
     edited_display = $editable;
   }
