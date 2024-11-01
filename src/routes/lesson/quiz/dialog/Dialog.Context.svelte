@@ -6,12 +6,7 @@
   import Paper, { Title, Subtitle } from '@smui/paper';
   import Accordion, { Panel, Header, Content } from '@smui-extra/accordion';
 
-  import {
-    langs,
-    llang,
-    dicts,
-    dc_state,
-  } from '$lib/js/stores.js';
+  import { langs, llang, dicts, dc_state } from '$lib/js/stores.js';
 
   import { mdiEarHearing } from '@mdi/js';
 
@@ -88,7 +83,7 @@
     async function playNext() {
       if (!isPlayAuto || ind >= textAr.length) return;
 
-      let originalSentence = textAr[ind];
+      let originalSentence = htmlToText(textAr[ind]).split(/(?<=[.!?])\s+/)[0];
       let translatedSentence = await Translate(
         originalSentence,
         $llang,
@@ -96,11 +91,21 @@
       ); // Вызов функции перевода
 
       // Озвучить перевод
-      tts.Speak_server($langs, translatedSentence, data.name, onEndSpeakTranslated);
+      tts.Speak_server(
+        $langs,
+        translatedSentence.replace(/['"<>]/g, ''),
+        data.name,
+        onEndSpeakTranslated
+      );
 
       async function onEndSpeakTranslated() {
         // Озвучить оригинал после перевода
-        tts.Speak_server($llang, originalSentence, data.name, onEndSpeakOriginal);
+        tts.Speak_server(
+          $llang,
+          originalSentence,
+          data.name,
+          onEndSpeakOriginal
+        );
       }
 
       async function onEndSpeakOriginal() {
@@ -113,23 +118,21 @@
   }
 </script>
 
-
-
 <div style="height:300vh; overflow-y:auto;font-size:smaller;color:#2196f3">
   {#if $dc_state === 'close'}
-  <div class="speaker-button">
-    <IconButton
-      on:click={() => {
-        PlayAutoText(data.html, quiz);
-      }}
-    >
-      <Icon tag="svg" viewBox="0 0 24 24">
-        <path fill={playAutoColor} d={mdiEarHearing} />
-      </Icon>
-    </IconButton>
-  </div>
-   { data.html}
-{/if}
+    <div class="speaker-button">
+      <IconButton
+        on:click={() => {
+          PlayAutoText(data.html, quiz);
+        }}
+      >
+        <Icon tag="svg" viewBox="0 0 24 24">
+          <path fill={playAutoColor} d={mdiEarHearing} />
+        </Icon>
+      </IconButton>
+    </div>
+    {@html data.html}
+  {/if}
 </div>
 
 <style>
