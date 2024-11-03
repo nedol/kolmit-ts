@@ -658,17 +658,17 @@
   });
 </script>
 
-<!-- <link
+<link
   rel="stylesheet"
   href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0"
-/> -->
+/>
 
 <Tts bind:this={tts}></Tts>
 
 <!-- <RV bind:this={voice}></RV> -->
 
 <!-- <VoiceRSS bind:this={voice}></VoiceRSS> -->
-<main>
+<main_dlg>
   <div class="top-app-bar-container flexor">
     <TopAppBar bind:this={topAppBar} variant="fixed">
       <Row>
@@ -1113,11 +1113,11 @@
     {/if}
     <div style="height:200px" />
   </div>
-</main>
+</main_dlg>
 
 <style scoped>
-  main {
-    overflow-y: auto;
+  main_dlg {
+    /* overflow-y: auto; */
     transition: transform 0.3s ease-in-out;
     width: 100vw;
     margin: 0 auto;
@@ -1360,13 +1360,13 @@
 
   .card {
     transition: transform 0.3s ease-in-out;
+    transform-style: preserve-3d;
+    transition: transform 0.5s;
     top: 80px;
     overflow-y: auto;
     border-radius: 5px;
     margin: 0 auto;
     position: relative;
-    transform-style: preserve-3d;
-    transition: transform 0.5s;
     height: calc(100vh - 80px);
     margin-left: 10px;
     margin-right: 10px;
@@ -1389,9 +1389,9 @@
   }
 
   .hidden-text {
-    opacity: 0;
-    animation: fadeIn 2s ease-in forwards;
-    animation-delay: 2s;
+    opacity: 1;
+    /* animation: fadeIn 2s ease-in forwards;
+    animation-delay: 2s; */
   }
 
   p {
@@ -1403,9 +1403,9 @@
     background-color: yellow;
   }
 
-  @keyframes fadeIn {
+  /* @keyframes fadeIn {
     to {
       opacity: 1;
     }
-  }
+  } */
 </style>

@@ -55,16 +55,6 @@
   const { find } = pkg;
 
   import md5 from 'md5';
-
-  /*TODO: дает*/
-  $: switch ($dc_state) {
-      case 'open':
-        $call_but_status = 'call';
-        local.audio.paused = false;
-
-
-        break;
-    }
   
 
   import { msg } from '$lib/js/stores.js';
@@ -316,11 +306,6 @@
     selected.display = true;
   }
 
-  $: switch ($dc_state) {
-    case 'open':
-      $call_but_status = 'call';
-      break;
-  }
 
   function OnClickCallButton() {
 
@@ -434,6 +419,14 @@
     video_progress = false;
   }
 
+    /*TODO: дает*/
+  $: switch ($dc_state) {
+      case 'open':
+        $call_but_status = 'call';//дубль
+        local.audio.paused = false;
+        break;
+    }
+
   function OnMessage(data: any, resolve: any) {
     if (data.func === 'close') {
       rtc?.OnInactive();
@@ -445,9 +438,10 @@
     if (data.call || data.func === 'call') {
    
       $showBottomAppBar = true;
-
+      $call_but_status = 'call';//дубль
       remote.text.display = 'block';
       video_button_display = false;
+      local.audio.paused = false;
 
       if (data.profile) {
         // remote.video.poster = data.profile.img;
