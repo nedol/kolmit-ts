@@ -44,7 +44,7 @@ const server = app.listen(process.env.PORT || 3000, () => {
   console.log('WebSocket сервер запущен на порту 3000');
 });
 
-// global.rtcPull = { user: {}, operator: {} };
+
 
 let prom = new Promise((resolve, reject) => {
   CreatePool(resolve);

@@ -27,7 +27,7 @@
     // import wsConnector from './wsConnector.js';
     // $wss = new wsConnector(host.host_wss);
 
-    $langs = JSON.parse(data.cookies).lang; // data.operator[0].lang;//
+    $langs = data.cookies? JSON.parse(data.cookies).lang: data.operator[0].lang;//
 
     $ice_conf = data.ice_conf;
 

@@ -7,7 +7,7 @@ import os from 'os';
 
 // import cc from '$lib/json/cc.json';
 
-global.rtcPull = { user: {}, operator: {} };
+// global.rtcPull = { user: {}, operator: {} };
 
 // global.rtcPool;
 // import { rtcPool_st } from '$lib/js/stores.js';
