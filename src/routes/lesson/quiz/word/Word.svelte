@@ -317,6 +317,8 @@
         userContent[i] = words[i] ? words[i] : '';
       }
     });
+
+    checkInput();
   }
 
   onMount(async () => {
@@ -777,7 +779,7 @@
                 tag="svg"
                 on:click={checkInput}
                 viewBox="0 0 24 24"
-                style="margin-top:0px; scale:.5; width:50px"
+                style="visibility:hidden;margin-top:0px; scale:.5; width:50px"
               >
                 <path fill="white" d={mdiTextBoxCheckOutline} />
               </Icon>

@@ -24,9 +24,6 @@
 
     $signal = new SignalingChannel(operator);
 
-    // import wsConnector from './wsConnector.js';
-    // $wss = new wsConnector(host.host_wss);
-
     $langs = data.cookies? JSON.parse(data.cookies).lang: data.operator[0].lang;//
 
     $ice_conf = data.ice_conf;
@@ -39,8 +36,6 @@
 
   onMount(async () => {
      (!operator || data?.group?.length===0)?$view='login':''; 
-
-
   });
 </script>
 
