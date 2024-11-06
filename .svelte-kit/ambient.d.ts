@@ -26,25 +26,8 @@
  * ```
  */
 declare module '$env/static/private' {
-	export const PGHOST: string;
-	export const PGDATABASE: string;
-	export const PGUSER: string;
-	export const PGPASSWORD: string;
-	export const ENDPOINT_ID: string;
-	export const GROQ_API_KEY: string;
-	export const LANGCHAIN_TRACING_V2: string;
-	export const LANGCHAIN_API_KEY: string;
-	export const ANTHROPIC_API_KEY: string;
-	export const HF_TOKEN: string;
-	export const HF_TOKEN_2: string;
-	export const HF_TOKEN_3: string;
-	export const FOREFRONT_API_KEY: string;
-	export const ASSEMBLY_API_KEY: string;
-	export const DEEPL_API_KEY: string;
 	export const ALLUSERSPROFILE: string;
 	export const APPDATA: string;
-	export const ChocolateyInstall: string;
-	export const ChocolateyLastPathUpdate: string;
 	export const CHROME_CRASHPAD_PIPE_NAME: string;
 	export const COLOR: string;
 	export const COLORTERM: string;
@@ -54,22 +37,19 @@ declare module '$env/static/private' {
 	export const ComSpec: string;
 	export const DriverData: string;
 	export const EDITOR: string;
+	export const EFC_6376: string;
 	export const FPS_BROWSER_APP_PROFILE_STRING: string;
 	export const FPS_BROWSER_USER_PROFILE_STRING: string;
 	export const GIT_ASKPASS: string;
 	export const HOME: string;
 	export const HOMEDRIVE: string;
 	export const HOMEPATH: string;
+	export const IGCCSVC_DB: string;
 	export const INIT_CWD: string;
-	export const JAVA_HOME: string;
 	export const LANG: string;
 	export const LOCALAPPDATA: string;
 	export const LOGONSERVER: string;
 	export const NODE: string;
-	export const NODE_ENV: string;
-	export const NODE_EXE: string;
-	export const NODE_OPTIONS: string;
-	export const NPM_CLI_JS: string;
 	export const npm_command: string;
 	export const npm_config_cache: string;
 	export const npm_config_engine_strict: string;
@@ -87,22 +67,22 @@ declare module '$env/static/private' {
 	export const npm_lifecycle_event: string;
 	export const npm_lifecycle_script: string;
 	export const npm_node_execpath: string;
+	export const npm_package_dev: string;
+	export const npm_package_dev_optional: string;
+	export const npm_package_engines_node: string;
+	export const npm_package_integrity: string;
 	export const npm_package_json: string;
 	export const npm_package_name: string;
+	export const npm_package_optional: string;
+	export const npm_package_peer: string;
+	export const npm_package_resolved: string;
 	export const npm_package_version: string;
-	export const NPM_PREFIX_NPM_CLI_JS: string;
 	export const NUMBER_OF_PROCESSORS: string;
-	export const NVM_HOME: string;
-	export const NVM_SYMLINK: string;
 	export const OneDrive: string;
-	export const OPENAI_API_KEY: string;
 	export const ORIGINAL_XDG_CURRENT_DESKTOP: string;
 	export const OS: string;
 	export const Path: string;
 	export const PATHEXT: string;
-	export const PhpStorm: string;
-	export const PM2_HOME: string;
-	export const POWERSHELL_DISTRIBUTION_CHANNEL: string;
 	export const PROCESSOR_ARCHITECTURE: string;
 	export const PROCESSOR_IDENTIFIER: string;
 	export const PROCESSOR_LEVEL: string;
@@ -129,11 +109,8 @@ declare module '$env/static/private' {
 	export const VSCODE_GIT_ASKPASS_NODE: string;
 	export const VSCODE_GIT_IPC_HANDLE: string;
 	export const VSCODE_INJECTION: string;
-	export const VSCODE_INSPECTOR_OPTIONS: string;
-	export const WebStorm: string;
 	export const windir: string;
-	export const __COMPAT_LAYER: string;
-	export const __PSLockDownPolicy: string;
+	export const ZES_ENABLE_SYSMAN: string;
 }
 
 /**
@@ -165,25 +142,8 @@ declare module '$env/static/public' {
  */
 declare module '$env/dynamic/private' {
 	export const env: {
-		PGHOST: string;
-		PGDATABASE: string;
-		PGUSER: string;
-		PGPASSWORD: string;
-		ENDPOINT_ID: string;
-		GROQ_API_KEY: string;
-		LANGCHAIN_TRACING_V2: string;
-		LANGCHAIN_API_KEY: string;
-		ANTHROPIC_API_KEY: string;
-		HF_TOKEN: string;
-		HF_TOKEN_2: string;
-		HF_TOKEN_3: string;
-		FOREFRONT_API_KEY: string;
-		ASSEMBLY_API_KEY: string;
-		DEEPL_API_KEY: string;
 		ALLUSERSPROFILE: string;
 		APPDATA: string;
-		ChocolateyInstall: string;
-		ChocolateyLastPathUpdate: string;
 		CHROME_CRASHPAD_PIPE_NAME: string;
 		COLOR: string;
 		COLORTERM: string;
@@ -193,22 +153,19 @@ declare module '$env/dynamic/private' {
 		ComSpec: string;
 		DriverData: string;
 		EDITOR: string;
+		EFC_6376: string;
 		FPS_BROWSER_APP_PROFILE_STRING: string;
 		FPS_BROWSER_USER_PROFILE_STRING: string;
 		GIT_ASKPASS: string;
 		HOME: string;
 		HOMEDRIVE: string;
 		HOMEPATH: string;
+		IGCCSVC_DB: string;
 		INIT_CWD: string;
-		JAVA_HOME: string;
 		LANG: string;
 		LOCALAPPDATA: string;
 		LOGONSERVER: string;
 		NODE: string;
-		NODE_ENV: string;
-		NODE_EXE: string;
-		NODE_OPTIONS: string;
-		NPM_CLI_JS: string;
 		npm_command: string;
 		npm_config_cache: string;
 		npm_config_engine_strict: string;
@@ -226,22 +183,22 @@ declare module '$env/dynamic/private' {
 		npm_lifecycle_event: string;
 		npm_lifecycle_script: string;
 		npm_node_execpath: string;
+		npm_package_dev: string;
+		npm_package_dev_optional: string;
+		npm_package_engines_node: string;
+		npm_package_integrity: string;
 		npm_package_json: string;
 		npm_package_name: string;
+		npm_package_optional: string;
+		npm_package_peer: string;
+		npm_package_resolved: string;
 		npm_package_version: string;
-		NPM_PREFIX_NPM_CLI_JS: string;
 		NUMBER_OF_PROCESSORS: string;
-		NVM_HOME: string;
-		NVM_SYMLINK: string;
 		OneDrive: string;
-		OPENAI_API_KEY: string;
 		ORIGINAL_XDG_CURRENT_DESKTOP: string;
 		OS: string;
 		Path: string;
 		PATHEXT: string;
-		PhpStorm: string;
-		PM2_HOME: string;
-		POWERSHELL_DISTRIBUTION_CHANNEL: string;
 		PROCESSOR_ARCHITECTURE: string;
 		PROCESSOR_IDENTIFIER: string;
 		PROCESSOR_LEVEL: string;
@@ -268,11 +225,8 @@ declare module '$env/dynamic/private' {
 		VSCODE_GIT_ASKPASS_NODE: string;
 		VSCODE_GIT_IPC_HANDLE: string;
 		VSCODE_INJECTION: string;
-		VSCODE_INSPECTOR_OPTIONS: string;
-		WebStorm: string;
 		windir: string;
-		__COMPAT_LAYER: string;
-		__PSLockDownPolicy: string;
+		ZES_ENABLE_SYSMAN: string;
 		[key: `PUBLIC_${string}`]: undefined;
 		[key: `${string}`]: string | undefined;
 	}
