@@ -1,0 +1,551 @@
+{
+  ".svelte-kit/generated/server/internal.js": {
+    "file": "internal.js",
+    "name": "internal",
+    "src": ".svelte-kit/generated/server/internal.js",
+    "isEntry": true,
+    "imports": [
+      "_internal.js"
+    ]
+  },
+  "_SelectionGroupIcon.js": {
+    "file": "chunks/SelectionGroupIcon.js",
+    "name": "SelectionGroupIcon",
+    "imports": [
+      "_utils.js",
+      "_ssr.js",
+      "_Textfield.js",
+      "_index2.js"
+    ],
+    "css": [
+      "_app/immutable/assets/SelectionGroupIcon.Cwfk-kdc.css"
+    ]
+  },
+  "_Textfield.js": {
+    "file": "chunks/Textfield.js",
+    "name": "Textfield",
+    "imports": [
+      "_utils.js",
+      "_ssr.js",
+      "_index2.js"
+    ]
+  },
+  "_Translate.js": {
+    "file": "chunks/Translate.js",
+    "name": "Translate"
+  },
+  "_client.js": {
+    "file": "chunks/client.js",
+    "name": "client",
+    "imports": [
+      "_exports.js"
+    ]
+  },
+  "_db.admin.js": {
+    "file": "chunks/db.admin.js",
+    "name": "db.admin",
+    "imports": [
+      "_db.js"
+    ]
+  },
+  "_db.js": {
+    "file": "chunks/db.js",
+    "name": "db",
+    "imports": [
+      "_index.js"
+    ]
+  },
+  "_dict.js": {
+    "file": "chunks/dict.js",
+    "name": "dict"
+  },
+  "_dict2.js": {
+    "file": "chunks/dict2.js",
+    "name": "dict",
+    "imports": [
+      "_stores.js"
+    ]
+  },
+  "_exports.js": {
+    "file": "chunks/exports.js",
+    "name": "exports"
+  },
+  "_ice_conf.js": {
+    "file": "chunks/ice_conf.js",
+    "name": "ice_conf"
+  },
+  "_index.js": {
+    "file": "chunks/index.js",
+    "name": "index"
+  },
+  "_index2.js": {
+    "file": "chunks/index2.js",
+    "name": "index",
+    "imports": [
+      "_utils.js"
+    ]
+  },
+  "_internal.js": {
+    "file": "chunks/internal.js",
+    "name": "internal",
+    "imports": [
+      "_ssr.js"
+    ]
+  },
+  "_prod-ssr.js": {
+    "file": "chunks/prod-ssr.js",
+    "name": "prod-ssr"
+  },
+  "_ssr.js": {
+    "file": "chunks/ssr.js",
+    "name": "ssr",
+    "imports": [
+      "_utils.js"
+    ]
+  },
+  "_stores.js": {
+    "file": "chunks/stores.js",
+    "name": "stores",
+    "imports": [
+      "_index2.js"
+    ]
+  },
+  "_utils.js": {
+    "file": "chunks/utils.js",
+    "name": "utils"
+  },
+  "node_modules/@fontsource/fira-mono/files/fira-mono-cyrillic-400-normal.woff": {
+    "file": "_app/immutable/assets/fira-mono-cyrillic-400-normal.Dq7SlH2J.woff",
+    "src": "node_modules/@fontsource/fira-mono/files/fira-mono-cyrillic-400-normal.woff"
+  },
+  "node_modules/@fontsource/fira-mono/files/fira-mono-cyrillic-400-normal.woff2": {
+    "file": "_app/immutable/assets/fira-mono-cyrillic-400-normal.36-45Uyg.woff2",
+    "src": "node_modules/@fontsource/fira-mono/files/fira-mono-cyrillic-400-normal.woff2"
+  },
+  "node_modules/@fontsource/fira-mono/files/fira-mono-cyrillic-ext-400-normal.woff": {
+    "file": "_app/immutable/assets/fira-mono-cyrillic-ext-400-normal.0xXfcOOq.woff",
+    "src": "node_modules/@fontsource/fira-mono/files/fira-mono-cyrillic-ext-400-normal.woff"
+  },
+  "node_modules/@fontsource/fira-mono/files/fira-mono-cyrillic-ext-400-normal.woff2": {
+    "file": "_app/immutable/assets/fira-mono-cyrillic-ext-400-normal.B04YIrm4.woff2",
+    "src": "node_modules/@fontsource/fira-mono/files/fira-mono-cyrillic-ext-400-normal.woff2"
+  },
+  "node_modules/@fontsource/fira-mono/files/fira-mono-greek-400-normal.woff": {
+    "file": "_app/immutable/assets/fira-mono-greek-400-normal.DUeQbRz0.woff",
+    "src": "node_modules/@fontsource/fira-mono/files/fira-mono-greek-400-normal.woff"
+  },
+  "node_modules/@fontsource/fira-mono/files/fira-mono-greek-400-normal.woff2": {
+    "file": "_app/immutable/assets/fira-mono-greek-400-normal.C3zng6O6.woff2",
+    "src": "node_modules/@fontsource/fira-mono/files/fira-mono-greek-400-normal.woff2"
+  },
+  "node_modules/@fontsource/fira-mono/files/fira-mono-greek-ext-400-normal.woff": {
+    "file": "_app/immutable/assets/fira-mono-greek-ext-400-normal.BEhC8Nsh.woff",
+    "src": "node_modules/@fontsource/fira-mono/files/fira-mono-greek-ext-400-normal.woff"
+  },
+  "node_modules/@fontsource/fira-mono/files/fira-mono-greek-ext-400-normal.woff2": {
+    "file": "_app/immutable/assets/fira-mono-greek-ext-400-normal.CsqI23CO.woff2",
+    "src": "node_modules/@fontsource/fira-mono/files/fira-mono-greek-ext-400-normal.woff2"
+  },
+  "node_modules/@fontsource/fira-mono/files/fira-mono-latin-400-normal.woff": {
+    "file": "_app/immutable/assets/fira-mono-latin-400-normal.g4W12wf9.woff",
+    "src": "node_modules/@fontsource/fira-mono/files/fira-mono-latin-400-normal.woff"
+  },
+  "node_modules/@fontsource/fira-mono/files/fira-mono-latin-400-normal.woff2": {
+    "file": "_app/immutable/assets/fira-mono-latin-400-normal.DKjLVgQi.woff2",
+    "src": "node_modules/@fontsource/fira-mono/files/fira-mono-latin-400-normal.woff2"
+  },
+  "node_modules/@fontsource/fira-mono/files/fira-mono-latin-ext-400-normal.woff": {
+    "file": "_app/immutable/assets/fira-mono-latin-ext-400-normal.CrDGr5zW.woff",
+    "src": "node_modules/@fontsource/fira-mono/files/fira-mono-latin-ext-400-normal.woff"
+  },
+  "node_modules/@fontsource/fira-mono/files/fira-mono-latin-ext-400-normal.woff2": {
+    "file": "_app/immutable/assets/fira-mono-latin-ext-400-normal.D6XfiR-_.woff2",
+    "src": "node_modules/@fontsource/fira-mono/files/fira-mono-latin-ext-400-normal.woff2"
+  },
+  "node_modules/@sveltejs/kit/src/runtime/components/svelte-4/error.svelte": {
+    "file": "entries/fallbacks/error.svelte.js",
+    "name": "entries/fallbacks/error.svelte",
+    "src": "node_modules/@sveltejs/kit/src/runtime/components/svelte-4/error.svelte",
+    "isEntry": true,
+    "imports": [
+      "_utils.js",
+      "_ssr.js",
+      "_client.js"
+    ]
+  },
+  "node_modules/@sveltejs/kit/src/runtime/server/index.js": {
+    "file": "index.js",
+    "name": "index",
+    "src": "node_modules/@sveltejs/kit/src/runtime/server/index.js",
+    "isEntry": true,
+    "imports": [
+      "_prod-ssr.js",
+      "_internal.js",
+      "_index.js",
+      "_exports.js",
+      "_index2.js"
+    ]
+  },
+  "src/lib/images/tutor.png": {
+    "file": "_app/immutable/assets/tutor.Dw8pvcdV.png",
+    "src": "src/lib/images/tutor.png"
+  },
+  "src/lib/mp3/bell.mp3": {
+    "file": "_app/immutable/assets/bell.yq3gAkA1.mp3",
+    "src": "src/lib/mp3/bell.mp3"
+  },
+  "src/lib/mp3/call.mp3": {
+    "file": "_app/immutable/assets/call.C8lmx5LD.mp3",
+    "src": "src/lib/mp3/call.mp3"
+  },
+  "src/lib/mp3/ring.mp3": {
+    "file": "_app/immutable/assets/ring.C9X-rfjT.mp3",
+    "src": "src/lib/mp3/ring.mp3"
+  },
+  "src/routes/+layout.server.js": {
+    "file": "entries/pages/_layout.server.js",
+    "name": "entries/pages/_layout.server",
+    "src": "src/routes/+layout.server.js",
+    "isEntry": true,
+    "imports": [
+      "_index.js"
+    ]
+  },
+  "src/routes/+layout.svelte": {
+    "file": "entries/pages/_layout.svelte.js",
+    "name": "entries/pages/_layout.svelte",
+    "src": "src/routes/+layout.svelte",
+    "isEntry": true,
+    "imports": [
+      "_ssr.js"
+    ],
+    "css": [
+      "_app/immutable/assets/_layout.Q2Y666EO.css"
+    ],
+    "assets": [
+      "_app/immutable/assets/fira-mono-cyrillic-ext-400-normal.B04YIrm4.woff2",
+      "_app/immutable/assets/fira-mono-cyrillic-ext-400-normal.0xXfcOOq.woff",
+      "_app/immutable/assets/fira-mono-cyrillic-400-normal.36-45Uyg.woff2",
+      "_app/immutable/assets/fira-mono-cyrillic-400-normal.Dq7SlH2J.woff",
+      "_app/immutable/assets/fira-mono-greek-ext-400-normal.CsqI23CO.woff2",
+      "_app/immutable/assets/fira-mono-greek-ext-400-normal.BEhC8Nsh.woff",
+      "_app/immutable/assets/fira-mono-greek-400-normal.C3zng6O6.woff2",
+      "_app/immutable/assets/fira-mono-greek-400-normal.DUeQbRz0.woff",
+      "_app/immutable/assets/fira-mono-latin-ext-400-normal.D6XfiR-_.woff2",
+      "_app/immutable/assets/fira-mono-latin-ext-400-normal.CrDGr5zW.woff",
+      "_app/immutable/assets/fira-mono-latin-400-normal.DKjLVgQi.woff2",
+      "_app/immutable/assets/fira-mono-latin-400-normal.g4W12wf9.woff"
+    ]
+  },
+  "src/routes/+page.js": {
+    "file": "entries/pages/_page.js",
+    "name": "entries/pages/_page",
+    "src": "src/routes/+page.js",
+    "isEntry": true
+  },
+  "src/routes/+page.server.ts": {
+    "file": "entries/pages/_page.server.ts.js",
+    "name": "entries/pages/_page.server.ts",
+    "src": "src/routes/+page.server.ts",
+    "isEntry": true,
+    "imports": [
+      "_dict.js",
+      "_ice_conf.js",
+      "_db.js"
+    ]
+  },
+  "src/routes/+page.svelte": {
+    "file": "entries/pages/_page.svelte.js",
+    "name": "entries/pages/_page.svelte",
+    "src": "src/routes/+page.svelte",
+    "isEntry": true,
+    "imports": [
+      "_utils.js",
+      "_ssr.js",
+      "_client.js",
+      "_SelectionGroupIcon.js",
+      "_stores.js",
+      "_index2.js",
+      "_Textfield.js",
+      "_Translate.js"
+    ],
+    "css": [
+      "_app/immutable/assets/_page.oFGT2FF3.css"
+    ],
+    "assets": [
+      "_app/immutable/assets/call.C8lmx5LD.mp3",
+      "_app/immutable/assets/ring.C9X-rfjT.mp3",
+      "_app/immutable/assets/icofont.CegLT4Ez.woff2",
+      "_app/immutable/assets/icofont.CRj9mKsw.woff"
+    ]
+  },
+  "src/routes/+server.js": {
+    "file": "entries/endpoints/_server.js",
+    "name": "entries/endpoints/_server",
+    "src": "src/routes/+server.js",
+    "isEntry": true,
+    "imports": [
+      "_index.js",
+      "_db.js",
+      "_stores.js"
+    ]
+  },
+  "src/routes/admin/+page.js": {
+    "file": "entries/pages/admin/_page.js",
+    "name": "entries/pages/admin/_page",
+    "src": "src/routes/admin/+page.js",
+    "isEntry": true
+  },
+  "src/routes/admin/+page.server.ts": {
+    "file": "entries/pages/admin/_page.server.ts.js",
+    "name": "entries/pages/admin/_page.server.ts",
+    "src": "src/routes/admin/+page.server.ts",
+    "isEntry": true,
+    "imports": [
+      "_dict.js",
+      "_db.js",
+      "_db.admin.js"
+    ]
+  },
+  "src/routes/admin/+page.svelte": {
+    "file": "entries/pages/admin/_page.svelte.js",
+    "name": "entries/pages/admin/_page.svelte",
+    "src": "src/routes/admin/+page.svelte",
+    "isEntry": true,
+    "imports": [
+      "_utils.js",
+      "_ssr.js",
+      "_SelectionGroupIcon.js",
+      "_stores.js",
+      "_client.js",
+      "_Textfield.js",
+      "_dict2.js"
+    ],
+    "css": [
+      "_app/immutable/assets/_page.BLv5L6D3.css"
+    ]
+  },
+  "src/routes/admin/+server.ts": {
+    "file": "entries/endpoints/admin/_server.ts.js",
+    "name": "entries/endpoints/admin/_server.ts",
+    "src": "src/routes/admin/+server.ts",
+    "isEntry": true,
+    "imports": [
+      "_index.js",
+      "_db.admin.js"
+    ]
+  },
+  "src/routes/admin/group/+server.ts": {
+    "file": "entries/endpoints/admin/group/_server.ts.js",
+    "name": "entries/endpoints/admin/group/_server.ts",
+    "src": "src/routes/admin/group/+server.ts",
+    "isEntry": true,
+    "imports": [
+      "_index.js",
+      "_db.admin.js"
+    ]
+  },
+  "src/routes/admin/login/+server.js": {
+    "file": "entries/endpoints/admin/login/_server.js",
+    "name": "entries/endpoints/admin/login/_server",
+    "src": "src/routes/admin/login/+server.js",
+    "isEntry": true,
+    "imports": [
+      "_index.js",
+      "_db.admin.js"
+    ]
+  },
+  "src/routes/admin/module/+server.js": {
+    "file": "entries/endpoints/admin/module/_server.js",
+    "name": "entries/endpoints/admin/module/_server",
+    "src": "src/routes/admin/module/+server.js",
+    "isEntry": true,
+    "imports": [
+      "_index.js",
+      "_db.admin.js"
+    ]
+  },
+  "src/routes/admin/quiz/dialog/+server.ts": {
+    "file": "entries/endpoints/admin/quiz/dialog/_server.ts.js",
+    "name": "entries/endpoints/admin/quiz/dialog/_server.ts",
+    "src": "src/routes/admin/quiz/dialog/+server.ts",
+    "isEntry": true,
+    "imports": [
+      "_index.js",
+      "_db.admin.js"
+    ]
+  },
+  "src/routes/assets/icofont/fonts/icofont.woff": {
+    "file": "_app/immutable/assets/icofont.CRj9mKsw.woff",
+    "src": "src/routes/assets/icofont/fonts/icofont.woff"
+  },
+  "src/routes/assets/icofont/fonts/icofont.woff2": {
+    "file": "_app/immutable/assets/icofont.CegLT4Ez.woff2",
+    "src": "src/routes/assets/icofont/fonts/icofont.woff2"
+  },
+  "src/routes/lesson/+layout.svelte": {
+    "file": "entries/pages/lesson/_layout.svelte.js",
+    "name": "entries/pages/lesson/_layout.svelte",
+    "src": "src/routes/lesson/+layout.svelte",
+    "isEntry": true,
+    "imports": [
+      "_ssr.js"
+    ],
+    "css": [
+      "_app/immutable/assets/_layout.BkKEX2pm.css"
+    ]
+  },
+  "src/routes/lesson/+page.js": {
+    "file": "entries/pages/lesson/_page.js",
+    "name": "entries/pages/lesson/_page",
+    "src": "src/routes/lesson/+page.js",
+    "isEntry": true
+  },
+  "src/routes/lesson/+page.server.js": {
+    "file": "entries/pages/lesson/_page.server.js",
+    "name": "entries/pages/lesson/_page.server",
+    "src": "src/routes/lesson/+page.server.js",
+    "isEntry": true
+  },
+  "src/routes/lesson/+server.js": {
+    "file": "entries/endpoints/lesson/_server.js",
+    "name": "entries/endpoints/lesson/_server",
+    "src": "src/routes/lesson/+server.js",
+    "isEntry": true,
+    "imports": [
+      "_index.js",
+      "_db.js"
+    ]
+  },
+  "src/routes/operator/+server.js": {
+    "file": "entries/endpoints/operator/_server.js",
+    "name": "entries/endpoints/operator/_server",
+    "src": "src/routes/operator/+server.js",
+    "isEntry": true,
+    "imports": [
+      "_index.js",
+      "_stores.js"
+    ]
+  },
+  "src/routes/operator/chat/+server.js": {
+    "file": "entries/endpoints/operator/chat/_server.js",
+    "name": "entries/endpoints/operator/chat/_server",
+    "src": "src/routes/operator/chat/+server.js",
+    "isEntry": true,
+    "imports": [
+      "_db.js",
+      "_Translate.js"
+    ]
+  },
+  "src/routes/public/+page.server.ts": {
+    "file": "entries/pages/public/_page.server.ts.js",
+    "name": "entries/pages/public/_page.server.ts",
+    "src": "src/routes/public/+page.server.ts",
+    "isEntry": true,
+    "imports": [
+      "_dict.js",
+      "_ice_conf.js",
+      "_db.js"
+    ]
+  },
+  "src/routes/public/+page.svelte": {
+    "file": "entries/pages/public/_page.svelte.js",
+    "name": "entries/pages/public/_page.svelte",
+    "src": "src/routes/public/+page.svelte",
+    "isEntry": true,
+    "imports": [
+      "_utils.js",
+      "_ssr.js",
+      "_client.js",
+      "_Textfield.js",
+      "_stores.js",
+      "_dict2.js"
+    ],
+    "css": [
+      "_app/immutable/assets/_page.DeMz_IcG.css"
+    ]
+  },
+  "src/routes/site/+page.js": {
+    "file": "entries/pages/site/_page.js",
+    "name": "entries/pages/site/_page",
+    "src": "src/routes/site/+page.js",
+    "isEntry": true
+  },
+  "src/routes/site/+page.svelte": {
+    "file": "entries/pages/site/_page.svelte.js",
+    "name": "entries/pages/site/_page.svelte",
+    "src": "src/routes/site/+page.svelte",
+    "isEntry": true,
+    "imports": [
+      "_ssr.js"
+    ],
+    "css": [
+      "_app/immutable/assets/_page.DnowOQRu.css"
+    ]
+  },
+  "src/routes/site/about/+page.js": {
+    "file": "entries/pages/site/about/_page.js",
+    "name": "entries/pages/site/about/_page",
+    "src": "src/routes/site/about/+page.js",
+    "isEntry": true,
+    "imports": [
+      "_prod-ssr.js"
+    ]
+  },
+  "src/routes/site/about/+page.svelte": {
+    "file": "entries/pages/site/about/_page.svelte.js",
+    "name": "entries/pages/site/about/_page.svelte",
+    "src": "src/routes/site/about/+page.svelte",
+    "isEntry": true,
+    "imports": [
+      "_ssr.js"
+    ]
+  },
+  "src/routes/speech/stt/+server.js": {
+    "file": "entries/endpoints/speech/stt/_server.js",
+    "name": "entries/endpoints/speech/stt/_server",
+    "src": "src/routes/speech/stt/+server.js",
+    "isEntry": true,
+    "imports": [
+      "_Translate.js"
+    ]
+  },
+  "src/routes/speech/tts/+server.js": {
+    "file": "entries/endpoints/speech/tts/_server.js",
+    "name": "entries/endpoints/speech/tts/_server",
+    "src": "src/routes/speech/tts/+server.js",
+    "isEntry": true,
+    "imports": [
+      "_db.js",
+      "_index.js"
+    ]
+  },
+  "src/routes/translate/+server.js": {
+    "file": "entries/endpoints/translate/_server.js",
+    "name": "entries/endpoints/translate/_server",
+    "src": "src/routes/translate/+server.js",
+    "isEntry": true,
+    "imports": [
+      "_Translate.js"
+    ]
+  },
+  "src/routes/user/+server.js": {
+    "file": "entries/endpoints/user/_server.js",
+    "name": "entries/endpoints/user/_server",
+    "src": "src/routes/user/+server.js",
+    "isEntry": true,
+    "imports": [
+      "_index.js",
+      "_stores.js"
+    ]
+  },
+  "src/routes/user/group/+server.js": {
+    "file": "entries/endpoints/user/group/_server.js",
+    "name": "entries/endpoints/user/group/_server",
+    "src": "src/routes/user/group/+server.js",
+    "isEntry": true,
+    "imports": [
+      "_db.js"
+    ]
+  }
+}

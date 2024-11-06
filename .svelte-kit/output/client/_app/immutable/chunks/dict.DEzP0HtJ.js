@@ -1,0 +1,1 @@
+import{e as t,l as i,a as r}from"./Textfield.BKZax2Uy.js";t.engine="google";t.from="ru";class n{constructor(s){this.dict=s,i.subscribe(a=>{this.llang=a}),r.subscribe(a=>{this.lang=a})}async get(s){return await t(s,this.lang)}}export{n as D};

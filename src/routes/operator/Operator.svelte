@@ -60,6 +60,7 @@
   import { msg } from '$lib/js/stores.js';
   $: if ($msg) {
     OnMessage($msg, null);
+    // $msg = ''
   }
 
   let dlg_display = 'none';

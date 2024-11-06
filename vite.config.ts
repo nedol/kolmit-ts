@@ -2,11 +2,19 @@ import { sveltekit } from "@sveltejs/kit/vite";
 import { defineConfig } from "vite";
 import path from "path";
 import { createProxyMiddleware } from "http-proxy-middleware";
+// import { terser } from 'vite-plugin-terser';
 
 import commonjs from "vite-plugin-commonjs";
+// import nodeGlobals from 'rollup-plugin-node-globals';
 
 export default defineConfig({
-  plugins: [sveltekit(), commonjs()],
+  plugins: [sveltekit(), commonjs()
+    // ,terser({
+    //   format: {
+    //     comments: false
+    //   }
+    // })
+  ],
   assetsInclude: ["**/*.html"],
 
   resolve: {
@@ -17,6 +25,12 @@ export default defineConfig({
     },
   },
 
+    define: {
+    // By default, Vite doesn't include shims for NodeJS/
+    // necessary for segment analytics lib to work
+      global: 'globalThis',
+  },
+
   build: {
     // Устанавливаем dev: true только для целей разработки
     dev: true,
@@ -24,6 +38,10 @@ export default defineConfig({
 
   server: {
     //port: 3478, // Измените этот порт по вашему усмотрению
+
+    host: '0.0.0.0',
+    port: 5173,  // Проверьте, что этот порт соответствует порту, на котором работает ваше приложение
+  
     https: {
       key: path.resolve("./key.pem"),
       cert: path.resolve("./cert.pem"),
@@ -38,6 +56,7 @@ export default defineConfig({
     // 	})
     // ]
   },
+
 
   css: {
     preprocessorOptions: {

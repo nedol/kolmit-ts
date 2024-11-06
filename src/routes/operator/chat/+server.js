@@ -1,7 +1,7 @@
 import { config } from 'dotenv';
 config();
 
-// import { Client, client } from '@gradio/client';
+import { Client, client } from '@gradio/client';
 
 import { GetPrompt } from '../../../lib/server/db';
 
