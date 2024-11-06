@@ -5,7 +5,7 @@ import ISO6391 from 'iso-google-locales';
 
 import { Translate } from '../../translate/Translate';
 
-import { client } from '@gradio/client';
+import { Client } from '@gradio/client';
 
 import { config } from 'dotenv';
 config();
@@ -103,8 +103,9 @@ export async function POST({ url, fetch, cookies, request }) {
 
 
 async function stt_sm4(blob, from_lang, to_lang) {
-   const app = await client(
-     'https://bluman1-seamless-m4t-v2-large.hf.space/--replicas/y1arv'
+
+   const app = await Client.connect(
+     'bluman1/seamless-m4t-v2-large-fixing'
    );
   const app_info = await app.view_api();
   const from = ISO6391.getName(from_lang);
