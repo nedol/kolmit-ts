@@ -103,12 +103,13 @@ export async function POST({ url, fetch, cookies, request }) {
 
 
 async function stt_sm4(blob, from_lang, to_lang) {
+
    const app = await Client.connect(
      'bluman1/seamless-m4t-v2-large-fixing'
    );
   const app_info = await app.view_api();
   const from = ISO6391.getName(from_lang);
-  const to = ISO6391.getName(to_lang);
+   const to = ISO6391.getName(to_lang);
   const result = await app.predict('/s2tt', [
     blob, // blob in 'Input speech' Audio component
     from, // string  in 'Source language' Dropdown component
@@ -119,7 +120,7 @@ async function stt_sm4(blob, from_lang, to_lang) {
 
 
 async function stt_mms(arrayBuffer,  from_lang, to_lang) {
-  const app = await new Client('https://mms-meta-mms.hf.space/');
+  const app = await client('https://mms-meta-mms.hf.space/');
     const from = ISO6391.getName(from_lang);
     const to = ISO6391.getName(to_lang);
   const result = await app.predict('/predict', [
@@ -141,7 +142,7 @@ async function stt_as(audioUrl) {
   const params = {
     audio: audioUrl,
   };
-  const transcript = await new Client.transcripts.transcribe(params);
+  const transcript = await client.transcripts.transcribe(params);
   return transcript;
 }
 
