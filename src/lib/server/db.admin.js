@@ -1,6 +1,10 @@
 import md5 from 'md5';
-import { getLevels } from './db'
+import { getLevels } from './db';
 import postgres from 'postgres';
+import { SendEmail } from './db';
+
+import pkg_l from 'lodash';
+const { find, remove, findIndex, difference } = pkg_l;
 
 let sql;
 
@@ -39,14 +43,14 @@ export async function CreatePool(resolve) {
 }
 
 export async function SetSQL(sql_) {
-  sql = await sql_;
+  sql = sql_;
 }
 
 export async function CreateAdmin(par) {
   try {
     let res = await sql`INSERT INTO admins
-			(name , email, hash, psw)
-			VALUES(${par.name},${par.email},${md5(par.email)},${md5(par.psw)})
+			(name , email, operator, psw, lang)
+			VALUES(${par.name},${par.email},${md5(par.email)},${md5(par.psw)},${par.lang})
 			ON CONFLICT ( email)
 			DO NOTHING
 			`;
@@ -54,75 +58,67 @@ export async function CreateAdmin(par) {
     return {
       name: par.name,
       email: par.email,
-      hash: md5(par.email),
+      operator: md5(par.email),
       psw: md5(par.psw),
+      lang: par.lang,
     };
   } catch (ex) {
     console.log();
   }
 }
 
-export async function GetClasses(par) {
-  let classes, operators, admin;
+export async function GetGroups(par) {
+  let groups, operators, admin;
   try {
     operators = await sql`
-			SELECT 
-			id,			
-      class,
-			role,
-			operator as email,
-			name,
-			picture,
-      lang,
-			dep
-			FROM operators
-			WHERE role<>'admin' AND operators.abonent=${par.abonent}`;
+      SELECT *
+      FROM operators
+      WHERE role <> 'admin' AND operators.abonent = ${par.abonent}`;
+
     admin = await sql`
-			SELECT 
-			id,			
-			role,
-			operator as email,
-			name,
-			picture,
-			dep
-			FROM operators
-			WHERE role='admin' AND operators.abonent=${par.abonent}
-			`;
-    classes = await sql`
-     SELECT classes.name  FROM classes
-     INNER JOIN operators ON (operators.operator = classes.owner)
-     WHERE classes.owner=${par.abonent} AND operators.psw = ${par.psw}
-     `;
+      SELECT *
+      FROM operators
+      WHERE role = 'admin' AND operators.abonent = ${par.abonent}`;
+
+    groups = await sql`
+      SELECT groups.name::text 
+      FROM groups
+      INNER JOIN operators ON (operators.abonent = groups.owner)
+      WHERE operators.operator = ${par.abonent} 
+      AND operators.role = 'admin' 
+      AND operators.psw = ${par.psw}`;
   } catch (ex) {
     console.log(ex);
   }
-  return { classes, operators, admin };
+  return { groups, operators, admin };
 }
 
-export async function DeleteUser(q) {
-  let res;
+
+export async function DeleteUser(par) {
+  let resp;
   try {
-    res = await sql`UPDATE operators SET abonent='public' 
-    WHERE operator=${q.email} AND abonent=${q.abonent}`;
-    res = GetUsers();
+    resp = await sql`UPDATE operators SET "group"='public', abonent='public' 
+    WHERE operator=${par.operator} AND abonent=${par.abonent}`;
   } catch (ex) {
     console.log(ex);
   }
-  return { res };
+  return { resp };
 }
 
 export async function AddUser(q) {
   try {
-    let res = await sql`INSERT INTO operators
-			(role, operator , abonent , name, lang )
-			VALUES(${q.role},${q.email}, ${q.abonent}, ${q.name}, ${q.lang})
+    let operator = md5(q.email);
+    let resp = await sql`INSERT INTO operators
+			("group", role, operator , email, abonent , name, lang )
+			VALUES(${q.class_name}, ${q.role},${operator}, ${q.email}, ${q.abonent}, ${q.name}, ${q.lang})
 			ON CONFLICT (operator, abonent)
 			DO NOTHING`;
-
-    SendEmail({ send_email: q.email, abonent: q.abonent, lang: q.lang });
-    return { res };
+    if (resp.count > 0) {
+      SendEmail({ send_email: q.email, abonent: q.abonent, lang: q.lang });
+    }
+    return { resp };
   } catch (ex) {
-    return JSON.stringify({ func: q.func, res: ex });
+    return JSON.stringify({ func: q.func, resp: ex });
   }
 }
 
@@ -134,13 +130,15 @@ export async function UpdateLesson(q) {
     });
 
     let res = await sql`INSERT INTO lessons
-			(level , owner, data, lang )
-			VALUES(${q.level},${q.owner},${JSON.parse(q.data)}, ${q.lang})
-			ON CONFLICT (level, owner)
+			(level , owner, data, lang, timestamp )
+			VALUES(${q.level},${q.owner},${JSON.parse(q.data)}, ${q.lang}, NOW())
+			ON CONFLICT (level, owner, lang)
 			DO UPDATE SET
 			owner = EXCLUDED.owner,
 			level = EXCLUDED.level,
-			data = EXCLUDED.data`;
+      lang = EXCLUDED.lang,
+			data = EXCLUDED.data,
+      timestamp = NOW()`;
     return { res };
   } catch (ex) {
     return JSON.stringify({ func: q.func, res: ex });
@@ -154,14 +152,66 @@ async function removeModule(item) {
 export async function UpdateDialog(q) {
   try {
     let res = await sql`INSERT INTO dialogs
-			(name , dialog, owner)
-			VALUES(${q.new_name},${q.data},${q.owner})
-			ON CONFLICT (name, owner)
+			(name , dialog, owner, html, level)
+			VALUES(${q.new_name},${q.data},${q.owner},${q.data.html || ''}, ${q.level} )
+			ON CONFLICT (name, owner, level)
 			DO UPDATE SET
 			name = EXCLUDED.name,
-			dialog = EXCLUDED.dialog`;
+      html = EXCLUDED.html,
+			dialog = EXCLUDED.dialog,
+      timestamp = NOW()`;
     return { res };
   } catch (ex) {
     return JSON.stringify({ func: q.func, res: ex });
   }
+}
+
+export async function UpdateListen(q) {
+  try {
+    let res = await sql`INSERT INTO listen
+			(owner, name , data, lang)
+			VALUES(${q.owner},${q.new_name},${q.data},${q.lang} )
+			ON CONFLICT (name, lang, owner)
+			DO UPDATE SET
+			data = EXCLUDED.data`;
+    return { res };
+  } catch (ex) {
+    return JSON.stringify({ func: q.func, res: ex });
+  }
+}
+
+export async function UpdateWords(q) {
+  try {
+    let res = await sql`INSERT INTO word
+			(name , data, owner, level,context)
+			VALUES(${q.new_name},${q.data},${q.owner}, ${q.level}, ${q.context})
+			ON CONFLICT (name, owner, level)
+			DO UPDATE SET
+			name = EXCLUDED.name,
+      level = EXCLUDED.level,
+			data = EXCLUDED.data,
+      context = EXCLUDED.context,
+      timestamp = NOW()`;
+    return { res };
+  } catch (ex) {
+    return JSON.stringify({ func: q.func, res: ex });
+  }
+}
+
+export async function GetPrompt(prompt, quiz_name, owner, level, theme) {
+  let prompt_res, words_res, gram_res, gram;
+  try {
+    prompt_res = await sql`SELECT * FROM prompts WHERE name=${prompt}`;
+    words_res = await sql`SELECT * FROM word WHERE name=${quiz_name}`;
+    gram_res =
+      await sql`SELECT * FROM grammar WHERE owner=${owner} AND level=${level}`;
+    gram = find(gram_res[0].data, { theme: theme });
+  } catch (ex) {
+    // return JSON.stringify({ res: ex });
+  }
+  return {
+    prompt: prompt_res[0],
+    words: words_res,
+    grammar: gram,
+  };
 }

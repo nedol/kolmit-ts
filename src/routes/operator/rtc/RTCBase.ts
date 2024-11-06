@@ -6,13 +6,12 @@ import { ice_conf } from '$lib/ice_conf';
 import { call_but_status } from '$lib/js/stores.js';
 
 export class RTCBase {
-	constructor(operator, uid, signal) {
+	constructor(operator, name, signal) {
 		this.signal = signal;
-		this.type = operator.type;
 		this.abonent = operator.abonent;
-		this.em = operator.em;
-		this.role = operator.role;
-		this.uid = uid;
+		this.operator = operator.operator;
+		this.name = name;
+		this.target = '';
 		this.status;
 
 		this.pcPull = {};
@@ -30,20 +29,6 @@ export class RTCBase {
 		// this.vr.open();
 	}
 
-	async SendCheck() {
-		let par = {};
-		par.proj = 'kolmit';
-		par.func = 'check';
-		par.status = 'check';
-		par.type = this.type;
-		par.abonent = this.abonent;
-		par.em = this.em;
-		par.uid = this.uid;
-		// par.abonent = this.abonent.toLowerCase();
-		this.signal.SendMessage(par, (resp) => {
-			this.status = 'check';
-		});
-	}
 
 	SendVideoOffer(key) {
 		this.pcPull[key].params['loc_desc'] = '';
@@ -75,7 +60,8 @@ export class RTCBase {
 
 			if (pc.con.iceConnectionState === 'disconnected') {
 				console.log(pc.pc_key + ' ICE state change event: disconnected', this);
-				pc.con.SendOffer();
+				pc.con.restartIce();
+				pc.SendOffer();
 			}
 
 			if (pc.con.iceConnectionState === 'connected') {

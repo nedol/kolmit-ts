@@ -7,7 +7,7 @@
 
 	export let display = 'none';
 
-	export let src = ''; //../src/routes/assets/operator.svg';
+	export let src = '/assets/operator.svg';
 	export let name = '';
 	export let email = '';
 

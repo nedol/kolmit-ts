@@ -2,13 +2,14 @@
 	"version": "0.2.0",
 	"configurations": [
 		{
-			"name": "Launch server",
+			"name":"Launch Server",
 			"request": "launch",
 			"runtimeArgs": ["run-script", "dev"],
 			"runtimeExecutable": "npm",
-			"skipFiles": ["<node_internals>/**"],
+			"console": "integratedTerminal",
 			"type": "node",
-			"console": "integratedTerminal"
+			"skipFiles": ["<node_internals>/**"],
+			"sourceMaps": true
 		},
 
 		{
@@ -26,3 +27,5 @@
 		}
 	]
 }
+
+  

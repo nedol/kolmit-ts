@@ -1,0 +1,7 @@
+@use '@smui-extra/badge/mixins' as badge;
+@use '@material/theme/color-palette';
+@use '@material/theme/theme-color';
+
+@include badge.badge-color(custom-green,
+    color-palette.$green-600,
+    theme-color.accessible-ink-color(color-palette.$green-600));

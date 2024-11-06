@@ -1,11 +1,29 @@
-import { DataChannel } from './DataChannel';
-import { msg_oper } from '$lib/js/stores.js';
-import { dc_oper } from '$lib/js/stores.js';
-import { dc_oper_state } from '$lib/js/stores.js';
+import { writable } from 'svelte/store';
 
-export class DataChannelOperator extends DataChannel {
-	constructor(rtc, pc) {
-		super(rtc, pc);
+import { DataChannel } from './DataChannel';
+import { msg, dc, dc_state, posterst ,operatorst } from '$lib/js/stores.js';
+import md5 from 'md5';
+
+
+let oper;
+operatorst.subscribe((data) => {
+  oper = data;
+});
+
+
+let poster;
+posterst.subscribe((data) => {
+  poster = data;
+});
+
+
+export class DataChannelOperator {
+
+	constructor(rtc,pc){
+        this.rtc = rtc;
+        this.pc = pc;
+        this.call_num = 3;
+        this.forward;
 
 		let that = this;
 		that.cnt_call = 0;
@@ -17,24 +35,24 @@ export class DataChannelOperator extends DataChannel {
 
 		this.dc.onopen = () => {
 			//this.dc.onopen = null;
-			dc_oper.set(this);
+			dc.set(this);
 			if (that.dc.readyState === 'open') {
 				console.log(that.pc.pc_key + ' datachannel open');
-				dc_oper_state.set(that.dc.readyState);
+				dc_state.set(that.dc.readyState);
+
+				this.dc.onclose = () => {
+					// msg.set({ func: 'mute' });
+					dc_state.set("close");					
+					rtc.SendStatus('close');
+				};
+
+				this.dc.onerror = () => {
+					// msg.set({ func: 'mute' });
+					dc_state.set("close");
+					rtc.SendStatus('close');
+				};
 			}
-
-			this.dc.onclose = () => {
-				msg_oper.set({ func: 'mute' });
-				dc_oper_state.set(that.dc.readyState);
-			};
-
-			this.dc.onerror = () => {
-				msg_oper.set({ func: 'mute' });
-				dc_oper_state.set(that.dc.readyState);
-			};
 		};
-
-		dc_oper_state.set(that.dc.readyState);
 
 		pc.StartEvents();
 
@@ -52,13 +70,33 @@ export class DataChannelOperator extends DataChannel {
 			try {
 				// debugger;
 				let parsed = JSON.parse(event.data);
+		
 				if (parsed.type === 'eom') {
-					if (data) {
-						that.rtc.OnMessage(JSON.parse(data), that);
-						await msg_oper.set(JSON.parse(data));
+					if (parsed.received) {
+						console.log(parsed.received);
 					}
-					data = '';
+					if (parsed.hash) {						
+						setTimeout(() => {
+							this.dc.send(JSON.stringify({ type: 'eom', received: parsed.hash }));
+						}, 0);	
+					}
+					if (data) {
+						//that.rtc.OnMessage(JSON.parse(data), that);			
+				
+						setTimeout(() => {
+							try {
+								msg.set(JSON.parse(data));
+								// msg.set('');
+							} catch (error) {
+								console.error('Msg ошибка:', error);
+							}
+							data = '';
+						
+						}, 0);
+					}
+					
 					return;
+						
 				}
 				data += parsed.slice;
 				if (parsed.file) {
@@ -93,42 +131,11 @@ export class DataChannelOperator extends DataChannel {
 		};
 	}
 
-	SendFile(data, name) {
-		// if(this.forward){
-		//     data.email = this.forward;
-		//     this.forward = '';
-		//     data.func = 'answer';
-		// }
-		try {
-			if (this.dc.readyState === 'open') {
-				let size = 16384;
-				const numChunks = Math.ceil(data.byteLength / size);
+	CreateDC(){
+        this.dc = pc.con.createDataChannel(pc.pc_key+" data channel");
+    }
 
-				this.dc.send(JSON.stringify({ file: name, length: data.byteLength }), function (data) {
-					console.log(data);
-				});
-				for (let i = 0, o = 0; i < numChunks; ++i, o += size) {
-					const slice = data.slice(o, o + size);
-					// document.getElementById('dataProgress').attributes.value = o + size;
-					this.dc.send(slice, function (data) {
-						console.log(data);
-					});
-				}
-				// setTimeout(function () {
-				// 	document.getElementById('dataProgress').style.display = 'none';
-				// }, 2000);
-
-				this.dc.send(
-					JSON.stringify({ type: 'eof', file: name, length: data.byteLength }),
-					function (data) {
-						console.log(data);
-					}
-				);
-			}
-		} catch (ex) {
-			console.log(ex);
-		}
-	}
+	
 
 	SendData(data, cb) {
 		// if(this.forward){
@@ -143,9 +150,10 @@ export class DataChannelOperator extends DataChannel {
 				const numChunks = Math.ceil(data.length / size);
 
 				for (let i = 0, o = 0; i < numChunks; ++i, o += size) {
-					this.dc.send(JSON.stringify({ slice: data.substr(o, size) }));
+					this.dc.send(JSON.stringify({ slice: data.substr(o, size),from:'oper' }));
 				}
-				this.dc.send(JSON.stringify({ type: 'eom' }));
+				this.dc.send(JSON.stringify({ type: 'eom', hash: md5(data)  }));
+				
 			}
 
 			if (cb) cb();
@@ -173,6 +181,65 @@ export class DataChannelOperator extends DataChannel {
 
 	//     that.rtc.PlayCallCnt();
 	// }
+
+	SendFile(data, name) {
+		// if(this.forward){
+		//     data.email = this.forward;
+		//     this.forward = '';
+		//     data.func = 'answer';
+		// }
+		try {
+			if (this.dc.readyState === 'open') {
+				let size = 16384;
+				const numChunks = Math.ceil(data.byteLength / size);
+
+				this.dc.send(JSON.stringify({ file: name, length: data.byteLength }), function (data) {
+					console.log(data);
+				});
+				for (let i = 0, o = 0; i < numChunks; ++i, o += size) {
+					const slice = data.slice(o, o + size);
+					// document.getElementById('dataProgress').attributes.value = o + size;
+					this.dc.send(slice, function (data) {
+						console.log(data);
+					});
+				}
+				// setTimeout(function () {
+				// 	document.getElementById('dataProgress').style.display = 'none';
+				// }, 2000);
+
+				this.dc.send(
+					JSON.stringify({ type: 'eof', file: name, length: data.byteLength, from: 'oper' }),
+					function (data) {
+						console.log(data);
+					}
+				);
+			}
+		} catch (ex) {
+			console.log(ex);
+		}
+	}
+
+
+  SendDCCall() {
+    let that = this;
+    let par = {};
+    par.func = 'call';
+	par.call = that.rtc.call_num;	  
+
+    par.profile = {
+      email: this.rtc.operator,
+      name: this.rtc.name,
+      img: this.rtc.poster
+    };
+
+    if (that.dc.readyState === 'open') {
+      that.SendData(par);
+
+      //that.rtc.pcPull[that.rtc.main_pc].params['loc_cand'] = [];
+    }
+
+    // that.rtc.OnOpenDataChannel();
+  }
 
 	SendDCHangup(cb) {
 		let par = {};

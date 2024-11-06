@@ -1,12 +1,16 @@
 <script lang="ts">
   import { setContext, onMount, onDestroy } from 'svelte';
 
-  import pkg from 'lodash';
+  import { Translate } from '../../translate/Transloc';
+
+  import pkg, { indexOf } from 'lodash';
   const { find, findKey, mapValues } = pkg;
 
   import _ from 'lodash';
-  // import deepdash from 'deepdash';
-  // deepdash(_);
+
+  import Checkbox from '@smui/checkbox';
+  import { SortableList } from '@jhubbardsf/svelte-sortablejs';
+
   import List, { Item, Separator, Text } from '@smui/list';
   import Button, { Label } from '@smui/button';
   import Menu from '@smui/menu';
@@ -22,23 +26,18 @@
     mdiFileWordBoxOutline,
     mdiHelp,
   } from '@mdi/js';
+
   import Accordion, { Panel, Header, Content } from '@smui-extra/accordion';
 
-  // import Select, { Option } from '@smui/select';
+  import { langs, llang, dicts } from '$lib/js/stores.js';
 
   import Quiz from '../quiz/Quiz.svelte';
 
-  import operator_svg from '$lib/images/operator.svg';
-
-  import tutor_src from '$lib/images/tutor.png';
-  // import { view } from '$lib/js/stores.js';
-  let view = 'lesson';
   let value = 'dialog';
 
-  import { lesson } from '$lib/js/stores.js';
-  let menu: Menu;
+  import { view } from '$lib/js/stores.js';
 
-  let clicked = '';
+  let menu: Menu;
 
   let disabled = [
     true,
@@ -56,55 +55,45 @@
     true,
   ];
 
-  let display = 'hidden';
-
-  $: if ($lesson.data) {
-    // if (view !== 'lesson')
-    data = $lesson.data;
-  }
-  $: if (view === 'lesson') {
-    display = 'block';
-  } else {
-    display = 'none';
-    data.quiz = '';
-  }
-
   export let abonent: any;
   setContext('abonent', abonent);
 
-  let llang = ' ',
-    llang_input;
+  let llang_input;
+  let theme_sort_list, quiz_sort_list, items;
 
-  let lesson_data: any;
+  let lesson_data = { data: { level: '' } };
   let levels: any = [];
   let module_input: any;
 
-  let module = {
-    level: ' ',
-    themes: [],
-  };
-
-  const quizes = ['', 'listen', 'text', 'dialog', 'word'];
-  let input_quiz
-
-  let data = {};
-  let panel_disabled = true;
+  const quizes = ['выбери quiz...', 'listen', 'dialog', 'word'];
 
   let containerWidth = '100%'; // Исходная ширина - 100% ширины родительского окна
   let containerHeight = '100vh';
 
-  let checked = {};
+  // $: if ($langs && lesson_data.data.module && llang) {
+
+  //   lesson_data.data.module.themes.map(async (theme) => {
+  //     if (!theme.name[$langs]) {
+  //       theme.name[$langs] = await Translate(theme.name[llang], $langs);
+  //     }
+  //   });
+
+  // }
 
   export async function fetchLesson(owner: string, level: string) {
     try {
       let lev_str = level ? '&level=' + level : '';
-      const response = await fetch(`./lesson?lesson=${abonent}` + lev_str);
+      const response = await fetch(
+        `./lesson?lesson=${abonent}&owner=${abonent}` + lev_str
+      );
       if (!response.ok) {
         throw new Error('Failed to fetch data');
       }
-      return await response.json();
+      const resp = await response.json();
+      $llang = resp.lang;
+      return resp;
     } catch (error) {
-      console.error(error);
+      // console.error(error);
       return [];
     }
   }
@@ -123,35 +112,36 @@
     containerHeight = parentHeight + 'px';
 
     // const modules = JSON.parse(localStorage.getItem('kolmit'))['modules'];
-    lesson_data = await fetchLesson(abonent);
+    lesson_data = await fetchLesson(abonent, '');
   });
 
-  $: if (lesson_data && lesson_data.data) {
-    module = lesson_data.data.module; //lessonData.data.module;
-    module.level = lesson_data.level;
+  $: if (lesson_data.data) {
     levels = lesson_data.levels;
-    llang = lesson_data.lang;
+    // $llang = lesson_data.lang.trim();
   }
 
   onDestroy(() => {});
 
   async function saveLessonData() {
     try {
-      if (!module.level) {
+      if (!lesson_data.level) {
         module_input.focus();
         return;
       }
 
-      lesson_data.data = { module: module };
+      const updatedLessonData = {
+        ...lesson_data, // Create a copy of the original lesson_data
+        data: JSON.stringify(lesson_data.data), // Stringify the updated data
+      };
 
       const response = await fetch(`/admin`, {
         method: 'POST',
         body: JSON.stringify({
           func: 'upd_lesson',
-          lang: llang,
-          level: module.level,
+          lang: $llang,
+          level: updatedLessonData.level,
           levels: levels,
-          data: JSON.stringify(lesson_data.data),
+          data: updatedLessonData.data,
           owner: abonent,
         }),
         headers: { 'Content-Type': 'application/json' },
@@ -159,26 +149,28 @@
       if (!response.ok) {
         throw new Error('Failed to fetch data');
       }
-      lesson_data = await response.json();
+      const data = await response.json();
+
+      //  lesson_data.data = data;
     } catch (error) {
       console.error(error);
       return [];
     }
   }
 
-  function onClickQuiz(ev) {
-    if (ev.currentTarget.attributes['type'].value !== 'quiz') {
-      data.llang = lesson_data.lang;
-      data.level = ev.currentTarget.attributes['level'].value;
-      data.name = ev.currentTarget.attributes['name'].value;
-      // data.theme = ev.currentTarget.attributes['theme'].value;
-      // data.words = find(lesson_data.module.themes, {
-      // 	name: ev.currentTarget.attributes['theme_name'].value
-      // })['words'];
-      data.quiz = ev.currentTarget.attributes['type'].value;
-      if (ev.currentTarget.attributes['highlight'])
-        data.highlight = ev.currentTarget.attributes['highlight'].value;
-    }
+  function onClickQuiz(quiz: any, level: string, theme: string) {
+    $view = 'quiz';
+
+    lesson_data.data.llang = lesson_data.data.lang;
+    // lesson_data.data.level = level;
+    lesson_data.data.name = quiz.name;
+    lesson_data.data.theme = theme;
+    // data.words = find(lesson_data.module.themes, {
+    // 	name: ev.currentTarget.attributes['theme_name'].value
+    // })['words'];
+    lesson_data.data.quiz = quiz.type;
+
+    // setContext('quiz_data', lesson_data.data);
   }
 
   function disablePanel(node) {
@@ -189,15 +181,7 @@
     // disabled = 'disabled';
   }
 
-  function OnClickUserCard(ev) {
-    if (ev.currentTarget.attributes['email']) {
-      const em = ev.currentTarget.attributes['email'].value;
-    } else {
-      onClickQuiz(ev);
-    }
-  }
-
-  export function findDeep(obj, predicate, path = '') {
+  export function findDeep(obj: object, predicate: string, path = '') {
     if (predicate(obj, path)) {
       return obj;
     }
@@ -215,118 +199,116 @@
     return null;
   }
 
-  function deleteObjectByName(obj, name) {
-    Object.keys(obj).forEach((key) => {
-      if (Array.isArray(obj[key])) {
-        // Удаление объектов с заданным id
-        obj[key] = obj[key].filter(
-          (item) => !(item.name && item.name === name)
-        );
-        // Продолжаем поиск внутри каждого элемента массива
-        obj[key].forEach((item) => deleteObjectByName(item, name));
+  function OnAddTheme() {
+    navigator.clipboard
+      .readText()
+      .then((text) => {
+        const quiz_data = JSON.parse(text);
+        pushTheme(quiz_data);
+      })
+      .catch((err) => {
+        // console.error('Failed to read clipboard contents: ', err);
+        pushTheme({ theme: { name: '' } });
+      });
 
-        // Преобразование после удаления
-        if (obj[key].length === 0) {
-          // delete obj[key]; // Удаляем пустой массив
-        } else if (obj[key].length === 1) {
-          obj[key] = [obj[key][0]]; // Преобразуем массив с одним элементом в этот элемент
-        }
-      } else if (typeof obj[key] === 'object' && obj[key] !== null) {
-        if ('name' in obj[key] && obj[key].name === name) {
-          delete obj[key]; // Удаляем объект, если найден id
-        } else {
-          deleteObjectByName(obj[key], name); // Продолжаем поиск, если это объект
-        }
+    function pushTheme(quiz_data: object) {
+      lesson_data.data.module.themes.push({
+        name: {
+          [$llang]: quiz_data.theme.name,
+        },
+        words:
+          quiz_data.words instanceof String
+            ? quiz_data.words.split(', ')
+            : quiz_data.words,
+        grammar:
+          quiz_data.grammar instanceof String
+            ? quiz_data.grammar.split(', ')
+            : quiz_data.grammar,
+        lessons: [{ quizes: [] }],
+      });
+
+      lesson_data = lesson_data;
+    }
+  }
+
+  function OnRemoveThemeItem(t) {
+    lesson_data.data.module.themes.splice(t, 1);
+    lesson_data = lesson_data;
+  }
+
+  function OnRemoveItem(name: string, t: any) {
+    // let quiz = find(
+    //   lesson_data.data.module.themes[t].lessons[0].quizes,
+    //   (q) => {
+    //     return (q[$langs] = name);
+    //   }
+    // );
+    let ind = lesson_data.data.module.themes[t].lessons[0].quizes.findIndex(
+      (q) => {
+        return q.name[$llang] === name;
       }
-    });
+    );
+    lesson_data.data.module.themes[t].lessons[0].quizes.splice(ind, 1);
+    lesson_data = lesson_data;
   }
 
-  function OnAddTheme(ev) {
-    lesson_data.data.module = module;
-    lesson_data.level = module.level;
-    module.themes.unshift({
-      name: 'Theme name',
-      lessons: [{ quizes: [] }],
-    });
-    console.log(module.level);
-    module = module;
-  }
-
-  function OnRemoveThemeItem(ev) {
-    find(module.themes, {
-      name: ev.currentTarget.attributes['name'].nodeValue,
-    });
-  }
-
-  function OnRemoveItem(ev) {
-    deleteObjectByName(module, ev.currentTarget.attributes['name'].nodeValue);
-    module = module;
-  }
-
-  function OnChangeThemeName(ev) {
-    const name = ev.currentTarget.attributes['name'].nodeValue;
-    const upd = ev.target.innerText;
-    if (name === upd) return;
-    let item = findDeep(module, (value) => value.name === name, {
-      childrenPath: 'themes',
-    });
-    if (item) {
-      item.name = upd;
-    }
-    module = module;
-  }
-
-  function OnAddQuiz(ev) {
-    const theme = find(module.themes, {
-      name: ev.currentTarget.attributes['name'].nodeValue,
-    });
-    theme.lessons[0].quizes.push({
+  async function OnAddQuiz(name, t) {
+    lesson_data.data.module.themes[t].lessons[0].quizes.push({
       type: 'quiz',
-      name: 'Quiz name',
+      name: { [$llang]: '' },
     });
-    module = module;
+    lesson_data = lesson_data;
   }
 
-  function OnSelectQuiztype(ev) {
+  function OnSelectQuiztype(type, t, name) {
+    const item = find(
+      lesson_data.data.module.themes[t].lessons[0].quizes,
+      (quiz) => {
+        if (quiz.name[$llang] === name) return quiz;
+      }
+    );
 
-    const name = ev.target.parentElement.attributes['name'].nodeValue;
-    let item = findDeep(module, (value) => value.name === name, {
-      childrenPath: 'quizes',
-    });
+    // console.log(item);
     if (item) {
-      item.type = ev.target.value;
+      item.type = type;
     }
-    module = module;
+    lesson_data = lesson_data;
   }
 
   function ChangeQuizName(name, new_name) {
-    let item = findDeep(module, (value) => value.name === name, {
-      childrenPath: 'quizes',
-    });
+    let item = findDeep(
+      lesson_data.data.module,
+      (value) => value.name === name,
+      {
+        childrenPath: 'quizes',
+      }
+    );
     if (item) {
       item.name = new_name;
     }
-    module = module;
+    lesson_data = lesson_data;
   }
 
   function OnChangeQuizName(ev) {}
 
   async function ChangeLevel(ev: any) {
-    module.level = ev.target.attributes['level'].nodeValue.trim();
-    lesson_data = await fetchLesson(abonent, module.level);
-    menu.setOpen(false)
+    lesson_data.data.module.level = ev.target.attributes['level'].nodeValue;
+    lesson_data = await fetchLesson(abonent, lesson_data.data.module.level);
+
+    menu.setOpen(false);
   }
 
   let level = '';
+
   async function OnInput(ev) {
     lesson_data.level = ev.target.value;
     module = {
-      level: module.level,
+      level: lesson_data.data.module.level,
       themes: [],
     };
 
     levels.map(async (item) => {
-      if (item !== module.level) {
+      if (item !== lesson_data.data.module.level) {
         lesson_data.data.module.themes = [];
       } else {
         //  lesson_data = await fetchLesson(abonent, module.level);
@@ -334,7 +316,7 @@
     });
   }
 
-  function OnClickQuizName(ev){
+  function OnClickQuizName(ev) {
     // ev.target.select()
   }
 
@@ -347,233 +329,346 @@
   }
 
   async function OnRemModule(ev) {
-    const rem_level = module.level;
+    const rem_level = lesson_data.data.module.level;
     const ind = lesson_data.levels.indexOf(rem_level);
     lesson_data.levels.splice(ind, 1);
-    module = module;
-    lesson_data.data = await fetchLesson(abonent, module.level)['data'];
-    module.level = lesson_data.levels[0];
+    lesson_data = lesson_data;
+    lesson_data.data = await fetchLesson(
+      abonent,
+      lesson_data.data.module.level
+    )['data'];
+    lesson_data.data.module.level = lesson_data.levels[0];
   }
+
+  function handleSort(event, items) {
+    const { oldIndex, newIndex } = event;
+    // Array move function (included here)
+    function arrayMove(arr, fromIndex, toIndex) {
+      const element = arr.splice(fromIndex, 1)[0];
+      arr.splice(toIndex, 0, element);
+      return arr;
+    }
+
+    // Update your lesson.quizes array based on the new order
+    items = arrayMove(items, oldIndex, newIndex); // Assuming you have an arrayMove function (see below)
+  }
+
+  function OnPublish(quiz, state) {
+    quiz.published = state?'': Date.now()
+  }
+
+  // async function OnThemeNameInput(t) {
+  //   // console.log(theme)
+  //   // return;
+  //   let theme = lesson_data.data.module;
+  //   if (!theme.name[$llang]) {
+  //     Object.keys(theme.name).forEach(async (key) => {
+  //       console.log(key);
+  //       if (key !== $llang) {
+  //         // theme.name[$llang] = await Translate(theme.name[key], key, $llang);
+  //         // lesson_data = lesson_data;
+  //         return;
+  //       }
+  //     });
+  //   }
+  // }
+
+  // function OnThemeNameChange(event: Event, t:number) {
+  //   let theme = lesson_data.data.module.themes[t];
+  //   theme.name[$llang] =
+  // }
 </script>
 
-{#if data.quiz}
-  <Quiz bind:data bind:lesson_display={display} {ChangeQuizName} />
-{:else if module}
-  <!-- svelte-ignore a11y-missing-content -->
+<main>
+  {#if $view === 'quiz'}
+    <Quiz data={lesson_data.data} {ChangeQuizName} />
+  {:else if lesson_data.data && lesson_data.data.module}
+    <!-- svelte-ignore a11y-missing-content -->
 
-  <div style="display:{display}; height:1500px">
-    <div class="level_container" style="">
-      <button class="save" on:click={saveLessonData}>Сохранить</button>
+    <div style="height:1500px; margin-top:20px">
+      <div class="level_container" style="">
+        {#await Translate('Save', 'en', $langs) then data}
+          <button class="save" on:click={saveLessonData}>
+            {data}
+          </button>
+        {/await}
 
-      <div>
-        <div class="add_module" style="display:inline-flex">
-          <IconButton class="material-icons" on:click={OnAddModule}
-            >add</IconButton
-          >
-        </div>
-        <Textfield
-          bind:this={module_input}
-          class="module_text"
-          style="width:50px; text-align:center"
-          value={module.level}
-          label="Module"
-          on:input={OnInput}
-          on:click= {() => menu.setOpen(true)}
-        ></Textfield>
+        <div>
+          <div class="add_module" style="display:inline-flex">
+            {#await Translate('Добавить модуль', 'ru', $langs) then data}
+              <IconButton
+                class="material-icons"
+                on:click={OnAddModule}
+                title={data}>add</IconButton
+              >{/await}
+          </div>
+          <Textfield
+            bind:this={module_input}
+            class="module_text"
+            style="width:50px; text-align:center"
+            value={lesson_data.level}
+            label="Module"
+            on:input={OnInput}
+            on:click={() => menu.setOpen(true)}
+          ></Textfield>
 
-        <Textfield
-          bind:this={llang_input}
-          class="module_text"
-          style="display:inline-flex; width:55px;text-align:center"
-          bind:value={llang}
-          label="Language"
-        ></Textfield>
+          <Textfield
+            bind:this={llang_input}
+            class="module_text"
+            style="display:inline-flex; width:55px;text-align:center"
+            bind:value={$llang}
+            label="Language"
+          ></Textfield>
 
-        <div class="rem_module" style="display:inline-flex">
-          <IconButton class="material-icons rem_module" on:click={OnRemModule}
-            >remove</IconButton
-          >
-        </div>
-
-        <Menu bind:this={menu}>
-          <List>
-            {#each levels as level}
-              <Item
-                on:SMUI:action={ChangeLevel}
-                {level}
-                style="text-align:center"
+          <div class="rem_module" style="display:inline-flex">
+            {#await Translate('Удалить модуль', 'ru', $langs) then data}
+              <IconButton
+                class="material-icons rem_module"
+                on:click={OnRemModule}
+                title={data}>remove</IconButton
               >
-                <Text>{level}</Text>
-              </Item>
-            {/each}
-          </List>
-        </Menu>
-      </div>
-    </div>
+            {/await}
+          </div>
 
-    <div class="lesson-container" style="">
-      {#each module.themes as theme, t}
-        <div class="accordion-container">
-          <Accordion multiple>
-            <Panel class="panel">
-              <Header>
-                <!-- <h4><input value={theme.name} /></h4> -->
-                <!-- <Textfield bind:value={theme.name} style="width: 368px;">
+          <Menu bind:this={menu}>
+            <List>
+              {#each levels as level}
+                <Item
+                  on:SMUI:action={ChangeLevel}
+                  {level}
+                  style="text-align:center"
+                >
+                  <Text>{level}</Text>
+                </Item>
+              {/each}
+            </List>
+          </Menu>
+        </div>
+      </div>
+
+      <div class="lesson-container" style="">
+        <SortableList
+          onSort={(ev) => {
+            handleSort(ev, lesson_data.data.module.themes);
+          }}
+          bind:this={theme_sort_list}
+        >
+          {#each lesson_data.data.module.themes as theme, t}
+            <div class="accordion-container">
+              <Accordion multiple>
+                <Panel class="panel">
+                  <Header>
+                    <!-- <h4><input value={theme.name[$langs]} /></h4> -->
+                    <!-- <Textfield bind:value={theme.name[$langs]} style="width: 368px;">
 									<HelperText slot="helper">Helper Text</HelperText>
 								</Textfield> -->
-                <div
-                  contenteditable
-                  on:blur={OnChangeThemeName}
-                  name={theme.name}
-                  style="font-weight: 600;width:90%"
-                >
-                  {theme.name}
-                </div>
-                <div class="rem_theme">
-                  <IconButton
-                    class="material-icons "
-                    name={theme.name}
-                    on:click={OnRemoveItem}>remove</IconButton
-                  >
-                </div>
-              </Header>
-              <Content>
-                {#if theme.lessons}
-                  {#each theme.lessons as lesson}
-                    <!-- <div>{lesson.num}.{lesson.title}</div> -->
-                    {#if lesson.quizes}
-                      {#each lesson.quizes as quiz}
-                        <!-- {@debug quiz} -->
-
-                        <div class="quiz-container" name={quiz.name}>
-                          <div
-                            on:click={onClickQuiz}
-                            type={quiz.type}
-                            name={quiz.name}
-                            level={module.level}
-                            highlight={quiz.highlight || ''}
+                    {#await Translate('Input Theme Name', 'en', $langs) then data}
+                      <input
+                        placeholder={data}
+                        bind:value={theme.name[$llang]}
+                        style="font-weight: bold; width:90%"
+                      />
+                      <!-- {@debug theme, $llang} -->
+                    {/await}
+                    <div class="rem_theme">
+                      {#await Translate('Remove theme', 'en', $langs) then data}
+                        <IconButton
+                          class="material-icons"
+                          title={data}
+                          name={theme.name[$llang]}
+                          on:click={() => OnRemoveThemeItem(t)}
+                          >remove</IconButton
+                        >
+                      {/await}
+                    </div>
+                  </Header>
+                  <Content>
+                    {#if theme.lessons}
+                      {#each theme.lessons as lesson}
+                        <!-- <div>{lesson.num}.{lesson.title}</div> -->
+                        {#if lesson.quizes}
+                          <SortableList
+                            onSort={(ev) => {
+                              handleSort(ev, lesson.quizes);
+                            }}
+                            bind:this={quiz_sort_list}
                           >
-                            {#if quiz.type === 'dialog'}
-                              <Icon
-                                tag="svg"
-                                viewBox="0 0 24 24"
-                                width="30px"
-                                height="30px"
-                              >
-                                <path fill="grey" d={mdiAccountMultiple} />
-                              </Icon>
-                            {:else if quiz.type === 'text'}
-                              <Icon
-                                tag="svg"
-                                viewBox="0 0 24 24"
-                                width="30px"
-                                height="30px"
-                              >
-                                <path fill="grey" d={mdiTextBoxOutline} />
-                              </Icon>
-                            {:else if quiz.type === 'word'}
-                              <Icon
-                                tag="svg"
-                                viewBox="0 0 24 24"
-                                width="30px"
-                                height="30px"
-                              >
-                                <path fill="grey" d={mdiFileWordBoxOutline} />
-                              </Icon>
-                            {:else if quiz.type === 'listen'}
-                              <Icon
-                                tag="svg"
-                                viewBox="0 0 24 24"
-                                width="30px"
-                                height="30px"
-                              >
-                                <path fill="grey" d={mdiEarHearing} />
-                              </Icon>
-                            {:else if quiz.type === 'quiz'}
-                              <Icon
-                                tag="svg"
-                                viewBox="0 0 24 24"
-                                width="30px"
-                                height="30px"
-                              >
-                                <path fill="grey" d={mdiHelp} />
-                              </Icon>
-                            {/if}
-                          </div>
-                          <!-- svelte-ignore a11y-invalid-attribute -->
-                          {#if quiz.type === 'quiz'}
-                            <input
-                              class="quiz_name"      
-                              on:click={OnClickQuizName}
-                              autofocus
-                              contenteditable
-                              {t}
-                              name={quiz.name}
-                              theme={theme.num}
-                              theme_name={theme.name}                            
-                              bind:value={quiz.name}/>
-                        
-                          {:else}
-                            <input
-                              on:click={OnClickQuizName}
-                              style="width:80%"
-                              {t}
-                              name={quiz.name}
-                              level={module.level}
-                              theme={theme.num}
-                              theme_name={theme.name}
-                              title={quiz.title}
-                              bind:value={quiz.name}
-                            />
-                          {/if}
+                            {#each lesson.quizes as quiz, q}
+                              <!-- {@debug quiz} -->
 
-                          {#if quiz.type === 'quiz'}
-                          
-                            <select on:change={OnSelectQuiztype}>
-                              {#each quizes as quizOption}
-                                <option value={quizOption}>{quizOption}</option>
-                              {/each}
-                            </select>
-                          {/if}
+                              <div class="quiz-container">
+                                <Checkbox
+                         
+                                  on:click={()=>OnPublish(lesson_data.data.module.themes[t].lessons[0].quizes[q], quiz.published)}
+    
+                                  checked={quiz.published ? 'true' : ''}
+                                  touch
+                                ></Checkbox>
 
-                          <div class="rem_quiz">
-                            <IconButton
-                              class="material-icons"
-                              name={quiz.name}
-                              on:click={OnRemoveItem}>remove</IconButton
-                            >
-                          </div>
-                        </div>
+                                <div
+                                  on:click={() => {
+                                    onClickQuiz(
+                                      quiz,
+                                      lesson_data.data.module.level,
+                                      theme.name[$llang]
+                                    );
+                                  }}
+                                  type={quiz.type}
+                                  name={quiz.name[$llang]}
+                                  level={lesson_data.data.module.level}
+                                  highlight={quiz.highlight || ''}
+                                >
+                                  {#if quiz.type === 'dialog'}
+                                    <Icon
+                                      tag="svg"
+                                      viewBox="0 0 24 24"
+                                      width="30px"
+                                      height="30px"
+                                    >
+                                      <path
+                                        fill="grey"
+                                        d={mdiAccountMultiple}
+                                      />
+                                    </Icon>
+                                  {:else if quiz.type === 'text'}
+                                    <Icon
+                                      tag="svg"
+                                      viewBox="0 0 24 24"
+                                      width="30px"
+                                      height="30px"
+                                    >
+                                      <path fill="grey" d={mdiTextBoxOutline} />
+                                    </Icon>
+                                  {:else if quiz.type === 'word'}
+                                    <Icon
+                                      tag="svg"
+                                      viewBox="0 0 24 24"
+                                      width="30px"
+                                      height="30px"
+                                    >
+                                      <path
+                                        fill="grey"
+                                        d={mdiFileWordBoxOutline}
+                                      />
+                                    </Icon>
+                                  {:else if quiz.type === 'listen'}
+                                    <Icon
+                                      tag="svg"
+                                      viewBox="0 0 24 24"
+                                      width="30px"
+                                      height="30px"
+                                    >
+                                      <path fill="grey" d={mdiEarHearing} />
+                                    </Icon>
+                                  {:else if quiz.type === 'quiz'}
+                                    <select
+                                      on:click|preventDefault|once|stopPropagation={() => {}}
+                                      on:change={(event) =>
+                                        OnSelectQuiztype(
+                                          event.target.value,
+                                          t,
+                                          quiz.name[$llang]
+                                        )}
+                                      name={quiz.name[$llang]}
+                                    >
+                                      {#each quizes as quizOption}
+                                        <option value={quizOption}
+                                          >{quizOption}</option
+                                        >
+                                      {/each}
+                                    </select>
+                                  {/if}
+                                </div>
+                                <!-- svelte-ignore a11y-invalid-attribute -->
+                                {#if quiz.type === 'quiz'}
+                                  {#await Translate('Quiz Name', $llang, $langs) then data}
+                                    <input
+                                      class="quiz_name"
+                                      on:click={OnClickQuizName}
+                                      autofocus
+                                      contenteditable
+                                      {t}
+                                      placeholder={data}
+                                      name={quiz.name[$langs]}
+                                      theme={theme.num}
+                                      theme_name={theme.name[$llang]}
+                                      bind:value={quiz.name[$langs]}
+                                    />
+                                  {/await}
+                                {:else}
+                                  {#await Translate('Quiz Name', $llang, $langs) then data}
+                                    <input
+                                      on:click={OnClickQuizName}
+                                      style="width:80%"
+                                      {t}
+                                      placeholder={data}
+                                      name={quiz.name[$llang]}
+                                      level={lesson_data.data.level}
+                                      theme={theme.num}
+                                      theme_name={theme.name[$llang]}
+                                      bind:value={quiz.name[$llang]}
+                                    />
+                                  {/await}
+                                {/if}
+
+                                <div class="rem_quiz">
+                                  {#await Translate('Remove quiz', 'en', $langs) then data}
+                                    <IconButton
+                                      class="material-icons"
+                                      title={data}
+                                      name={quiz.name[$llang]}
+                                      on:click={() => {
+                                        OnRemoveItem(quiz.name[$llang], t);
+                                      }}>remove</IconButton
+                                    >
+                                  {/await}
+                                </div>
+                              </div>
+                            {/each}
+                          </SortableList>
+                        {/if}
                       {/each}
+                      <div class="add_quiz" style="left:10px">
+                        {#await Translate('Add quiz', 'en', $langs) then data}
+                          <IconButton
+                            class="material-icons"
+                            title={data}
+                            name={theme.name[$llang]}
+                            on:click={() => {
+                              OnAddQuiz(theme.name[$llang], t);
+                            }}>add</IconButton
+                          >
+                        {/await}
+                      </div>
                     {/if}
-                  {/each}
-                  <div class="add_quiz">
-                    <IconButton
-                      class="material-icons"
-                      name={theme.name}
-                      on:click={OnAddQuiz}>add</IconButton
-                    >
-                  </div>
-                {/if}
-              </Content>
-            </Panel>
-          </Accordion>
-        </div>
-      {/each}
-      {#if module.level && llang !== ' '}
-        <div class="add_theme">
-          <IconButton class="material-icons" on:click={OnAddTheme}
-            >add</IconButton
-          >
-        </div>
-      {/if}
-    </div>
+                  </Content>
+                </Panel>
+              </Accordion>
+            </div>
+          {/each}
+        </SortableList>
+        {#if lesson_data.level && $llang !== ' '}
+          <div class="add_theme">
+            {#await Translate('Add theme', 'en', $langs) then data}
+              <IconButton
+                class="material-icons"
+                on:click={() => OnAddTheme()}
+                title={data}>add</IconButton
+              >
+            {/await}
+          </div>
+        {/if}
+      </div>
 
-    <div style="height:100px"></div>
-  </div>
-{/if}
+      <div style="height:100px"></div>
+    </div>
+  {/if}
+</main>
 
 <style>
+  main {
+    margin-top: 40px;
+  }
   .module_level {
     position: fixed;
     background-color: rgba(255, 255, 255, 0.8);
@@ -603,8 +698,7 @@
   }
 
   .lesson-container {
-    /* height: 120vh; */
-
+    height: 90vh;
     overflow-y: auto;
     overflow-x: hidden;
     max-width: 100%;
@@ -616,7 +710,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 10px; /* Установите желаемый отступ вокруг элемента */
+    padding: 0px; /* Установите желаемый отступ вокруг элемента */
   }
 
   .add_quiz,
@@ -629,10 +723,10 @@
     position: relative;
 
     background-color: aliceblue;
-    border-radius: 25px;
-    width: 50px;
-    height: 50px;
-    scale: 0.8;
+    border-radius: 24px;
+    width: 24px;
+    height: 24px;
+    scale: 1.2;
   }
 
   div > .rem_quiz,
@@ -650,6 +744,7 @@
 
   .add_theme {
     position: relative;
+    top: 10px;
   }
 
   select {
@@ -669,19 +764,21 @@
     outline: none;
   }
 
+  ::placeholder {
+    font-weight: 400;
+  }
   div:focus,
-  input:focus
-  {
+  input:focus {
     /* background: lightcyan; */
     outline: none; /* Убираем также контур */
   }
 
-  select{
-    border:0;
-    background-color: lightgray ;
+  select {
+    border: 0;
+    background-color: lightgray;
   }
 
-  option{
+  option {
     font-size: larger;
   }
 </style>

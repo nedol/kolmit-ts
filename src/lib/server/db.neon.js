@@ -10,7 +10,6 @@ import { writable } from 'svelte/store';
 
 import { tarifs } from './tarifs.json';
 
-import user_pic from '$lib/images/operator.svg';
 
 import postgres from 'postgres';
 
@@ -312,7 +311,7 @@ export async function AddDep(q) {
 					name: '',
 					role: 'admin',
 					email: '',
-					picture: { user_pic }
+					picture: '/assets/operator.svg'
 				},
 				staff: []
 			};
@@ -403,7 +402,7 @@ export async function GetText(q) {
 
 export async function GetWords(q) {
 	try {
-		let res = await sql`SELECT data FROM words
+		let res = await sql`SELECT data FROM word
 		WHERE name=${q.name} AND owner=${q.owner}`;
 		//debugger;
 		return res[0].data;

@@ -5,8 +5,8 @@
   import Textfield from '@smui/textfield';
 
   import { dicts } from '../../../lib/js/stores.js';
-  import { signal } from '$lib/js/stores.js';
-  import operator_svg from '$lib/images/operator.svg';
+  import { langs } from '$lib/js/stores.js';
+
   // let operator_svg =
   // 	'https://kolmit-service.onrender.com/_app/immutable/assets/operator.7238a518.svg';
 
@@ -14,21 +14,17 @@
 
   let width, height, value;
   let formData = {
-    name: 'Kolmit',
-    email: 'kolmit.be@gmail.com',
-    psw: 'kolmit',
-    confirmPassword: 'kolmit',
+    func:'',
+    name: '',
+    email: '',
+    psw: '',
+    confirmPassword: '',
     picture: '',
-    lang: '',
+    lang: $langs,
   };
 
   if (!formData.picture) {
-    formData.picture = operator_svg;
-  }
-
-  let lang = 'en';
-  $: if (lang) {
-    formData.lang = lang;
+    formData.picture = '/assets/operator.svg';
   }
 
   let psw;
@@ -55,7 +51,7 @@
     passwordMatch = par.confirmPassword === par.psw;
     if (!passwordMatch) return;
     par.func = 'operator';
-    par.abonent = abonent;
+    par.lang = $langs;
     const headers = {
       'Content-Type': 'application/json',
       // Authorization: `Bearer ${token}`
@@ -65,9 +61,19 @@
       // mode: 'no-cors',
       body: JSON.stringify({ par }),
       headers: headers,
-    });
-
-    location.reload();
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        location.href =
+          location.origin +
+          location.pathname +
+          '?abonent=' +
+          data.resp.operator;
+      })
+      .catch((error) => {
+        console.log(error);
+        return [];
+      });
   }
 </script>
 
@@ -75,11 +81,10 @@
 
 <form on:submit|preventDefault={handleSubmit}>
   <div class="columns margins">
-    <input name="lang" value={formData.lang} hidden />
     <div>
       <Textfield
         bind:value={formData.email}
-        label="{$dicts['Email'][lang]}:"
+        label="{$dicts['Email',$langs]}:"
         required
       />
     </div>
@@ -89,7 +94,7 @@
         type="text"
         name="name"
         bind:value={formData.name}
-        label="{$dicts['Имя'][lang]}:"
+        label="{$dicts['Имя'][$langs]}:"
         required
       />
     </div>
@@ -99,7 +104,7 @@
         type="password"
         name="psw"
         bind:value={formData.psw}
-        label="{$dicts['Пароль'][lang]}:"
+        label="{$dicts['Пароль'][$langs]}:"
         required
       />
     </div>
@@ -109,19 +114,19 @@
         type="password"
         name="confirmPassword"
         bind:value={formData.confirmPassword}
-        label="{$dicts['Повторить пароль'][lang]}:"
+        label="{$dicts['Повторить пароль'][$langs]}:"
         required
       />
     </div>
 
     <div>
-      <Button class="upload-button">{$dicts['Sign In'][lang]}</Button>
+      <Button class="upload-button">{$dicts['Sign In'][$langs]}</Button>
     </div>
   </div>
 </form>
 
 {#if !passwordMatch}
-  <p style="color: red;">{$dicts['Пароли не совпадают'][lang]}</p>
+  <p style="color: red;">{$dicts['Пароли не совпадают'][$langs]}</p>
 {/if}
 
 <style>

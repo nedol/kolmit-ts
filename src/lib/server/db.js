@@ -1,15 +1,13 @@
 import pkg from 'moment';
 const { moment } = pkg;
 
-import pkg from 'lodash';
-const { find, remove, findIndex, difference } = pkg;
+import pkg_l from 'lodash';
+const { find, remove, findIndex, difference } = pkg_l;
 
 import md5 from 'md5';
 import { writable } from 'svelte/store';
 
-import { tarifs } from './tarifs.json';
-
-import user_pic from '$lib/images/operator.svg';
+// import { tarifs } from './tarifs.json';
 
 import postgres from 'postgres';
 
@@ -18,7 +16,7 @@ export let sql;
 let { PGHOST, PGDATABASE, PGUSER, PGPASSWORD, ENDPOINT_ID } = process.env;
 
 import { redirect } from '@sveltejs/kit';
-import Email from './email';
+import Email from './email.js';
 
 let conStr = {
   connectionStringSupabase:
@@ -59,25 +57,44 @@ function getHash(par) {
 }
 
 export function SendEmail(q, new_email) {
-  let em = new Email();
+  let operator = new Email();
   const abonent = q.abonent;
   const mail = q.send_email;
   const hash = getHash(mail);
-  let text = {
-    ru: '<h1>Присоединиться к сети Kolmit:</h1></a>',
-    en: '<h1>Join Kolmit network:</h1></a>',
-    fr: '<h1>Rejoindre le réseau Kolmit:</h1></a>',
-  }[q.lang];
-  let html = '<a href="https://kolmit.onrender.com/?abonent='+abonent+'">';
+  let html =
+    `<a href='https://kolmit.onrender.com/?abonent=${abonent}&user=${mail}'>` +
+    {
+      ru: '<h1>Присоединиться к сети Kolmit:</h1></a>',
+      en: '<h1>Join Kolmit network:</h1></a>',
+      fr: '<h1>Rejoindre le réseau Kolmit:</h1></a>',
+    }[q.lang];
 
-  em.SendMail(
+  operator.SendMail(
     `nedooleg@gmail.com`,
-     mail,
+    mail,
     {
       ru: 'Новый пользователь сети Колмит',
       en: 'New Kolmit network user',
       fr: 'Le nouvel opérateur de Kolmi',
     }[q.lang],
+    html,
+    (result) => {
+      console.log();
+    }
+  );
+}
+
+export function SendEmailTodayPublished(q) {
+  let operator = new Email();
+  const mail = q.send_email;
+  const hash = getHash(mail);
+  let html = q.html;
+  let head = q.head;
+
+  operator.SendMail(
+    `nedooleg@gmail.com`,
+    mail,    
+    head,
     html,
     (result) => {
       console.log();
@@ -92,21 +109,29 @@ export async function CreateOperator(par) {
 		UPDATE operators 
 		SET
 		name = ${par.name},
-		hash = ${md5(par.email)}, 
+    email = ${par.email},
+		operator = ${md5(par.email)}, 
 		psw = ${md5(par.psw)}, 
 		picture = ${par.picture} 
-		WHERE operator = ${par.email} AND abonent=${par.abonent}
+		WHERE email = ${par.email} AND abonent=${par.abonent}
 		`;
     return {
+      operator: md5(par.email),
       name: par.name,
       email: par.email,
-      hash: md5(par.email),
       psw: md5(par.psw),
       lang: par.lang,
     };
   } catch (er) {
     console.log(er);
   }
+}
+
+export async function CreateSession(oper, suid) {
+  let res = await sql` 
+    SELECT create_session(${oper}, ${suid})
+  `;
+
 }
 
 async function updateOper(q) {
@@ -130,6 +155,50 @@ async function updateUsers(users, q) {
   return JSON.stringify({ func: q.func, dep: users[0] });
 }
 
+export async function GetGroup(par) {
+  //всех кто в группе, кроме себя
+  const group = await sql`
+			SELECT "group", abonent, role, operator, picture, lang, name
+      	FROM operators
+        WHERE operators.abonent=${par.abonent} 
+        AND  operators.operator=${par.operator}
+        AND operators.group=(
+        SELECT "group" FROM operators
+        WHERE operators.abonent=${par.abonent} 
+        AND operator=${par.operator} AND psw=${par.psw}
+      )`;
+  
+       if (group) {
+         const timestamp = new Date().toISOString(); // Получаем текущую метку времени
+         CreateSession(par.operator, md5(par.operator+timestamp));
+       }
+
+  const oper = await sql`
+			SELECT 
+			"group", abonent, role, operator, picture, lang, name
+			FROM operators
+			WHERE operators.abonent=${par.abonent} AND operator=${par.operator}
+      `;
+
+  return { group, oper };
+}
+
+export async function GetUsersEmail(owner, level) {
+  const group = await sql`
+    SELECT 
+    name
+    FROM groups
+    WHERE owner=${owner} AND level=${level}
+  `;
+  
+  const emails = await sql`
+    SELECT 
+    email, name, lang
+    FROM operators
+    WHERE "group"=${group[0].name}
+    `;
+  return emails;
+}
 
 export async function GetUsers(par) {
   let operators,
@@ -139,32 +208,25 @@ export async function GetUsers(par) {
     if (par.abonent) {
       operators = await sql`
 			SELECT 
-			id,			
-			role,
-			operator as email,
-			name,
-			picture,
-			dep
+			*,
+			operator as email
 			FROM operators
-			WHERE role<>'admin' AND operators.abonent=${par.abonent}`;
+			WHERE role<>'admin' AND operators.abonent=${par.abonent} AND
+      operators.group = (
+          SELECT operators.group
+          FROM operators
+          WHERE operators.operator=${par.operator} AND operators.abonent=${par.abonent} 
+      )
+      `;
+
       admin = await sql`
 			SELECT 
-			id,			
-			role,
-			operator as email,
-			name,
-			picture,
-			dep
+			*,
+			operator as email
 			FROM operators
 			WHERE role='admin' AND operators.abonent=${par.abonent}
 			`;
-    } else {
-      users = await sql`SELECT  users, quiz_users
-			FROM operators
-			INNER JOIN users ON (operators.abonent = users.operator = operators.operator) 
-			WHERE operators.operator=users.operators.operator AND operators.operator=${par.em} 
-				AND operators.psw=${par.psw};`;
-    }
+    } 
   } catch (ex) {
     console.log();
   }
@@ -177,22 +239,22 @@ export async function CheckOperator(q) {
 
   // console.log(sql);
 
-  if (q.psw && q.hash && getHash(q.em) === q.hash) {
+  if (q.psw && q.operator) {
     try {
       await sql`
-			INSERT INTO operators (psw, operator, abonent,  name) VALUES(${q.psw}, ${q.em}, 
+			INSERT INTO operators (psw, operator, abonent,  name) VALUES(${q.psw}, ${q.operator}, 
 			, ${q.name})`;
     } catch (ex) {}
   }
 
-  if (q.em) {
+  if (q.operator) {
     if (q.abonent) {
       result = await sql`
-			SELECT * FROM  operators WHERE operator=${q.em} AND abonent=${q.abonent} AND psw=${q.psw}`;
+			SELECT * FROM  operators WHERE operator=${q.operator} AND abonent=${q.abonent} AND psw=${q.psw}`;
     } else {
       result = result;
       await sql`
-			SELECT * FROM  operators WHERE operator=${q.em} AND abonent=${q.abonent} AND psw=${q.psw}`;
+			SELECT * FROM  operators WHERE operator=${q.operator} AND abonent=${q.abonent} AND psw=${q.psw}`;
     }
 
     result = result;
@@ -211,7 +273,7 @@ export async function CheckOperator(q) {
     }
   } else {
     result = await sql`
-		SELECT * FROM  operators WHERE operator=${q.em}`;
+		SELECT * FROM  operators WHERE operator=${q.operator}`;
 
     return result;
   }
@@ -266,7 +328,7 @@ export async function ChangeDep(q) {
 	FROM operators as oper
 	INNER JOIN users as usr ON (operators.abonent = users.operator)
 	WHERE oper.abonent=${q.abonent} AND oper.operator=${
-    q.em || q.operator
+    q.operator || q.operator
   } AND oper.psw=${q.psw}`;
 
   if (res[0]) {
@@ -282,12 +344,12 @@ export async function ChangeDep(q) {
 export async function AddDep(q) {
   if (q.abonent) {
     let res = await sql`SELECT *, (SELECT users FROM users WHERE operator=${
-      q.abonent || q.em
+      q.abonent || q.operator
     }) as users
 		FROM  operators as oper
-		WHERE oper.operator=${q.abonent || q.em}  AND abonent=${q.abonent} AND psw=${
-      q.psw
-    }
+		WHERE oper.operator=${q.abonent || q.operator}  AND abonent=${
+      q.abonent
+    } AND psw=${q.psw}
 		`;
     let users = [];
     if (res[0]) {
@@ -316,7 +378,7 @@ export async function RemDep(q) {
   let res = sql`SELECT users 
 		FROM operators as oper
 		INNER JOIN users as usr ON (operators.abonent = users.operator)
-		WHERE oper.operator=${q.em || q.abonent} AND oper.psw=${q.psw}`;
+		WHERE oper.operator=${q.operator || q.abonent} AND oper.psw=${q.psw}`;
 
   if (res[0]) {
     let users = JSON.parse(res[0].users);
@@ -329,12 +391,12 @@ export async function RemDep(q) {
 
 export async function ChangeOperator(q) {
   const res = await sql`SELECT *, (SELECT users FROM users WHERE operator=${
-    q.abonent || q.em
+    q.abonent || q.operator
   }) as users 
 		FROM  operators as oper 
-		WHERE oper.operator=${q.abonent || q.em}  AND abonent=${q.abonent} AND psw=${
-    q.psw
-  }`;
+		WHERE oper.operator=${q.abonent || q.operator}  AND abonent=${
+    q.abonent
+  } AND psw=${q.psw}`;
 
   if (res[0]) {
     try {
@@ -366,9 +428,9 @@ export async function ChangeOperator(q) {
 export async function RemoveOperator(q) {
   const res = sql`SELECT *, (SELECT users FROM users WHERE operator=?) as users ' +
 		'FROM  operators as oper 
-		'WHERE oper.operator=${q.abonent || q.em}  AND abonent=${q.abonent} AND psw=${
-    q.psw
-  }`;
+		'WHERE oper.operator=${q.abonent || q.operator}  AND abonent=${
+    q.abonent
+  } AND psw=${q.psw}`;
   try {
     let users = [];
     if (res[0]) {
@@ -384,12 +446,12 @@ export async function RemoveOperator(q) {
   }
 }
 
-export async function GetText(q) {
+export async function GetListen(q) {
   try {
-    let res = await sql`SELECT text, questions FROM texts
-		WHERE level= ${q.level} AND theme=${q.theme} AND title=${q.title} AND owner=${q.owner}`;
+    let res = await sql`SELECT data FROM listen
+		WHERE name= ${q.name} AND lang=${q.lang}`;
     //debugger;
-    return { text: res[0].text, questions: res[0].questions };
+    return { data: res[0].data };
   } catch (ex) {
     return JSON.stringify({ func: q.func, res: ex });
   }
@@ -397,10 +459,9 @@ export async function GetText(q) {
 
 export async function GetWords(q) {
   try {
-    let res = await sql`SELECT data FROM words
-		WHERE name=${q.name} AND owner=${q.owner}`;
-    //debugger;
-    return res[0].data;
+    let res = await sql`SELECT data, context, subscribe  FROM word
+		WHERE name=${q.name} AND owner=${q.owner} AND level=${q.level}`;
+    return res[0];
   } catch (ex) {
     return JSON.stringify({ func: q.func, res: ex });
   }
@@ -408,13 +469,25 @@ export async function GetWords(q) {
 
 export async function GetDialog(q) {
   try {
-    let res = await sql`SELECT dialog, html FROM dialogs
-		WHERE name=${q.name} AND owner=${q.owner}`;
-    //debugger;
-    return { dialog: res[0].dialog, html: res[0].html || '' };
+    let res = await sql`SELECT dialog, html, subscribe FROM dialogs
+		WHERE name=${q.name} AND owner=${q.owner} AND level=${q.level}`;
+
+    return {
+      dialog: res[0].dialog,
+      html: res[0].html || '',
+      subscribe: res[0].subscribe
+    };
   } catch (ex) {
     return JSON.stringify({ func: q.func, res: ex });
   }
+}
+
+export async function GetPrompt(name) {
+  let prompt = await sql`SELECT system, user FROM prompts
+		WHERE name=${name}`;
+  return {
+    prompt: prompt[0],
+  };
 }
 
 export async function getLevels(owner) {
@@ -425,23 +498,48 @@ export async function getLevels(owner) {
   });
 }
 
+export async function GetLessonsByDate() {
+  const startOfDay = new Date();
+  startOfDay.setHours(0, 0, 0, 0); // Начало текущего дня
+
+  const endOfDay = new Date();
+  endOfDay.setHours(23, 59, 59, 999); // Конец текущего дня
+
+  return await sql`SELECT owner, data, level, lang 
+    FROM lessons 
+    WHERE timestamp BETWEEN ${startOfDay} AND ${endOfDay} 
+    ORDER BY level DESC`;
+}
+
 export async function GetLesson(q) {
   try {
     let res = '';
-    if (q.level) {
+    if (q.operator !== q.owner) {
+      res = await sql`
+      SELECT lessons.data, lessons.level, lessons.lang 
+        FROM lessons
+        JOIN operators ON (operators.operator = ${q.operator} and operators.abonent=${q.owner})
+        JOIN groups ON (groups.name = operators.group and groups.level=lessons.level)
+        WHERE  groups.owner=${q.owner} AND lessons.owner=${q.owner}
+        ORDER BY level desc`;
+      
+     } else if (q.level) {
       res =
         await sql`SELECT data, level, lang FROM lessons WHERE owner=${q.owner} AND level=${q.level}  ORDER BY level desc`;
-    } else {
+    } else {      
       res =
         await sql`SELECT data, level, lang FROM lessons WHERE owner=${q.owner}  ORDER BY level desc`;
+      
     }
     //debugger;
     const levels = await getLevels(q.owner);
 
+    const les = find(res, {level:q.level})
+
     return {
-      data: res[0].data,
-      lang: res[0].lang,
-      level: res[0].level,
+      data: les?les.data:res[0].data,
+      lang: les?.lang?les.lang:res[0].lang,
+      level: les?.level?les.level:res[0].level,
       levels: levels,
     };
   } catch (ex) {
@@ -450,32 +548,60 @@ export async function GetLesson(q) {
 }
 
 export async function UpdateQuizUsers(q) {
+  let res;
   try {
-    let res = await sql`SELECT quiz_users FROM users 
-		WHERE operator=${q.abonent}`;
-    let qu = res[0].quiz_users;
-    if (!qu[q.quiz]) qu[q.quiz] = [];
-    if (q.add && !qu[q.quiz].includes(q.add)) {
-      qu[q.quiz].push(q.add);
-    } else if (q.rem && qu[q.quiz].includes(q.rem)) {
-      let ind = qu[q.quiz].indexOf(q.rem);
-      qu[q.quiz].splice(1, ind);
+    // Получаем текущие подписки в формате JSON
+
+    if (q.type == 'dialog')
+      res =
+        await sql`SELECT subscribe FROM dialogs WHERE name = ${q.quiz} AND owner = ${q.abonent}`;
+    else if (q.type == 'word')
+      res =
+        await sql`SELECT subscribe FROM word WHERE name = ${q.quiz} AND owner = ${q.abonent}`;
+
+    // Извлекаем подписки, если пусто - создаем пустой массив
+    let qu = res[0]?.subscribe || [];
+
+    // Если нужно добавить новую подписку
+    if (q.add) {
+      qu.push(q.add);
+    }
+    // Если нужно удалить подписку
+    else if (q.rem) {
+      let index = qu.indexOf(q.rem); // находим индекс элемента
+      if (index > -1) {
+        // проверяем, что элемент найден
+        qu.splice(index, 1); // удаляем элемент
+      }
     }
 
-    res = await sql`UPDATE users SET quiz_users=${qu}
-		WHERE operator=${q.abonent}`;
+    // Обновляем базу данных, преобразуя массив в JSON
+    if (q.type == 'dialog')
+      res = await sql`UPDATE dialogs 
+                    SET subscribe = ${sql.json(
+                      qu
+                    )} -- используем JSON для PostgreSQL
+                    WHERE name = ${q.quiz} AND owner = ${q.abonent}`;
+    else if (q.type == 'word')
+      res = await sql`UPDATE word 
+                    SET subscribe = ${sql.json(
+                      qu
+                    )} -- используем JSON для PostgreSQL
+                    WHERE name = ${q.quiz} AND owner = ${q.abonent}`;
 
     return qu;
-    //debugger;
-  } catch (ex) {}
+  } catch (ex) {
+    console.log(ex);
+    throw ex; // чтобы ошибка могла быть обработана выше
+  }
 }
 
 export async function GetDict(q) {
   try {
     let res = await sql`SELECT words FROM dicts
-		WHERE type=${q.type} AND level= ${q.level} AND theme=${q.theme} AND owner=${q.owner}`;
-    //debugger;
-    return res[0].words;
+		WHERE type=${q.type} AND level= ${q.level}  AND owner=${q.owner}`;
+    if (res[0]) return res[0].words;
+    else return res;
   } catch (ex) {
     // debugger;
     return JSON.stringify({ func: q.func, res: ex });
@@ -483,16 +609,26 @@ export async function GetDict(q) {
 }
 
 export async function WriteSpeech(q) {
-  await sql.begin(async (sql) => {
-    let res = await sql`INSERT INTO speech
-		(admin,key, data) VALUES (${q.admin}, ${q.key}, ${q.data})`;
-  });
+  try {
+    await sql.begin(async (sql) => {
+      await sql`INSERT INTO speech (lang, key, text, data, quiz)
+                VALUES (${q.lang}, ${q.key}, ${q.text}, ${q.data}, ${q.quiz})
+                ON CONFLICT (key) 
+                DO UPDATE SET 
+                    lang = ${q.lang}, 
+                    text = ${q.text}, 
+                    data = ${q.data}, 
+                    quiz = ${q.quiz}`;
+    });
+  } catch (ex) {
+      console.log()
+  }
 }
 
 export async function ReadSpeech(q) {
   try {
     let res = await sql`SELECT data FROM speech
-		WHERE key= ${q.key}`;
+		WHERE key= ${q.key} AND quiz IS NOT NULL`;
     if (res[0]) {
       return res[0].data;
     }

@@ -1,56 +1,48 @@
-<script>
-	import { onMount, setContext } from 'svelte';
-	import Operator from './operator/Operator.svelte';
-	import Login from './site/Login.svelte';
+<script lang="ts">
+  import { onMount, setContext } from 'svelte';
+  import Header from './Header.svelte';
+  import { wss } from '$lib/js/stores.js';
+  import Operator from './operator/Operator.svelte';
+  import Login from './site/Login.svelte';
+  import { SignalingChannel } from './signalingChannel.js';
+  import { signal, langs, ice_conf, dicts, view } from '$lib/js/stores.js';
 
-	export let data;
+  export let data;
+  let operator, abonent, name, user_pic;
 
-	let user_pic = data.picture ? data.picture.medium : '';
+  $dicts = data.dict[0];
 
-	let email = data.operator,
-		abonent = data.abonent,
-		name = data.name;
+  function Init() {
+    setContext('group_data', data.group);
+    setContext('operator', data.operator[0]);
+    setContext('abonent', data.abonent);
 
-	import { SignalingChannel } from './signalingChannel.js';
-	import { signal } from '$lib/js/stores.js';
-	$signal = new SignalingChannel(email);
+    (operator = data.operator[0].operator),
+      (abonent = data.operator[0].abonent),
+      (name = data.operator[0].name),
+      (user_pic = data.operator ? data.operator[0].picture : '');
 
-	import host from './assets/host.json';
+    $signal = new SignalingChannel(operator);
 
-	import { wss } from '$lib/js/stores.js';
+    $langs = data.cookies? JSON.parse(data.cookies).lang: data.operator[0].lang;//
 
-	// import wsConnector from './wsConnector.js';
-	// $wss = new wsConnector(host.host_wss);
+    $ice_conf = data.ice_conf;
 
-	import { server_path } from '$lib/js/stores.js';
-	$server_path = data.host;
+  }
 
-	import { langs } from '$lib/js/stores.js';
-	$langs = data.lang;
+  if (data.operator) {
+    Init();
+  }
 
-	import { dicts } from '$lib/js/stores.js';
-	$dicts = data.dict[0];
-
-	import { ice_conf } from '$lib/js/stores.js';
-	$ice_conf = data.ice_conf;
-
-	import { users } from '$lib/js/stores.js';
-	if (data.users) {
-		$users = data.users;
-	}
-
-	import { quiz_users_ } from '$lib/js/stores.js';
-	if (data.quiz_users) {
-		$quiz_users_ = data.quiz_users;
-	}
-
-	let scriptLoaded = false;
-
-	onMount(async () => {});
+  onMount(async () => {
+     (!operator || data?.group?.length===0)?$view='login':''; 
+  });
 </script>
 
-{#if email && data.users}
-	<Operator {email} {abonent} {name} users_={$users} />
-{:else}
-	<Login {email} {abonent} {user_pic} />
+<Header></Header>
+
+{#if operator && data?.group?.length>0}
+  <Operator {operator} {abonent} {name} />
+{:else if $view==='login'}
+  <Login {operator} {abonent} {user_pic} />
 {/if}

@@ -8,7 +8,7 @@
 	let muted = true;
 	export let video_element, card;
 	export let parent_div;
-	export let name, em;
+	export let name, operator;
 	let rv;
 
 	onMount(async () => {
@@ -60,7 +60,7 @@
 				{#if name}
 					{name.slice(0, 8)}
 				{:else}
-					{em.slice(0, 8)}
+					{operator.slice(0, 8)}
 				{/if}
 			</h3>
 		</Card>

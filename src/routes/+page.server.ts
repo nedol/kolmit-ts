@@ -2,27 +2,23 @@ import md5 from 'md5';
 import dict from '$lib/dict/dict.json';
 import { ice_conf } from '$lib/ice_conf';
 import os from 'os';
-import Turn from 'node-turn';
+
 
 // import cc from '$lib/json/cc.json';
 
-global.rtcPull = { user: {}, operator: {} };
+// global.rtcPull = { user: {}, operator: {} };
 
-import { CreatePool, GetUsers } from '$lib/server/db.js'; //src\lib\server\server.db.js
+// global.rtcPool;
+// import { rtcPool_st } from '$lib/js/stores.js';
+// rtcPool_st.subscribe((data) => {
+//   global.rtcPool = data;
+// });
+
+import { CreatePool, GetUsers, GetGroup } from '$lib/server/db.js'; //src\lib\server\server.db.js
 
 let kolmit;
 
-if (!global.turn_server) {
-	global.turn_server = new Turn({
-		// set options
-		authMech: 'long-term',
-		listeningPort: 443
-	});
-	global.turn_server.start();
-	global.turn_server.addUser('username', 'password');
-	global.turn_server.log();
-	console.log('Turn server started on ' + global.turn_server.listeningPort);
-}
+
 
 /** @type {import('./$types').PageServerLoad} */
 export async function load({ fetch, cookies, route, url, stuff }) {
@@ -34,14 +30,12 @@ export async function load({ fetch, cookies, route, url, stuff }) {
 	let abonent = url.searchParams.get('abonent');
 	let lang = url.searchParams.get('lang');
 	let name = url.searchParams.get('name');
-	let email = url.searchParams.get('email');
+	let operator = url.searchParams.get('operator');
 	let psw = url.searchParams.get('psw');
 
 	let prom = new Promise((resolve, reject) => {
 		CreatePool(resolve);
 	});
-
-	const pool = await prom;
 
 	const host = url.origin; //'http://localhost:3000'; //'https://kolmit-sveltekit-nedol.vercel.app'; //
 
@@ -50,18 +44,21 @@ export async function load({ fetch, cookies, route, url, stuff }) {
 		ice_conf: ice_conf
 	};
 	try {
-		res = cookies.get('abonent:' + abonent);
+		res = cookies.get('kolmit.operator.' + abonent);
 
 		if (psw) {
-			kolmit = { operator: email, psw: md5(psw), name: name, lang: lang };
+			kolmit = { operator: operator, psw: md5(psw), name: name, lang: lang };
 		} else {
 			if (res) {
 				kolmit = JSON.parse(res);
 			} else {
+
 				resp.check = false;
+				resp.operator = '';
 				resp.abonent = abonent;
-				resp.users = '{}';
-				resp.host = host;
+				resp.operators = '{}';
+				resp.dict = dict;
+	
 				return resp;
 			}
 		}
@@ -75,32 +72,21 @@ export async function load({ fetch, cookies, route, url, stuff }) {
 		psw: kolmit.psw
 	};
 
-	let { operators, admin } = await GetUsers(params); //cc[0]; //
+	// let { operators, admin } = await GetUsers(params); //cc[0]; //
+	let { group, oper } = await GetGroup(params);
+	
+	// global.rtcPool['user'][abonent][kolmit.operator]
 
-	const users = [
-		{
-			id: '0',
-			admin: {
-				desc: 'Admin',
-				name: admin[0].name,
-				role: admin[0].role,
-				email: admin[0].email
-			},
-			staff: operators
-		}
-	];
 
 	return {
 		check: true,
 		host: host,
 		// url: decodeURIComponent(url.toString()),
-		operator: kolmit.operator,
-		name: kolmit.name,
+		cookies:cookies.get('kolmit.operator.'+abonent),
+		operator: oper,
 		abonent: abonent,
-		lang: kolmit.lang,
 		dict: dict,
-		users: users,
-		quiz_users: {}, //res && res.quiz_users ? res.quiz_users : '',
+		group: group,
 		ice_conf: ice_conf
 	};
 }

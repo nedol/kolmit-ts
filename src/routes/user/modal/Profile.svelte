@@ -20,11 +20,10 @@
 		console.log(files);
 	}
 
-	import { langs } from '../rtc/stores.js';
+	import { langs,dicts } from '$lib/js/stores.js';
 	let lang = 'en';
 	lang = $langs;
 
-	import { dicts } from '../rtc/stores.js';
 	const dict = $dicts;
 
 	async function setForm(form) {

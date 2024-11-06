@@ -1,7 +1,7 @@
-<script>
-  import { onMount, onDestroy } from 'svelte';
+<script lang="ts">
+  import { onMount, onDestroy, getContext } from 'svelte';
 
-  import Speak from './Speak.svelte';
+  // import Speak from './Speak.svelte';
   import moment from 'moment';
   moment.locale('nl-be');
   import { DateTime } from 'luxon';
@@ -15,20 +15,17 @@
     mdiShuffle,
   } from '@mdi/js';
 
-  // import EasySpeech from '../../../speech/tts/EasySpeech.svelte';
-  // let easyspeech;
+  import TTS from '../../../speech/tts/Tts.svelte';
+  let tts;
 
-  import RV from '/src/routes/speech/tts/RV.svelte';
-  let voice;
+  // import RV from '/src/routes/speech/tts/RV.svelte';
+  // let rv;
 
-  import { lesson } from '$lib/js/stores.js';
-  import { dc_user } from '$lib/js/stores.js';
-  import { dc_oper } from '$lib/js/stores.js';
-  import { dc_oper_state } from '$lib/js/stores.js';
-  import { dc_user_state } from '$lib/js/stores.js';
-  import { langs } from '$lib/js/stores.js';
+  //  import { Speak } from '/src/routes/speech/tts/VoiceRSS';
 
-  import { dicts } from '$lib/js/stores.js';
+  import { lesson, dc, dc_state , langs, llang , dicts } from '$lib/js/stores.js';
+
+  const operator = getContext('operator');
 
   let dict = $dicts;
 
@@ -67,8 +64,8 @@
     onChangeClick();
   }
 
-  $: if ($dc_oper_state) {
-    switch ($dc_oper_state) {
+  $: if ($dc_state) {
+    switch ($dc_state) {
       case 'open':
         share_button = true;
         break;
@@ -80,7 +77,7 @@
     }
   }
 
-  $: if ($dc_user_state) {
+  $: if ($dc_state) {
     share_button = true;
   }
 
@@ -100,13 +97,27 @@
   let cnt = 0;
   let digit = 10;
   let div_input;
+  let listen_data;
+  let currentWord,
+    currentWordIndex = 0;
 
   onMount(async () => {});
 
+  $: if (listen_data) currentWord = listen_data[currentWordIndex];
+
+  fetch(`./lesson?listen=${data.name}&owner=${operator.abonent}&lang=${$llang}`)
+    .then((response) => response.json())
+    .then((res) => {
+      listen_data = res.data.data;
+    })
+    .catch((error) => {
+      console.log(error);
+      return [];
+    });
+
   async function SendToPartner() {
-    if (share_mode && ($dc_user || $dc_oper)) {
-      let dc = $dc_user || $dc_oper;
-      await dc.SendData(
+    if (share_mode && $dc) {
+      await $dc.SendData(
         {
           lesson: { quiz: 'dialog.client' },
         },
@@ -117,163 +128,13 @@
     }
   }
 
-  function numberToDutchString(number) {
-    const ones = [
-      '',
-      'een',
-      'twee',
-      'drie',
-      'vier',
-      'vijf',
-      'zes',
-      'zeven',
-      'acht',
-      'negen',
-    ];
-    const teens = [
-      'tien',
-      'elf',
-      'twaalf',
-      'dertien',
-      'veertien',
-      'vijftien',
-      'zestien',
-      'zeventien',
-      'achttien',
-      'negentien',
-    ];
-    const tens = [
-      '',
-      '',
-      'twintig',
-      'dertig',
-      'veertig',
-      'vijftig',
-      'zestig',
-      'zeventig',
-      'tachtig',
-      'negentig',
-    ];
-
-    function convertToWords(num) {
-      if (num < 10) return ones[num];
-      if (num < 20) return teens[num - 10];
-      const ten = Math.floor(num / 10);
-      const rest = num % 10;
-      return rest === 0 ? tens[ten] : ones[rest] + 'en' + tens[ten];
-    }
-
-    function convertGroup(num, unit) {
-      const hundred = Math.floor(num / 100);
-      const rest = num % 100;
-      let result = '';
-
-      if (hundred > 0) {
-        result += ones[hundred] + 'honderd';
-        if (rest > 0) result += 'en';
-      }
-
-      if (rest > 0) {
-        result += convertToWords(rest);
-      }
-
-      if (unit) {
-        result += unit;
-      }
-
-      return result;
-    }
-
-    if (number === 0) return 'nul';
-
-    let result = '';
-    let unitIndex = 0;
-
-    while (number > 0) {
-      const group = number % 1000;
-      if (group > 0) {
-        const groupResult = convertGroup(
-          group,
-          unitIndex === 1 ? 'duizend' : ''
-        );
-        result = groupResult + (result ? 'en' : '') + result;
-      }
-      number = Math.floor(number / 1000);
-      unitIndex++;
-    }
-
-    return result.trim();
-  }
-
-  function generate() {
-    if (name === 'time') {
-      generateTime();
-    } else if (name === 'numbers') {
-      generateNumber();
-    }
-  }
-
-  function generateNumber() {
+  function Generate() {
     buttonName = 'Повторить';
     isFirst = true;
-
-    if (cnt % 10 === 0) {
-      digit *= 10;
-    }
-    // Генерация случайного числа (вы можете использовать свой способ генерации)
-    const random = Math.floor(Math.random() * digit) + digit / 10;
-    if (random === generatedValue) return generateNumber();
-    generatedValue = random;
-    cnt++;
-    // Очистка предыдущего ответа и статуса
     result = '';
     isCorrect = null;
-    // Озвучивание сгенерированного числа
-    speak(numberToDutchString(generatedValue));
-
     div_input.focus();
-  }
-
-  function generateTime() {
-    isFirst = true;
-    let hours = Math.floor(Math.random() * 24) + 1;
-    if (hours >= 13) hours = parseInt(hours - 12);
-    const minutes = Math.floor(Math.random() * 12) * 5; // генерация с шагом 15 минут
-
-    generatedValue = DateTime.local()
-      .set({ hours, minutes })
-      .toLocaleString(DateTime.TIME_24_SIMPLE);
-    generatedValueObj = { hours, minutes }; //
-    // generatedValue = generatedValue.toLocaleString(DateTime.TIME_24_SIMPLE);
-    // generatedValue = generatedValue.format('hh:mm');
-    speak(formatTime(generatedValueObj));
-    div_input.focus();
-    cnt++;
-  }
-
-  function formatTime(time) {
-    const hours = time.hours;
-    const minutes = time.minutes;
-
-    if (minutes === 0) {
-      return `${hours} uur`;
-    } else if (minutes < 15) {
-      return `${minutes} over ${hours}`;
-    } else if (minutes === 15) {
-      return `kwart over ${hours}`;
-    } else if (minutes > 15 && minutes < 30) {
-      return `${30 - minutes} voor half ${hours + 1}`;
-    } else if (minutes === 30) {
-      return `half ${hours === 1 ? 'twee' : hours + 1}`;
-    } else if (minutes > 30 && minutes < 45) {
-      return `${minutes - 30} over half ${hours + 1}`;
-    } else if (minutes === 45) {
-      return `kwart voor ${hours === 1 ? 'tien' : hours + 1}`;
-    } else if (minutes > 45) {
-      return `${60 - minutes} voor  ${hours + 1}`;
-    } else {
-      return `${minutes} minuten over ${hours}`;
-    }
+    speak(currentWord.original);
   }
 
   function checkInput() {
@@ -281,13 +142,16 @@
       .replace(/&nbsp;/g, '')
       .replace(/<\/?[^>]+(>|$)/g, '');
     const trimmedUserContent = userContent.trim();
-    isCorrect = trimmedUserContent === generatedValue.toString();
+    isCorrect =
+      trimmedUserContent.toLowerCase() === currentWord.example.toLowerCase();
 
     if (isCorrect) {
       inputStyle = isCorrect ? 'color: green;' : 'color: red; ';
+      // if (listen_data[currentWordIndex + 1]) currentWordIndex++;
+      // else currentWordIndex = 0;
       setTimeout(() => {
         userContent = '';
-        generate();
+        Generate();
       }, 1000);
 
       // nextWord();
@@ -297,13 +161,13 @@
       userContent = '';
       result = '';
 
-      while (i < generatedValue.length || i < trimmedUserContent.length) {
+      while (i < currentWord.example.length || i < trimmedUserContent.length) {
         if (!trimmedUserContent[i]) {
           // Недостающие символы выделяются пустым span с красной окантовкой
           result += `<span class="empty_block" onchage="onChangeUserContent" style="display: inline-block; background-color:rgba(255, 240, 251, 0.9);border:1px solid rgba(255, 240, 251, 0.9); width:15px">&nbsp;</span>`;
-        } else if (trimmedUserContent[i] === generatedValue[i]) {
+        } else if (trimmedUserContent[i] === currentWord.example[i]) {
           // Совпадающие символы
-          result += `<span class="correct">${generatedValue[i]}</span>`;
+          result += `<span class="correct">${currentWord.example[i]}</span>`;
         } else {
           // Несовпадающие символы
           result += `<span style="color:red;  ">${trimmedUserContent[i]}</span>`;
@@ -334,17 +198,15 @@
   }
 
   async function speak(text) {
-    voice.Speak(text);
+    tts.Speak($llang, text);
   }
 
   function repeat() {
     // Реализуйте функцию озвучивания числа, используя доступные средства или библиотеки
     // Например, можно использовать Text-to-Speech API или библиотеку для озвучивания
-    if (name === 'numbers') {
-      speak(numberToDutchString(generatedValue));
-    } else if (name === 'time') {
-      speak(formatTime(generatedValueObj));
-    }
+
+    speak(currentWord.original);
+
     div_input.focus();
   }
 
@@ -359,9 +221,8 @@
     data.quiz = data.quiz === 'dialog.client' ? 'dialog' : 'dialog.client';
     let client_quiz =
       data.quiz === 'dialog.client' ? 'dialog' : 'dialog.client';
-    let dc = $dc_user || $dc_oper;
-    if (dc)
-      dc.SendData({ lesson: data }, () => {
+
+      $dc?.SendData({ lesson: data }, () => {
         console.log();
       });
   }
@@ -395,9 +256,11 @@
 
   function showHint() {
     // wordsString = shuffleWords(wordsString);
-    userContent = generatedValue.toString();
+    userContent = currentWord.example;
 
     setTimeout(() => {
+      if (listen_data[currentWordIndex + 1]) currentWordIndex++;
+      else currentWordIndex = 0;
       checkInput();
     }, 1000);
 
@@ -421,17 +284,17 @@
 
   onDestroy(() => {
     // easyspeech.Cancel();
-    voice = '';
+    // rv = '';
   });
 </script>
 
-<link
+<!-- <link
   rel="stylesheet"
   href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0"
-/>
+/> -->
 
-<!-- <EasySpeech bind:this={easyspeech}></EasySpeech> -->
-<RV bind:this={voice}></RV>
+<TTS bind:this={tts}></TTS>
+<!-- <RV bind:this={rv}></RV> -->
 
 {#if share_button}
   <IconButton class="material-icons" on:click={onShare} style={style_button}>
@@ -441,58 +304,43 @@
   </IconButton>
 {/if}
 <main>
-  {#if data.quiz == 'listen'}
-    <div>
-      <p>{dict['Послушай и напиши'][$langs]}:</p>
+  <div>
+    <p>{dict['Послушай и напиши'][$langs]}:</p>
 
-      {#if !isFirst}
-        <button on:click={generate}>{dict['Старт'][$langs]}</button>
-      {:else}
-        <button on:click={repeat}>{dict['Повторить'][$langs]}</button>
-        <button on:click={checkInput}>{dict['Проверить'][$langs]}</button>
-      {/if}
-    </div>
+    {#if !isFirst}
+      <button on:click={Generate}>{dict['Старт'][$langs]}</button>
+    {:else}
+      <button on:click={repeat}>{dict['Повторить'][$langs]}</button>
+      <button on:click={checkInput}>{dict['Проверить'][$langs]}</button>
+    {/if}
+  </div>
 
-    <div>
-      <!-- <label for="userAnswer">Your Answer:</label> -->
-      {#if name === 'numbers'}
-        <div
-          class="input"
-          contenteditable="true"
-          style={inputStyle}
-          bind:this={div_input}
-          bind:innerHTML={userContent}
-        >
-          {@html result}
-        </div>
-      {:else if name === 'time'}
-        <div
-          contenteditable="true"
-          id="userTime"
-          class="input"
-          placeholder="hh:mm"
-          on:input={handleUserInput}
-          bind:this={div_input}
-          bind:innerHTML={userContent}
-        />
-      {/if}
-      {#if isFirst}
-        <button on:click={showHint} class="hint-button">
-          <span class="material-symbols-outlined"> question_mark </span>
-        </button>
-      {/if}
+  <div>
+    <!-- <label for="userAnswer">Your Answer:</label> -->
 
-      <!-- <input type="text" id="userAnswer" bind:value={userAnswer} style={inputStyle} /> -->
-    </div>
-  {:else if data.quiz == 'dialog.client'}
-    <Speak {data} />
-  {/if}
+    <div
+      contenteditable="true"
+      class="input"
+      style={inputStyle}
+      on:input={handleUserInput}
+      bind:this={div_input}
+      bind:innerHTML={userContent}
+    />
+
+    {#if isFirst}
+      <button on:click={showHint} class="hint-button">
+        <span class="material-symbols-outlined"> question_mark </span>
+      </button>
+    {/if}
+
+    <!-- <input type="text" id="userAnswer" bind:value={userAnswer} style={inputStyle} /> -->
+  </div>
 </main>
 
 <style>
   main {
     text-align: center;
-    margin-top: 20px;
+    margin-top: 40px;
   }
   .hint-button {
     display: inline-block;
@@ -522,7 +370,7 @@
   .input {
     display: inline-block;
     padding: 8px;
-    width: 30%;
+    width: 50vw;
     font-size: 24px;
     margin-top: 10px; /* Добавим отступ сверху для выравнивания */
     margin-left: auto;

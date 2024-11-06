@@ -1,240 +1,265 @@
-<script>
-	import { onMount /*, onDestroy, getContext, setContext*/, setContext } from 'svelte';
-	import { page, navigating, updated } from '$app/stores';
-	import List, { Item, Graphic, Separator, Text } from '@smui/list';
+<script lang="ts">
+  import {
+    onMount /*, onDestroy, getContext, setContext*/,
+    setContext,
+  } from 'svelte';
 
-	import TopAppBar, { Row, Section, Title, AutoAdjust } from '@smui/top-app-bar';
-	import IconButton from '@smui/icon-button';
+  import { page, navigating, updated } from '$app/stores';
 
-	import { lesson } from '$lib/js/stores.js';
+  import langs_list from '$lib/dict/google_lang_list.json';
 
-	import ru_flag from '$lib/images/flag-square-250_ru.png';
+  import ISO6391 from 'iso-google-locales';
 
-	import { editable } from '$lib/js/stores.js';
-	$: if ($editable) {
-		edited_display = $editable;
-	}
+  // let langs_list = JSON.parse(localStorage.getItem('langs_list'));
+  //ISO6391.getAllNames();
 
-	import { view } from '$lib/js/stores.js';
+  import { Translate } from './translate/Transloc';
 
-	import { langs } from '$lib/js/stores.js';
+  import List, { Item, Graphic, Separator, Text } from '@smui/list';
 
-	import { dicts } from '$lib/js/stores.js';
-	$: if ($dicts) {
-		console.log($dicts);
-	}
+  import TopAppBar, {
+    Row,
+    Section,
+    Title,
+    AutoAdjust,
+  } from '@smui/top-app-bar';
+  import IconButton from '@smui/icon-button';
 
-	$view = 'class';
+  import {
+    lesson,
+    view,
+    langs,
+    dicts,
+    editable,
+    showBottomAppBar,
+  } from '$lib/js/stores.js';
 
-	let menu = 'menu';
+  $: if ($editable) {
+    edited_display = $editable;
+  }
 
-	let topAppBar;
-	let abonent;
 
-	onMount(async () => {
-		let params = new URL(document.location).searchParams;
-		abonent = params.get('abonent');
-	});
+  let menu = 'menu';
 
-	let lang_menu = false;
+  let topAppBar;
+  let abonent = '';
 
-	let langAr = {
-		en: `https://cdn.countryflags.com/thumbs/united-kingdom/flag-square-250.png
-			`,
-		fr: `
-			https://cdn.countryflags.com/thumbs/france/flag-square-250.png
-			`,
-		nl: `
-			https://cdn.countryflags.com/thumbs/netherlands/flag-square-250.png
-			`,
-		de: `https://cdn.countryflags.com/thumbs/germany/flag-square-250.png
-			`,
-		uk: `
-			https://cdn.countryflags.com/thumbs/ukraine/flag-square-250.png
-			`,
-		ru: ru_flag
-	};
+  onMount(async () => {
+    let params = new URL(document.location).searchParams;
+    abonent = params.get('abonent');
+ 
+  });
 
-	function setLang(lang) {
-		fetch(`./?func=cookie&abonent=${abonent}&lang=${lang}`)
-			.then(() => console.log())
-			.catch((error) => {
-				console.log(error);
-			});
-	}
+  let lang_menu = false;
+
+  $: if ($dicts && !$dicts['CLASS'][$langs]) {
+    (async () => {
+      try {
+        $dicts['CLASS'][$langs] = await Translate(
+          'CLASS',
+          'en',
+          $langs
+        );
+      } catch (ex) {
+        let name = ISO6391.getName($langs);
+        let ind = langs_list.indexOf(name);
+        if (ind !== -1) {
+          let ar = langs_list.splice(ind, 1);
+          // $langs = 'en';
+        }
+      }
+    })();
+  }
+
+  $: if ($dicts && !$dicts['LESSON'][$langs]) {
+    (async () => {
+      try {
+        $dicts['LESSON'][$langs] = await Translate(
+          'LESSON',
+          'en',
+          $langs
+        );
+      } catch (ex) {
+        console.log(ex);
+        // $langs = 'en';
+      }
+    })();
+  }
+
+  function setLang(ev) {
+    let lang = ev.currentTarget.outerText;
+    let code = ISO6391.getCode(lang);
+    if (code !== 'English') {
+      $langs = code;
+    }
+    // console.log($langs);
+    lang_menu = false;
+
+    fetch(`./?func=cookie&abonent=${abonent}&lang=${$langs}`)
+      .then(() => console.log())
+      .catch((error) => {
+        console.log(error);
+      });
+  }
 </script>
 
-{#if $view === 'class' || $view === 'lesson'}
-{#if $dicts && $dicts['CLASS'][$langs]}
-	<header>
-		<div class="top-app-bar-container flexor">
-			<TopAppBar bind:this={topAppBar} variant="fixed" dense>
-				<Row>
-					<div class="sec_items">
-						<Section>
-							<Title
-								on:click={() => {
-									$view = 'class';
-								}}>{$dicts ? $dicts['CLASS'][$langs] : 'CLASS'}</Title
-							>
+{#if $dicts && $langs && $dicts['CLASS'][$langs]}
+  <header>
+    <div class="top-app-bar-container flexor">
+      <TopAppBar bind:this={topAppBar} variant="fixed" dense>
+        <Row>
+          <div class="sec_items">
+            {#if $view !== 'login'}
+              <Section>
+                {#await Translate('Quit the exercise?', 'en', $langs) then data}
+                  <Title
+                    on:click={() => {
+                    if ($lesson.data?.quiz) {
+                      
+                      if (confirm(data)) {
+                        $view = 'group';
+                        $showBottomAppBar = true;
+                      }
+                   
+                    } else {
+                      $view = 'group';
+                      $showBottomAppBar = true;
+                    }
+                    }}>{$dicts ? $dicts['CLASS'][$langs] : 'CLASS'}</Title
+                  >
 
-							<Title
-								on:click={async () => {
-									console.log();
-									$lesson.data = { quiz: '' };
-									$view = 'lesson';
-								}}>{$dicts ? $dicts['LESSON'][$langs] : 'LESSON'}</Title
-							>
-							<!-- <IconButton class="material-icons" aria-label="Bookmark this page">bookmark</IconButton> -->
-						</Section>
-					</div>
-					<Section align="end">
-						<IconButton
-							class="material-icons"
-							on:click={() => {
-								lang_menu = !lang_menu;
-							}}><img src={langAr[$langs]} alt={langAr[$langs]} /></IconButton
-						>
-						{#if lang_menu}
-							<div class="lang_list" style="position:absolute; display: flex; margin-top:300px">
-								<List dense>
-									<Item
-										on:SMUI:action={() => {
-											$langs = 'en';
-											setLang($langs);
-											lang_menu = false;
-										}}
-									>
-										<!-- <Graphic class="material-icons">edit</Graphic> -->
-										<img src={langAr['en']} alt="English" />
-									</Item>
-									<Item
-										on:SMUI:action={() => {
-											$langs = 'fr';
-											setLang($langs);
-											lang_menu = false;
-										}}
-									>
-										<!-- <Graphic class="material-icons">edit</Graphic> -->
-										<img src={langAr['fr']} alt="Français" />
-									</Item>
-									<Item
-										on:SMUI:action={() => {
-											$langs = 'nl';
-											setLang($langs);
-											lang_menu = false;
-										}}
-									>
-										<!-- <Graphic class="material-icons">edit</Graphic> -->
-										<img src={langAr['nl']} alt="Nederlands" />
-									</Item>
-									<Item
-										on:SMUI:action={() => {
-											$langs = 'de';
-											setLang($langs);
-											lang_menu = false;
-										}}
-									>
-										<!-- <Graphic class="material-icons">edit</Graphic> -->
-										<img src={langAr['de']} alt="Deutch" />
-									</Item>
-									<Item
-										on:SMUI:action={() => {
-											$langs = 'uk';
-											setLang($langs);
-											lang_menu = false;
-										}}
-									>
-										<!-- <Graphic class="material-icons">edit</Graphic> -->
-										<img src={langAr['uk']} alt="Український" />
-									</Item>
-									<Item
-										on:SMUI:action={() => {
-											$langs = 'ru';
-											setLang($langs);
-											lang_menu = false;
-										}}
-									>
-										<img src={langAr['ru']} alt="Русский" />
-									</Item>
-								</List>
-							</div>
-						{/if}
-					</Section>
-				</Row>
-			</TopAppBar>
-			<div class="flexor-content"></div>
-		</div>
-	</header>
-{/if}
+                  <Title
+                    on:click={async () => {
+                    if ($lesson.data?.quiz) {
+                     
+                      if (confirm(data)) {
+                        $lesson.data = { quiz: '' };
+                        $view = 'lesson';
+                        $showBottomAppBar = true;
+                      }
+            
+                    } else {
+                      $lesson.data = { quiz: '' };
+                      $view = 'lesson';
+                      $showBottomAppBar = true;
+                    }
+                    }}>{$dicts ? $dicts['LESSON'][$langs] : 'LESSON'}</Title
+                  >
+                {/await}
+                <!-- <IconButton class="material-icons" aria-label="Bookmark this page">bookmark</IconButton> -->
+              </Section>
+            {/if}
+          </div>
+
+          <Section align="end">
+            <span
+              class="lang_span"
+              on:click={() => {
+                lang_menu = !lang_menu;
+              }}
+              >{(() => {
+                return ISO6391.getNativeName($langs);
+              })()}</span
+            >
+            {#if lang_menu}
+              <div class="lang_list">
+                {#each langs_list as lang}
+                  <div
+                    style="color:black; margin:10px;font-size:smaller"
+                    on:click={setLang}
+                  >
+                    {lang}
+                  </div>
+                {/each}
+              </div>
+            {/if}
+          </Section>
+        </Row>
+      </TopAppBar>
+      <div class="flexor-content"></div>
+    </div>
+  </header>
 {/if}
 
 <style>
-	header {
-		display: flex;
-		justify-content: space-between;
-		width: 100%;
-	}
+  header {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+  }
 
-	.top-app-bar-container {
-		/* max-width: 480px; */
-		/* width: 100%; */
-		/* height: 100vh; */
-		border: 1px solid var(--mdc-theme-text-hint-on-background, rgba(0, 0, 0, 0.1));
-		margin: 0 18px 18px 0;
-		background-color: var(--mdc-theme-background, #fff);
+  .top-app-bar-container {
+    top: 0;
+    border: 1px solid
+      var(--mdc-theme-text-hint-on-background, rgba(0, 0, 0, 0.1));
+    margin: 0 18px 18px 0;
+    background-color: var(--mdc-theme-background, #fff);
 
-		overflow: auto;
-		display: inline-block;
-	}
+    overflow: auto;
+    display: inline-block;
+  }
 
-	img {
-		width: 30px;
-		opacity: 100%;
-	}
+  .lang_span {
+    font-size: smaller;
+    bottom: -15px;
+    position: relative;
+  }
 
-	.sec_items {
-		position: absolute;
-		z-index: 2;
-		/* left: 30%; */
-		top: 15%;
-	}
+  .lang_list {
+    position: absolute;
+    top: 50px;
+    height: 80vh;
+    overflow: auto;
+    justify-content: center; /* Выравниваем содержимое по центру вертикально */
+    align-items: center; /* Выравниваем содержимое по центру горизонтально */
+    background-color: white;
+    /* opacity: 50%; */
+  }
 
-	button.sec_right {
-		left: 100px;
-	}
-	.lang_list {
-		background-color: white;
-		/* opacity: 50%; */
-	}
-	@media (max-width: 480px) {
-		.top-app-bar-container {
-			margin-right: 0;
-		}
-	}
+  img {
+    width: 30px;
+    opacity: 100%;
+  }
 
-	.flexy {
-		display: flex;
-		flex-wrap: wrap;
-	}
+  .sec_items {
+    position: absolute;
+    z-index: 2;
+    /* left: 30%; */
+    top: 15%;
+  }
 
-	.flexor {
-		display: inline-flex;
-		flex-direction: column;
-	}
+  button.sec_right {
+    left: 100px;
+  }
 
-	.flexor-content {
-		flex-basis: 0;
-		/* height: 100vh; */
-		flex-grow: 1;
-		overflow: auto;
-	}
-	/* Стили для мобильных устройств */
-	@media screen and (max-width: 767px) {
-		.sec_items {
-			position: absolute;
-			left: 30%;
-			top: 15%;
-		}
-	}
+  @media (max-width: 480px) {
+    .top-app-bar-container {
+      margin-right: 0;
+    }
+  }
+
+  .flexy {
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  .flexor {
+    display: inline-flex;
+    flex-direction: column;
+  }
+
+  .flexor-content {
+    flex-basis: 0;
+    /* height: 100vh; */
+    flex-grow: 1;
+    overflow: auto;
+  }
+  /* Стили для мобильных устройств */
+  @media screen and (max-width: 767px) {
+    .sec_items {
+      position: absolute;
+      left: 35%;
+      top: 15%;
+    }
+  }
 </style>

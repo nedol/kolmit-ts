@@ -1,86 +1,92 @@
 <script>
-	import { onMount, onDestroy, getContext } from 'svelte';
-	import EasySpeech from 'easy-speech';
-	import bell from '$lib/mp3/bell.mp3';
+  import { onMount, onDestroy, getContext } from 'svelte';
+  // import EasySpeech from 'easy-speech';
 
-	let voice, tts;
+  import bell from '$lib/mp3/bell.mp3';
 
-	onMount(() => {
-		initSpeech();
-	});
+  import { audioCtx } from '$lib/js/stores.js';
 
-	export function Speak(text) {
-		setTimeout(() => {
-			EasySpeech.speak({
-				text: text, //dialog_data.content[cur_qa].question['nl'],
-				voice: tts.voice,
-				volume: 9,
-				rate: 0.6,
-				error: (e) => EasySpeech.reset()
-			});
-		}, 0);
-	}
+  import { view, lesson } from '$lib/js/stores.js';
 
-	export function Cancel() {
-		return;
-		EasySpeech.cancel();
-	}
+  // @ts-ignore
+  let voice, tts;
 
-	export function Pause() {
-		EasySpeech.pause();
-	}
+  // onMount(async () => {
+    // console.log(await EasySpeech.detect());
+    initSpeech();
+  // });
 
-	export function Resume() {
-		EasySpeech.resume();
-	}
+  export async function Speak(text) {
+    // console.log(
+    //   'EasySpeech.status before Speak:' + EasySpeech.status()['status']
+    // );
 
-	export async function initSpeech() {
-		console.log('EasySpeech.status before initSpeech:' + EasySpeech.status()['status']);
-		// const es_det = EasySpeech.detect();
-		await EasySpeech.init({ maxTimeout: 10000, interval: 250, quiet: false, rate: 0.7 }); // required
+    if ('speechSynthesis' in window) {
+      let utterance = new SpeechSynthesisUtterance(text);
+      utterance.voice = tts.voice;
+      // utterance.volume = parseFloat(volumeInput.value);
+      utterance.rate = parseFloat(.6);
+      // utterance.pitch = parseFloat(pitchInput.value);
+      utterance.onend = ()=>{
+         window.speechSynthesis.cancel()
+       }
+      window.speechSynthesis.speak(
+        utterance
+      )
 
-		let voices = EasySpeech.voices();
+    }
 
-		for (let v in voices) {
-			tts = { voice: voices[v] };
 
-			if (voices[v].lang.includes('nl')) {
-				tts = { voice: voices[v] };
 
-				if (voices[v].lang.includes('BE')) {
-					// utterance.voice = voices[index]; //'Microsoft Bart - Dutch (Belgium)';
-					tts = { voice: voices[v] };
-					break;
-				}
-			}
-		}
+    // EasySpeech.speak({
+    //   text: text, //dialog_data.content[cur_qa].question['nl'],
+    //   voice: tts.voice,
+    //   volume: 9,
+    //   rate: 0.6,
+    //   pitch: 1,
+    //   boundary: (e) => console.debug('boundary reached'),
+    //   error: async (e) => {
+    //     console.log(e);
+    //     EasySpeech.reset();
+    //   },
+    // });
 
-		EasySpeech.on('error', () => {
-			EasySpeech.reset();
-		});
+    // EasySpeech.reset();
+  }
 
-		document.addEventListener('visibilitychange', async () => {
-			if (document.hidden) {
-				// Ваш код, выполняемый при переходе приложения в неактивное состояние
-				// if (audioCtx) audioCtx.suspend();
 
-				// EasySpeech.pause();
-				// EasySpeech.cancel();
-				await EasySpeech.reset();
-				console.log('EasySpeech.status  before hidden:' + EasySpeech.status()['status']);
-			} else {
-				// EasySpeech.cancel();
-				await EasySpeech.init({ maxTimeout: 10000, interval: 250, quiet: false, rate: 1 }); // required
+  export async function initSpeech() {
 
-				console.log('EasySpeech.status  after hidden:' + EasySpeech.status()['status']);
+    const voices =  window.speechSynthesis.getVoices()
 
-				console.log('Приложение активно');
-			}
-		});
-	}
+    for (let v in voices) {
+      tts = { voice: voices[v] };
 
-	onDestroy(() => {
-		// EasySpeech.cancel();
-		console.log('EasySpeech.status before destroy:' + EasySpeech.status()['status']);
-	});
+      if (voices[v].lang.includes('nl')) {
+        tts = { voice: voices[v] };
+
+        if (voices[v].lang.includes('BE')) {
+          // utterance.voice = voices[index]; //'Microsoft Bart - Dutch (Belgium)';
+          tts = { voice: voices[v] };
+          break;
+        }
+      }
+    }
+
+    document.addEventListener('visibilitychange', async () => {
+      // await EasySpeech.reset();
+      if (document.hidden) {
+
+      } else {
+
+
+        console.log('Приложение активно');
+      }
+    });
+  }
+
+  onDestroy(() => {
+
+
+  });
 </script>

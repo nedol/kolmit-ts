@@ -1,229 +1,223 @@
 <script>
-	import { onMount } from 'svelte';
-	import Card, { Content, PrimaryAction, Media, MediaContent } from '@smui/card';
+  import { getContext, onMount } from 'svelte';
+  import Card, {
+    Content,
+    PrimaryAction,
+    Media,
+    MediaContent,
+  } from '@smui/card';
 
-	import CallButtonUser from './CallButtonUser.svelte';
-	import { view } from '$lib/js/stores.js';
+  import CallButtonUser from './CallButtonUser.svelte';
+  import { view } from '$lib/js/stores.js';
 
-	export let abonent, em, name;
+  export let abonent, operator, name;
 
-	import poster from '$lib/images/tutor.png';
+  import poster from '$lib/images/tutor.png';
 
-	import { call_but_status } from '$lib/js/stores.js';
+  import { users, call_but_status, click_call_func} from '$lib/js/stores.js';
 
-	import { click_call_func } from '$lib/js/stores.js';
+  $click_call_func = null;
 
-	import { users_status } from '$lib/js/stores.js';
+  import pkg from 'lodash';
+  const { groupBy, find } = pkg;
 
-	$click_call_func = null;
+  let checked = false;
 
-	import { user_placeholder } from '$lib/js/stores.js';
+  let rtc;
 
-	import pkg from 'lodash';
-	const { groupBy, find } = pkg;
+  let call_cnt;
+  let selected,
+    inter,
+    status = 'inactive',
+    profile = false,
+    card;
 
-	let checked = false;
+  let video_button_display = false;
+  let video_element, parent_div;
 
-	let rtc;
+  $: if (status && operator) {
+     $users[operator].status = status;
+  }
 
-	let call_cnt;
-	let selected,
-		inter,
-		status = 'inactive',
-		profile = false,
-		card;
+  let progress = {
+    display: 'none',
+    value: 0,
+  };
 
-	let video_button_display = false;
-	let video_element, parent_div;
+  let video = {
+    display: 'none',
+  };
 
-	$: if (status) {
-		$users_status[em] = status;
-	}
+  let local = {
+    video: {
+      display: 'none',
+      srcObject: '',
+    },
+    audio: {
+      paused: true,
+      src: '',
+    },
+  };
 
-	let progress = {
-		display: 'none',
-		value: 0
-	};
+  let remote = {
+    video: {
+      display: 'block',
+      srcObject: '',
+      poster: poster,
+    },
+  };
 
-	let video = {
-		display: 'none'
-	};
+  let select = {
+    display: false,
+  };
 
-	let local = {
-		video: {
-			display: 'none',
-			srcObject: ''
-		},
-		audio: {
-			paused: true,
-			src: ''
-		}
-	};
+  let user = {
+    operator: operator,
+    abonent: abonent,
+    type: 'user',
+  };
 
-	let remote = {
-		video: {
-			display: 'block',
-			srcObject: '',
-			poster: poster
-		}
-	};
+  onMount(async () => {
+    // $call_but_status = status;
+  });
 
-	let select = {
-		display: false
-	};
+  // onDestroy();
 
-	let user = {
-		em: em,
-		abonent: abonent,
-		type: 'user'
-	};
+  function OnLongPress() {
+    select.display = true;
+  }
 
-	onMount(async () => {
-		// $call_but_status = status;
-	});
+  function OnMessage(data) {
+    if (data.operators && data.operators[operator]) {
+      let res = groupBy(data.operators[operator], 'status');
+      try {
+        if (res && res['offer']) {
+          if (status !== 'call') {
+            status = 'active';
+            // $call_but_status = 'active';
+          }
+        } else if (res['busy']) {
+          // if ($click_call_func === null)
+          if (
+            !rtc.DC ||
+            (rtc.DC &&
+              rtc.DC.dc.readyState !== 'open' &&
+              rtc.DC.dc.readyState !== 'connecting')
+          )
+            status = 'busy';
+        } else if (res['close']) {
+          local.video.display = 'none';
+          // remote.video.display = 'none';
+          local.audio.paused = true;
 
-	// onDestroy();
+          //rtc.abonent = url.searchParams.get('abonent');
+          status = 'inactive';
+          // $call_but_status = 'inactive';
+          $click_call_func = null; //operator -> OnClickCallButton
+          parent_div.appendChild(card);
+          rtc.OnInactive();
+          video_element.src = '';
+        }
+      } catch (ex) {
+        console.log(ex);
+      }
+    }
 
-	function OnLongPress() {
-		select.display = true;
-	}
+    if (data.operator && data.operator.operator === rtc.operator) {
+      status = 'active';
+      // $call_but_status = 'active';
+    }
 
-	function OnMessage(data) {
-		if (data.operators && data.operators[em]) {
-			let res = groupBy(data.operators[em], 'status');
-			try {
-				if (res && res['offer']) {
-					if (status !== 'call') {
-						status = 'active';
-						// $call_but_status = 'active';
-					}
-				} else if (res['busy']) {
-					// if ($click_call_func === null)
-					if (
-						!rtc.DC ||
-						(rtc.DC && rtc.DC.dc.readyState !== 'open' && rtc.DC.dc.readyState !== 'connecting')
-					)
-						status = 'busy';
-				} else if (res['close']) {
-					local.video.display = 'none';
-					// remote.video.display = 'none';
-					local.audio.paused = true;
+    // TODO: to delete
+    if (data.desc && data.cand) {
+      if (status === 'talk') {
+        // status = 'talk';
+      } else {
+        // status = 'call';
+      }
+    }
 
-					//rtc.abonent = url.searchParams.get('abonent');
-					status = 'inactive';
-					// $call_but_status = 'inactive';
-					$click_call_func = null; //operator -> OnClickCallButton
-					parent_div.appendChild(card);
-					rtc.OnInactive();
-					video_element.src = '';
-				}
-			} catch (ex) {
-				console.log(ex);
-			}
-		}
+    if (data.func === 'call') {
+      remote.video.muted = true;
+    }
 
-		if (data.operator && data.operator.em === rtc.em) {
-			status = 'active';
-			// $call_but_status = 'active';
-		}
+    if (data.func === 'mute') {
+      local.audio.paused = true;
 
-		// TODO: to delete
-		if (data.desc && data.cand) {
-			if (status === 'talk') {
-				// status = 'talk';
-			} else {
-				// status = 'call';
-			}
-		}
+      video_button_display = false;
+      local.video.display = 'none';
+      // remote.video.display = 'none';
+      // rtc.abonent = url.searchParams.get('abonent');
+      status = 'inactive';
+      $call_but_status = 'inactive';
+      $click_call_func = null; //operator -> OnClickCallButton
+      parent_div.appendChild(card);
+      // video_element.load();
+    }
 
-		if (data.func === 'call') {
-			remote.video.muted = true;
-		}
+    if (data.func === 'talk') {
+      console.log('user talk', data.operator);
+      if (data.operator === operator) {
+        $call_but_status = 'talk';
+        status = 'talk';
+        video_button_display = true;
+        local.audio.paused = true;
+        remote.video.muted = false;
+        video_button_display = 'block';
+        // local.video.display = "block";
+        remote.video.display = 'block';
+      }
+    }
 
-		if (data.func === 'mute') {
-			local.audio.paused = true;
+    if (data.func === 'redirect') {
+      status = 'call';
+      // $call_but_status = 'call';
+      local.audio.paused = true;
 
-			video_button_display = false;
-			local.video.display = 'none';
-			// remote.video.display = 'none';
-			// rtc.abonent = url.searchParams.get('abonent');
-			status = 'inactive';
-			$call_but_status = 'inactive';
-			$click_call_func = null; //operator -> OnClickCallButton
-			parent_div.appendChild(card);
-			// video_element.load();
-		}
+      remote.video.srcObject = null;
+      remote.video.display = 'none';
+    }
 
-		if (data.func === 'talk') {
-			console.log('user talk', data.em);
-			if (data.em === em) {
-				$call_but_status = 'talk';
-				status = 'talk';
-				video_button_display = true;
-				local.audio.paused = true;
-				remote.video.muted = false;
-				video_button_display = 'block';
-				// local.video.display = "block";
-				remote.video.display = 'block';
-			}
-		}
+    // $call_but_status = status;
+  }
 
-		if (data.func === 'redirect') {
-			status = 'call';
-			// $call_but_status = 'call';
-			local.audio.paused = true;
+  let SetDlgDisplay = getContext('SetDlgDisplay');
 
-			remote.video.srcObject = null;
-			remote.video.display = 'none';
-		}
-
-		// $call_but_status = status;
-	}
-
-	let OnClickCallButton = function (ev, email) {
-		$view = 'chat';
-	};
+  let OnClickCallButton = function (ev, email) {
+    SetDlgDisplay();
+  };
 </script>
 
 <div class="card-display" bind:this={parent_div}>
-	<div class="card-container" bind:this={card}>
-		<Card style="min-width: 50px;">
-			<Media class="card-media-square" aspectRatio="square">
-				<MediaContent>
-					<video
-						class="user_video_remote"
-						bind:this={video_element}
-						on:click
-						{poster}
-						autoplay
-						playsinline
-						on:click={OnClickCallButton}
-					>
-						<track kind="captions" />
-					</video>
-				</MediaContent>
-			</Media>
-			<h3
-				class="mdc-typography--subtitle2"
-				style="margin: 0; color: #888;font-size:x-small;text-align:center;z-index:1"
-			>
-				{#if name}
-					{name.slice(0, 8)}
-				{:else}
-					{em.slice(0, 8)}
-				{/if}
-			</h3>
-		</Card>
-	</div>
+  <div class="card-container" bind:this={card}>
+    <!-- <Card style="min-width: 50px;"> -->
+
+    <video
+      class="user_video_remote"
+      bind:this={video_element}
+      on:click
+      {poster}
+      autoplay
+      playsinline
+      on:click={OnClickCallButton}
+    >
+      <track kind="captions" />
+    </video>
+  </div>
 </div>
 
 <style>
-	video {
-		display: block;
-		margin-right: auto;
-		margin-left: auto;
-		margin-top: auto;
-		max-width: 50px;
-		max-height: 50px;
-	}
+  video {
+    display: block;
+    margin-right: auto;
+    margin-left: auto;
+    margin-top: auto;
+    max-width: 65px;
+    max-height: 65px;
+  }
+
+  .card-display {
+    position: relative;
+    /* bottom: 70px; */
+  }
 </style>
