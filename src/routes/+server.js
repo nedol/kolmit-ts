@@ -33,11 +33,14 @@ export async function GET({ url, fetch, cookies }) {
 
   // debugger;
   if (func === 'reset') {
-    cookies.delete('kolmit.operator:' + abonent);
+    cookies.delete('kolmit.operator.' + abonent{
+      path: '/'
+      });
   } else if (func === 'cookie') {
     if (lang) {
       try {
-        let cookie = cookies.get(`kolmit.operator:${abonent}`);
+        let cookie = cookies.get(`kolmit.operator.${abonent}`);
+
         cookie = JSON.parse(cookie);
         cookie.lang = lang;
         const oper = admin ? 'admin' : 'operator';
@@ -45,6 +48,7 @@ export async function GET({ url, fetch, cookies }) {
           path: '/',
           maxAge: 60 * 60 * 24 * 400,
         });
+
       } catch (ex) {
         console.log(ex);
       }
@@ -52,7 +56,8 @@ export async function GET({ url, fetch, cookies }) {
   } else if (func === 'set_lang') {
     if (lang) {
       try {
-        let cookie = cookies.get(`kolmit.admin:${abonent}`);
+        let cookie = cookies.get(`kolmit.operator.${abonent}`);
+        
         cookie = JSON.parse(cookie);
         cookie.lang = lang;
         const oper = admin ? 'admin' : 'operator';

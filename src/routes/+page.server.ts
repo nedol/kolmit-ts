@@ -45,6 +45,19 @@ export async function load({ fetch, cookies, route, url, stuff }) {
 	};
 	try {
 		res = cookies.get('kolmit.operator.' + abonent);
+		if(!res){
+			res = cookies.get('kolmit.operator:' + abonent);
+			if(res){
+				cookies.set('kolmit.operator.' + abonent,res, {
+					path: '/',
+					maxAge: 60 * 60 * 24 * 400,
+				  });
+
+				  cookies.delete('kolmit.operator:' + abonent,{
+					path: '/'
+				  });
+			}
+		}
 
 		if (psw) {
 			kolmit = { operator: operator, psw: md5(psw), name: name, lang: lang };
@@ -52,7 +65,6 @@ export async function load({ fetch, cookies, route, url, stuff }) {
 			if (res) {
 				kolmit = JSON.parse(res);
 			} else {
-
 				resp.check = false;
 				resp.operator = '';
 				resp.abonent = abonent;
