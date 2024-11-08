@@ -33,7 +33,7 @@ export async function GET({ url, fetch, cookies }) {
 
   // debugger;
   if (func === 'reset') {
-    cookies.delete('kolmit.operator.' + abonent{
+    cookies.delete('kolmit.operator.' + abonent, {
       path: '/'
       });
   } else if (func === 'cookie') {
