@@ -191,9 +191,9 @@
       console.log();
     }
 
-    setTimeout(()=>{
-      OnClickCallButton();//активировать
-    },1000)
+    // setTimeout(()=>{
+    //   OnClickCallButton();//активировать
+    // },1000)
 
   });
 

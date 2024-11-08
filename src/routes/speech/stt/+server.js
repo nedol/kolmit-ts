@@ -7,6 +7,8 @@ import { Translate } from '../../translate/Translate';
 
 import { Client } from '@gradio/client';
 
+import axios from 'axios';
+
 import { config } from 'dotenv';
 config();
 
@@ -75,7 +77,7 @@ export async function POST({ url, fetch, cookies, request }) {
     // const result = await queryHF(buffer);
     // const result = await stt_nl(arrayBuffer, from_lang);
 
-    const result = await stt_sm4(blob, from_lang, to_lang);
+    const result = await stt_bluman(blob, from_lang, to_lang);
     // const result = await stt_mms(arrayBuffer, from_lang, to_lang);
 
     if (result) {
@@ -85,7 +87,7 @@ export async function POST({ url, fetch, cookies, request }) {
       };
     }
   } else {
-    const result = await stt_sm4(blob, from_lang);
+    const result = await stt_bluman(blob, from_lang);
     // resp = await stt_as(audioUrl);
     if (result) {
       resp = {
@@ -101,21 +103,62 @@ export async function POST({ url, fetch, cookies, request }) {
   return response;
 }
 
-
 async function stt_sm4(blob, from_lang, to_lang) {
 
-   const app = await Client.connect(
-     'bluman1/seamless-m4t-v2-large-fixing'
-   );
+  const app = await Client.connect( "facebook-seamless-m4t.hf.space/--replicas/ryeyq/");
   const app_info = await app.view_api();
   const from = ISO6391.getName(from_lang);
-   const to = ISO6391.getName(to_lang);
-  const result = await app.predict('/s2tt', [
-    blob, // blob in 'Input speech' Audio component
-    from, // string  in 'Source language' Dropdown component
-    from, // string  in 'Target language' Dropdown component
-  ]);
-  return result.data[0];
+  let result;
+  try{
+    result = await app.predict("/run", [		
+      "(S2TT,S2TT)", 
+      "file", // string  in 'Audio source' Radio component
+      blob, 	// blob in 'Input speech' Audio component
+      blob, 	// blob in 'Input speech' Audio component		
+      "Howdy!",	
+      `('${from}','${from}')`, 
+      `('${from}','${from}')`
+    ]);
+  }catch(ex){
+    console.log(ex)
+  }
+ return result?.data;
+}
+
+
+async function stt_bluman(blob, from_lang, to_lang) {
+
+  const app = await Client.connect(
+    'bluman1/seamless-m4t-v2-large-fixing'
+  );
+ const app_info = await app.view_api();
+ const from = ISO6391.getName(from_lang);
+  const to = ISO6391.getName(to_lang);
+ const result = await app.predict('/s2tt', [
+   blob, // blob in 'Input speech' Audio component
+   from, // string  in 'Source language' Dropdown component
+   from, // string  in 'Target language' Dropdown component
+ ]);
+ return result.data[0];
+}
+
+async function stt_sm4__(blob, from_lang, to_lang) {
+
+  // Конвертируем Blob в ArrayBuffer
+  const audioArrayBuffer = await blob.arrayBuffer();
+
+  const response = await axios.post(
+    'https://api-inference.huggingface.co/models/facebook/wav2vec2-large-960h',
+    audioArrayBuffer,
+    {
+      headers: {
+        Authorization: `Bearer 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`,
+        'Content-Type': 'audio/wav', // Укажите правильный тип контента для вашего аудиофайла
+      },
+    }
+  );
+
+  return response.data;
 }
 
 

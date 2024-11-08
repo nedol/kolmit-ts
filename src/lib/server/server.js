@@ -86,7 +86,7 @@ async function HandleMessage(q, ws) {
         const par = await CreateOperator(q);
         if (par) {
           cookies.set(
-            'kolmit.operator:' + q.abonent,
+            'kolmit.operator.' + q.abonent,
             JSON.stringify({
               name: par.name,
               operator: par.operator,

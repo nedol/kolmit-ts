@@ -41,7 +41,7 @@ export async function GET({ url, fetch, cookies }) {
         cookie = JSON.parse(cookie);
         cookie.lang = lang;
         const oper = admin ? 'admin' : 'operator';
-        cookies.set(`kolmit.${oper}:${abonent}`, JSON.stringify(cookie), {
+        cookies.set(`kolmit.${oper}.${abonent}`, JSON.stringify(cookie), {
           path: '/',
           maxAge: 60 * 60 * 24 * 400,
         });
@@ -56,7 +56,7 @@ export async function GET({ url, fetch, cookies }) {
         cookie = JSON.parse(cookie);
         cookie.lang = lang;
         const oper = admin ? 'admin' : 'operator';
-        cookies.set(`kolmit.${oper}:${abonent}`, JSON.stringify(cookie), {
+        cookies.set(`kolmit.${oper}.${abonent}`, JSON.stringify(cookie), {
           path: '/',
           maxAge: 60 * 60 * 24 * 400,
         });
@@ -126,7 +126,7 @@ export async function POST({ request, url, fetch, cookies }) {
         const par = await CreateOperator(q);
         if (par) {
           cookies.set(
-            'kolmit.operator:' + q.abonent,
+            'kolmit.operator.' + q.abonent,
             JSON.stringify({
               name: par.name,
               operator: par.operator,
@@ -180,7 +180,7 @@ export async function POST({ request, url, fetch, cookies }) {
         SendOperatorOffer(q);
         return new Response(JSON.stringify({ resp }));
       } else if (q.type === 'operator') {
-        const res = cookies.get('kolmit.operator:' + q.abonent);
+        const res = cookies.get('kolmit.operator.' + q.abonent);
         let kolmit;
         if (res) {
           kolmit = JSON.parse(res);

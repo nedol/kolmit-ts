@@ -12,7 +12,7 @@ export async function POST({ request, url, fetch, cookies }) {
 
   if (resp) {
     try {
-      //   let cookie = cookies.get(`kolmit.admin:${resp.operator}`);
+      //   let cookie = cookies.get(`kolmit.admin.${resp.operator}`);
       //   cookie = JSON.parse(cookie);
       //   cookie.lang = lang;
 

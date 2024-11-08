@@ -44,7 +44,7 @@ export async function load({ fetch, cookies, route, url, stuff }) {
 		ice_conf: ice_conf
 	};
 	try {
-		res = cookies.get('kolmit.operator:' + abonent);
+		res = cookies.get('kolmit.operator.' + abonent);
 
 		if (psw) {
 			kolmit = { operator: operator, psw: md5(psw), name: name, lang: lang };
@@ -82,7 +82,7 @@ export async function load({ fetch, cookies, route, url, stuff }) {
 		check: true,
 		host: host,
 		// url: decodeURIComponent(url.toString()),
-		cookies:cookies.get('kolmit.operator:'+abonent),
+		cookies:cookies.get('kolmit.operator.'+abonent),
 		operator: oper,
 		abonent: abonent,
 		dict: dict,
