@@ -237,6 +237,7 @@
           spanElement.appendChild(div_input[i]); // Используем cloneNode, чтобы не удалить div_input из DOM
           // spanElement.style.width = "50px";
           resultElementWidth[i] = getTextWidth(wAr[i], '20px Arial');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
         });
       }, 0);
 

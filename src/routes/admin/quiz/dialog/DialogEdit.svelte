@@ -90,7 +90,7 @@
       dialog_data = resp.data.dialog;
       if (!dialog_data) dialog_data = { content: [] };
       if (resp.data.html) {
-        dialog_data.html = splitHtmlContent(resp.data.html);
+        dialog_data.html = resp.data.html;//splitHtmlContent(resp.data.html);
       }
       dialog_data.name = name;
       //DB
@@ -108,7 +108,7 @@
           prompt = prompt.replaceAll('${llang}', $llang);
           prompt = prompt.replaceAll('${name[$llang]}', name[$llang]);
           prompt = prompt.replaceAll('${langs}', $langs);
-          prompt = prompt.replaceAll('${dialog_data.html}', dialog_data.html);
+          // prompt = prompt.replaceAll('${dialog_data.html}', dialog_data.html);
           prompt = prompt.replaceAll('${data.level}', data.level);
           prompt = prompt.replaceAll('${num}', num);
 
@@ -126,7 +126,7 @@
             );
           }
 
-          dialog_data.html = resp.resp.words[0]?.context;
+          // dialog_data.html = resp.resp.words[0]?.context;
 
           let quiz_grammar = resp.resp.grammar?.quizes[data.name[$llang]];
 
@@ -146,6 +146,22 @@
 
   onMount(async () => {});
 
+  // Функция для преобразования HTML в текст
+  function htmlToText(htmlString) {
+    // Преобразуем строку HTML в DOM
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(htmlString, 'text/html');
+
+    // Извлечение содержимого элемента с классом 'intro'
+    const introContent = doc.querySelector('.intro')?.textContent.trim();
+
+    // Извлечение содержимого всех элементов с классом 'text'
+    const textContents = Array.from(doc.querySelectorAll('.text')).map(textElement => textElement.textContent.trim());
+
+    return  introContent + textContents;
+}
+
+
   function LoadPrompt(name, data) {
     if (name === 'context') {
       active = `Context`;
@@ -161,7 +177,7 @@
         prompt = prompt.replaceAll('${llang}', $llang);
         prompt = prompt.replaceAll('${name[$llang]}', dialog_data.name[$llang]);
         prompt = prompt.replaceAll('${langs}', $langs);
-        prompt = prompt.replaceAll('${dialog_data.html}', dialog_data.html);
+        prompt = prompt.replaceAll('${dialog_data.html}',htmlToText(dialog_data.html));
         prompt = prompt.replaceAll('${data.level}', data.level);
         prompt = prompt.replaceAll('${num}', num);
         prompt = prompt.replaceAll('${grammar}', data.resp.grammar.grammar.map((el)=>{return el}));

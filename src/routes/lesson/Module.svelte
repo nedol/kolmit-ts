@@ -231,7 +231,8 @@
   async function OnClickUserCard(user, theme, module, quiz) {
     await new Promise((resolve) => {
       $users[user]['OnClickCallButton'](resolve);
-    });
+    }) 
+    .catch(error => console.error("Ошибка:", error));
 
     onClickQuiz(
       quiz.type,

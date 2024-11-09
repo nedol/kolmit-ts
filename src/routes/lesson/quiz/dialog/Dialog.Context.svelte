@@ -74,18 +74,25 @@
     playNext();
 
     // Функция для преобразования HTML в текст
-    function htmlToText(html) {
-      let tempDiv = document.createElement('div');
-      tempDiv.innerHTML = html;
-      return tempDiv.textContent || tempDiv.innerText || '';
+    function htmlToText(htmlString) {
+        // Преобразуем строку HTML в DOM
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(htmlString, 'text/html');
+
+        // Извлечение содержимого элемента с классом 'intro'
+        const introContent = doc.querySelector('.intro')?.textContent.trim();
+
+        // Извлечение содержимого всех элементов с классом 'text'
+        const textContents = Array.from(doc.querySelectorAll('.text')).map(textElement => textElement.textContent.trim());
+
+        return  introContent + textContents;
     }
 
     async function playNext() {
       if (!isPlayAuto || ind >= textAr.length) return;
 
-      let originalSentence = htmlToText(textAr[ind]).split(/(?<=[.!?])\s+/)[0];
       let translatedSentence = await Translate(
-        originalSentence,
+        textAr[ind],
         $llang,
         $langs
       ); // Вызов функции перевода
@@ -102,7 +109,7 @@
         // Озвучить оригинал после перевода
         tts.Speak_server(
           $llang,
-          originalSentence,
+          textAr[ind],
           data.name,
           onEndSpeakOriginal
         );

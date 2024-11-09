@@ -17,7 +17,7 @@ export async function POST({ request, url, fetch, cookies }) {
       //   cookie.lang = lang;
 
       cookies.set(
-        'kolmit.admin:' + resp.operator,
+        'kolmit.admin.' + resp.operator,
         JSON.stringify({
           name: resp.name,
           abonent: resp.operator,

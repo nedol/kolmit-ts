@@ -343,8 +343,9 @@
         .split(' ');
       // a_shfl = shuffle(ar).toString().replaceAll(',', ' ');
 
-      resolve();
-    });
+      resolve('');
+    }) 
+    .catch(error => console.error("Ошибка:", error));
   }
 
   function handleBackClick() {
@@ -583,10 +584,11 @@
           },
           () => {
             console.log();
-            resolve();
+            resolve('');
           }
         );
-      });
+      }) 
+      .catch(error => console.error("Ошибка:", error));
     }
   }
 

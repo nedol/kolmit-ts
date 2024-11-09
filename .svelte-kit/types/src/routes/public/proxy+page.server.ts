@@ -40,7 +40,7 @@ export async function load({ fetch, cookies, route, url, stuff }) {
 		ice_conf: ice_conf
 	};
 	try {
-		res = cookies.get('kolmit.operator.' + abonent);
+		res = cookies.get('kolmit.operator:' + abonent);
 
 		if (psw) {
 			kolmit = { operator: operator, psw: md5(psw), name: name, lang: lang };

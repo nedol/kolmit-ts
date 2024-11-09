@@ -36,7 +36,8 @@ export async function load({ fetch, cookies, route, url, stuff }) {
 
 	let prom = new Promise((resolve, reject) => {
 		CreatePool(resolve);
-	});
+	}) 
+	.catch(error => console.error("Ошибка:", error));
 
 	const host = url.origin; //'http://localhost:3000'; //'https://kolmit-sveltekit-nedol.vercel.app'; //
 
