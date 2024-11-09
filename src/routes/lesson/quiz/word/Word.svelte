@@ -61,7 +61,9 @@
 
   let words = [],
     word,
-    example;
+    example,
+    main,
+    top_el;
   let shuffleWords;
   let hints;
   let currentWordIndex = 0;
@@ -237,7 +239,7 @@
           spanElement.appendChild(div_input[i]); // Используем cloneNode, чтобы не удалить div_input из DOM
           // spanElement.style.width = "50px";
           resultElementWidth[i] = getTextWidth(wAr[i], '20px Arial');
-          window.scrollTo({ top: 0, behavior: 'smooth' });
+       
         });
       }, 0);
 
@@ -323,10 +325,13 @@
   }
 
   onMount(async () => {
-     window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    main.scrollIntoView()
+    
     setTimeout(() => {
       //  $showBottomAppBar = false;//test
-    }, 3000);
+    
+    }, 1000);
   });
 
   function handleBackClick() {
@@ -681,7 +686,7 @@
 {/if}
 
 {#if words}
-  <main>
+  <main bind:this={main}>
     <div class="top-app-bar-container flexor">
       <TopAppBar bind:this={topAppBar} variant="fixed">
         <Row>
@@ -790,7 +795,7 @@
       </TopAppBar>
     </div>
 
-    <span
+    <span  bind:this={top_el}
       style="display:block;position:relative;top: 60px;color: lightgray;font-style: italic;font-size:smaller;font-family: serif;"
       >{data.name}</span
     >
@@ -799,7 +804,7 @@
       <div class="title">{data}:</div>
     {/await}
 
-    <div class="word">
+    <div class="word" >
       {#if example}
         {@html example}
       {:else}
@@ -846,7 +851,7 @@
 
     <!-- <br /> -->
     <!-- {#if hintIndex != 0} -->
-    <div class="words_div accordion-container">
+    <div class="words_div accordion-container" >
       {#if hints?.length > 0}
         <Content style="line-height: 2.0; overflow-y:auto;">
           {#each hints as hint, i}

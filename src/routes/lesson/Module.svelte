@@ -84,7 +84,7 @@
     data = $lesson.data;
   }
 
-  let module;
+  let module, main;
 
   let panel_disabled = true;
 
@@ -141,6 +141,7 @@
 
       // if (ev.currentTarget.attributes['highlight'])
       //   data.highlight = ev.currentTarget.attributes['highlight'].value;
+
     } catch (ex) {
       console.log(ex);
     }
@@ -264,7 +265,7 @@
   }
 </script>
 
-<main>
+<main bind:this={main}>
   {#if data.quiz}
     <!-- {@debug data} -->
     <Quiz {data} />
@@ -353,6 +354,7 @@
                                   theme.name[$llang],
                                   quiz.name[$llang]
                                 );
+             
                               }}
                               style="width:100%"
                               {t}
