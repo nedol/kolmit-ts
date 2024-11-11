@@ -39,11 +39,12 @@ export async function GET({ url, fetch, cookies }) {
   } else if (func === 'cookie') {
     if (lang) {
       try {
-        let cookie = cookies.get(`kolmit.operator.${abonent}`);
+        const oper = admin ? 'admin' : 'operator';
+        let cookie = cookies.get(`kolmit.${oper}.${abonent}`);
 
         cookie = JSON.parse(cookie);
         cookie.lang = lang;
-        const oper = admin ? 'admin' : 'operator';
+        
         cookies.set(`kolmit.${oper}.${abonent}`, JSON.stringify(cookie), {
           path: '/',
           maxAge: 60 * 60 * 24 * 400,
@@ -56,11 +57,12 @@ export async function GET({ url, fetch, cookies }) {
   } else if (func === 'set_lang') {
     if (lang) {
       try {
-        let cookie = cookies.get(`kolmit.operator.${abonent}`);
+        const oper = admin ? 'admin' : 'operator';
+        let cookie = cookies.get(`kolmit.${oper}.${abonent}`);
         
         cookie = JSON.parse(cookie);
         cookie.lang = lang;
-        const oper = admin ? 'admin' : 'operator';
+        
         cookies.set(`kolmit.${oper}.${abonent}`, JSON.stringify(cookie), {
           path: '/',
           maxAge: 60 * 60 * 24 * 400,

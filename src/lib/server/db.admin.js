@@ -153,7 +153,7 @@ export async function UpdateDialog(q) {
   try {
     let res = await sql`INSERT INTO dialogs
 			(name , dialog, owner, html, level)
-			VALUES(${q.new_name},${q.data},${q.owner},${q.data.html || ''}, ${q.level} )
+			VALUES(${q.new_name},${q.data},${q.owner},${q.data.html || ''}, ${q.level}, NOW() )
 			ON CONFLICT (name, owner, level)
 			DO UPDATE SET
 			name = EXCLUDED.name,
@@ -169,22 +169,22 @@ export async function UpdateDialog(q) {
 export async function UpdateListen(q) {
   try {
     let res = await sql`INSERT INTO listen
-			(owner, name , data, lang)
-			VALUES(${q.owner},${q.new_name},${q.data},${q.lang} )
+			(owner, name , data, lang,timestamp)
+			VALUES(${q.owner},${q.new_name},${q.data},${q.lang}, NOW() )
 			ON CONFLICT (name, lang, owner)
 			DO UPDATE SET
-			data = EXCLUDED.data`;
+			data = EXCLUDED.data, 
+      timestamp = NOW() `;
     return { res };
   } catch (ex) {
-    return JSON.stringify({ func: q.func, res: ex });
-  }
+    return JSON.stringify({ func: q.func, res: ex });  }
 }
 
 export async function UpdateWords(q) {
   try {
     let res = await sql`INSERT INTO word
-			(name , data, owner, level,context)
-			VALUES(${q.new_name},${q.data},${q.owner}, ${q.level}, ${q.context})
+			(name , data, owner, level,context,timestamp)
+			VALUES(${q.new_name},${q.data},${q.owner}, ${q.level}, ${q.context},NOW())
 			ON CONFLICT (name, owner, level)
 			DO UPDATE SET
 			name = EXCLUDED.name,

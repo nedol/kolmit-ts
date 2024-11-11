@@ -30,7 +30,7 @@
   export let ChangeQuizName: any;
 
   const abonent = getContext('abonent');
-  const data = getContext('quiz_data');
+  let data = getContext('quiz_data');
 
   let content: any,
     new_content = false,
@@ -132,6 +132,7 @@
   // Функция для сохранения текущего состояния в localStorage
   function OnSave() {
     SaveData(name, data.name, words_data, data.level);
+    words_data = words_data;
     // ChangeQuizName(name, data.name);
   }
 
@@ -229,17 +230,39 @@
     items = arrayMove(items, oldIndex, newIndex); // Assuming you have an arrayMove function (see below)
   }
 
+    function htmlToText(html) {
+    // Создаем временный элемент DOM
+    const tempDiv = document.createElement("div");
+    
+    // Присваиваем ему содержимое HTML
+    tempDiv.innerHTML = html;
+
+    // Возвращаем только текстовое содержимое
+    return tempDiv.textContent || tempDiv.innerText || "";
+  }
+
+  function splitTextIntoSentences(text) {
+  return text
+    // Убираем лишние пробелы и переводим строки в обычные пробелы
+    .replace(/\s+/g, ' ')
+    // Разбиваем текст по точкам, восклицательным или вопросительным знакам
+    .split(/(?<=[.!?])\s+/);
+}
+
+
   async function findWordsInText(wordAr, word) {
     // Разбиваем текст на предложения
-    const sentences = context.match(/(?:\d+\.\d+|[^.!?])+[.!?]/gu) || [];
+    let cont = htmlToText(context);
+    const sentences = splitTextIntoSentences(cont) || [];//(/([A-Z][^\.]*)\./) 
     let result = [];
 
     for (const sentence of sentences) {
       for (const word of wordAr) {
-        const regex = new RegExp(`\\b(${word})\\b`, 'gi'); // Регулярное выражение для поиска слова
+        const regex = new RegExp(`(\\b${word}\\b)`, 'gi'); // Регулярное выражение для поиска слова
         if (sentence.match(regex)) {
-          const sent = sentence.replace(regex, '<<$1>>');
-
+          let sent = sentence.replace(regex, '<<$1>>');//const regex = new RegExp(`([A-Z][^<]*\\b${word}\\b[^<]*\\.)`, 'gi'); 
+          // let sent_ = sent.match(/[А-ЯA-Z][^А-ЯA-Z.]*[.?!]?(?=\s*[А-ЯA-Z]|\s*$)/g);//.replace(/<[^>]*>/g, '').trim();
+          // sent = sent.replace(/<[^>]*>/g, '').trim();
           const translation = await Translate(sent, $llang, $langs); // Дожидаемся перевода
 
           result.push({
