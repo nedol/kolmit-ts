@@ -448,10 +448,10 @@ export async function RemoveOperator(q) {
 
 export async function GetListen(q) {
   try {
-    let res = await sql`SELECT data FROM listen
+    let res = await sql`SELECT * FROM listen
 		WHERE name= ${q.name} AND lang=${q.lang}`;
     //debugger;
-    return { data: res[0].data };
+    return { data: res[0].data, html: res[0].html};
   } catch (ex) {
     return JSON.stringify({ func: q.func, res: ex });
   }

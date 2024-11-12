@@ -125,6 +125,7 @@
   }
 </script>
 
+
 <div style="height:300vh; overflow-y:auto;font-size:smaller;color:#2196f3">
   {#if $dc_state === 'close'}
     <div class="speaker-button">
@@ -138,8 +139,12 @@
         </Icon>
       </IconButton>
     </div>
-    {@html data.html}
-  {/if}
+    <iframe srcdoc={data.html} 
+      width="100%" height="500px"
+    allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+    sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
+    allowfullscreen></iframe>
+    {/if}
 </div>
 
 <style>

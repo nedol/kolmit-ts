@@ -238,6 +238,7 @@
       <div class="generator_container">
         <TabBar
               tabs={[
+                context_title,
                 words_title,
                 prompt_title,
                 content_title,
@@ -249,15 +250,15 @@
             <Label>{tab}</Label>
           </Tab>
         </TabBar>
-        <!-- {#if active === 'Format'}
+        {#if active === context_title}
           <Paper variant="unelevated">
             <Content>
               <div>
                 {@html output}
               </div>
             </Content>
-          </Paper> -->
-        {#if active === words_title}
+          </Paper>
+        {:else if active === words_title}
           <Paper variant="unelevated">
             <Content>
               <textarea rows="20" name="dialog_words" bind:value={words}

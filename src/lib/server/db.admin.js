@@ -152,7 +152,7 @@ async function removeModule(item) {
 export async function UpdateDialog(q) {
   try {
     let res = await sql`INSERT INTO dialogs
-			(name , dialog, owner, html, level)
+			(name , dialog, owner, html, level,timestamp)
 			VALUES(${q.new_name},${q.data},${q.owner},${q.data.html || ''}, ${q.level}, NOW() )
 			ON CONFLICT (name, owner, level)
 			DO UPDATE SET

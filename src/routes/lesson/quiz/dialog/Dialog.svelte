@@ -1094,7 +1094,6 @@
           </div>
         </div>
       {/if}
-
       <br />
 
       {#if dialog_data.html}
