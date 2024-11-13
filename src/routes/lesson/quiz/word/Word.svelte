@@ -326,7 +326,8 @@
 
   onMount(async () => {
 
-    main.scrollIntoView()
+    // main.scrollIntoView();
+    // main.scrollTo(0,-1700)
     
     setTimeout(() => {
       //  $showBottomAppBar = false;//test

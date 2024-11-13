@@ -139,6 +139,9 @@
       data.level = level;
       data.quiz = type;
 
+      // main.scrollIntoView();
+      main.scrollTo(0,-200)
+
       // if (ev.currentTarget.attributes['highlight'])
       //   data.highlight = ev.currentTarget.attributes['highlight'].value;
 
