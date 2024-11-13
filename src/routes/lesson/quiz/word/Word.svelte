@@ -822,7 +822,7 @@
 
       <div
         class="input"
-        contenteditable="true"
+        contenteditable="false"
         on:click={OnClickInput}
         on:input={onChangeUserContent}
         bind:this={div_input[0]}
@@ -976,6 +976,7 @@
     width: 95vw;
     margin: 0 auto;
     text-align: center;
+
   }
 
   .words_div {
@@ -990,10 +991,17 @@
     /* top:3px; */
     height: 18px;
     display: inline-table;
-    outline: none;
+    /* outline: none; */
     border: none;
     background: rgba(0, 0, 0, 0.12);
     text-align: center;
+    user-select: text;
+    pointer-events: auto;
+  }
+
+  div::selection {
+    background: #3399ff; /* Цвет фона при выделении */
+    color: #ffffff;      /* Цвет текста при выделении */
   }
 
   .input:focus {
