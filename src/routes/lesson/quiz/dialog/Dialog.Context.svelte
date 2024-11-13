@@ -67,7 +67,7 @@
     isPlayAuto = !isPlayAuto;
     if (!isPlayAuto) return;
 
-    const textAr = htmlToText(text).split(/(?<=[.!?])\s+/);
+    let textAr = htmlToText(text).split(/(?<=[.!?])\s+/).map(t => t.split('.')).flat().filter(sentence => sentence.trim() !== '');
     let ind = 0;
 
     // Запуск последовательного процесса озвучивания
@@ -140,7 +140,8 @@
       </IconButton>
     </div>
     <iframe srcdoc={data.html} 
-      width="100%" height="500px"
+      width="98%" height="500px"
+      frameborder="0"
     allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
     sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
     allowfullscreen></iframe>

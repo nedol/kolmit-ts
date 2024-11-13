@@ -464,7 +464,7 @@
                   <Content>
                     <textarea
                       rows="20"
-                      name="dialog_context"
+                      name="dialog_context" 
                       bind:value={dialog_data.html}
                       on:change={OnContextChange}
                     ></textarea>
