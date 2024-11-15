@@ -291,8 +291,9 @@
                         OnThemeNameInput(theme);
                       })()}
                   ><div class="mdc-typography--subtitle2">
-                    {theme.name[$llang]}<br /><small>({data})</small>
-                  </div></Header
+                    {theme.name[$llang]}<br />
+                  </div>
+                  </Header
                 >{/await}
               <Content>
                 {#if theme.lessons}
