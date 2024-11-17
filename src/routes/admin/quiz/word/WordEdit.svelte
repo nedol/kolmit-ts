@@ -132,7 +132,7 @@
   // Функция для сохранения текущего состояния в localStorage
   function OnSave() {
     SaveData(name, data.name, words_data, data.level);
-    words_data = words_data;
+    // words_data = words_data;
     // ChangeQuizName(name, data.name);
   }
 
@@ -194,13 +194,51 @@
     });
   }
 
-  function PasteContent() {
+  function parseTextToArray(text) {
+    // Преобразуем строку в формат JSON
+    const cleanedText = `[${text.trim().replace(/\n\s*,/g, ',')}]`;
+    
+    // Парсим JSON и возвращаем массив
+    return JSON.parse(cleanedText);
+  }
+
+  
+  function ChangeContent() {
+
+    // Вставляем содержимое буфера обмена в <textarea>
+      navigator.clipboard
+      .readText()
+      .then((text) => {
+        content = text;
+        let parsed = '';
+        try{
+          parsed = JSON.parse(text);
+        }catch(ex){
+          parsed = parseTextToArray(text);
+        }
+
+        words_data = parsed;
+        
+      })
+      .catch((err) => {
+        console.error('Failed to read clipboard contents: ', err);
+      });
+  }
+
+  function AddContent() {
     // Вставляем содержимое буфера обмена в <textarea>
     navigator.clipboard
       .readText()
       .then((text) => {
         content = text;
-        const parsed = JSON.parse(text);
+
+        let parsed = '';
+        try{
+          parsed = JSON.parse(text);
+        }catch(ex){
+          parsed = parseTextToArray(text);
+        }
+
         if (words_data) {
           words_data = words_data.concat(parsed);
         } else {
@@ -458,12 +496,22 @@
                 ></textarea>
               {/await}
               <button
+              class="paste_content"
+              on:click={() => {
+                AddContent();
+              }}
+            >
+              {#await Translate('Add Content', 'en', $langs) then data}
+                {data}
+              {/await}
+            </button>
+              <button
                 class="paste_content"
                 on:click={() => {
-                  PasteContent();
+                  ChangeContent();
                 }}
               >
-                {#await Translate('Paste Content', 'en', $langs) then data}
+                {#await Translate('Change Content', 'en', $langs) then data}
                   {data}
                 {/await}
               </button>
@@ -599,7 +647,10 @@
   /* Для последнего word_field может потребоваться сброс правого отступа */
 
   .save {
-    margin-top: 10px; /* Отступ для кнопки 'Создать' */
+    position: fixed;
+    bottom:0;
+    right:0;
+    margin: 10px; /* Отступ для кнопки 'Создать' */
   }
 
   textarea {

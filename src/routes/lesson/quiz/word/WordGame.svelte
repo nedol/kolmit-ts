@@ -84,6 +84,7 @@
   let isFlipped = false;
   let hint_example = '';
   let label = {};
+  let next_button;
   label[true] = 'Ожидай вопрос';
   label[false] = 'Выбери слово';
 
@@ -466,7 +467,7 @@
       ev.target.classList.add('selected');
       label[false] = 'Ожидай вопрос';
     } else {
-      showCheckButton = true;
+      // showCheckButton = true;
       div_input.forEach((di) => {
         di.style.color = '';
       });
@@ -498,6 +499,8 @@
     }
 
     hint_example = replaceWord(words[i].example[$langs]);
+
+    checkInput();
   }
 
   async function SendData(data) {
@@ -874,7 +877,7 @@
           <Section align="end">
             {#if isFlipped}
               {#if showNextButton}
-                <button on:click={nextWord} class="next-button"
+                <button on:click={nextWord} class="next-button" bind:this={next_button}
                   >{#await Translate('Вперед', 'ru', $langs) then data}
                     {data}
                   {/await}</button

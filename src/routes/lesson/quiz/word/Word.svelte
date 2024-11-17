@@ -182,7 +182,7 @@
   }
 
   function makeExample() {
-          if (!currentWord) return;
+    if (!currentWord) return;
 
     return new Promise(async (resolve, reject) => {
 
@@ -661,6 +661,15 @@
     tts.Speak_server($langs, active, data.name,onEndSpeak);
   }
 
+  function ToggleLangs(){
+    // alert('ToggleLangs');
+
+    $llang = $langs;
+    $langs = _llang;
+    _llang = $llang;
+    makeExample();
+  }
+
   onDestroy(() => {
     // Очищаем интервал при размонтировании компонента
     $llang = _llang;
@@ -719,7 +728,7 @@
           </Section>
 
           <Section align="end">
-            <div class="counter">
+            <div class="counter" on:click={ToggleLangs}>
               <p>
                 <span class="mdc-typography--overline" style="position:relative"
                   >{currentWordIndex}
