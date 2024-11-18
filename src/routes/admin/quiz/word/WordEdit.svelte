@@ -250,6 +250,19 @@
       });
   }
 
+  
+  function CopyContent() {
+
+    navigator.clipboard.writeText(words_data)
+        .then(() => {
+            console.log('Текст успешно скопирован в буфер обмена!');
+        })
+        .catch(err => {
+            console.error('Ошибка при копировании текста:', err);
+        });
+
+  }
+
   function remRecord(ind) {
     words_data.splice(ind, 1);
     words_data = words_data;
@@ -505,16 +518,26 @@
                 {data}
               {/await}
             </button>
-              <button
-                class="paste_content"
-                on:click={() => {
-                  ChangeContent();
-                }}
-              >
-                {#await Translate('Change Content', 'en', $langs) then data}
-                  {data}
-                {/await}
-              </button>
+            <button
+              class="paste_content"
+              on:click={() => {
+                ChangeContent();
+              }}
+            >
+              {#await Translate('Change Content', 'en', $langs) then data}
+                {data}
+              {/await}
+            </button>
+            <button
+            class="paste_content"
+            on:click={() => {
+              CopyContent();
+            }}
+          >
+            {#await Translate('Copy Content', 'en', $langs) then data}
+              {data}
+            {/await}
+          </button>
             </Content>
           </Paper>
         {/if}

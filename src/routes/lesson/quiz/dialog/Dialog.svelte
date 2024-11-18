@@ -935,7 +935,7 @@
           {/if}
         </div>
 
-        <div style="text-align: center;   margin-top: 10px;">
+        <div style="text-align: center;   margin-top: 30px;">
           <span style="color: darkgreen;">
             {@html stt_text}
           </span>
