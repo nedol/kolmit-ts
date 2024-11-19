@@ -4,7 +4,7 @@ const { moment } = pkg;
 import pkg_l from 'lodash';
 const { find, remove, findIndex, difference } = pkg_l;
 
-import { Translate } from './src/routes/translate/Translate.ts'
+import { Translate } from '../../routes/translate/Translate.ts'
 
 import md5 from 'md5';
 import { writable } from 'svelte/store';
