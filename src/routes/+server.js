@@ -256,7 +256,7 @@ export async function POST({ request, url, fetch, cookies }) {
   return response;
 }
 
-function SendEmail(q, new_email) {
+function _SendEmail(q, new_email) {
   return;
   let operator = new Email();
   const abonent = q.abonent ? '&abonent=' + q.abonent : '';
@@ -278,7 +278,6 @@ function SendEmail(q, new_email) {
     '</a></div>';
 
   operator.SendMail(
-    'nedol@narod.ru',
     q.send_mail || new_email,
     {
       ru: 'Новый оператор сети Колмит',

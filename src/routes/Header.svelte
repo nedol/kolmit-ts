@@ -31,6 +31,7 @@
     langs,
     dicts,
     editable,
+    call_but_status,
     showBottomAppBar,
   } from '$lib/js/stores.js';
 
@@ -51,6 +52,11 @@
   });
 
   let lang_menu = false;
+
+  $:if($call_but_status=='inactive'){
+    $view = 'lesson';
+  }
+  
 
   $: if ($dicts && !$dicts['CLASS'][$langs]) {
     (async () => {
@@ -111,10 +117,28 @@
           <div class="sec_items">
             {#if $view !== 'login'}
               <Section>
+                <Title
+                on:click={async () => {
+                if ($lesson.data?.quiz) {
+                 
+                  if (confirm(data)) {
+                    $lesson.data = { quiz: '' };
+                    $view = 'lesson';
+                    $showBottomAppBar = true;
+                  }
+        
+                } else {
+                  $lesson.data = { quiz: '' };
+                  $view = 'lesson';
+                  $showBottomAppBar = true;
+                }
+                }}>{$dicts ? $dicts['LESSON'][$langs] : 'LESSON'}</Title
+              >
                 {#await Translate('Quit the exercise?', 'en', $langs) then data}
+                  {#if  $call_but_status!='inactive'}                    
                   <Title
                     on:click={() => {
-                    if ($lesson.data?.quiz) {
+                    if ($lesson.data?.quiz ) {
                       
                       if (confirm(data)) {
                         $view = 'group';
@@ -127,24 +151,9 @@
                     }
                     }}>{$dicts ? $dicts['CLASS'][$langs] : 'CLASS'}</Title
                   >
+                  {/if}
 
-                  <Title
-                    on:click={async () => {
-                    if ($lesson.data?.quiz) {
-                     
-                      if (confirm(data)) {
-                        $lesson.data = { quiz: '' };
-                        $view = 'lesson';
-                        $showBottomAppBar = true;
-                      }
-            
-                    } else {
-                      $lesson.data = { quiz: '' };
-                      $view = 'lesson';
-                      $showBottomAppBar = true;
-                    }
-                    }}>{$dicts ? $dicts['LESSON'][$langs] : 'LESSON'}</Title
-                  >
+             
                 {/await}
                 <!-- <IconButton class="material-icons" aria-label="Bookmark this page">bookmark</IconButton> -->
               </Section>

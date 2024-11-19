@@ -485,10 +485,10 @@
 
 <!-- {@debug $view} -->
 
-<!-- {#if $view === 'group'} -->
-<Group  {rtc} bind:group={group}/>
+{#if $view === 'group' &&  $call_but_status!=='inactive'}
+  <Group  {rtc} bind:group={group}/>
 
-{#if $view === 'lesson'}
+{:else if $view === 'lesson'}
   <Module data={group_data} bind:group={group}/>
 {/if}
 

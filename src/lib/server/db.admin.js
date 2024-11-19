@@ -114,7 +114,7 @@ export async function AddUser(q) {
 			ON CONFLICT (operator, abonent)
 			DO NOTHING`;
     if (resp.count > 0) {
-      SendEmail({ send_email: q.email, abonent: q.abonent, lang: q.lang });
+      SendEmail({ send_email: q.email, abonent: q.abonent, lang: q.lang, name:q.name });
     }
     return { resp };
   } catch (ex) {

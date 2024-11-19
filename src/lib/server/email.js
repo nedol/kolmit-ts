@@ -22,17 +22,20 @@ export default class Email {
       service: 'gmail',
       port: 465,
       secure: true, // upgrade later with STARTTLS
-      auth: {
-        user: 'nedooleg@gmail.com',
-        // pass: 'NissanPathfinder@720'
-        pass: 'gytn jkgk ucll koig',
+      auth:{
+        user:'kolmit.be@gmail.com',
+        pass:'zsfz xbhd iwax jvxj'
       },
+      // auth: {
+      //   user: 'nedooleg@gmail.com',
+      //   pass: 'gytn jkgk ucll koig',
+      // },
     });
   }
 
-  SendMail(from, to, subj, html, cb) {
+  SendMail(to, subj, html, cb) {
     let mailOptions = {
-      from: from, //from, //'youremail@gmail.com',
+      from: 'kolmit.be@gmail.com', //from, //'youremail@gmail.com',
       to: to, //'myfriend@yahoo.com',
       subject: subj,
       html: html,
@@ -42,8 +45,8 @@ export default class Email {
         cb({ err: error });
         console.log(error);
       } else {
-        cb('Email sent: ' + info.response);
-        console.log('Email sent: ' + info.response);
+        cb('Email sent to: '+ to + info.response);
+        console.log('Email sent to: '+ to + info.response);
       }
     });
   }

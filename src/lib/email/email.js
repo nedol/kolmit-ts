@@ -13,10 +13,14 @@ module.exports = class Email {
     // })
     this.transporter = nodemailer.createTransport({
       service: 'gmail',
-      auth: {
-        user: 'nedooleg@gmail.com', //"admin@delivery-angels.ru",//
-        pass: 'gbfnittpzefnhgqx',
+      auth:{
+        user:'kolmit.be@gmail.com',
+        pass:'zsfz xbhd iwax jvxj'
       },
+      // auth: {
+      //   user: 'nedooleg@gmail.com',
+      //   pass: 'gbfnittpzefnhgqx',
+      // },
     });
     // this.transporter = nodemailer.createTransport({
     //     host: "smtp.yandex.ru",
