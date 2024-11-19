@@ -330,8 +330,7 @@
     // main.scrollTo(0,-1700)
     
     setTimeout(() => {
-      //  $showBottomAppBar = false;//test
-    
+      //  $showBottomAppBar = false;//test    
     }, 1000);
   });
 

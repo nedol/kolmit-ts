@@ -117,15 +117,16 @@
           <div class="sec_items">
             {#if $view !== 'login'}
               <Section>
+                {#await Translate('Quit the exercise?', 'en', $langs) then data}
                 <Title
                 on:click={async () => {
-                if ($lesson.data?.quiz) {
+                if ($lesson.data?.quiz) {                
                  
                   if (confirm(data)) {
                     $lesson.data = { quiz: '' };
                     $view = 'lesson';
                     $showBottomAppBar = true;
-                  }
+                  }            
         
                 } else {
                   $lesson.data = { quiz: '' };
@@ -133,9 +134,10 @@
                   $showBottomAppBar = true;
                 }
                 }}>{$dicts ? $dicts['LESSON'][$langs] : 'LESSON'}</Title
-              >
-                {#await Translate('Quit the exercise?', 'en', $langs) then data}
-                  {#if  $call_but_status!='inactive'}                    
+              >  {/await}
+
+                  {#if  $call_but_status!='inactive'}         
+                  {#await Translate('Quit the exercise?', 'en', $langs) then data}           
                   <Title
                     on:click={() => {
                     if ($lesson.data?.quiz ) {
@@ -150,11 +152,9 @@
                       $showBottomAppBar = true;
                     }
                     }}>{$dicts ? $dicts['CLASS'][$langs] : 'CLASS'}</Title
-                  >
-                  {/if}
-
-             
+                  >                        
                 {/await}
+                {/if}
                 <!-- <IconButton class="material-icons" aria-label="Bookmark this page">bookmark</IconButton> -->
               </Section>
             {/if}

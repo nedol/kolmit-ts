@@ -647,6 +647,7 @@
     tts.Speak_server($langs, active, onEndSpeak);
   }
 
+
   onDestroy(async () => {
     // voice.Cancel();
     $lesson.data = { quiz: '' };
