@@ -112,7 +112,7 @@
 {#if $dicts && $langs && $dicts['CLASS'][$langs]}
   <header>
     <div class="top-app-bar-container flexor">
-      <TopAppBar bind:this={topAppBar} variant="fixed" dense>
+      <TopAppBar bind:this={topAppBar} variant="standart" dense>
         <Row>
           <div class="sec_items">
             {#if $view !== 'login'}
@@ -185,7 +185,7 @@
           </Section>
         </Row>
       </TopAppBar>
-      <div class="flexor-content"></div>
+
     </div>
   </header>
 {/if}
