@@ -1,7 +1,8 @@
 .DS_Store
 node_modules
+/.vscode
 /build
-# /.svelte-kit
+/.svelte-kit
 /package
 .env
 .env.*
@@ -11,6 +12,6 @@ vite.config.ts.timestamp-*
 .env*
 # tsconfig.json
 /src/routes/speech/tts/audio
-
+/sql
 
 .vercel

@@ -5,7 +5,7 @@ export let operatorst = writable();
 
 export let editable = writable(false);
 
-export let view = writable('lesson');
+export let view = writable('group');
 
 export let nlang = writable('en'); //native lang
 
@@ -40,14 +40,13 @@ export let ice_conf = writable();
 export let rtcPool_st = writable();
 rtcPool_st.set({ });
 
-export let lesson = writable({ visible: true });
+export let lesson = writable({ visible: true , data:''});
 
 export let click_call_func = writable();
 
 export let dc = writable();
 
 export let dc_state = writable('close');
-
 
 export let share_mode = writable(false);
 

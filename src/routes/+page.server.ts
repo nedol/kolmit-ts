@@ -16,12 +16,12 @@ import os from 'os';
 
 import { CreatePool, GetUsers, GetGroup } from '$lib/server/db.js'; //src\lib\server\server.db.js
 
-let kolmit;
+let kolmit:any;
 
 
 
 /** @type {import('./$types').PageServerLoad} */
-export async function load({ fetch, cookies, route, url, stuff }) {
+export async function load({ fetch, cookies, route, url }) {
 	// res.json({ response: completion.data.choices[0].text }
 	// let operator = url.searchParams.get('operator');
 

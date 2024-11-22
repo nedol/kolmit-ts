@@ -61,9 +61,7 @@
 
   let words = [],
     word,
-    example,
-    main,
-    top_el;
+    example;
   let shuffleWords;
   let hints;
   let currentWordIndex = 0;
@@ -182,7 +180,7 @@
   }
 
   function makeExample() {
-    if (!currentWord) return;
+          if (!currentWord) return;
 
     return new Promise(async (resolve, reject) => {
 
@@ -239,7 +237,6 @@
           spanElement.appendChild(div_input[i]); // Используем cloneNode, чтобы не удалить div_input из DOM
           // spanElement.style.width = "50px";
           resultElementWidth[i] = getTextWidth(wAr[i], '20px Arial');
-       
         });
       }, 0);
 
@@ -325,13 +322,10 @@
   }
 
   onMount(async () => {
-
-    // main.scrollIntoView();
-    // main.scrollTo(0,-1700)
-    
+     window.scrollTo({ top: 0, behavior: 'smooth' });
     setTimeout(() => {
-      //  $showBottomAppBar = false;//test    
-    }, 1000);
+      //  $showBottomAppBar = false;//test
+    }, 3000);
   });
 
   function handleBackClick() {
@@ -660,15 +654,6 @@
     tts.Speak_server($langs, active, data.name,onEndSpeak);
   }
 
-  function ToggleLangs(){
-    // alert('ToggleLangs');
-
-    $llang = $langs;
-    $langs = _llang;
-    _llang = $llang;
-    makeExample();
-  }
-
   onDestroy(() => {
     // Очищаем интервал при размонтировании компонента
     $llang = _llang;
@@ -695,7 +680,7 @@
 {/if}
 
 {#if words}
-  <main bind:this={main}>
+  <main>
     <div class="top-app-bar-container flexor">
       <TopAppBar bind:this={topAppBar} variant="fixed">
         <Row>
@@ -727,7 +712,7 @@
           </Section>
 
           <Section align="end">
-            <div class="counter" on:click={ToggleLangs}>
+            <div class="counter">
               <p>
                 <span class="mdc-typography--overline" style="position:relative"
                   >{currentWordIndex}
@@ -804,7 +789,7 @@
       </TopAppBar>
     </div>
 
-    <span  bind:this={top_el}
+    <span
       style="display:block;position:relative;top: 60px;color: lightgray;font-style: italic;font-size:smaller;font-family: serif;"
       >{data.name}</span
     >
@@ -813,7 +798,7 @@
       <div class="title">{data}:</div>
     {/await}
 
-    <div class="word" >
+    <div class="word">
       {#if example}
         {@html example}
       {:else}
@@ -830,7 +815,7 @@
 
       <div
         class="input"
-        contenteditable="false"
+        contenteditable="true"
         on:click={OnClickInput}
         on:input={onChangeUserContent}
         bind:this={div_input[0]}
@@ -860,7 +845,7 @@
 
     <!-- <br /> -->
     <!-- {#if hintIndex != 0} -->
-    <div class="words_div accordion-container" >
+    <div class="words_div accordion-container">
       {#if hints?.length > 0}
         <Content style="line-height: 2.0; overflow-y:auto;">
           {#each hints as hint, i}
@@ -984,7 +969,6 @@
     width: 95vw;
     margin: 0 auto;
     text-align: center;
-
   }
 
   .words_div {
@@ -999,17 +983,10 @@
     /* top:3px; */
     height: 18px;
     display: inline-table;
-    /* outline: none; */
+    outline: none;
     border: none;
     background: rgba(0, 0, 0, 0.12);
     text-align: center;
-    user-select: text;
-    pointer-events: auto;
-  }
-
-  div::selection {
-    background: #3399ff; /* Цвет фона при выделении */
-    color: #ffffff;      /* Цвет текста при выделении */
   }
 
   .input:focus {

@@ -46,12 +46,12 @@
     return oper.picture || '/assets/operator.svg';
   }
 
-  let usersPic = group.map((item: any) => ({
-    operator: item.operator,
-    src: findPic(item.operator),
-    name: item.name,
-    status: item.status,
-  }));
+  // let usersPic = group.map((item: any) => ({
+  //   operator: item.operator,
+  //   src: findPic(item.operator),
+  //   name: item.name,
+  //   status: item.status,
+  // }));
 
   import tutor_src from '$lib/images/tutor.png';
   import { view } from '$lib/js/stores.js';
@@ -94,7 +94,7 @@
   $: if (Array.isArray($msg)) {
     try {
       $msg.map((el) => {
-        if (el.add) {
+        if (el.add && $users[el.add]) {
           BuildQuizUsers(el.quiz, el.add, el.type);
 
           $msg = '';
@@ -190,6 +190,12 @@
   };
 
   function BuildQuizUsers(quiz, user, type) {
+    let usersPic = group.map((item: any) => ({
+      operator: item.operator,
+      src: findPic(item.operator),
+      name: item.name,
+      status: item.status,
+    }));
     let obj = find(usersPic, { operator: user });
     if (obj) obj.type = type;
 

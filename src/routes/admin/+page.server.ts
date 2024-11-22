@@ -35,7 +35,7 @@ export async function load({ fetch, cookies, route, url, stuff }) {
 		dict: dict
 	};
 	try {
-		res = cookies.get('kolmit.admin.' + abonent);
+		res = cookies.get('kolmit.admin:' + abonent);
 
 		if (psw) {
 			kolmit = { operator: operator, psw: md5(psw), name: name, lang: lang };

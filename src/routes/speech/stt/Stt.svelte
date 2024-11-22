@@ -248,6 +248,6 @@
   audio {
     height: 25px;
     margin: 0 auto;
-    width: 30vw; 
+    /* width: 30vw; */
   }
 </style>

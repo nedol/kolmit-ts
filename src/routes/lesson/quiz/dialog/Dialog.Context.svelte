@@ -67,32 +67,25 @@
     isPlayAuto = !isPlayAuto;
     if (!isPlayAuto) return;
 
-    let textAr = htmlToText(text).split(/(?<=[.!?])\s+/).map(t => t.split('.')).flat().filter(sentence => sentence.trim() !== '');
+    const textAr = htmlToText(text).split(/(?<=[.!?])\s+/);
     let ind = 0;
 
     // Запуск последовательного процесса озвучивания
     playNext();
 
     // Функция для преобразования HTML в текст
-    function htmlToText(htmlString) {
-        // Преобразуем строку HTML в DOM
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(htmlString, 'text/html');
-
-        // Извлечение содержимого элемента с классом 'intro'
-        const introContent = doc.querySelector('.intro')?.textContent.trim();
-
-        // Извлечение содержимого всех элементов с классом 'text'
-        const textContents = Array.from(doc.querySelectorAll('.text')).map(textElement => textElement.textContent.trim());
-
-        return  introContent + textContents;
+    function htmlToText(html) {
+      let tempDiv = document.createElement('div');
+      tempDiv.innerHTML = html;
+      return tempDiv.textContent || tempDiv.innerText || '';
     }
 
     async function playNext() {
       if (!isPlayAuto || ind >= textAr.length) return;
 
+      let originalSentence = htmlToText(textAr[ind]).split(/(?<=[.!?])\s+/)[0];
       let translatedSentence = await Translate(
-        textAr[ind],
+        originalSentence,
         $llang,
         $langs
       ); // Вызов функции перевода
@@ -109,7 +102,7 @@
         // Озвучить оригинал после перевода
         tts.Speak_server(
           $llang,
-          textAr[ind],
+          originalSentence,
           data.name,
           onEndSpeakOriginal
         );
@@ -125,7 +118,6 @@
   }
 </script>
 
-
 <div style="height:300vh; overflow-y:auto;font-size:smaller;color:#2196f3">
   {#if $dc_state === 'close'}
     <div class="speaker-button">
@@ -139,13 +131,8 @@
         </Icon>
       </IconButton>
     </div>
-    <iframe srcdoc={data.html} 
-      width="98%" height="500px"
-      frameborder="0"
-    allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
-    sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
-    allowfullscreen></iframe>
-    {/if}
+    {@html data.html}
+  {/if}
 </div>
 
 <style>

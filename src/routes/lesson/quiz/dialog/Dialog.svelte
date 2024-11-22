@@ -343,9 +343,8 @@
         .split(' ');
       // a_shfl = shuffle(ar).toString().replaceAll(',', ' ');
 
-      resolve('');
-    }) 
-    .catch(error => console.error("Ошибка:", error));
+      resolve();
+    });
   }
 
   function handleBackClick() {
@@ -584,11 +583,10 @@
           },
           () => {
             console.log();
-            resolve('');
+            resolve();
           }
         );
-      }) 
-      .catch(error => console.error("Ошибка:", error));
+      });
     }
   }
 
@@ -646,7 +644,6 @@
     let active = q[$langs];
     tts.Speak_server($langs, active, onEndSpeak);
   }
-
 
   onDestroy(async () => {
     // voice.Cancel();
@@ -773,8 +770,10 @@
       style="display:block;position:relative;color: lightgray;font-style: italic;font-size:smaller;font-family: serif;"
       >{dialog_data?.name}</span
     >
+   
     {#if q || a}
       {#if !isFlipped}
+      <div class="border">
         <div class="container">
           {#if $call_but_status == 'talk'}
             <div class="repeat_but">
@@ -825,8 +824,8 @@
             <!-- {/if} -->
           </div>
         </div>
-
-        <div style="text-align: center;">
+      
+        <div class="" style="text-align: center;">
           <div class="user1" style="visibility:{visibility[1]}">
             <span>
               {#if !q[$langs]}
@@ -838,7 +837,7 @@
               {/if}
             </span>
           </div>
-        </div>
+     
 
         {#if isThumb}
           <div class="thumb_alert">
@@ -855,6 +854,11 @@
             </Button>
           </div>
         {/if}
+      </div>
+      </div>
+  
+
+      <div class="border">
 
         {#await Translate('Ответь', 'ru', $langs) then data}
           <div class="title">{data}:</div>
@@ -891,7 +895,7 @@
                 {@html a[$langs].replace(/"([^"]*)"/g, '$1')}
               {/if}
             {/if}
-          </div>
+          
 
           <div class="speaker-button" on:click={speak(a[$llang])}>
             <IconButton>
@@ -899,7 +903,8 @@
                 <path fill="currentColor" d={mdiPlay} />
               </Icon>
             </IconButton>
-          </div>
+          </div>       
+        </div>
 
           {#if !share_mode}
             <div
@@ -936,12 +941,14 @@
           {/if}
         </div>
 
-        <div style="text-align: center;   margin-top: 30px;">
+        <div style="text-align: center;   margin-top: 10px;">
           <span style="color: darkgreen;">
             {@html stt_text}
           </span>
         </div>
+      </div>
       {:else}
+      <div class="border"> 
         {#if isThumb}
           <div class="thumb_alert">
             <Icon tag="svg" color="green" viewBox="0 0 24 24">
@@ -981,7 +988,7 @@
               (match) => {
                 return `<span class="span_hidden" onclick="(this.style.color='#2196f3')" 
                 style="display:inline-block;margin: 5px 0px;border:1px;border-style:groove;border-color:light-blue;
-                color:transparent;">${match}</span>`;
+                color:transparent; backgroung-color:white">${match}</span>`;
               }
             )}
           {:else if visibility[1] === 'visible'}
@@ -990,7 +997,7 @@
               (match) => {
                 return `<span class="span_hidden"  
                 style="display:inline-block;margin: 5px 0px;border:1px;border-style:groove;border-color:light-blue;
-                color:#2196f3">${match}</span>`;
+                color:#2196f3;backgroung-color:white"">${match}</span>`;
               }
             )}
           {/if}
@@ -1037,6 +1044,8 @@
             {@html stt_text}
           </span>
         </div>
+        </div>
+        <div class="border">
         <div class="container">
           {#if $call_but_status == 'talk'}
             <div class="repeat_but">
@@ -1094,7 +1103,9 @@
             <!-- {/if} -->
           </div>
         </div>
+      </div>
       {/if}
+
       <br />
 
       {#if dialog_data.html}
@@ -1146,32 +1157,23 @@
   .container {
     display: flex;
     top: 5px;
-    margin-bottom: 30px;
+    margin-bottom: 15px;
     position: relative;
     justify-content: space-between;
     align-items: center;
   }
 
-  .repeat_but {
-    display: inline-flex;
-    /* position: absolute; */
-    color: grey;
-    margin-left: 15px;
-    font-size: smaller;
-    top: 0px;
-    z-index: 2;
-    scale: 1;
-  }
 
-  .thumb_but {
+  .thumb_but,.repeat_but{
     display: inline-flex;
-    /* position: absolute; */
     color: grey;
-    margin-right: 15px;
-    font-size: smaller;
+    margin-right: 5px;
+    font-size: xx-small;
     top: 0px;
     z-index: 2;
-    scale: 1;
+    scale: .8;
+    border: grey solid 1px;
+    border-radius: 15px;
   }
   .top-app-bar-container {
     /* display: inline-block; */
@@ -1284,12 +1286,20 @@
   .title {
     width: fit-content;
     margin: 5px auto; /* Центрирование второго элемента */
-    margin-top: 15px;
+    margin-top: 5px;
     color: coral;
     line-height: normal;
     text-align: center;
     font-size: 0.8em;
-    background-color: ghostwhite;
+    background-color:transparent; 
+  }
+
+  .border{
+    border:1px solid #80808038; 
+    background-color:#c8c8c815; 
+    border-radius: 5px;
+    padding: 5px;
+    margin-top: 5px;
   }
 
   .user1 {

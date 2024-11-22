@@ -40,15 +40,9 @@
 
   let lang = $langs;
 
-  let group_data = getContext('group_data');
-
   export let group = [];
 
-  setContext('group', group);
-
   let no_users_display = 'block';
-
-  let users_online = 0;
 
   const headers = {
     'Content-Type': 'application/json',
@@ -84,16 +78,18 @@
 
   function OnClickUpload() {}
 
-  $: if (Object.keys($users).length > 0) {
+  $: if (group.length > 0) {
     mapValues($users, function (o) {
-      if (o.status !== 'inactive' && o.status !== 'busy') users_online++;
+      // if (o.status !== 'inactive' && o.status !== 'busy')  no_users_display = 'none';
     });
 
-    if (users_online > 0) no_users_display = 'none';
-    else no_users_display = 'block';
+    no_users_display = 'none';
 
-    users_online = 0;
+  }else{
+    console.log()
+    no_users_display = 'block';
   }
+  
 
   function onMessage(data) {
     console.log();
@@ -143,12 +139,12 @@
 
 <!-- {@debug operator} -->
 <div class="deps_div">
-  <!-- {#await Translate('Нет пользователей онлайн', 'ru', $langs) then data}
+  {#await Translate('Нет пользователей онлайн', 'ru', $langs) then data}
     <span
       style="display:{no_users_display};position: relative;top:0px;text-align: center; font-size: smaller;
       font-family: monospace;">{data}</span
     >
-  {/await} -->
+  {/await}
   <div class="flexy-dad">
     {#each group as user, i}
       {#if user && user.operator !== operator.operator}

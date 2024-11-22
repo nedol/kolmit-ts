@@ -1,20 +1,13 @@
-// @ts-nocheck
 import md5 from 'md5';
 import dict from '$lib/dict/dict.json';
-import { ice_conf } from '$lib/ice_conf';
 import os from 'os';
-import Turn from 'node-turn';
 
-// import cc from '$lib/json/cc.json';
-
-// global.rtcPull = { user: {}, operator: {} };
-
-import { CreatePool, GetUsers, GetGroup } from '$lib/server/db.js'; //src\lib\server\server.db.js
+import { CreatePool, GetUsers } from '$lib/server/db.js'; //src\lib\server\server.db.js
+import {  SetSQL, GetGroups } from '$lib/server/db.admin.js'; 
 
 let kolmit;
 
-
-/** @param {Parameters<import('./$types').PageServerLoad>[0]} event */
+/** @type {import('./$types').PageServerLoad} */
 export async function load({ fetch, cookies, route, url, stuff }) {
 	// res.json({ response: completion.data.choices[0].text }
 	// let operator = url.searchParams.get('operator');
@@ -26,21 +19,23 @@ export async function load({ fetch, cookies, route, url, stuff }) {
 	let name = url.searchParams.get('name');
 	let operator = url.searchParams.get('operator');
 	let psw = url.searchParams.get('psw');
+	let sql = ''
 
 	let prom = new Promise((resolve, reject) => {
 		CreatePool(resolve);
 	});
 
-	const pool = await prom;
+	sql = await prom;
 
-	const host = url.origin; //'http://localhost:3000'; //'https://kolmit-sveltekit-nedol.vercel.app'; //
+	SetSQL(sql)
+
+	let host = url.origin; //'http://localhost:3000'; //'https://kolmit-sveltekit-nedol.vercel.app'; //
 
 	let resp = {
-		dict: dict,
-		ice_conf: ice_conf
+		dict: dict
 	};
 	try {
-		res = cookies.get('kolmit.operator:' + abonent);
+		res = cookies.get('kolmit.admin.' + abonent);
 
 		if (psw) {
 			kolmit = { operator: operator, psw: md5(psw), name: name, lang: lang };
@@ -48,13 +43,10 @@ export async function load({ fetch, cookies, route, url, stuff }) {
 			if (res) {
 				kolmit = JSON.parse(res);
 			} else {
-
 				resp.check = false;
-				resp.operator = '';
 				resp.abonent = abonent;
-				resp.operators = '{}';
-				resp.dict = dict;
-	
+				resp.users = '{}';
+				resp.host = host;
 				return resp;
 			}
 		}
@@ -63,24 +55,24 @@ export async function load({ fetch, cookies, route, url, stuff }) {
 	}
 
 	let params = {
-		operator: kolmit.operator,
+		operator: abonent,
 		abonent: abonent,
 		psw: kolmit.psw
 	};
 
-	let { operators, admin } = await GetUsers(params); //cc[0]; //
-	let { group, oper} = await GetGroup(params);
+	let { operators, admin, groups } = await GetGroups(params); 
 
-
-	return {
+return {
 		check: true,
 		host: host,
+		groups: groups,
+		operators:operators,
 		// url: decodeURIComponent(url.toString()),
-		operator: oper,
+		operator: kolmit.operator,
+		name: kolmit.name,
+		abonent: abonent,
+		lang: kolmit.lang,
 		dict: dict,
-		group: group,
-		quiz_users: {}, //res && res.quiz_users ? res.quiz_users : '',
-		ice_conf: ice_conf
 	};
 }
 

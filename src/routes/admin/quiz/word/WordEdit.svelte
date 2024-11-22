@@ -30,7 +30,7 @@
   export let ChangeQuizName: any;
 
   const abonent = getContext('abonent');
-  let data = getContext('quiz_data');
+  const data = getContext('quiz_data');
 
   let content: any,
     new_content = false,
@@ -132,7 +132,6 @@
   // Функция для сохранения текущего состояния в localStorage
   function OnSave() {
     SaveData(name, data.name, words_data, data.level);
-    // words_data = words_data;
     // ChangeQuizName(name, data.name);
   }
 
@@ -194,51 +193,13 @@
     });
   }
 
-  function parseTextToArray(text) {
-    // Преобразуем строку в формат JSON
-    const cleanedText = `[${text.trim().replace(/\n\s*,/g, ',')}]`;
-    
-    // Парсим JSON и возвращаем массив
-    return JSON.parse(cleanedText);
-  }
-
-  
-  function ChangeContent() {
-
-    // Вставляем содержимое буфера обмена в <textarea>
-      navigator.clipboard
-      .readText()
-      .then((text) => {
-        content = text;
-        let parsed = '';
-        try{
-          parsed = JSON.parse(text);
-        }catch(ex){
-          parsed = parseTextToArray(text);
-        }
-
-        words_data = parsed;
-        
-      })
-      .catch((err) => {
-        console.error('Failed to read clipboard contents: ', err);
-      });
-  }
-
-  function AddContent() {
+  function PasteContent() {
     // Вставляем содержимое буфера обмена в <textarea>
     navigator.clipboard
       .readText()
       .then((text) => {
         content = text;
-
-        let parsed = '';
-        try{
-          parsed = JSON.parse(text);
-        }catch(ex){
-          parsed = parseTextToArray(text);
-        }
-
+        const parsed = JSON.parse(text);
         if (words_data) {
           words_data = words_data.concat(parsed);
         } else {
@@ -248,19 +209,6 @@
       .catch((err) => {
         console.error('Failed to read clipboard contents: ', err);
       });
-  }
-
-  
-  function CopyContent() {
-
-    navigator.clipboard.writeText(words_data)
-        .then(() => {
-            console.log('Текст успешно скопирован в буфер обмена!');
-        })
-        .catch(err => {
-            console.error('Ошибка при копировании текста:', err);
-        });
-
   }
 
   function remRecord(ind) {
@@ -281,39 +229,17 @@
     items = arrayMove(items, oldIndex, newIndex); // Assuming you have an arrayMove function (see below)
   }
 
-    function htmlToText(html) {
-    // Создаем временный элемент DOM
-    const tempDiv = document.createElement("div");
-    
-    // Присваиваем ему содержимое HTML
-    tempDiv.innerHTML = html;
-
-    // Возвращаем только текстовое содержимое
-    return tempDiv.textContent || tempDiv.innerText || "";
-  }
-
-  function splitTextIntoSentences(text) {
-  return text
-    // Убираем лишние пробелы и переводим строки в обычные пробелы
-    .replace(/\s+/g, ' ')
-    // Разбиваем текст по точкам, восклицательным или вопросительным знакам
-    .split(/(?<=[.!?])\s+/);
-}
-
-
   async function findWordsInText(wordAr, word) {
     // Разбиваем текст на предложения
-    let cont = htmlToText(context);
-    const sentences = splitTextIntoSentences(cont) || [];//(/([A-Z][^\.]*)\./) 
+    const sentences = context.match(/(?:\d+\.\d+|[^.!?])+[.!?]/gu) || [];
     let result = [];
 
     for (const sentence of sentences) {
       for (const word of wordAr) {
-        const regex = new RegExp(`(\\b${word}\\b)`, 'gi'); // Регулярное выражение для поиска слова
+        const regex = new RegExp(`\\b(${word})\\b`, 'gi'); // Регулярное выражение для поиска слова
         if (sentence.match(regex)) {
-          let sent = sentence.replace(regex, '<<$1>>');//const regex = new RegExp(`([A-Z][^<]*\\b${word}\\b[^<]*\\.)`, 'gi'); 
-          // let sent_ = sent.match(/[А-ЯA-Z][^А-ЯA-Z.]*[.?!]?(?=\s*[А-ЯA-Z]|\s*$)/g);//.replace(/<[^>]*>/g, '').trim();
-          // sent = sent.replace(/<[^>]*>/g, '').trim();
+          const sent = sentence.replace(regex, '<<$1>>');
+
           const translation = await Translate(sent, $llang, $langs); // Дожидаемся перевода
 
           result.push({
@@ -509,35 +435,15 @@
                 ></textarea>
               {/await}
               <button
-              class="paste_content"
-              on:click={() => {
-                AddContent();
-              }}
-            >
-              {#await Translate('Add Content', 'en', $langs) then data}
-                {data}
-              {/await}
-            </button>
-            <button
-              class="paste_content"
-              on:click={() => {
-                ChangeContent();
-              }}
-            >
-              {#await Translate('Change Content', 'en', $langs) then data}
-                {data}
-              {/await}
-            </button>
-            <button
-            class="paste_content"
-            on:click={() => {
-              CopyContent();
-            }}
-          >
-            {#await Translate('Copy Content', 'en', $langs) then data}
-              {data}
-            {/await}
-          </button>
+                class="paste_content"
+                on:click={() => {
+                  PasteContent();
+                }}
+              >
+                {#await Translate('Paste Content', 'en', $langs) then data}
+                  {data}
+                {/await}
+              </button>
             </Content>
           </Paper>
         {/if}
@@ -670,10 +576,7 @@
   /* Для последнего word_field может потребоваться сброс правого отступа */
 
   .save {
-    position: fixed;
-    bottom:0;
-    right:0;
-    margin: 10px; /* Отступ для кнопки 'Создать' */
+    margin-top: 10px; /* Отступ для кнопки 'Создать' */
   }
 
   textarea {
