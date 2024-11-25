@@ -311,6 +311,16 @@
                             use:GetSubscribers
                             name={quiz.name[$llang]}
                           >
+                          <span
+                            style="position: relative; right:90vw;color:red; top:-2px;"
+                          >
+                            {Date.now() -
+                              new Date(quiz.published).getTime() <
+                            10 * 24 * 60 * 60 * 1000
+                              ? 'new'
+                              : ''}
+                          </span>
+
                             {#if quiz.type === 'dialog'}
                               <Icon
                                 tag="svg"
@@ -372,15 +382,7 @@
                             </a><span />
 
                             {#if quiz.type === 'dialog' || quiz.type === 'word'}
-                              <span
-                                style="position: absolute; right:90vw;color:red; top:-2px;"
-                              >
-                                {Date.now() -
-                                  new Date(quiz.published).getTime() <
-                                10 * 24 * 60 * 60 * 1000
-                                  ? 'new'
-                                  : ''}
-                              </span>
+                        
 
                               <div class="form-field-container">
                                 <FormField>

@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { Translate } from '../../translate/Transloc';
+  import { Translate } from '../../translate/Transloc.ts';
 
   import {
     langs,

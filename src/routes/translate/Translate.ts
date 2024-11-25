@@ -43,10 +43,18 @@ export async function Translate(text, from, to) {
         continue;
         
       let res;
+
+      let isQuotes = false;
+
+      if(chunk.search("<<")!=-1){
+        isQuotes = true
+      }
+
+
       // try {
 
-      //   chunk = chunk.replace('<<', '<');
-      //   chunk = chunk.replace('>>', '>');
+        // chunk = chunk.replace(/<</g, '« ');
+        // chunk = chunk.replace(/>>/g, ' »');
  
       //   translate.engine = 'deepl';
       //   res = await translate(chunk, to);
@@ -54,8 +62,8 @@ export async function Translate(text, from, to) {
       //   res = res.replace(/\<(.*?)\>/g, '<<$1>>');
         
       // } catch (ex) {
-      chunk = chunk.replace(/<</g, '<< ').replace(/>>/g, ' >>');
-      //  chunk = chunk.replace(/<</g, '<').replace(/>>/g, '"');//инверсия 
+      chunk = chunk.replace(/<</g, '( ').replace(/>>/g, ' )');
+      // chunk = chunk.replace(/<</g, '<').replace(/>>/g, '"');//инверсия 
         
       translate.engine = 'google';
       
@@ -67,15 +75,17 @@ export async function Translate(text, from, to) {
 
           // text; // или другое подходящее значение по умолчанию
       }
-      if (res) {
-        res = res.replace(/«/g, '<<');
-        res = res.replace(/»/g, '>>');
-        res = res?.replace(/<<\s*(.*?)\s*>>/g,'<<$1>>');
 
-      } else {
-        res = text;
+
+      if (res){
+        res = res.replaceAll('(', '<<').replaceAll(')', '>>');
+        res = res?.replace(/<<\s*(.*?)\s*>>/g,'<<$1>>');
+        translatedText += (res + ' '); // Добавление переведенной части к полному тексту
+
+      }else{
+        translatedText += res;
       }
-       translatedText += (res + ' '); // Добавление переведенной части к полному тексту
+
     }
 
     return translatedText.trim(); // Удаление лишних пробелов в конце текста

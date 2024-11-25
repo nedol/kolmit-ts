@@ -13,7 +13,7 @@
   // let langs_list = JSON.parse(localStorage.getItem('langs_list'));
   //ISO6391.getAllNames();
 
-  import { Translate } from './translate/Transloc';
+  import { Translate } from './translate/Transloc.ts';
 
   import List, { Item, Graphic, Separator, Text } from '@smui/list';
 

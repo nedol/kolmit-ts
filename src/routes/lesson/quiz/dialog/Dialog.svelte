@@ -665,15 +665,12 @@
 
 <Tts bind:this={tts}></Tts>
 
-<!-- <RV bind:this={voice}></RV> -->
-
-<!-- <VoiceRSS bind:this={voice}></VoiceRSS> -->
 <main_dlg>
   <div class="top-app-bar-container flexor">
     <TopAppBar bind:this={topAppBar} variant="fixed">
       <Row>
         <Section align="start">
-          {#if !isFlipped}
+          <!-- {#if !isFlipped} -->
             {#if cur_qa > 0}
               <Icon
                 tag="svg"
@@ -693,7 +690,7 @@
                 <path fill="" d={mdiArrowLeft} />
               </Icon>
             {/if}
-          {/if}
+          <!-- {/if} -->
         </Section>
         <Section align="start">
           {#if $dc_state === 'close'}
@@ -750,7 +747,7 @@
           </button>
         </Section>
         <Section align="end">
-          {#if !isFlipped}
+          <!-- {#if !isFlipped} -->
             <Icon
               tag="svg"
               on:click={onNextQA}
@@ -759,7 +756,7 @@
             >
               <path fill="white" d={mdiArrowRight} />
             </Icon>
-          {/if}
+          <!-- {/if} -->
         </Section>
       </Row>
     </TopAppBar>
@@ -836,11 +833,10 @@
                 {@html q[$langs].replace(/"([^"]*)"/g, '$1')}
               {/if}
             </span>
-          </div>
-     
+          </div>     
 
         {#if isThumb}
-          <div class="thumb_alert">
+          <div class="thumb_alert" style="margin-top: 10px;">
             <Icon tag="svg" color="green" viewBox="0 0 24 24">
               <path fill="currentColor" d={mdiThumbUpOutline} />
             </Icon>
@@ -848,7 +844,7 @@
         {/if}
 
         {#if isRepeat}
-          <div class="repeat_alert">
+          <div class="repeat_alert" style="margin-top: 10px;">
             <Button>
               <Label>{dict['Repeat'][$langs]}</Label>
             </Button>
@@ -884,6 +880,13 @@
               }
             )}
           {/if}
+          <div class="speaker-button" on:click={speak(a[$llang])}>
+            <IconButton>
+              <Icon tag="svg" viewBox="0 0 24 24">
+                <path fill="currentColor" d={mdiPlay} />
+              </Icon>
+            </IconButton>
+          </div>  
 
           <div class="user2_tr">
             {#if a && visibility[0] === 'visible'}
@@ -894,16 +897,9 @@
               {:else}
                 {@html a[$langs].replace(/"([^"]*)"/g, '$1')}
               {/if}
-            {/if}
-          
+            {/if}          
 
-          <div class="speaker-button" on:click={speak(a[$llang])}>
-            <IconButton>
-              <Icon tag="svg" viewBox="0 0 24 24">
-                <path fill="currentColor" d={mdiPlay} />
-              </Icon>
-            </IconButton>
-          </div>       
+     
         </div>
 
           {#if !share_mode}
@@ -941,7 +937,7 @@
           {/if}
         </div>
 
-        <div style="text-align: center;   margin-top: 10px;">
+        <div style="text-align: center;   margin-top: 20px;">
           <span style="color: darkgreen;">
             {@html stt_text}
           </span>
@@ -950,7 +946,7 @@
       {:else}
       <div class="border"> 
         {#if isThumb}
-          <div class="thumb_alert">
+          <div class="thumb_alert" style="    margin-top: -2px;">
             <Icon tag="svg" color="green" viewBox="0 0 24 24">
               <path fill="currentColor" d={mdiThumbUpOutline} />
             </Icon>
@@ -958,7 +954,7 @@
         {/if}
 
         {#if isRepeat}
-          <div class="repeat_alert">
+          <div class="repeat_alert" style="    margin-top: -4px;">
             <Button>
               <Label>{dict['Repeat'][$langs]}</Label>
             </Button>
@@ -1073,7 +1069,15 @@
         </div>
 
         <div class="tip mdc-typography--headline6">
-          {@html q[$llang]}
+          {@html q[$llang]}        
+
+          <div class="speaker-button" on:click={speak(q[$llang])}>
+            <IconButton>
+              <Icon tag="svg" viewBox="0 0 24 24">
+                <path fill="currentColor" d={mdiPlay} />
+              </Icon>
+            </IconButton>
+          </div>   
         </div>
 
         <div style="text-align: center;">
@@ -1093,15 +1097,10 @@
               <br />
             </div>
             <!-- {#if showSpeakerButton} -->
-            <div class="speaker-button" on:click={speak(q[$llang])}>
-              <IconButton>
-                <Icon tag="svg" viewBox="0 0 24 24">
-                  <path fill="currentColor" d={mdiPlay} />
-                </Icon>
-              </IconButton>
-            </div>
-            <!-- {/if} -->
+            <!-- {/if} -->         
+          
           </div>
+
         </div>
       </div>
       {/if}
@@ -1143,14 +1142,16 @@
   .repeat_alert {
     position: absolute;
     left: 30px;
-    /* scale: 0.7; */
+    scale: 0.7;
     z-index: 2;
   }
 
   .thumb_alert {
     position: absolute;
+
     width: 30px;
     z-index: 2;
+    scale: 0.7;
     right: 40px;
   }
 

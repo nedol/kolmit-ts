@@ -317,6 +317,18 @@
                             use:GetSubscribers
                             name={quiz.name[$llang]}
                           >
+                          <div>
+                          <span
+                          style="position: absolute; color:red; top:-2px;"
+                        >
+                       
+                          {Date.now() -
+                            new Date(quiz.published).getTime() <
+                          10 * 24 * 60 * 60 * 1000
+                            ? 'new'
+                            : ''}
+                        </span></div>
+
                             {#if quiz.type === 'dialog'}
                               <Icon
                                 tag="svg"
@@ -378,15 +390,15 @@
                             </a><span />
 
                             {#if quiz.type === 'dialog' || quiz.type === 'word'}
-                              <span
-                                style="position: absolute; right:90vw;color:red; top:-2px;"
+                              <!-- <span
+                                style="position: relative;color:red; top:-2px;"
                               >
                                 {Date.now() -
                                   new Date(quiz.published).getTime() <
                                 10 * 24 * 60 * 60 * 1000
                                   ? 'new'
                                   : ''}
-                              </span>
+                              </span> -->
 
                               <div class="form-field-container">
                                 <FormField>
@@ -498,8 +510,14 @@
 
   .user-cards {
     display: flex;
-    justify-content: flex-end;
+    justify-content: flex-start;
+    margin-left: 20px;
+    border: #80808047  solid 0px;
+    border-radius: 5px;
+    width: 88vw;
+    overflow-x: auto;
   }
+  
 
   .lesson-container {
     /* height: 120vh; */

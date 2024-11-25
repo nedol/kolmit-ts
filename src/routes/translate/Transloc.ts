@@ -7,6 +7,13 @@
 
       let question = { text: text, from_lang: from_lang, to_lang: to_lang };
 
+      
+      text = text?.trim();
+
+      if(!text){
+        return text;
+      }
+
       let data = await fetch(`/translate`, {
         method: 'POST',
         body: JSON.stringify({ question }),

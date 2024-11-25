@@ -62,26 +62,37 @@ export async function SendEmail(q) {
   let operator = new Email();
   const { abonent, send_email: mail, lang ,name} = q;
 
+  const helpLink = `https://kolmit.onrender.com/html/howto.html`
+
   const link = `https://kolmit.onrender.com/?abonent=${abonent}&user=${mail}`;
 
   // Локализация текста письма
   const subject =  await  Translate('Приглашение присоединиться к приложению Kolmit','ru', lang);
 
   const html = `
-    <div style="font-family: Arial, sans-serif; color: #333; line-height: 1.6; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px;">
-      <h2 style="color: #007BFF;">${await Translate('Здравствуйте','ru', lang)} ${name}!</h2>`+
-      await Translate(
-      `<p>Спасибо, что выбрали <strong>Kolmit</strong> для изучения иностранных языков! Мы рады приветствовать вас в нашем сообществе.</p>
-      <p>Для входа в приложение используйте следующую ссылку:</p>`, 'ru', lang)+
-      `<p style="text-align: center;">
-        <a href="${link}" style="background-color: #007BFF; color: #fff; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">
-          👉 ${await Translate('Войти в Kolmit', 'ru', lang)}
-        </a>
-      </p>
-      ${await Translate('<p>Удачи в изучении языков и увлекательного обучения!</p><p>С уважением,</p><p><strong>Команда Kolmit</strong></p>', 'ru', lang)}
-        <p style="font-size: 0.9em; color: #666;">kolmit.be@gmail.com</p>
-    </div>
-  `;
+  <div style="font-family: Arial, sans-serif; color: #333; line-height: 1.6; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px;">
+    <h2 style="color: #007BFF;">${await Translate('Здравствуйте', 'ru', lang)} ${name}!</h2>
+    ${await Translate(
+    `<p>Спасибо, что выбрали <strong>Kolmit</strong> для изучения иностранных языков! Мы рады приветствовать вас в нашем сообществе.</p>
+    <p>Для входа в приложение используйте следующую ссылку:</p>`, 'ru', lang)}
+    <p style="text-align: center;">
+      <a href="${link}" style="background-color: #007BFF; color: #fff; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">
+        👉 ${await Translate('Войти в Kolmit', 'ru', lang)}
+      </a>
+    </p>
+    ${await Translate('<p>Для получения помощи по работе с приложением ознакомьтесь с инструкцией по ссылке ниже:</p>', 'ru', lang)}
+    <p style="text-align: center;">
+      <a href="${helpLink}" style="color: #007BFF; text-decoration: underline;">
+        📖 ${await Translate('Инструкция по работе с приложением', 'ru', lang)}
+      </a>
+    </p>
+    <p>Удачи в изучении языков и увлекательного обучения!</p>
+    <p>С уважением,</p>
+    <p><strong>${await Translate('Команда Kolmit</strong></p>', 'ru', lang)}
+    <p style="font-size: 0.9em; color: #666;">kolmit.be@gmail.com</p>
+  </div>
+`;
+
 
   // Отправка письма
   operator.SendMail(
