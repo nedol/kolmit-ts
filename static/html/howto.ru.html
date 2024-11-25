@@ -7,6 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Инструкция по работе с Kolmit</title>
     <style>
+        /* Ваш текущий стиль */
         body {
             font-family: Arial, sans-serif;
             line-height: 1.6;
@@ -60,7 +61,7 @@
             border-radius: 8px;
             border: 0px solid #ddd;
         }
-
+    
         .video-thumbnail {
             width: 150px;
             cursor: pointer;
@@ -106,7 +107,22 @@
             font-size: 0.9rem;
             color: #666;
         }
+    
+        /* Новый стиль для мобильных устройств */
+        @media (max-width: 768px) {
+            .step {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .step-text {
+                margin-bottom: 15px; /* Разделение текста и видео */
+            }
+            .video-thumbnail {
+                width: 25%; /* Видео займет всю ширину */
+            }
+        }
     </style>
+    
 </head>
 <body>
     <header>
@@ -194,8 +210,9 @@
                 </video>
             </div>
         </div>
-        
+    
 
+        <!-- Step 5 -->
         <div class="step">
             <div class="step-text">
                 <h2><span class="mdi mdi-account-multiple"></span> 5. Работа с упражнениями "Диалог" </span></h2>
@@ -217,7 +234,7 @@
             </div>
         </div>
 
-        <!-- Step 5 -->
+        <!-- Step 6 -->
         <div class="step">
             <div class="step-text">
                 <h2><span class="mdi mdi-file-word-box-outline"></span> 6. Совместная работа.</h2>
@@ -230,8 +247,17 @@
                     <dd><img src="/assets/img/phone.call.png" alt="Разговор" style="vertical-align: middle; height: 26px;"> 
                         Вызов.</dd>
                     <dd><img src="/assets/img/phone.talk.png" alt="Разговор" style="vertical-align: middle; height: 26px;"> 
-                        Разговор.</dd>  </dt>
+                        Разговор.</dd>  
+                    </dt>
+                    <dt>Практика:
+                        <dd><span class="mdi mdi-checkbox-outline"></span>  Выбор упражнения для практики</dd>  
+                        <dd>  
+                            <img src="/assets/img/check_quiz.png" alt="Разговор" style="vertical-align: middle; width: 100%"> 
+                        </dd>
+                        
+                    </dt>    
                 </dl>
+                
                 
             </div>
             <div class="video-thumbnail" onclick="openFullscreen(this)">
@@ -243,7 +269,7 @@
         </div>
 
         
-        <!-- Step 5 -->
+        <!-- Step 7 -->
         <div class="step">
             <div class="step-text">
                 <h2><span class="mdi mdi-file-word-box-outline"></span> 7. Совместная работа. Словарный запас.</h2>
@@ -259,7 +285,8 @@
                 </video>
             </div>
         </div>
-
+        
+        <!-- Step 8 -->
         <div class="step">
             <div class="step-text">
                 <h2><span class="mdi mdi-account-multiple"></span> 8. Совместная работа. Диалог</h2>

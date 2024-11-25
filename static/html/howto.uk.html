@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="uk">
+    <link href="https://cdn.jsdelivr.net/npm/@mdi/font/css/materialdesignicons.min.css" rel="stylesheet">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Інструкція з роботи з Kolmit</title>
+    <style>
+        /* Ваш текущий стиль */
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f6f8;
+            color: #333;
+        }
+        header {
+            background-color: #0056b3;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        header h1 {
+            margin: 0;
+            font-size: 2rem;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        .step {
+            background: #f0f4f8;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .step-text {
+            flex: 1;
+            margin-right: 20px;
+        }
+        h2 {
+            color: #0056b3;
+            margin-bottom: 15px;
+        }
+        ul, ol {
+            padding-left: 20px;
+        }
+        img, video { 
+            max-width: 100%;
+            border-radius: 8px;
+            border: 0px solid #ddd;
+        }
+    
+        .video-thumbnail {
+            width: 150px;
+            cursor: pointer;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #ccc;
+            transition: transform 0.3s;
+        }
+        .video-thumbnail:hover {
+            transform: scale(1.05);
+        }
+        .fullscreen-video {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        .fullscreen-video video {
+            max-width: 90%;
+            max-height: 90%;
+        }
+        .fullscreen-video .close-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: #fff;
+            color: #333;
+            padding: 10px;
+            border-radius: 50%;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        footer {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 0.9rem;
+            color: #666;
+        }
+    
+        /* Новый стиль для мобильных устройств */
+        @media (max-width: 768px) {
+            .step {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .step-text {
+                margin-bottom: 15px; /* Разделение текста и видео */
+            }
+            .video-thumbnail {
+                width: 25%; /* Видео займет всю ширину */
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Інструкція з роботи з Kolmit</h1>
+    </header>
+
+    <div class="container">
+         <!-- Крок 1 -->
+         <div class="step">
+            <div class="step-text">
+                <h2>🔑 1. Реєстрація нового користувача</h2>
+                <ol>
+                    <li>Відкрийте додаток Kolmit.</li>
+                    <li>Заповніть реєстраційну форму:
+                        <ul>
+                            <li><strong>Ім'я:</strong> Вкажіть своє ім'я.</li>
+                            <li><strong>Пароль:</strong> Придумайте та введіть пароль.</li>
+                            <li><strong>Підтвердження пароля:</strong> Повторіть пароль.</li>
+                        </ul>
+                    </li>
+                    <li>Переконайтеся, що всі поля заповнені правильно, і натисніть <strong>РЕЄСТРАЦІЯ</strong>.</li>
+                </ol>
+            </div>
+            <div class="video-thumbnail" onclick="openFullscreen(this)">
+                <video>
+                    <source src="/assets/video/registry.mp4" type="video/mp4">
+                    Ваш браузер не підтримує відео.
+                </video>
+            </div>
+        </div>
+             <!-- Крок 2 -->
+             <div class="step">
+                <div class="step-text">
+                    <h2>🌐 2. Вибір мови інтерфейсу</h2>
+                    <p>На верхній панелі додатку можна змінити мову інтерфейсу. Натисніть на поточну мову (наприклад, "English" або "Українська") і оберіть потрібну зі списку.</p>
+                </div>
+                <div class="video-thumbnail" onclick="openFullscreen(this)">
+                    <video>
+                        <source src="/assets/video/lang.mp4" type="video/mp4">
+                        Ваш браузер не підтримує відео.
+                    </video>
+                </div>
+            </div>
+    
+            <!-- Крок 3 -->
+            <div class="step">
+                <div class="step-text">
+                    <h2>📋 3. Вибір теми для практики</h2>
+                    <ol>
+                        <li>Після входу в систему відкрийте головне меню.</li>
+                        <li>Оберіть одну з доступних категорій тем.</li>
+                        <li>Обрана тема відкриє набір вправ.</li>
+                    </ol>
+                </div>
+                <div class="video-thumbnail" onclick="openFullscreen(this)">
+                    <video>
+                        <source src="/assets/video/themes.mp4" type="video/mp4">
+                        Ваш браузер не підтримує відео.
+                    </video>
+                </div>
+            </div>
+
+            <!-- Крок 4 -->
+            <div class="step">
+                <div class="step-text">
+                    <h2><span class="mdi mdi-file-word-box-outline"></span> 4. Робота з вправами "Словниковий запас" </h2>
+                    <dl>
+                        <dt>Виберіть <span class="mdi mdi-file-word-box-outline"></span> вправу зі списку (наприклад, "ABC-lijst normal perfectum").</dt>
+                        <dt>Інтерфейс:
+                            <dd><img src="/assets/img/counter.png" alt="Кількість завдань" style="vertical-align: middle; height: 26px;"> 
+                            загальна кількість завдань та номер поточного завдання.</dd>
+                            <dd><span class="mdi mdi-help-box"></span> Допомога, Переклад, Підказки</dd>
+                            <dd><span class="mdi mdi-arrow-left"></span><span class="mdi mdi-arrow-right"></span> Навігація</dd>
+                            <dd><span class="mdi mdi-play"></span> Озвучування тексту.</dd>
+                            <dd><span class="mdi mdi-ear-hearing"></span> Озвучування всіх завдань поспіль.</dd>
+                            <dd><span class="mdi mdi-shuffle"></span> Перемішування порядку завдань.</dd>         
+                        </dt>
+                    </dl>
+                </div>
+                <div class="video-thumbnail" onclick="openFullscreen(this)">
+                    <video>
+                        <source src="/assets/video/words.mp4" type="video/mp4">
+                        Ваш браузер не підтримує відео.
+                    </video>
+                </div>
+            </div>
+            <!-- Крок 5 -->
+            <div class="step">
+                <div class="step-text">
+                    <h2><span class="mdi mdi-account-multiple"></span> 5. Робота з вправами "Діалог" </h2>
+                    <dl>
+                        <dt>Виберіть вправу <span class="mdi mdi-account-multiple"></span> зі списку (наприклад, "Boeken van tickets en hotelkamers").</dt>
+                        <dt>Інтерфейс:
+                            <dd><span class="mdi mdi-help-box"></span> Допомога, Переклад, Підказки</dd>
+                            <dd><span class="mdi mdi-play"></span> Озвучування тексту.</dd>
+                            <dd><span class="mdi mdi-microphone"></span> Розпізнавання мови</dd>
+                        </dt>
+                    </dl>
+                </div>
+                <div class="video-thumbnail" onclick="openFullscreen(this)">
+                    <video>
+                        <source src="/assets/video/dialog.mp4" type="video/mp4">
+                        Ваш браузер не підтримує відео.
+                    </video>
+                </div>
+            </div>
+
+
+        <!-- Крок 5 -->
+        <div class="step">
+            <div class="step-text">
+                <h2><span class="mdi mdi-file-word-box-outline"></span> 6. Спільна робота.</h2>
+                <dl>
+                    <dt>Стан:
+                    <dd><img src="/assets/img/phone.inactive.png" alt="Офлайн" style="vertical-align: middle; width: 26px;"> 
+                        Офлайн.</dd>        
+                    <dd><img src="/assets/img/phone.active.png" alt="Онлайн" style="vertical-align: middle; width: 26px;"> Підключення до групи.</dd>                  
+
+                    <dd><img src="/assets/img/phone.call.png" alt="Дзвінок" style="vertical-align: middle; height: 26px;"> 
+                        Дзвінок.</dd>
+                    <dd><img src="/assets/img/phone.talk.png" alt="Розмова" style="vertical-align: middle; height: 26px;"> 
+                        Розмова.</dd>  
+                    </dt>
+                    <dt>Практика:
+                        <dd><span class="mdi mdi-checkbox-outline"></span> Вибір вправи для практики</dd>  
+                        <dd>  
+                            <img src="/assets/img/check_quiz.png" alt="Розмова" style="vertical-align: middle; width: 100%"> 
+                        </dd>
+                    </dt>    
+                </dl>
+            </div>
+            <div class="video-thumbnail" onclick="openFullscreen(this)">
+                <video>
+                    <source src="/assets/video/online.word.mp4" type="video/mp4">
+                    Ваш браузер не підтримує відео.
+                </video>
+            </div>
+        </div>
+
+        <!-- Крок 7 -->
+        <div class="step">
+            <div class="step-text">
+                <h2><span class="mdi mdi-file-word-box-outline"></span> 7. Спільна робота. Словниковий запас</h2>
+                <dl>
+                    <dt></dt>
+                </dl>
+            </div>
+            <div class="video-thumbnail" onclick="openFullscreen(this)">
+                <video>
+                    <source src="/assets/video/online.word.mp4" type="video/mp4">
+                    Ваш браузер не підтримує відео.
+                </video>
+            </div>
+        </div>
+
+        <!-- Крок 8 -->
+        <div class="step">
+            <div class="step-text">
+                <h2><span class="mdi mdi-account-multiple"></span> 8. Спільна робота. Діалог</h2>
+                <p>Щоб почати розмову, натисніть на значок телефону у нижньому куті. Додаток надасть вам аудіо або текстові підказки для спілкування.</p>
+            </div>
+            <div class="video-thumbnail" onclick="openFullscreen(this)">
+                <video>
+                    <source src="/assets/video/online.dialog.mp4" type="video/mp4">
+                    Ваш браузер не підтримує відео.
+                </video>
+            </div>
+        </div>
+        <!-- Fullscreen Video Container -->
+        <div id="fullscreenVideo" class="fullscreen-video" onclick="closeFullscreen()">
+            <div class="close-btn">&times;</div>
+            <video controls autoplay>
+                <source src="" type="video/mp4">
+                Ваш браузер не поддерживает видео.
+            </video>
+        </div>
+
+        <footer>
+            <p>© 2024 Kolmit. Усі права захищені.</p>
+        </footer>
+    </div>
+
+    <script>
+        function openFullscreen(thumbnail) {
+            const fullscreenContainer = document.getElementById('fullscreenVideo');
+            const fullscreenVideo = fullscreenContainer.querySelector('video');
+            const videoSource = thumbnail.querySelector('video source').src;
+
+            fullscreenVideo.src = videoSource;
+            fullscreenContainer.style.display = 'flex';
+        }
+
+        function closeFullscreen() {
+            const fullscreenContainer = document.getElementById('fullscreenVideo');
+            const fullscreenVideo = fullscreenContainer.querySelector('video');
+
+            fullscreenVideo.pause();
+            fullscreenVideo.src = "";
+            fullscreenContainer.style.display = 'none';
+        }
+    </script>
+</body>
+</html>

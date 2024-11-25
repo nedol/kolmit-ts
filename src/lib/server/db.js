@@ -62,7 +62,7 @@ export async function SendEmail(q) {
   let operator = new Email();
   const { abonent, send_email: mail, lang ,name} = q;
 
-  const helpLink = `https://kolmit.onrender.com/html/howto.html`
+  const helpLink = `https://kolmit.onrender.com/html/howto.${lang}.html`
 
   const link = `https://kolmit.onrender.com/?abonent=${abonent}&user=${mail}`;
 
