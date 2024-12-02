@@ -75,6 +75,14 @@
   ];
 
   export let data;
+  
+  const icons = {
+    dialog: mdiAccountMultiple,
+    text: mdiTextBoxOutline,
+    word: mdiFileWordBoxOutline,
+    listen: mdiEarHearing,
+  };
+
 
   $: if ($lesson.data) {
     if ($lesson.data.quiz == '' && data.quiz) {
@@ -272,6 +280,10 @@
     theme.name = await Translate(theme.name[$llang], $llang, $langs);
     module = module;
   }
+
+  function isNew(publishedDate) {
+    return Date.now() - new Date(publishedDate).getTime() < 10 * 24 * 60 * 60 * 1000;
+  }
 </script>
 
 <main bind:this={main}>
@@ -303,13 +315,9 @@
                 >{/await}
               <Content>
                 {#if theme.lessons}
-                  <!-- {@debug theme} -->
                   {#each theme.lessons as lesson}
-                    <!-- <div>{lesson.num}.{lesson.title}</div> -->
                     {#if lesson.quizes}
                       {#each lesson.quizes as quiz}
-                        <!-- {@debug quiz} -->
-
                         {#if quiz.name[$llang] && quiz.published}
                           <div
                             class="quiz-container mdc-typography--caption"
@@ -317,55 +325,20 @@
                             use:GetSubscribers
                             name={quiz.name[$llang]}
                           >
-                          <div>
-                          <span
-                          style="position: absolute; color:red; top:-10px;"
-                        >
-                       
-                          {Date.now() -
-                            new Date(quiz.published).getTime() <
-                          10 * 24 * 60 * 60 * 1000
-                            ? 'new'
-                            : ''}
-                        </span></div>
+                          <div class="icon-wrapper">
+                            <div>
+                              {#if isNew(quiz.published)}
+                                <span  class="new-badge" >new</span>
+                              {/if}
+                            </div>
 
-                            {#if quiz.type === 'dialog'}
-                              <Icon
-                                tag="svg"
-                                viewBox="0 0 24 24"
-                                width="30px"
-                                height="30px"
-                              >
-                                <path fill="grey" d={mdiAccountMultiple} />
-                              </Icon>
-                            {:else if quiz.type === 'text'}
-                              <Icon
-                                tag="svg"
-                                viewBox="0 0 24 24"
-                                width="30px"
-                                height="30px"
-                              >
-                                <path fill="grey" d={mdiTextBoxOutline} />
-                              </Icon>
-                            {:else if quiz.type === 'word'}
-                              <Icon
-                                tag="svg"
-                                viewBox="0 0 24 24"
-                                width="30px"
-                                height="30px"
-                              >
-                                <path fill="grey" d={mdiFileWordBoxOutline} />
-                              </Icon>
-                            {:else if quiz.type === 'listen'}
-                              <Icon
-                                tag="svg"
-                                viewBox="0 0 24 24"
-                                width="30px"
-                                height="30px"
-                              >
-                                <path fill="grey" d={mdiEarHearing} />
+                            {#if icons[quiz.type]}
+                              <Icon tag="svg" viewBox="0 0 24 24" width="30px" height="30px">
+                                <path fill="grey" d={icons[quiz.type]} />
                               </Icon>
                             {/if}
+                          </div>
+                        
                             <a
                               href="#"
                               use:disablePanel
@@ -390,16 +363,7 @@
                             </a><span />
 
                             {#if $call_but_status!=='inactive' && (quiz.type === 'dialog' || quiz.type === 'word')}
-                              <!-- <span
-                                style="position: relative;color:red; top:-2px;"
-                              >
-                                {Date.now() -
-                                  new Date(quiz.published).getTime() <
-                                10 * 24 * 60 * 60 * 1000
-                                  ? 'new'
-                                  : ''}
-                              </span> -->
-
+ 
                               <div class="form-field-container">
                                 <FormField>
                                   <Checkbox
@@ -481,6 +445,28 @@
 </main>
 
 <style>
+  :root {
+    --accent-color: rgba(225, 55, 55, 0.8);
+  }
+
+  .icon-wrapper {
+    position: relative;
+    display: inline-block; /* Позволяет корректно позиционировать вложенные элементы */
+    width: 30px;
+    height: 30px;
+  }
+
+  .new-badge {
+    position: absolute;
+    color: red;
+    font-size: 14px; /* Подбирайте размер шрифта для лучшей читаемости */
+    top: -12px; /* Расположение над иконкой */
+    right: -15px; /* Расположение справа */
+    background-color: white;/*transparent; /* Для контраста, опционально */
+    border-radius: 3px; /* Слегка закругляем для стилистики */
+    padding: 1px 2px; /* Отступы для лучшего внешнего вида */
+    z-index: 1; /* Чтобы текст отображался поверх иконки */
+  }
   main {
     position: fixed;
     top: 20px;
@@ -501,7 +487,7 @@
   .module_level {
     position: fixed;
     color: white;
-    background-color: rgba(225, 55, 55, 0.8);
+    background-color: var(--accent-color);
     top: 60px;
     left: 20px;
     transform: translate(-50%, -50%);
