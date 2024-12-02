@@ -105,36 +105,39 @@
           //   .then((response) => response.text())
           //   .then((resp) => {
           // prompt = resp;
+
+  
+          // data.module.themes[1].lessons[0].quizes[1].name
+
           prompt = prompt.replaceAll('${llang}', $llang);
-          prompt = prompt.replaceAll('${name[$llang]}', name[$llang]);
+          prompt = prompt.replaceAll('${name[$llang]}', `${data.theme.name[$llang]}.${name[$llang]}`);
           prompt = prompt.replaceAll('${langs}', $langs);
           prompt = prompt.replaceAll('${dialog_data.html}', dialog_data.html);
-          prompt = prompt.replaceAll('${data.level}', data.level);
+          prompt = prompt.replaceAll('${data.level}', `${data.level}.${data.theme.id}(${data.module.themes.length})`);
           prompt = prompt.replaceAll('${num}', num);
 
           dialog_data.words = JSON.stringify(
-            resp.resp.words[0].data
+            resp.resp.words[0]?.data//resp.words[0].data
               .map((item) => extractWords(item.example[$llang]))
               .join(',')
           );
 
-          if (resp.resp.words[0].data){            
+          function extractContent(str) {
+            const match = str.match(/<<(.*?)>>/); // Ищем содержимое между << и >>
+            return match ? match[1] : null; // Возвращаем содержимое или null, если нет совпадений
+          }
+
+          if (resp.resp.words[0]?.data){            
 
             prompt = prompt.replaceAll(
               '[${dialog_data_words}]',
-              resp.resp.words[0].data.map(item => item.infinitive)
+              resp.resp.words[0].data.map(item => extractContent(item.example[$llang]))
             );
           }
 
           dialog_data.html = resp.resp.words[0]?.context;
 
-          let quiz_grammar = resp.resp.grammar?.quizes[data.name[$llang]];
-
-          grammar = resp.resp.grammar?.grammar.concat(quiz_grammar);
-
-          if (grammar) prompt = prompt.replaceAll('${grammar}', grammar.map(element => {
-            return element
-          }));
+          if (data.theme.grammar) prompt = prompt.replaceAll('${grammar}', JSON.stringify(data.theme.grammar)) 
 
           prompt = prompt;
         });
@@ -405,8 +408,7 @@
   </div>
 
   <Accordion
-    style="  margin-top: 20px;
-  margin-bottom: 20px;"
+    style="margin-top: 20px;margin-bottom: 20px;"
   >
     <Panel>
       <Header
@@ -623,7 +625,7 @@
     >
     <div class="container">
       {#await Translate('Save', 'en', $langs) then data}
-        <button class="save" on:click={() => OnSave()}>{data}</button>{/await}
+        <button class="save_content" on:click={() => OnSave()}>{data}</button>{/await}
     </div>
   </div>
 </main>
@@ -689,7 +691,10 @@
 
   /* Для последнего dialog-field может потребоваться сброс правого отступа */
 
-  .save {
+  .save_content {
+    position: fixed;
+    right: 20px;
+    bottom:5px;
     margin-top: 10px; /* Отступ для кнопки "Создать" */
   }
 

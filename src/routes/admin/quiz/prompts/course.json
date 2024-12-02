@@ -1,0 +1,35 @@
+{
+    "lang": "(nl)",
+    "level": "(A1|A2...)",
+    "module": {
+      "themes": [
+        {
+          "id":"(theme id)",
+          "name": {
+            "nl": "(theme name)"
+          },
+          "lessons": [
+            {
+              "quizes": [
+                {
+                  "type": "word",
+                  "name": {
+                    "nl": "(quiz name)"
+                  },
+                  "published": ""
+                },
+                {
+                    "type": "dialog",
+                    "name": {
+                      "nl": "(quiz name)"
+                    },
+                    "published": ""
+                }
+              ],
+              "grammar":["(the theme grammar rules and constructions array)"]
+            }
+          ]
+        }
+      ]
+    }
+}

@@ -7,6 +7,9 @@
 
   import { langs, llang } from '$lib/js/stores.js';
 
+  import pkg, { indexOf } from 'lodash';
+  const { find, findKey, mapValues } = pkg;
+
   import Menu from '@smui/menu';
   import List, { Item, Separator, Text } from '@smui/list';
   import Tab, { Label } from '@smui/tab';
@@ -32,6 +35,8 @@
   const abonent = getContext('abonent');
   const data = getContext('quiz_data');
 
+  console.log(data)
+
   let content: any,
     new_content = false,
     words_data: [];
@@ -55,9 +60,13 @@
     prompt = prompt.replaceAll('${langs}', $langs);
     prompt = prompt.replaceAll(
       '${topic}',
-      data.theme + '.' + data.name[$llang]
+      data.theme.name[$llang] + '.' + data.name[$llang]
     );
-    prompt = prompt.replaceAll('${level}', data.level);
+    prompt = prompt.replaceAll('${level}', `${data.level}.${data.theme.id}(${data.module.themes.length})`);
+
+    if (data.theme.grammar) prompt = prompt.replaceAll('${grammar}', JSON.stringify(data.theme.grammar)) 
+
+    prompt = prompt;
   }
 
   let grammar_title = 'Grammar',
@@ -493,7 +502,7 @@
 
   <div class="container">
     <button class="add-record" on:click={addEmptyRecord}>+</button>
-    <div class="container">
+    <div class="save_container">
       {#await Translate('Сохранить', 'ru', $langs) then data}
         <button class="save" on:click={() => OnSave()}>{data}</button>
       {/await}
@@ -518,7 +527,7 @@
   .collapsible {
     overflow: hidden;
     margin-top: 1rem;
-    margin-bottom: 3rem;
+    margin-bottom: 1rem;
     margin-left: 1rem;
   }
   ::selection {
@@ -598,6 +607,14 @@
   }
   .container {
     display: flex;
+    justify-content: space-between; /* Распределяет контейнеры равномерно по горизонтали */
+  }
+
+  .save_container {
+    display: flex;
+    position: fixed;
+    right:50px;
+    bottom:10px;
     justify-content: space-between; /* Распределяет контейнеры равномерно по горизонтали */
   }
 

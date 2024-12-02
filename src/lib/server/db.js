@@ -1,8 +1,5 @@
-import pkg from 'moment';
-const { moment } = pkg;
-
-import pkg_l from 'lodash';
-const { find, remove, findIndex, difference } = pkg_l;
+import pkg from 'lodash';
+const { find, remove, findIndex, difference } = pkg;
 
 import { Translate } from '../../routes/translate/Translate'
 
@@ -99,12 +96,8 @@ export async function SendEmail(q) {
     mail,
     subject,
     html,
-    (error, result) => {
-      if (error) {
-        console.error('Ошибка при отправке письма:', error);
-      } else {
+    (result) => {
         console.log('Письмо успешно отправлено:', result);
-      }
     }
   );
 }

@@ -319,7 +319,7 @@
                           >
                           <div>
                           <span
-                          style="position: absolute; color:red; top:-2px;"
+                          style="position: absolute; color:red; top:-10px;"
                         >
                        
                           {Date.now() -
@@ -389,7 +389,7 @@
                               >{quiz.name[$llang]}
                             </a><span />
 
-                            {#if quiz.type === 'dialog' || quiz.type === 'word'}
+                            {#if $call_but_status!=='inactive' && (quiz.type === 'dialog' || quiz.type === 'word')}
                               <!-- <span
                                 style="position: relative;color:red; top:-2px;"
                               >
@@ -503,7 +503,7 @@
     color: white;
     background-color: rgba(225, 55, 55, 0.8);
     top: 60px;
-    left: 10px;
+    left: 20px;
     transform: translate(-50%, -50%);
     z-index: 1;
   }
@@ -534,7 +534,7 @@
     position: relative;
     justify-content: start;
     align-items: center;
-    padding: 0px; /* Установите желаемый отступ вокруг элемента */
+    padding: 5px; /* Установите желаемый отступ вокруг элемента */
   }
 
   .form-field-container {

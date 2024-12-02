@@ -321,16 +321,16 @@
 
       if (!a[$langs]) a[$langs] = await Translate(a[$llang], $llang, $langs);
 
-      a[$llang] = a[$llang]?.replace('${user2_name}', operator.name);
-      a[$langs] = a[$langs]?.replace('${user2_name}', operator.name);
-      a[$llang] = a[$llang]?.replace(
-        '${user1_name}',
-        $dc ? 'user_name' : 'Kolmit'
-      );
-      a[$langs] = a[$langs]?.replace(
-        '${user1_name}',
-        $dc ? 'user_name' : 'Kolmit'
-      );
+      a[$llang] = a[$llang]?.replace('${user2_name}', '...');
+      a[$langs] = a[$langs]?.replace('${user2_name}', '...');
+      // a[$llang] = a[$llang]?.replace(
+      //   '${user1_name}',
+      //   $dc ? 'user_name' : 'Kolmit'
+      // );
+      // a[$langs] = a[$langs]?.replace(
+      //   '${user1_name}',
+      //   $dc ? 'user_name' : 'Kolmit'
+      // );
 
       hints = a.hints;
       dialog_data.hints = a.hints;

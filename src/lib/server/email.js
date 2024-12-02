@@ -42,7 +42,7 @@ export default class Email {
     };
     this.transporter.sendMail(mailOptions, function (error, info) {
       if (error) {
-        cb({ err: error });
+        cb({ error: error });
         console.log(error);
       } else {
         cb('Email sent to: '+ to + info.response);

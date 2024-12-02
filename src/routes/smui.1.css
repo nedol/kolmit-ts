@@ -63,3 +63,7 @@ body {
 .mdc-image-list__supporting {
   display: block;
 }
+
+.mdc-checkbox {
+  /* height:8px */
+}

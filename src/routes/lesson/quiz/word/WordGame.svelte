@@ -498,6 +498,8 @@
     }
 
     hint_example = replaceWord(words[i].example[$langs]);
+    
+    checkInput();
   }
 
   async function SendData(data) {

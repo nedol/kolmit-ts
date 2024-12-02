@@ -4,9 +4,9 @@
   import { Translate } from '../../translate/Transloc';
 
   import pkg, { indexOf } from 'lodash';
-  const { find, findKey, mapValues } = pkg;
+  const { find, isObject, mapValues } = pkg;
 
-  import _ from 'lodash';
+
 
   import Checkbox from '@smui/checkbox';
   import { SortableList } from '@jhubbardsf/svelte-sortablejs';
@@ -165,8 +165,8 @@
     // lesson_data.data.level = level;
     lesson_data.data.name = quiz.name;
     lesson_data.data.theme = theme;
-    // data.words = find(lesson_data.module.themes, {
-    // 	name: ev.currentTarget.attributes['theme_name'].value
+    // lesson_data.data.words = find(lesson_data.module.themes, {
+    // 	name: ev.currentTarget.attributes['name'].value
     // })['words'];
     lesson_data.data.quiz = quiz.type;
 
@@ -186,7 +186,7 @@
       return obj;
     }
 
-    if (_.isObject(obj)) {
+    if (isObject(obj)) {
       for (let key in obj) {
         if (obj.hasOwnProperty(key)) {
           let found = findDeep(obj[key], predicate, `${path}.${key}`);
@@ -510,7 +510,7 @@
                                     onClickQuiz(
                                       quiz,
                                       lesson_data.data.module.level,
-                                      theme.name[$llang]
+                                      theme
                                     );
                                   }}
                                   type={quiz.type}

@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount, onDestroy } from 'svelte';
-
+  import {Translate} from "../../../translate/Transloc"
   import Speak from './Speak.svelte';
   //  import { Speak } from '/src/routes/speech/tts/VoiceRSS';
   import moment from 'moment';
@@ -501,22 +501,23 @@
 {/if}
 <main>
   {#if data.quiz == 'listen'}
-    <div>
-      <p>{dict['Послушай и напиши'][$langs]}:</p>
 
+      <p>{#await Translate('Послушай и напиши','ru', $langs) then data} {data}: {/await}</p>
+
+
+    <div class="button-group">
       {#if !isFirst}
-        <button on:click={Generate}>{dict['Старт'][$langs]}</button>
+        <button on:click={Generate} class="btn action-btn">{#await Translate('Старт','ru', $langs) then data}  {data} {/await}</button>
       {:else}
-        <button on:click={repeat}>{dict['Повторить'][$langs]}</button>
-        <button on:click={checkInput}>{dict['Проверить'][$langs]}</button>
+        <button on:click={repeat} class="btn repeat-btn">{#await Translate('Повторить','ru', $langs) then data} {data} {/await}</button>
+        <button on:click={checkInput} class="btn check-btn">{#await Translate('Проверить','ru', $langs) then data} {data} {/await}</button>
       {/if}
     </div>
 
-    <div>
-      <!-- <label for="userAnswer">Your Answer:</label> -->
+    <div class="input-group">
       {#if name === 'Nummers'}
         <div
-          class="input"
+          class="input-field"
           contenteditable="true"
           style={inputStyle}
           bind:this={div_input}
@@ -528,7 +529,7 @@
         <div
           contenteditable="true"
           id="userTime"
-          class="input"
+          class="input-field"
           placeholder="hh:mm"
           on:input={handleUserInput}
           bind:this={div_input}
@@ -538,7 +539,7 @@
         <div
           contenteditable="true"
           id="userTime"
-          class="input"
+          class="input-field"
           on:input={handleUserInput}
           bind:this={div_input}
           bind:innerHTML={userContent}
@@ -549,8 +550,6 @@
           <span class="material-symbols-outlined"> ? </span>
         </button>
       {/if}
-
-      <!-- <input type="text" id="userAnswer" bind:value={userAnswer} style={inputStyle} /> -->
     </div>
   {:else if data.quiz == 'dialog.client'}
     <Speak {data} />
@@ -559,64 +558,89 @@
 
 <style>
   main {
+    max-width: 50%;
+    margin: 0 auto;
     text-align: center;
     margin-top: 40px;
-  }
-  .hint-button {
-    display: inline-block;
-    position: relative;
-    top: -2px;
-    height: 44px;
-    color: white;
-    background-color: #2196f3;
-    border-radius: 3px;
+    font-family: Arial, sans-serif;
   }
 
-  button {
-    margin-top: 10px;
-    padding: 8px 16px;
+  .quiz-header p {
+    font-size: 20px;
+    margin-bottom: 15px;
+  }
+
+  /* Flexbox для кнопок */
+  .button-group {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px; /* Отступ между кнопками */
+    margin-top: 20px;
+  }
+
+  .btn {
+    padding: 10px 20px;
     font-size: 16px;
-    cursor: pointer;
-  }
-
-  #userTime {
-    width: 80px;
-    font-size: x-large;
-    text-align: center;
-    border: 1px solid grey;
-    background-color: rgb(220, 228, 228);
-  }
-
-  .input {
-    display: inline-block;
-    padding: 8px;
-    width: 120px;
-    font-size: 24px;
-    margin-top: 10px; /* Добавим отступ сверху для выравнивания */
-    margin-left: auto;
-    margin-right: auto;
-  }
-
-  label {
-    display: block;
-    font-size: 18px;
-    margin-top: 10px; /* Добавим отступ сверху для выравнивания */
-  }
-
-  main > div {
-    margin-bottom: 20px; /* Добавим отступ снизу для разделения блоков */
-  }
-
-  .share-button {
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    padding: 10px;
-    font-size: 1.5em;
-    background-color: #2196f3;
-    color: #fff;
     border: none;
     border-radius: 5px;
+    color: white;
+    background-color: #ff9800;
     cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+
+  .btn:hover {
+    background-color: #45a049;
+  }
+
+  .input-group {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 20px;
+  }
+
+  .input-field {
+    flex: 1;
+    max-width: 300px;
+    padding: 10px;
+    font-size: 18px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #f9f9f9;
+    text-align: center;
+    margin-right: 10px;
+  }
+
+
+  .check-btn {
+    background-color: #9c27b0;
+    color: white;
+   }
+
+  .hint-button {
+    display: inline-block;
+    height: 44px;
+    width: 44px;
+    border: none;
+    border-radius: 50%;
+    color: white;
+    background-color: #2196f3;
+    font-size: 18px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+
+  .hint-button:hover {
+    background-color: #1e88e5;
+  }
+
+   /* Адаптивность */
+   @media (max-width: 768px) {
+    .button-group {
+      flex-direction: column; /* Выравниваем кнопки вертикально */
+      gap: 15px; /* Увеличиваем расстояние между кнопками */
+    }
   }
 </style>

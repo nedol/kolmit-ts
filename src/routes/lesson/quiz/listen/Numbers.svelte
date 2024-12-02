@@ -3,6 +3,8 @@
 
   import Speak from './Speak.svelte';
 
+  import {Translate} from "../../../translate/Transloc"
+
   import moment from 'moment';
   moment.locale('nl-be');
   // import 'moment/locale/nl';
@@ -303,124 +305,188 @@
     >
   </IconButton>
 {/if}
+
 <main>
-  {#if data.quiz == 'listen'}
+   {#if data.quiz == 'listen'}
     <div>
-      <p>{dict['Послушай и напиши'][$langs]}:</p>
-
-      {#if !isFirst}
-        <button on:click={Generate}>{dict['Старт'][$langs]}</button>
-      {:else}
-        <button on:click={repeat}>{dict['Повторить'][$langs]}</button>
-        <button on:click={checkInput}>{dict['Проверить'][$langs]}</button>
-      {/if}
+     <p>{#await Translate('Послушай и напиши','ru', $langs) then data} {data}: {/await}</p>
+  
+     <div class="button-group">
+     {#if !isFirst}
+      <button on:click={Generate} class="btn start-btn">{#await Translate('Старт','ru', $langs) then data} {data} {/await}</button>
+     {:else}
+      <button on:click={repeat} class="btn repeat-btn">{#await Translate('Повторить','ru', $langs) then data} {data} {/await}</button>
+      <button on:click={checkInput} class="btn check-btn">{#await Translate('Проверить','ru', $langs) then data} {data} {/await}</button>
+     {/if}
     </div>
-
-    <div>
-      <!-- <label for="userAnswer">Your Answer:</label> -->
-      {#if name === 'Nummers'}
-        <div
-          class="input"
-          contenteditable="true"
-          style={inputStyle}
-          bind:this={div_input}
-          bind:innerHTML={userContent}
-        >
-          {@html result}
-        </div>
-      {:else if name === 'Tijd'}
-        <div
-          contenteditable="true"
-          id="userTime"
-          class="input"
-          placeholder="hh:mm"
-          on:input={handleUserInput}
-          bind:this={div_input}
-          bind:innerHTML={userContent}
-        />
-      {:else if name === 'Alphabet'}
-        <div
-          contenteditable="true"
-          id="userTime"
-          class="input"
-          on:input={handleUserInput}
-          bind:this={div_input}
-          bind:innerHTML={userContent}
-        />
-      {/if}
-      {#if isFirst}
-        <button on:click={showHint} class="hint-button">
-          <span class="material-symbols-outlined"> ? </span>
-        </button>
-      {/if}
-
-      <!-- <input type="text" id="userAnswer" bind:value={userAnswer} style={inputStyle} /> -->
+  </div>
+  
+    <div class="input-group">
+     {#if name === 'Nummers'}
+      <div
+       class="input-field"
+       contenteditable="true"
+       style={inputStyle}
+       bind:this={div_input}
+       bind:innerHTML={userContent}
+      >
+       {@html result}
+      </div>
+     {:else if name === 'Tijd'}
+      <div
+       contenteditable="true"
+       id="userTime"
+       class="input-field"
+       placeholder="hh:mm"
+       on:input={handleUserInput}
+       bind:this={div_input}
+       bind:innerHTML={userContent}
+      />
+     {:else if name === 'Alphabet'}
+      <div
+       contenteditable="true"
+       id="userTime"
+       class="input-field"
+       on:input={handleUserInput}
+       bind:this={div_input}
+       bind:innerHTML={userContent}
+      />
+     {/if}
+     {#if isFirst}
+      <button on:click={showHint} class="btn hint-btn">
+       <span class="material-symbols-outlined"> ? </span>
+      </button>
+     {/if}
     </div>
-  {:else if data.quiz == 'dialog.client'}
+   {:else if data.quiz == 'dialog.client'}
     <Speak {data} />
-  {/if}
-</main>
-
-<style>
-  main {
+   {/if}
+  </main>
+  
+  <style>
+   /* Основной контейнер */
+   main {
     text-align: center;
-    margin-top: 40px;
-  }
-  .hint-button {
-    display: inline-block;
-    position: relative;
-    top: -2px;
-    height: 44px;
-    color: white;
-    background-color: #2196f3;
-    border-radius: 3px;
-  }
-
-  button {
-    margin-top: 10px;
-    padding: 8px 16px;
-    font-size: 16px;
-    cursor: pointer;
-  }
-
-  #userTime {
-    width: 80px;
-    font-size: x-large;
-    text-align: center;
-    border: 1px solid grey;
-    background-color: rgb(220, 228, 228);
-  }
-
-  .input {
-    display: inline-block;
-    padding: 8px;
-    width: 120px;
-    font-size: 24px;
-    margin-top: 10px; /* Добавим отступ сверху для выравнивания */
-    margin-left: auto;
-    margin-right: auto;
-  }
-
-  label {
-    display: block;
+    margin: 40px auto;
+    font-family: Arial, sans-serif;
+    color: #333;
+    width: 60%; /* Устанавливаем ширину 50% */
+    box-sizing: border-box; /* Учитываем padding в общей ширине */
+   }
+  
+   /* Блок с инструкциями */
+   p {
     font-size: 18px;
-    margin-top: 10px; /* Добавим отступ сверху для выравнивания */
-  }
-
-  main > div {
-    margin-bottom: 20px; /* Добавим отступ снизу для разделения блоков */
-  }
-
-  .share-button {
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    padding: 10px;
-    font-size: 1.5em;
-    background-color: #2196f3;
-    color: #fff;
+    margin-bottom: 15px;
+   }
+  
+   /* Кнопки */
+   .btn {
+    margin-top: 10px;
+    padding: 10px 20px;
+    font-size: 16px;
     border: none;
     border-radius: 5px;
     cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+   }
+
+   .button-group {
+    display: flex; /* Располагаем элементы в ряд */
+    justify-content: center; /* Центрируем кнопки по горизонтали */
+    gap: 10px; /* Добавляем расстояние между кнопками */
+    margin-top: 20px; /* Отступ сверху */
   }
-</style>
+
+  .btn {
+    flex: none; /* Убираем возможность растягиваться */
+  }
+
+  
+   .btn:hover {
+    background-color: #1e88e5;
+    transform: scale(1.05);
+   }
+  
+   .start-btn {
+    background-color: #4caf50;
+    color: white;
+   }
+  
+   .repeat-btn {
+    background-color: #ff9800;
+    color: white;
+   }
+  
+   .check-btn {
+    background-color: #9c27b0;
+    color: white;
+   }
+  
+   .hint-btn {
+    background-color: #2196f3;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    font-weight: 700 26px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    transition: transform 0.2s;
+   }
+  
+   .hint-btn:hover {
+    transform: scale(1.1);
+    background-color: #7b1fa2;
+    
+   }
+  
+   /* Группа поля ввода и кнопки */
+   .input-group {
+    display: flex;
+    align-items: center; /* Центрирование по вертикали */
+    justify-content: center; /* Центрирование группы по горизонтали */
+    gap: 10px; /* Расстояние между input и кнопкой */
+    margin-top: 20px;
+   }
+  
+   /* Поле ввода */
+   .input-field {
+    flex: 1; /* Поле ввода занимает доступное пространство */
+    width:90%;
+    padding: 10px;
+    font-size: 18px;
+    text-align: center;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+   }
+  
+   .input-field:focus {
+    outline: none;
+    border-color: #2196f3;
+    box-shadow: 0 0 8px rgba(33, 150, 243, 0.5);
+   }
+  
+   #userTime {
+    width: 100px;
+    font-size: x-large;
+   }
+  
+   /* Адаптивность */
+   @media (max-width: 768px) {
+    .button-group {
+      flex-direction: column; /* Выравниваем кнопки вертикально */
+      gap: 15px; /* Увеличиваем расстояние между кнопками */
+    }
+  }
+
+  </style>
+  
+  
+ 
