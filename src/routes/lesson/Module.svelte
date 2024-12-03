@@ -328,7 +328,9 @@
                           <div class="icon-wrapper">
                             <div>
                               {#if isNew(quiz.published)}
-                                <span  class="new-badge" >new</span>
+                              {#await Translate('новый', 'ru', $llang) then data}
+                                <span  class="new-badge" >{data}</span>
+                                {/await}
                               {/if}
                             </div>
 
@@ -459,12 +461,12 @@
   .new-badge {
     position: absolute;
     color: red;
-    font-size: 14px; /* Подбирайте размер шрифта для лучшей читаемости */
+    font-size: 10px; /* Подбирайте размер шрифта для лучшей читаемости */
     top: -12px; /* Расположение над иконкой */
-    right: -15px; /* Расположение справа */
-    background-color: white;/*transparent; /* Для контраста, опционально */
+    right: 8px; /* Расположение справа */
+    background-color: transparent; /* Для контраста, опционально */
     border-radius: 3px; /* Слегка закругляем для стилистики */
-    padding: 1px 2px; /* Отступы для лучшего внешнего вида */
+    padding: 1px 1px; /* Отступы для лучшего внешнего вида */
     z-index: 1; /* Чтобы текст отображался поверх иконки */
   }
   main {
@@ -521,13 +523,16 @@
     justify-content: start;
     align-items: center;
     padding: 5px; /* Установите желаемый отступ вокруг элемента */
+    margin-top: 10px;
   }
 
+
   .form-field-container {
-    display: flex;
-    justify-content: flex-end;
-    align-items: right;
-    /*width: 100%;  /*Занимать всю доступную ширину */
-    z-index: 2;
+    position: absolute; /* Отключает влияние на другие элементы */
+    top: 0; /* Настраивайте по месту в зависимости от дизайна */
+    right: 40px; /* Закрепляет к правому краю */
+    z-index: 2; /* Позволяет перекрывать другие элементы, если требуется */
   }
+
+
 </style>
