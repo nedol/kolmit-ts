@@ -305,7 +305,9 @@
     }
 
     const arSpan = extractSpans(resultElement);
-    const words = arSpan.length > 1 ? word.split(' ') : [word];
+    const words = arSpan.length > 1 ? arSpan.map((span)=>{
+      return span.getAttribute('value');
+    }): [word];
 
     div_input[0].style.width = '';
     div_input[1].style.width = '';
