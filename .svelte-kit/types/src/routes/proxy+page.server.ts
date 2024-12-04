@@ -33,6 +33,7 @@ export async function load({ fetch, cookies, route, url }) {
 	let name = url.searchParams.get('name');
 	let operator = url.searchParams.get('operator');
 	let psw = url.searchParams.get('psw');
+	let lvl = url.searchParams.get('lvl')? url.searchParams.get('lvl')+'.' :'';
 
 	let prom = new Promise((resolve, reject) => {
 		CreatePool(resolve);
@@ -46,7 +47,7 @@ export async function load({ fetch, cookies, route, url }) {
 		ice_conf: ice_conf
 	};
 	try {
-		res = cookies.get('kolmit.operator.' + abonent);
+		res = cookies.get(`${lvl}kolmit.operator.${abonent}`);
 		if(!res){
 			res = cookies.get('kolmit.operator:' + abonent);
 			if(res){
