@@ -141,6 +141,7 @@
                             <li><strong>Name:</strong> Укажите ваше имя.</li>
                             <li><strong>Password:</strong> Придумайте и введите пароль.</li>
                             <li><strong>Confirm Password:</strong> Повторите пароль для подтверждения.</li>
+                            <li><strong>Choose your image:</strong> Выберите изображение.</li>
                         </ul>
                     </li>
                     <li>Убедитесь, что все поля заполнены корректно, и нажмите кнопку <strong>REGISTER</strong>.</li>
@@ -158,7 +159,7 @@
         <div class="step">
             <div class="step-text">
                 <h2>🌐 2. Выбор языка интерфейса</h2>
-                <p>В верхней панели приложения вы можете изменить язык интерфейса. Нажмите на текущий язык (например, "English" или "Українська") и выберите нужный из списка.</p>
+                <p>Изменить язык интерфейса. Нажмите на текущий язык (например, "English") и выберите нужный из списка.</p>
             </div>
             <div class="video-thumbnail" onclick="openFullscreen(this)">
                 <video>
@@ -173,7 +174,7 @@
             <div class="step-text">
                 <h2><span class="mdi mdi-format-align-left"></span>  3. Выбор темы</h2>
                 <ol>
-                    <li>После входа в систему откройте главное меню.</li>
+                    <li>После входа в систему откройте Урок</li>
                     <li>Выберите одну из доступных категорий тем.</li>
                     <li>Выбранная тема откроет набор упражнений.</li>
                 </ol>
@@ -189,18 +190,18 @@
         <!-- Step 4 -->
         <div class="step">
             <div class="step-text">
-            <h2><span class="mdi mdi-file-word-box-outline"></span> 4. Работа с упражнениями "Словарный запас" </h2>
+            <h2><span class="mdi mdi-file-word-box-outline"></span> 4. Работа с упражнениями Словарный запас </h2>
             <dl>
                 <dt>Выберите <span class="mdi mdi-file-word-box-outline"></span> упражнение из списка (например, "ABC-lijst normal perfectum").</li>
-                <dt>Интерфейс:
+                <!-- <dt>Интерфейс: -->
                     <dd><img src="/assets/img/counter.png" alt="Количество заданий" style="vertical-align: middle; height: 26px;"> 
-                    общее количество заданий и номер текущего задания.</dd>
+                        общее количество заданий и номер текущего задания.</dd>
                     <dd><span class="mdi mdi-help-box"></span>  Помощь, Перевод, Подсказки</dd>
                     <dd><span class="mdi mdi-arrow-left"></span><span class="mdi mdi-arrow-right"></span>  Навигация</dd>
                     <dd><span class="mdi mdi-play"></span>  Озвучивание текста.</dd>
                     <dd><span class="mdi mdi-ear-hearing"></span>  Озвучивание всех заданий последовательно.</dd>
                     <dd><span class="mdi mdi-shuffle"></span>  Перемешивание порядка заданий.</dd>         
-                </dt>
+                <!-- </dt> -->
             </dl>
             </div>
             <div class="video-thumbnail"  onclick="openFullscreen(this)">
@@ -215,10 +216,10 @@
         <!-- Step 5 -->
         <div class="step">
             <div class="step-text">
-                <h2><span class="mdi mdi-account-multiple"></span> 5. Работа с упражнениями "Диалог" </span></h2>
+                <h2><span class="mdi mdi-account-multiple"></span> 5. Работа с упражнениями Диалог</span></h2>
                 <dl>
                     <dt>Выберите упражнение <span class="mdi mdi-account-multiple"></span> из списка (например, "Boeken van tickets en hotelkamers").</li>
-                    <dt>Интерфейс:
+                    <dt>
                         <dd><span class="mdi mdi-help-box"></span>  Помощь, Перевод, Подсказки</dd>
                         <dd><span class="mdi mdi-play"></span>  Озвучивание текста.</dd>
                         <dd><span class="mdi mdi-microphone"></span>  Распознавание речи</dd>
@@ -239,7 +240,7 @@
             <div class="step-text">
                 <h2><span class="mdi mdi-file-word-box-outline"></span> 6. Совместная работа.</h2>
                 <dl>                                          
-                    <dt>Состояния:
+                    <dt>Состояния сзязи:
                     <dd><img src="/assets/img/phone.inactive.png" alt="Офлайн" style="vertical-align: middle; width: 26px;"> 
                         Офлайн.</dd>        
                     <dd><img src="/assets/img/phone.active.png" alt="Онлайн" style="vertical-align: middle; width: 26px;">  Подсоединение к группе.</dd>                  
@@ -249,15 +250,14 @@
                     <dd><img src="/assets/img/phone.talk.png" alt="Разговор" style="vertical-align: middle; height: 26px;"> 
                         Разговор.</dd>  
                     </dt>
-                    <dt>Практика:
+                    <br>
+                    <dt>
                         <dd><span class="mdi mdi-checkbox-outline"></span>  Выбор упражнения для практики</dd>  
                         <dd>  
                             <img src="/assets/img/check_quiz.png" alt="Разговор" style="vertical-align: middle; width: 100%"> 
-                        </dd>
-                        
+                        </dd>                        
                     </dt>    
-                </dl>
-                
+                </dl>               
                 
             </div>
             <div class="video-thumbnail" onclick="openFullscreen(this)">
@@ -273,6 +273,7 @@
         <div class="step">
             <div class="step-text">
                 <h2><span class="mdi mdi-file-word-box-outline"></span> 7. Совместная работа. Словарный запас.</h2>
+                <p>Кликните аватарку вызываемого абонента.</p>
                 <dl>
                     <dt></dt>
                 </dl>
@@ -290,7 +291,7 @@
         <div class="step">
             <div class="step-text">
                 <h2><span class="mdi mdi-account-multiple"></span> 8. Совместная работа. Диалог</h2>
-                <p>Для начала разговора нажмите на значок телефона в нижнем углу. Приложение предоставит вам аудио или текстовые подсказки для общения.</p>
+                <p>Во вкладке Класс, кликните аватарку вызываемого абонента.</p>
             </div>
             <div class="video-thumbnail" onclick="openFullscreen(this)">
                 <video>
