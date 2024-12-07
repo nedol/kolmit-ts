@@ -5,6 +5,7 @@
 
   import { Number2Words } from '$lib/tts/convert.nl.js';
   import { NumberString, numberToDutchString } from '$lib/tts/Listen.numbers';
+
   // import BottomAppBar, { Section } from '@smui-extra/bottom-app-bar';
 
   //  import '$lib/css/_Colored.scss';
@@ -16,7 +17,7 @@
 
   import { Translate } from '../../../translate/Transloc';
 
-  // import {  RemoveQuizUser} from '../../Module.svelte'
+  import { slide } from 'svelte/transition';
 
   import CircularProgress from '@smui/circular-progress';
   import Chip, { Set, LeadingIcon, TrailingIcon, Text } from '@smui/chips';
@@ -70,6 +71,8 @@
     isThumb = false;
 
   let isPlayAuto = false;
+
+  let isCollapsed = true;
 
   let playAutoColor = 'currentColor';
 
@@ -764,9 +767,23 @@
   <!-- Ваш контент для лицевой стороны -->
   <div class="card">
     <span
-      style="display:block;position:relative;color: lightgray;font-style: italic;font-size:smaller;font-family: serif;"
+      style="display:block-inline;position:relative;color: lightgray;font-style: italic;font-size:smaller;font-family: serif;"
       >{dialog_data?.name}</span
     >
+
+    {#if dialog_data?.html }
+    <span  on:click={() => (isCollapsed = !isCollapsed)}
+      class="not_collapsed"
+        style="position:absolute; right:50px;color:lightgray;font-style: italic;font-size:smaller;font-family: serif;"     
+    >context</span>
+
+      {#if !isCollapsed}
+          <div class="collapsible" in:slide={{ duration: 300 }}>
+            <ConText data={dialog_data} {tts} />
+          </div>
+      {/if}
+    {/if}
+
    
     {#if q || a}
       {#if !isFlipped}
@@ -1107,9 +1124,7 @@
 
       <br />
 
-      {#if dialog_data.html}
-        <ConText data={dialog_data} {tts} />
-      {/if}
+     
     {:else}
       <div style="text-align:center">
         <span

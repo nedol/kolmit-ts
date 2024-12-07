@@ -212,7 +212,7 @@
             </div>
             <div class="video-thumbnail" onclick="openFullscreen(this)">
                 <video>
-                    <source src="/assets/video/dialogs.mp4" type="video/mp4">
+                    <source src="/assets/video/dialog.mp4" type="video/mp4">
                     Ваш браузер не підтримує відео.
                 </video>
             </div>
@@ -221,13 +221,29 @@
         <!-- Крок 6 -->
         <div class="step">
             <div class="step-text">
-                <h2>💡 6. Розв'язання проблем</h2>
-                <p>Якщо ви зіштовхнулися з проблемами, зверніться до розділу "Допомога" в головному меню.</p>
+                <h2><span class="mdi mdi-file-word-box-outline"></span> 6. Спільна робота.</h2>
+                <dl>                                          
+                    <dt>Телефон:
+                    <dd><img src="/assets/img/phone.inactive.png" alt="Офлайн" style="vertical-align: middle; width: 26px;"> - офлайн.</dd>        
+                    <dd><img src="/assets/img/phone.active.png" alt="Онлайн" style="vertical-align: middle; width: 26px;">  - приєднання до групи.</dd>                  
+
+                    <dd><img src="/assets/img/phone.call.png" alt="Разговор" style="vertical-align: middle; height: 26px;"> - виклик (супроводжується звуковим сигналом).</dd>
+                    <dd><img src="/assets/img/phone.talk.png" alt="Разговор" style="vertical-align: middle; height: 26px;"> - розмова.</dd>  
+                    </dt>
+                    <br>
+                    <dt>
+                        <dd><span class="mdi mdi-checkbox-outline"></span> -  вибір вправ для спільного виконання</dd>  
+                        <dd>  
+                            <img src="/assets/img/check_quiz.png" alt="Разговор" style="vertical-align: middle; width: 100%"> 
+                        </dd>                        
+                    </dt>    
+                </dl>               
+                
             </div>
             <div class="video-thumbnail" onclick="openFullscreen(this)">
                 <video>
-                    <source src="/assets/video/help.mp4" type="video/mp4">
-                    Ваш браузер не підтримує відео.
+                    <source src="/assets/video/online.word.mp4" type="video/mp4">
+                    Ваш браузер не поддерживает видео.
                 </video>
             </div>
         </div>
@@ -235,31 +251,41 @@
         <!-- Крок 7 -->
         <div class="step">
             <div class="step-text">
-                <h2>⚙️ 7. Налаштування профілю</h2>
-                <p>Перейдіть до розділу "Профіль", щоб змінити ім'я, пароль або аватар.</p>
+                <h2><span class="mdi mdi-file-word-box-outline"></span> 7. Спільна робота. Словниковий запас</h2>
+                <p>Клацніть аватарку абонента, що викликається.</p>
+                <dl>
+                    <dt></dt>
+                </dl>
+                
             </div>
             <div class="video-thumbnail" onclick="openFullscreen(this)">
                 <video>
-                    <source src="/assets/video/profile.mp4" type="video/mp4">
-                    Ваш браузер не підтримує відео.
+                    <source src="/assets/video/online.word.mp4" type="video/mp4">
+                    Ваш браузер не поддерживает видео.
                 </video>
             </div>
         </div>
-
         <!-- Крок 8 -->
         <div class="step">
             <div class="step-text">
-                <h2>🔒 8. Вихід із системи</h2>
-                <p>Натисніть на іконку <span class="mdi mdi-logout"></span> у верхньому меню, щоб завершити роботу.</p>
+                <h2><span class="mdi mdi-account-multiple"></span> 8. Спільна робота. Діалог</h2>
+                <p>У вкладці Клас клацніть аватарку абонента, що викликається.</p>
             </div>
             <div class="video-thumbnail" onclick="openFullscreen(this)">
                 <video>
-                    <source src="/assets/video/logout.mp4" type="video/mp4">
-                    Ваш браузер не підтримує відео.
+                    <source src="/assets/video/online.dialog.2.mp4" type="video/mp4">
+                    Ваш браузер не поддерживает видео.
                 </video>
             </div>
         </div>
-
+        <!-- Fullscreen Video Container -->
+        <div id="fullscreenVideo" class="fullscreen-video" onclick="closeFullscreen()">
+            <div class="close-btn">&times;</div>
+            <video controls autoplay>
+                <source src="" type="video/mp4">
+                Ваш браузер не поддерживает видео.
+            </video>
+        </div>
         <footer>
             <p>© 2024 Kolmit. Всі права захищено.</p>
         </footer>
