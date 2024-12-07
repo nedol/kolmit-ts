@@ -110,39 +110,44 @@
             {#if $view !== 'login'}
               <Section>
                 {#await Translate('Quit the exercise?', 'en', $langs) then data}
+                <div class={$view !== 'lesson' ? 'active' : ''}>
                   <Title
                     on:click={() => {
-                    if ($lesson.data?.quiz) {
-                      
-                      if (confirm(data)) {
+                      if ($lesson.data?.quiz) {
+                        if (confirm(data)) {
+                          $view = 'group';
+                          $showBottomAppBar = true;
+                        }
+                      } else {
                         $view = 'group';
                         $showBottomAppBar = true;
                       }
-                   
-                    } else {
-                      $view = 'group';
-                      $showBottomAppBar = true;
-                    }
-                    }}>{$dicts ? $dicts['CLASS'][$langs] : 'CLASS'}</Title
+                    }}
                   >
-
+                    {$dicts ? $dicts['CLASS'][$langs] : 'CLASS'}
+                  </Title>
+                </div>
+                
+                <div class={$view === 'lesson' ? 'active' : ''}>
                   <Title
                     on:click={async () => {
-                    if ($lesson.data?.quiz) {
-                     
-                      if (confirm(data)) {
+                      if ($lesson.data?.quiz) {
+                        if (confirm(data)) {
+                          $lesson.data = { quiz: '' };
+                          $view = 'lesson';
+                          $showBottomAppBar = true;
+                        }
+                      } else {
                         $lesson.data = { quiz: '' };
                         $view = 'lesson';
                         $showBottomAppBar = true;
                       }
-            
-                    } else {
-                      $lesson.data = { quiz: '' };
-                      $view = 'lesson';
-                      $showBottomAppBar = true;
-                    }
-                    }}>{$dicts ? $dicts['LESSON'][$langs] : 'LESSON'}</Title
+                    }}
                   >
+                    {$dicts ? $dicts['LESSON'][$langs] : 'LESSON'}
+                  </Title>
+                </div>
+                
                 {/await}
                 <!-- <IconButton class="material-icons" aria-label="Bookmark this page">bookmark</IconButton> -->
               </Section>
@@ -185,6 +190,12 @@
     justify-content: space-between;
     width: 100%;
   }
+
+  .active {
+  color: #007bff; /* Выбранный цвет */
+  font-weight: bold;
+}
+
 
   .top-app-bar-container {
     top: 0;

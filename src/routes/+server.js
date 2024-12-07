@@ -117,9 +117,10 @@ export async function POST({ request, url, fetch, cookies }) {
   //debugger;
   let resp;
   const abonent = url.searchParams.get('abonent');
+
   const { par } = await request.json();
   const q = par;
-  const res = cookies.get('abonent:' + abonent);
+  const res = '';//cookies.get('abonent:' + abonent);
   let kolmit;
   if (res) {
     kolmit = JSON.parse(res);
@@ -132,21 +133,39 @@ export async function POST({ request, url, fetch, cookies }) {
       if (q.email && q.psw) {
         const par = await CreateOperator(q);
         if (par) {
-          cookies.set(
-            'kolmit.operator.' + q.abonent,
-            JSON.stringify({
-              name: par.name,
-              operator: par.operator,
-              abonent: q.abonent,
-              psw: par.psw,
-              email: q.email,
-              lang: par.lang,
-            }),
-            {
-              path: '/',
-              maxAge: 60 * 60 * 24 * 400,
-            }
-          );
+          if (q.lvl) {
+            cookies.set(
+              `${q.lvl}.kolmit.operator.${q.abonent}`,
+              JSON.stringify({
+                name: par.name,
+                operator: par.operator,
+                abonent: q.abonent,
+                psw: par.psw,
+                email: q.email,
+                lang: par.lang,
+              }),
+              {
+                path: '/',
+                maxAge: 60 * 60 * 24 * 400,
+              }
+            );
+          }else{
+            cookies.set(
+              'kolmit.operator.' + q.abonent,
+              JSON.stringify({
+                name: par.name,
+                operator: par.operator,
+                abonent: q.abonent,
+                psw: par.psw,
+                email: q.email,
+                lang: par.lang,
+              }),
+              {
+                path: '/',
+                maxAge: 60 * 60 * 24 * 400,
+              }
+            );
+          }
 
           resp = JSON.stringify({
             func: par.func,

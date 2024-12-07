@@ -10,7 +10,7 @@
 	import { dicts } from '$lib/js/stores.js';
 	
 
-	let width, height, value, abonent;
+	let width, height, value, abonent, lvl;
 	let formData = {
 		name: '',//'WH',//
 		email: '',//,'white@house.usa'
@@ -36,6 +36,7 @@
 	onMount(async () => {
 		let url = new URL(window.location.href);
 		abonent = url.searchParams.get('abonent');
+		lvl = url.searchParams.get('lvl');
 		formData.email = url.searchParams.get('user');
 		// console.log(abonent);
 		// if (url.searchParams.get('psw')) {
@@ -78,6 +79,7 @@
 		passwordMatch = par.confirmPassword === par.psw;
 		if (!passwordMatch) return;
 		par.func = 'operator';
+		par.lvl = lvl;
 		par.abonent = abonent;
 		const headers = {
 			'Content-Type': 'application/json'

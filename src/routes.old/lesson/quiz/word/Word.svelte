@@ -978,13 +978,13 @@
 
   .input-container {
     display: inline-block;
-    font-size: 1em;
+    font-size: larger;
+    font-weight: 700;
     position: relative;
     color: #2196f3;
     width: 95vw;
-    margin: 0 auto;
+    margin: 10px auto;
     text-align: center;
-
   }
 
   .words_div {

@@ -1131,6 +1131,7 @@
     display: inline-block;
     top: 60px;
     font-size: larger;
+    font-weight: 700;
     position: relative;
     color: #2196f3;
     width: 95vw;

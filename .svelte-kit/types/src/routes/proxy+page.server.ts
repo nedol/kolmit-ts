@@ -33,7 +33,7 @@ export async function load({ fetch, cookies, route, url }) {
 	let name = url.searchParams.get('name');
 	let operator = url.searchParams.get('operator');
 	let psw = url.searchParams.get('psw');
-	let lvl = url.searchParams.get('lvl')? url.searchParams.get('lvl')+'.' :'';
+	let lvl = url.searchParams.get('lvl')? url.searchParams.get('lvl'):'';
 
 	let prom = new Promise((resolve, reject) => {
 		CreatePool(resolve);
@@ -47,20 +47,33 @@ export async function load({ fetch, cookies, route, url }) {
 		ice_conf: ice_conf
 	};
 	try {
-		res = cookies.get(`${lvl}kolmit.operator.${abonent}`);
-		if(!res){
-			res = cookies.get('kolmit.operator:' + abonent);
-			if(res){
-				cookies.set('kolmit.operator.' + abonent,res, {
-					path: '/',
-					maxAge: 60 * 60 * 24 * 400,
-				  });
 
-				  cookies.delete('kolmit.operator:' + abonent,{
-					path: '/'
-				  });
+
+		if(lvl){
+			res = cookies.get(`${lvl}.kolmit.operator.${abonent}`);
+			if(!res){
+
+			}
+		}else{
+
+			if(!res){
+				res = cookies.get(`kolmit.operator.${abonent}`);
+			}
+			if(!res){
+				res = cookies.get('kolmit.operator:' + abonent);
+				if(res){
+					cookies.set('kolmit.operator.' + abonent,res, {
+						path: '/',
+						maxAge: 60 * 60 * 24 * 400,
+					});
+
+					cookies.delete('kolmit.operator:' + abonent,{
+						path: '/'
+					});
+				}
 			}
 		}
+			
 
 		if (psw) {
 			kolmit = { operator: operator, psw: md5(psw), name: name, lang: lang };
@@ -97,6 +110,7 @@ export async function load({ fetch, cookies, route, url }) {
 		check: true,
 		host: host,
 		// url: decodeURIComponent(url.toString()),
+		lvl: lvl,
 		cookies:cookies.get('kolmit.operator.'+abonent),
 		operator: oper,
 		abonent: abonent,
