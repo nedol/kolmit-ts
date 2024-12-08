@@ -478,6 +478,7 @@
     width: 100vw;
     margin: 0 auto;
     background-color: #fff;
+    font-size: larger;
     /*transition: transform 0.3s ease-in-out;
 
     position: relative;
@@ -534,5 +535,14 @@
     z-index: 2; /* Позволяет перекрывать другие элементы, если требуется */
   }
 
+  @media screen and (min-width: 768px) {
+		/* Ваши стили для более крупных экранов здесь */
+    .mdc-typography--subtitle2 {
+     font-size: 1.2em;
+    }
+    a{
+      font-size: 1.4em;
+    }
+	}
 
 </style>

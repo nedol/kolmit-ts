@@ -116,6 +116,8 @@
           prompt = prompt.replaceAll('${data.level}', `${data.level}.${data.theme.id}(${data.module.themes.length})`);
           prompt = prompt.replaceAll('${num}', num);
 
+         
+
           dialog_data.words = JSON.stringify(
             resp.resp.words[0]?.data//resp.words[0].data
               .map((item) => extractWords(item.example[$llang]))

@@ -41,8 +41,15 @@
 
 <Header></Header>
 
+<main>
 {#if operator && data?.group?.length>0}
   <Operator {operator} {abonent} {name} />
 {:else if $view==='login'}
   <Login {operator} {abonent} {user_pic} />
 {/if}
+</main>
+
+<style>
+  
+
+</style>

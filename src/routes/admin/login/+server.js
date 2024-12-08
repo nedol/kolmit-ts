@@ -8,15 +8,18 @@ export async function POST({ request, url, fetch, cookies }) {
 
 	if (resp) {
 		cookies.set(
-			'abonent:' + resp.hash,
+			`kolmit.admin.${resp.operator}`,
 			JSON.stringify({
 				name: resp.name,
-				operator: resp.hash,
-				abonent: resp.hash,
+				operator: resp.operator,
+				abonent: resp.operator,
 				psw: resp.psw,
 				lang: 'en'
 			}),
-			{ maxAge: 60 * 60 * 24 * 400 }
+			{ 
+				path: '/',
+				maxAge: 60 * 60 * 24 * 400 
+			}
 		);
 	}
 

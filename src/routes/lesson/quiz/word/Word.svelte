@@ -976,7 +976,7 @@
   .words_div {
     position: relative;
     text-align: center;
-    overflow-y: auto;
+    overflow-y: hidden;
     height: 70vh;
   }
 
@@ -1060,10 +1060,22 @@
     position: absolute;
     top: 50px;
     height: 80vh;
-    overflow: auto;
+    overflow: hidden;
     justify-content: center; /* Выравниваем содержимое по центру вертикально */
     align-items: center; /* Выравниваем содержимое по центру горизонтально */
     background-color: white;
     /* opacity: 50%; */
   }
+
+  @media screen and (min-width: 768px) {
+		/* Ваши стили для более крупных экранов здесь */
+    main {
+     font-size: larger;
+    }
+    .top-app-bar-container{
+      /* top:0px;
+     transform: scale(1.2) translate(-4%,0%);
+     transform-origin: center ; */
+    }
+	}
 </style>

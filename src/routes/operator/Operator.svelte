@@ -484,6 +484,7 @@
 </script>
 
 <!-- {@debug $view} -->
+<main>
 
 <!-- {#if $view === 'group'} -->
 <Group  {rtc} bind:group={group}/>
@@ -597,6 +598,8 @@
   <!-- {@debug $call_but_status} -->
 </div>
 
+</main>
+
 <style lang="scss">
   /* Hide everything above this component. */
 
@@ -668,4 +671,15 @@
       top: 0px;
     }
   }
+
+  @media screen and (min-width: 768px) {
+		/* Ваши стили для более крупных экранов здесь */
+    main {
+      // transform: scale(1.0);
+        // transform-origin: center; /* Масштабирование от центра элемента */
+        // max-width: 100%; /* Ограничение ширины */
+        // max-height: 100%; /* Ограничение высоты */
+    }
+	}
+
 </style>
