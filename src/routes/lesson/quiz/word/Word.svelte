@@ -61,7 +61,8 @@
 
   let words = [],
     word,
-    example;
+    example,
+    example_lang = $langs;
   let shuffleWords;
   let hints;
   let currentWordIndex = 0;
@@ -180,17 +181,18 @@
   }
 
   function makeExample() {
-          if (!currentWord) return;
+    
+    if (!currentWord) return;
 
     return new Promise(async (resolve, reject) => {
 
-      if (currentWord?.example[$langs]) {
-        example = currentWord.example[$langs];
+      if (currentWord?.example[example_lang]) {
+        example = await currentWord.example[example_lang];
       } else if (currentWord.example[$llang]) {
         example = await Translate(currentWord.example[$llang], $llang, $langs);
       }
 
-      currentWord.example[$langs] = example;
+      //currentWord.example[$langs] = example;
 
       const regex = /(<<\w+>>)\s+(<<\w+>>)/;
       const match = currentWord?.example[$llang]
@@ -540,6 +542,7 @@
 
   async function nextWord() {
     if (currentWordIndex >= words.length) currentWordIndex = 0;
+    example_lang = $langs;
     currentWord = words[currentWordIndex];
     await makeExample();
 
@@ -654,6 +657,17 @@
     }, 100);
     let active = currentWord.example[$langs].replace(/<<|>>/g, ''); //currentWord.example[$langs];
     tts.Speak_server($langs, active, data.name,onEndSpeak);
+  }
+
+  function OnClickLBL(){
+
+    if(example_lang === $langs){
+      example_lang ='lbl';
+      makeExample()
+
+    }else{
+      example_lang=$langs
+    }
   }
 
   onDestroy(() => {
@@ -800,7 +814,7 @@
       <div class="title">{data}:</div>
     {/await}
 
-    <div class="word">
+    <div class="word" on:click={OnClickLBL}>
       {#if example}
         {@html example}
       {:else}
@@ -920,12 +934,12 @@
     background-color: transparent;
   }
 
-  /* Стилизуйте компонент по вашему усмотрению */
+  /* Стилизуйте компонент по вашему усмотению */
   .word {
     font-size: 0.8em;
     flex-direction: column;
     align-items: center;
-    margin: 2px;
+    margin-top: 10px;
     text-align: center;
     line-height: 17px;
   }
@@ -969,7 +983,8 @@
     position: relative;
     color: #2196f3;
     width: 95vw;
-    margin: 0 auto;
+    margin-top: 10px;
+    margin-bottom: 10px;
     text-align: center;
   }
 
