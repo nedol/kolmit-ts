@@ -990,7 +990,7 @@
 
   .input-container {
     display: inline-block;
-    font-size: 1em;
+    font-size: larger;
     position: relative;
     color: #2196f3;
     width: 95vw;
