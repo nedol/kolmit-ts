@@ -16,6 +16,7 @@
     mdiTextBoxCheckOutline,
     mdiPlay,
     mdiEarHearing,
+    mdiTranslateVariant
   } from '@mdi/js';
 
   // import words from './80.json';
@@ -110,6 +111,7 @@
     });
 
   $: if ($langs) {
+    example_lang = $langs;
     makeExample();
   }
 
@@ -660,13 +662,11 @@
   }
 
   function OnClickLBL(){
-
-    if(example_lang === $langs){
-      example_lang ='lbl';
+    console.log()
+    if(currentWord?.example[`lbl.${$langs}`]){
+      example_lang =`lbl.${$langs}`;
       makeExample()
 
-    }else{
-      example_lang=$langs
     }
   }
 
@@ -814,9 +814,19 @@
       <div class="title">{data}:</div>
     {/await}
 
-    <div class="word" on:click={OnClickLBL}>
+    <div class="word" >
       {#if example}
-        {@html example}
+      {#if currentWord?.example[`lbl.${$langs}`]}
+      <Icon tag="svg" on:click={OnClickLBL} viewBox="0 0 24 24" 
+        style="position: absolute;
+             left: 0;
+             margin-top:-15px; 
+             scale:.5; 
+             width:50px">
+      <path fill="lightgrey" d={mdiTranslateVariant} /></Icon>
+      {/if}
+        {@html example} 
+
       {:else}
         {#await Translate(example, 'ru', $langs) then data}
           {@html data}
@@ -916,6 +926,7 @@
     /* top: 30px; */
   }
   .title {
+    font-size: medium;
     color: coral;
     position: relative;
     text-align: center;
@@ -983,8 +994,7 @@
     position: relative;
     color: #2196f3;
     width: 95vw;
-    margin-top: 10px;
-    margin-bottom: 10px;
+    margin: 10px auto;
     text-align: center;
   }
 
