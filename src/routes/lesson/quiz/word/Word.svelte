@@ -820,7 +820,7 @@
       <Icon tag="svg" on:click={OnClickLBL} viewBox="0 0 24 24" 
         style="position: absolute;
              left: 0;
-             top:-40px; 
+             margin-top:-40px; 
              scale:.5; 
              width:50px">
       <path fill="lightgrey" d={mdiTranslateVariant} /></Icon>
