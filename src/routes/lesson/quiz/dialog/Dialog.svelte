@@ -76,6 +76,8 @@
 
   let playAutoColor = 'currentColor';
 
+  let example_lang = $langs;
+
   $: if (isPlayAuto) {
     playAutoColor = 'green';
   } else {
@@ -216,6 +218,11 @@
     (async () => {
       a[$langs] = await Translate(a[$llang], $llang, $langs);
     })();
+  }
+
+  $: if ($langs) {
+    example_lang = $langs;
+    // Dialog();
   }
 
   if (data.func) {

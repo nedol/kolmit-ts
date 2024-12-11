@@ -296,6 +296,7 @@
     div_input.forEach((di) => {
       di.style.color = '';
     });
+    word=word.split(' '); 
     const span_cnt = countWordOccurrences(resultElement, '<span');
     function extractSpans(htmlString) {
       // Создаем новый DOMParser
@@ -316,11 +317,12 @@
     div_input[0].style.width = '';
     div_input[1].style.width = '';
 
+
     arSpan.forEach((el, i) => {
-      if (word === el.attributes.value.nodeValue.toLowerCase()) {
+      if (el.attributes.value.nodeValue.toLowerCase().includes(word[i])) {
         userContent[i] = el.attributes.value.nodeValue;
       } else {
-        userContent[i] = words[i] ? words[i] : '';
+        userContent[i] = word[i] ? word[i] : '';
       }
     });
 
