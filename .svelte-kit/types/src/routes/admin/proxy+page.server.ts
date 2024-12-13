@@ -3,7 +3,7 @@ import md5 from 'md5';
 import dict from '$lib/dict/dict.json';
 import os from 'os';
 
-import { CreatePool, GetUsers } from '$lib/server/db.js'; //src\lib\server\server.db.js
+import { CreatePool_neon, GetUsers } from '$lib/server/db.js'; //src\lib\server\server.db.js
 import {  SetSQL, GetGroups } from '$lib/server/db.admin.js'; 
 
 let kolmit;
@@ -23,7 +23,7 @@ export async function load({ fetch, cookies, route, url, stuff }) {
 	let sql = ''
 
 	let prom = new Promise((resolve, reject) => {
-		CreatePool(resolve);
+		CreatePool_neon(resolve);
 	});
 
 	sql = await prom;
