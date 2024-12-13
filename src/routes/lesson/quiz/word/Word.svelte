@@ -818,7 +818,9 @@
 
     <div class="word" >
       {#if example}
-      {#if currentWord?.example[`lbl.${$langs}`]}
+      <!-- {@debug example} -->
+      {#if currentWord?.example[`lbl.${$langs}`] && 
+        currentWord?.example[`lbl.${$langs}`] !== currentWord?.example[$langs]}
       <Icon tag="svg" on:click={OnClickLBL} viewBox="0 0 24 24" 
         style="position: absolute;
              left: 0;
