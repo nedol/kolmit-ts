@@ -49,7 +49,7 @@
 
   import Module from '../lesson/Module.svelte';
 
-  // import Chat from './chat/Сhat.svelte';
+  import Chat from './chat/Сhat.svelte';
 
   import pkg from 'lodash';
   const { find } = pkg;
@@ -494,7 +494,7 @@
 {/if}
 
 <div class="dialog" style="display: {dlg_display};">
-  <!-- <Chat></Chat> -->
+  <Chat></Chat>
 </div>
 
 <div class="bottom-app-bar-wrapper" class:hide={!$showBottomAppBar}>

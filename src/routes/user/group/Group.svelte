@@ -166,7 +166,7 @@
       {/if}
     {/each}
   </div>
-  {#if false || window.location.hostname==='localhost'}
+  {#if window.location.hostname==='localhost'}
     <div class="flexy-dad tutor">
       <div class="mdc-elevation--z{1} flexy-boy">
         <Item style="text-align: center">

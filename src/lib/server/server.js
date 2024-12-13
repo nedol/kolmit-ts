@@ -3,7 +3,7 @@ import express from 'express';
 import Turn from 'node-turn';
 import cron from 'node-cron';
 
-import Translate from '../../routes/translate/Translate.js';
+import Translate from '../server/Translate.js';
 
 import { json } from '@sveltejs/kit';
 
