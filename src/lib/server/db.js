@@ -40,7 +40,20 @@ let conStrNeon = {
     'postgresql://nedooleg:nHLhfQB0WS5Y@ep-polished-bush-a2n4g5y9-pooler.eu-central-1.aws.neon.tech:5432/neondb?sslmode=require',
 };
 
-export async function CreatePool(resolve) {
+export async function CreatePool_render(resolve) {
+  sql = postgres(conStrNeon.connectionString, {
+    host: 'dpg-ctdjkkjv2p9s73c6iua0-a.frankfurt-postgres.render.com', // Postgres ip address[s] or domain name[s]
+    port: 5432, // Postgres server port[s]
+    database: 'kolmit_jzl1', // Name of database to connect to
+    username: 'kolmit_jzl1_user', // Username of database user
+    password: 'ncEr4gySWNJmCIUyahHROsST2gny0Mki', // Password of database user
+    idle_timeout: 20,
+    max_lifetime: 60 * 30,
+  });
+  resolve(sql);
+}
+
+export async function CreatePool_neon(resolve) {
   sql = postgres(conStrNeon.connectionString, {
     host: 'ep-polished-bush-a2n4g5y9-pooler.eu-central-1.aws.neon.tech', // Postgres ip address[s] or domain name[s]
     port: 5432, // Postgres server port[s]
@@ -50,6 +63,7 @@ export async function CreatePool(resolve) {
   });
   resolve(sql);
 }
+
 
 function getHash(par) {
   return md5(par + par);

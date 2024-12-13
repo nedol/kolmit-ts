@@ -27,13 +27,17 @@
 
   import Button, { Label } from '@smui/button';
   import IconButton, { Icon } from '@smui/icon-button';
+
   import Stt from '../../speech/stt/Stt.svelte';
+  let stt: Stt;
+  import TTS from '../../speech/tts/Tts.svelte';
+  let tts:TTS;
 
   let userInput = {};
   let messages = [];
   let isListening = false;
   let display_audio = 'none';
-  let stt: Stt;
+
   let variant = 'outlined';
   let showHint:number;
   let to;
@@ -99,7 +103,7 @@
   });
 
   async function speak(text) {
-    Speak(text);
+    tts.Speak_server($llang, text,'chat');
   }
 
   function micClicked() {
@@ -226,6 +230,8 @@
   </IconButton>
 
   <Stt bind:this={stt} bind:display_audio {SttResult} {StopListening}></Stt>
+
+  <TTS bind:this={tts}></TTS>
 
   {#await Translate('Отправить', 'ru', $langs) then data}
     <Button

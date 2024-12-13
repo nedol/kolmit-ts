@@ -14,7 +14,7 @@ import os from 'os';
 //   global.rtcPool = data;
 // });
 
-import { CreatePool, GetUsers, GetGroup } from '$lib/server/db.js'; //src\lib\server\server.db.js
+import { CreatePool_render, CreatePool_neon, GetUsers, GetGroup } from '$lib/server/db.js'; //src\lib\server\server.db.js
 
 let kolmit:any;
 
@@ -35,7 +35,9 @@ export async function load({ fetch, cookies, route, url }) {
 	let lvl = url.searchParams.get('lvl')? url.searchParams.get('lvl'):'';
 
 	let prom = new Promise((resolve, reject) => {
-		CreatePool(resolve);
+		url.hostname === 'localhost'
+        ?  CreatePool_render(resolve)
+        : CreatePool_neon(resolve);
 	}) 
 	.catch(error => console.error("Ошибка:", error));
 
