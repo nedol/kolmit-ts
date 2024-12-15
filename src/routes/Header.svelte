@@ -281,11 +281,11 @@
     overflow: auto;
   }
   /* Стили для мобильных устройств */
-  @media screen and (max-width: 767px) {
+  /* @media screen and (max-width: 767px) { */
     .sec_items {
       position: absolute;
-      left: 35%;
+      left: 40%;
       top: 15%;
     }
-  }
+  /* } */
 </style>
