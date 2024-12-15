@@ -112,7 +112,7 @@
   <header>
     <div class="top-app-bar-container flexor">
       <TopAppBar bind:this={topAppBar} variant="fixed" dense>
-        <span style="position:absolute;left:0;bottom:2px;color:white;background-color:red">{lvl.toUpperCase()}</span>
+        <span style="position:absolute;font-size:.8em;left:0;bottom:2px;color:white;background-color:red">{lvl.toUpperCase()}</span>
         <Row>
           <div class="sec_items">
             {#if $view !== 'login'}
@@ -138,7 +138,7 @@
                     <span>{data.toUpperCase()}</span>
                   {/await}
                     
-                    <span style="color:red">{Object.keys($users).length>0?`(${Object.keys($users).length})`:''}</span>
+                    <span >{Object.keys($users).length>0?`(${Object.keys($users).length})`:''}</span>
 
                   </Title>
                 </div>
