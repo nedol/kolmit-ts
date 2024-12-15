@@ -112,7 +112,7 @@
   <header>
     <div class="top-app-bar-container flexor">
       <TopAppBar bind:this={topAppBar} variant="fixed" dense>
-        <span style="position:absolute;font-size:.8em;left:0;bottom:2px;color:white;background-color:red">{lvl.toUpperCase()}</span>
+        <span style="position:absolute;font-size:.8em;left:0;bottom:2px;color:white;">{lvl}</span>
         <Row>
           <div class="sec_items">
             {#if $view !== 'login'}

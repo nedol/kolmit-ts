@@ -14,7 +14,7 @@
 
   function Init() {
     setContext('group_data', data.group);
-    setContext('lvl', data.lvl);
+    setContext('lvl', data.group[0].group);
     setContext('operator', data.operator[0]);
     setContext('abonent', data.abonent);
 
