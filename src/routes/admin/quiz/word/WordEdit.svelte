@@ -294,6 +294,32 @@
     const res = await findWordsInText(wordAr, selectedText);
     words_data = words_data.concat(res);
   }
+
+  
+  function OnCopyContent() {
+    const stringToCopy = JSON.stringify(words_data)
+    navigator.permissions.query({ name: 'clipboard-write' }).then((result) => {
+      if (result.state == 'granted' || result.state == 'prompt') {
+        navigator.clipboard
+          .writeText(stringToCopy)
+          .then(() => {
+            console.log('Контент скопирован в буфер обмена');
+            content = '';
+          })
+          .catch((err) => {
+            console.error('Ошибка при копировании строки: ', err);
+          });
+      } else {
+        console.error('Доступ к буферу обмена не разрешен.');
+      }
+    });
+  }
+
+  function OnReplaceContent() {
+    words_data  = '';
+
+    PasteContent();
+  }
 </script>
 
 <div class="word_container">
@@ -503,6 +529,12 @@
   <div class="container">
     <button class="add-record" on:click={addEmptyRecord}>+</button>
     <div class="save_container">
+      {#await Translate('Копировать контент', 'ru', $langs) then data}
+        <button class="copy" on:click={() => OnCopyContent()}>{data}</button>
+      {/await}
+      {#await Translate('Заменить контент', 'ru', $langs) then data}
+        <button class="copy" on:click={() => OnReplaceContent()}>{data}</button>
+      {/await}
       {#await Translate('Сохранить', 'ru', $langs) then data}
         <button class="save" on:click={() => OnSave()}>{data}</button>
       {/await}
@@ -585,7 +617,12 @@
   /* Для последнего word_field может потребоваться сброс правого отступа */
 
   .save {
-    margin-top: 10px; /* Отступ для кнопки 'Создать' */
+    margin: 10px; /* Отступ для кнопки 'Создать' */
+  }
+
+  
+  .copy {
+    margin: 10px; /* Отступ для кнопки 'Создать' */
   }
 
   textarea {

@@ -1,7 +1,8 @@
 import { config } from 'dotenv';
 config();
 
-import { Client, client } from '@gradio/client';
+import { Client} from '@gradio/client';
+
 
 import { GetPrompt } from '../../../lib/server/db';
 
@@ -11,8 +12,14 @@ import Groq from 'groq-sdk';
 
 const HF_TOKEN = process.env.HF_TOKEN;
 
+import { HfInference } from "@huggingface/inference";
+
+const client = new HfInference(HF_TOKEN);
+
+const GROQ_API_KEY = process.env.GROQ_API_KEY
+
 const groq = new Groq({
-  apiKey: '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', // process.env.GROQ_API_KEY,
+  apiKey: GROQ_API_KEY
 });
 
 // import prompt_data from './prompt/prompt_data.json';
@@ -46,8 +53,8 @@ export async function POST({ request, fetch }) {
 }
 
 async function chatLlama(system, task) {
-  return '';
-  const app = await Client.connect('huggingface-projects/llama-2-7b-chat', {
+
+  const app = await Client.connect('NiansuhAI/HFLLMs', {
     hf_token: HF_TOKEN,
   });
 
@@ -55,45 +62,35 @@ async function chatLlama(system, task) {
 
   let result;
 
-  try {
+
     result = await app.predict('/chat', {
-      message: task,
-      system_prompt: system,
-      max_new_tokens: 1024,
-      temperature: 0.6,
-      top_p: 0.9,
-      top_k: 50,
-      repetition_penalty: 1,
+      message: "Hello!!",
+      system_prompt: "Hello!!",
+      max_new_tokens:1,
+      temperature: 0.1,
+      top_p: 0.05,
+      top_k: 1,
+      repetition_penalty: 1
     });
-  } catch (ex) {}
+
 
   return result?.data[0];
+}
 
-  // async function query(data) {
-  //   const response = await fetch(
-  //     'https://api-inference.huggingface.co/models/meta-llama/Llama-2-70b-chat-hf',
-  //     {
-  //       headers: {
-  //         Authorization: 'Bearer ' + HF_TOKEN,
-  //       },
-  //       method: 'POST',
-  //       body: JSON.stringify(data),
-  //     }
-  //   );
-  //   if (!response.ok) {
-  //     // Read the response as text to log the error message
-  //     const errorText = await response.text();
-  //     throw new Error(
-  //       `HTTP error! status: ${response.status}, message: ${errorText}`
-  //     );
-  //   }
-  //   return await response.text();
-  // }
+async function query(system, task) {
 
-  // const response = await query({
-  //   inputs: 'Can you please let us know more details about your ',
-  // });
-  // return response.data;
+  const chatCompletion = await client.chatCompletion({
+    model: "meta-llama/Llama-2-13b-chat-hf",
+    messages: [
+      {
+        role: "user",
+        content: task
+      }
+    ],
+    max_tokens: 500
+  });
+
+  return chatCompletion;
 }
 
 async function chatGPTo(system, task) {

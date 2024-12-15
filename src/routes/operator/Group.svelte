@@ -1,11 +1,10 @@
 <script lang="ts">
-  // import RTCOperator from '../js/RTCOperator.js';
-  // import { getContext } from 'svelte';
-  import { setContext,getContext, onMount } from 'svelte';
 
-  import { Translate } from '../../translate/Transloc.js';
+  import { getContext, onMount } from 'svelte';
 
-  import Tutor from '../../tutor/Tutor.svelte';
+  import { Translate } from '../translate/Transloc.js';
+
+  import Tutor from '../tutor/Tutor.svelte';
 
   import '$lib/css/Elevation.scss';
 
@@ -32,7 +31,7 @@
     call_but_status,
   } from '$lib/js/stores.js';
 
-  import User from '../User.svelte';
+  import User from '../user/User.svelte';
 
   let operator = getContext('operator');
 
@@ -62,6 +61,7 @@
     });
   } else if ($call_but_status === 'inactive') {
     group = group = [];
+    $users = {};
   }
 
   async function GetOperators(par: any) {

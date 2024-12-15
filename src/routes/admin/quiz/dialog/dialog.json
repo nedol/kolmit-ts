@@ -1,103 +1,166 @@
 {
-    "html": "<html lang=\"nl\">\n<head>\n<meta charset=\"UTF-8\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n<title>Familie 2</title>\n<link rel=\"stylesheet\" href=\"https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap\">\n<style>\nbody {\n  font-family: 'Roboto', sans-serif;\n  margin: 0;\n  padding: 0;\n}\n.container {\n  max-width: 800px;\n  margin: 20px auto;\n  padding: 20px;\n  background-color: #f9f9f9;\n  border-radius: 8px;\n  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);\n}\n</style>\n</head>\n<body>\n<div class=\"container\">\n<h2>Familie 2</h2>\n<p>Hallo! Mijn naam is Amir Jallad. Ik ben de jongere broer van Marc. Hij heeft jullie al veel verteld over onze familie. Ik wil jullie nog een beetje meer vertellen over mezelf en mijn gezin. Ik ben 40 jaar geleden geboren in Tripoli, in Libanon. Toen ik 10 jaar was, zijn onze ouders naar Frankrijk verhuisd. Zij wonen nog steeds in Reims, in het noorden van Frankrijk. Ik woon nu met mijn gezin in Toulouse. Dat ligt in het zuiden van Frankrijk. Ik ben loodgieter en ik heb heel veel werk. Dat is goed want zo kan ik veel geld verdienen. Ik kan heel goed dingen repareren, dus de mensen bellen mij vaak. Als ik niet moet werken, speel ik graag rugby met mijn vrienden. Ik ben getrouwd met Julie en wij hebben een dochtertje van 2, Elise. Julie is verkoopster in een schoenwinkel. Zij winkelt heel graag en koopt dan mooie kleren voor onze dochters. Ik heb ook nog een dochter uit mijn eerste huwelijk. Zij heet Aisha en zij is 14 jaar. Zij speelt graag met haar kleine zus en ze kan heel goed tekenen. De mama van Aisha heette Bouchra. Zij was mijn eerste vrouw maar ze is jammer genoeg overleden toen Aisha 3 jaar was. Ze is gestorven in een auto-ongeval. Gelukkig klikt het goed tussen Julie en Aisha! Mijn oudere broer en zus wonen nu allebei met hun gezin in België, maar we bezoeken elkaar regelmatig en we houden via e-mail en Skype.</p>\n</div>\n</body>\n</html>",
     "content": [
         {
             "user1": {
-                "nl": "Waar is Amir geboren?",
-                "ru": "Где родился Амир?"
+                "nl": "Kun je me iets vertellen over de eerste persoon? Wat voor uiterlijk heeft hij?",
+                "ru": "Ты можешь рассказать мне что-то о первом человеке? Как он выглядит?",
+                "hints": [
+                    "uiterlijk",
+                    "beschrijven",
+                    "zwart haar",
+                    "sportief",
+                    "tatoeages"
+                ]
             },
             "user2": {
-                "nl": "Amir is geboren in Tripoli, in Libanon.",
-                "ru": "Амир родился в Триполи, в Ливане."
+                "nl": "De eerste persoon heeft kort, zwart haar en een atletische bouw. Hij heeft donkerbruine ogen en een donkere huidskleur. Zijn armen zijn bedekt met opvallende tatoeages, en hij draagt meestal een eenvoudige T-shirt en een spijkerbroek.",
+                "ru": "У первого человека короткие чёрные волосы, спортивное телосложение. У него тёмно-карие глаза и тёмный оттенок кожи. Его руки покрыты заметными татуировками, и он обычно носит простую футболку и джинсы.",
+                "hints": [
+                    "zwart haar",
+                    "atletische bouw",
+                    "tatoeages",
+                    "donkerbruine ogen",
+                    "spijkerbroek"
+                ]
             }
         },
         {
             "user1": {
-                "nl": "Waar wonen Amirs ouders?",
-                "ru": "Где живут родители Амира?"
+                "nl": "En hoe lang is hij?",
+                "ru": "А какого он роста?",
+                "hints": [
+                    "lengte",
+                    "uiterlijk"
+                ]
             },
             "user2": {
-                "nl": "Amirs ouders wonen in Reims, in het noorden van Frankrijk.",
-                "ru": "Родители Амира живут в Реймсе, на севере Франции."
+                "nl": "Hij is vrij lang, ongeveer 1,85 meter.",
+                "ru": "Он довольно высокий, около 1,85 м.",
+                "hints": [
+                    "lang",
+                    "lengte"
+                ]
             }
         },
         {
             "user1": {
-                "nl": "Wat is Amirs beroep?",
-                "ru": "Кем работает Амир?"
+                "nl": "En hoe zit het met de tweede persoon? Wat voor uiterlijk heeft zij?",
+                "ru": "А как насчёт второго человека? Как она выглядит?",
+                "hints": [
+                    "beschrijving",
+                    "rood haar",
+                    "groene ogen",
+                    "bril",
+                    "sproeten"
+                ]
             },
             "user2": {
-                "nl": "Amir is loodgieter.",
-                "ru": "Амир работает водопроводчиком."
+                "nl": "Ze heeft halflang, rood haar dat in zachte krullen valt, en grote, heldergroene ogen. Ze draagt een elegante bril met een dun, goudkleurig montuur. Haar gezicht is bezaaid met lichte sproeten, en ze kleedt zich vaak in pastelkleurige jurken.",
+                "ru": "У неё волосы средней длины, рыжие, мягкими локонами, и большие ярко-зелёные глаза. Она носит элегантные очки с тонкой золотистой оправой. Её лицо усыпано светлыми веснушками, а одевается она часто в платья пастельных тонов.",
+                "hints": [
+                    "rood haar",
+                    "groene ogen",
+                    "bril",
+                    "sproeten",
+                    "jurken"
+                ]
             }
         },
         {
             "user1": {
-                "nl": "Wat doet Amir graag in zijn vrije tijd?",
-                "ru": "Чем занимается Амир в свободное время?"
+                "nl": "Hoe lang is zij?",
+                "ru": "А какого она роста?",
+                "hints": [
+                    "lengte",
+                    "uiterlijk"
+                ]
             },
             "user2": {
-                "nl": "Amir speelt graag rugby met zijn vrienden.",
-                "ru": "Амир любит играть в регби со своими друзьями."
+                "nl": "Ze is van gemiddelde lengte, ongeveer 1,65 meter.",
+                "ru": "Она среднего роста, около 1,65 м.",
+                "hints": [
+                    "gemiddeld",
+                    "lengte"
+                ]
             }
         },
         {
             "user1": {
-                "nl": "Met wie is Amir getrouwd?",
-                "ru": "С кем Амир женат?"
+                "nl": "Laten we de derde persoon bespreken. Hoe ziet hij eruit?",
+                "ru": "Давай обсудим третьего человека. Как он выглядит?",
+                "hints": [
+                    "lang haar",
+                    "baard",
+                    "motorjas",
+                    "zonnebril"
+                ]
             },
             "user2": {
-                "nl": "Amir is getrouwd met Julie.",
-                "ru": "Амир женат на Джули."
+                "nl": "De derde persoon heeft lang, donker haar dat hij vaak in een staart draagt, een volle, netjes getrimde baard en opvallende, donkere snorren. Hij heeft scherpe gelaatstrekken en draagt meestal een stoere motorjas met leren details. Zijn zonnebril heeft een reflecterende glazen.",
+                "ru": "У третьего человека длинные тёмные волосы, которые он часто собирает в хвост, густая, аккуратно подстриженная борода и выразительные тёмные усы. У него резкие черты лица, и он обычно носит стильную мотоциклетную куртку с кожаными вставками. Его солнечные очки имеют зеркальные стёкла.",
+                "hints": [
+                    "lang haar",
+                    "baard",
+                    "snorren",
+                    "motorjas",
+                    "zonnebril"
+                ]
             }
         },
         {
             "user1": {
-                "nl": "Hoeveel dochters heeft Amir?",
-                "ru": "Сколько у Амира дочерей?"
+                "nl": "En hoe lang is hij?",
+                "ru": "А какого он роста?",
+                "hints": [
+                    "lengte",
+                    "uiterlijk"
+                ]
             },
             "user2": {
-                "nl": "Amir heeft twee dochters, Elise en Aisha.",
-                "ru": "У Амира две дочери, Элиза и Аиша."
+                "nl": "Hij is erg lang, ongeveer 1,90 meter.",
+                "ru": "Он очень высокий, около 1,90 м.",
+                "hints": [
+                    "lang",
+                    "lengte"
+                ]
             }
         },
         {
             "user1": {
-                "nl": "Hoe oud is Aisha?",
-                "ru": "Сколько лет Айше?"
+                "nl": "Hoe zou je de vierde persoon beschrijven?",
+                "ru": "Как бы ты описал четвёртого человека?",
+                "hints": [
+                    "blond haar",
+                    "hobby",
+                    "sportief"
+                ]
             },
             "user2": {
-                "nl": "Aisha is 14 jaar oud.",
-                "ru": "Аише 14 лет."
+                "nl": "De vierde persoon heeft kort, blond haar dat een beetje warrig zit, en een energieke uitstraling. Haar blauwe ogen glinsteren, en ze draagt vaak sportieve kleding zoals leggings en sneakers. Ze heeft een natuurlijke blos op haar wangen.",
+                "ru": "У четвёртого человека короткие светлые волосы, которые немного растрёпаны, и энергичный вид. Её голубые глаза блестят, и она часто носит спортивную одежду, например, леггинсы и кроссовки. У неё естественный румянец на щеках.",
+                "hints": [
+                    "blond haar",
+                    "blauwe ogen",
+                    "sportieve kleding"
+                ]
             }
         },
         {
             "user1": {
-                "nl": "Wat is er met Amirs eerste vrouw gebeurd?",
-                "ru": "Что случилось с первой женой Амира?"
+                "nl": "Hoe lang is zij?",
+                "ru": "А какого она роста?",
+                "hints": [
+                    "lengte",
+                    "uiterlijk"
+                ]
             },
             "user2": {
-                "nl": "Amirs eerste vrouw, Bouchra, is overleden in een auto-ongeluk.",
-                "ru": "Первая жена Амира, Бушра, погибла в автокатастрофе."
-            }
-        },
-        {
-            "user1": {
-                "nl": "Hoe is de relatie tussen Julie en Aisha?",
-                "ru": "Какие отношения между Джули и Айшей?"
-            },
-            "user2": {
-                "nl": "Gelukkig klikt het goed tussen Julie en Aisha.",
-                "ru": "К счастью, отношения между Джули и Айшей хорошие."
-            }
-        },
-        {
-            "user1": {
-                "nl": "Waar wonen Amirs oudere broer en zus?","ru": "Где живут старший брат и сестра Амира?"
-            },
-            "user2": {
-                "nl": "Amirs oudere broer en zus wonen nu allebei met hun gezin in België.",
-                "ru": "Старший брат и сестра Амира сейчас оба живут со своими семьями в Бельгии."
+                "nl": "Ze is van gemiddelde lengte, ongeveer 1,70 meter.",
+                "ru": "Она среднего роста, около 1,70 м.",
+                "hints": [
+                    "gemiddeld",
+                    "lengte"
+                ]
             }
         }
     ]

@@ -87,12 +87,12 @@ export async function POST({ url, fetch, cookies, request }) {
       };
     }
   } else {
-    const result = await stt_bluman(blob, from_lang);
+    const result = await stt_whisper(blob, from_lang,from_lang );
     // resp = await stt_as(audioUrl);
     if (result) {
       resp = {
-        [from_lang]: result.text,
-        [to_lang]: await Translate(result.text, from_lang, to_lang),
+        [from_lang]: result,
+        [to_lang]: await Translate(result, from_lang, to_lang),
       };
     }
   }
@@ -144,7 +144,8 @@ async function stt_bluman(blob, from_lang, to_lang) {
 
 async function stt_whisper(blob, from_lang, to_lang) {
   const response = await fetch(
-    "https://api-inference.huggingface.co/models/openai/whisper-large-v3",
+    // "https://api-inference.huggingface.co/models/openai/whisper-large-v3",
+    "https://api-inference.huggingface.co/models/openai/whisper-small",
     {
       headers: {
         Authorization: "Bearer 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",
@@ -160,23 +161,26 @@ async function stt_whisper(blob, from_lang, to_lang) {
 
 async function stt_whisper_space(blob, from_lang, to_lang) {
 
-  const app =  new Client(
+  const app = await Client.connect(
     'https://openai-whisper.hf.space/'
   );
 
- const from = ISO6391.getName(from_lang);
-  const to = ISO6391.getName(to_lang);
- const result = await app.predict('/predict', [
-   blob, // blob in 'Input speech' Audio component
-   "transcribe"
- ]);
- return result.data[0];
+  const audioArrayBuffer = await blob.arrayBuffer();
+
+  const response_0 = await fetch("https://github.com/gradio-app/gradio/raw/main/test/test_files/audio_sample.wav");
+const exampleAudio = await response_0.blob();
+
+  const result = await app.predict('/predict_1', [
+    blob, // blob in 'Input speech' Audio component
+    "transcribe"
+  ]);
+  return result;
 }
 
-async function stt_sm4(audioArrayBuffer, from_lang, to_lang) {
+async function stt_sm4(blob, from_lang, to_lang) {
 
   // Конвертируем Blob в ArrayBuffer
-  // const audioArrayBuffer = await blob.arrayBuffer();
+  const audioArrayBuffer = await blob.arrayBuffer();
 
   const response = await axios.post(
     'https://api-inference.huggingface.co/models/facebook/wav2vec2-large-960h',
@@ -200,7 +204,7 @@ async function stt_mms(arrayBuffer,  from_lang, to_lang) {
   const result = await app.predict('/predict', 
     {
       audio_data: arrayBuffer,//convertBlobToBase64(arrayBuffer),
-      lang: 'nld (Dutch)'
+      lang: 'rus (Russian)'
     }
   );
   return result.data[0];

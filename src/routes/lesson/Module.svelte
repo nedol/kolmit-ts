@@ -130,6 +130,8 @@
     }
   }
 
+
+
   onMount(async () => {
     const lessonData = await fetchLesson(operator.abonent, operator.operator);
     lesson_data = lessonData.data;
@@ -141,7 +143,10 @@
 
   function onClickQuiz(type, level, theme, name) {
     try {
-      data.theme = theme;
+      data.theme = theme.name[$langs];
+      lesson_data?.module.themes.map((theme)=>{
+        theme.new_cnt=0;
+      })
       data.name = name;
       data.llang = $llang;
       data.level = level;
@@ -255,7 +260,7 @@
     onClickQuiz(
       quiz.type,
       lesson_data.level,
-      theme.name[$llang],
+      theme,
       quiz.name[$llang]
     );
   }
@@ -281,8 +286,15 @@
     module = module;
   }
 
-  function isNew(publishedDate) {
-    return Date.now() - new Date(publishedDate).getTime() < 10 * 24 * 60 * 60 * 1000;
+  function isNew(publishedDate,theme) {
+
+    if(Date.now() - new Date(publishedDate).getTime() < 10 * 24 * 60 * 60 * 1000){
+      if(!theme.new_cnt)
+        theme.new_cnt = 0;
+      theme.new_cnt++;
+      return true;
+    }
+    return false;
   }
 </script>
 
@@ -292,9 +304,6 @@
     <Quiz {data} />
   {:else if module}
     <div class="lesson-container">
-      <div class="module_level">
-        <div class="mdc-typography--caption">{lesson_data.level}</div>
-      </div>
 
       {#each module.themes as theme, t}
         <br />
@@ -309,10 +318,13 @@
                         OnThemeNameInput(theme);
                       })()}
                   ><div class="mdc-typography--subtitle2">
-                    {theme.name[$llang]}<br />
+                    {theme.name[$llang]}
+                    {#if theme.new_cnt>0}
+                    <span style="color:red">({theme.new_cnt})</span>
+                    {/if}<br />
                   </div>
                   </Header
-                >{/await}
+                >{/await} 
               <Content>
                 {#if theme.lessons}
                   {#each theme.lessons as lesson}
@@ -327,9 +339,9 @@
                           >
                           <div class="icon-wrapper">
                             <div>
-                              {#if isNew(quiz.published)}
+                              {#if isNew(quiz.published, theme)}
                               {#await Translate('новый', 'ru', $llang) then data}
-                                <span  class="new-badge" >{data}</span>
+                                <span  class="new-badge">{data}</span>
                                 {/await}
                               {/if}
                             </div>
@@ -348,7 +360,7 @@
                                 onClickQuiz(
                                   quiz.type,
                                   lesson_data.level,
-                                  theme.name[$llang],
+                                  theme,
                                   quiz.name[$llang]
                                 );
              

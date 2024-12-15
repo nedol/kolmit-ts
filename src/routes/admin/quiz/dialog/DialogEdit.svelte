@@ -248,6 +248,8 @@
     ChangeQuizName(name, data.name);
   }
 
+
+
   async function SaveDialogData(name: string, data: any) {
     const response = await fetch(`/admin/module`, {
       method: 'POST',
@@ -365,6 +367,26 @@
       .catch((err) => {
         console.error('Failed to read clipboard contents: ', err);
       });
+  }
+
+  function OnCopyContent() {
+    const stringToCopy = JSON.stringify(dialog_data.content);
+    navigator.permissions.query({ name: 'clipboard-write' }).then((result) => {
+      if (result.state == 'granted' || result.state == 'prompt') {
+        navigator.clipboard
+          .writeText(stringToCopy)
+          .then(() => {
+            console.log('Контент скопирован в буфер обмена');
+            active = content_title;
+            content = '';
+          })
+          .catch((err) => {
+            console.error('Ошибка при копировании строки: ', err);
+          });
+      } else {
+        console.error('Доступ к буферу обмена не разрешен.');
+      }
+    });
   }
 
   function OnGrammarChange() {
@@ -626,8 +648,12 @@
       >add</IconButton
     >
     <div class="container">
+      {#await Translate('Copy data', 'en', $langs) then data}
+        <button class="copy_content" on:click={() => OnCopyContent()}>{data}</button>
+      {/await}
       {#await Translate('Save', 'en', $langs) then data}
-        <button class="save_content" on:click={() => OnSave()}>{data}</button>{/await}
+        <button class="save_content" on:click={() => OnSave()}>{data}</button>
+      {/await}
     </div>
   </div>
 </main>
@@ -693,12 +719,25 @@
 
   /* Для последнего dialog-field может потребоваться сброс правого отступа */
 
+  .container {
+    display: flex;
+    justify-content: space-between; /* Распределяет контейнеры равномерно по горизонтали */
+  }
   .save_content {
     position: fixed;
     right: 20px;
     bottom:5px;
     margin-top: 10px; /* Отступ для кнопки "Создать" */
   }
+
+  
+  .copy_content {
+    position: fixed;
+    right: 120px;
+    bottom:5px;
+    margin-top: 10px; /* Отступ для кнопки "Создать" */
+  }
+
 
   textarea {
     width: 100%;
@@ -717,10 +756,6 @@
   .dialog_lang,
   .dialog_level {
     border: 0;
-  }
-  .container {
-    display: flex;
-    justify-content: space-between; /* Распределяет контейнеры равномерно по горизонтали */
   }
 
   .dialog-field {

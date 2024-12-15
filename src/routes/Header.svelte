@@ -1,6 +1,6 @@
 <script lang="ts">
   import {
-    onMount /*, onDestroy, getContext, setContext*/,
+    onMount , onDestroy, getContext, 
     setContext,
   } from 'svelte';
 
@@ -30,6 +30,7 @@
     view,
     langs,
     dicts,
+    users,
     editable,
     showBottomAppBar,
   } from '$lib/js/stores.js';
@@ -38,11 +39,17 @@
     edited_display = $editable;
   }
 
+  $:if($users){
+    console.log($users)
+  }
+
 
   let menu = 'menu';
 
   let topAppBar;
   let abonent = '';
+
+  const lvl = getContext('lvl');
 
   onMount(async () => {
     let params = new URL(document.location).searchParams;
@@ -105,12 +112,14 @@
   <header>
     <div class="top-app-bar-container flexor">
       <TopAppBar bind:this={topAppBar} variant="fixed" dense>
+        <span style="position:absolute;left:0;bottom:2px;color:white;background-color:red">{lvl.toUpperCase()}</span>
         <Row>
           <div class="sec_items">
             {#if $view !== 'login'}
               <Section>
                 {#await Translate('Quit the exercise?', 'en', $langs) then data}
                 <div class={$view !== 'lesson' ? 'active' : ''}>
+              
                   <Title
                     on:click={() => {
                       if ($lesson.data?.quiz) {
@@ -124,7 +133,13 @@
                       }
                     }}
                   >
-                    {$dicts ? $dicts['CLASS'][$langs] : 'CLASS'}
+               
+                  {#await Translate('КЛАСС', 'ru', $langs) then data}
+                    <span>{data.toUpperCase()}</span>
+                  {/await}
+                    
+                    <span style="color:red">{Object.keys($users).length>0?`(${Object.keys($users).length})`:''}</span>
+
                   </Title>
                 </div>
                 
@@ -144,7 +159,9 @@
                       }
                     }}
                   >
-                    {$dicts ? $dicts['LESSON'][$langs] : 'LESSON'}
+                    {#await Translate('УРОК', 'ru', $langs) then data}
+                    <span>{data.toUpperCase()}</span>
+                  {/await}
                   </Title>
                 </div>
                 

@@ -2,6 +2,8 @@
   import { onMount } from 'svelte';
   import { Translate } from '../../translate/Transloc.ts';
 
+
+
   import {
     langs,
     llang,
@@ -103,6 +105,7 @@
   });
 
   async function speak(text) {
+    if(text)
     tts.Speak_server($llang, text,'chat');
   }
 
@@ -149,7 +152,7 @@
         }
       );
     } else {
-      callChat(text || 'Расскажи о себе ');
+      // callChat(text || 'Расскажи о себе ');
     }
   }
 
@@ -159,8 +162,8 @@
       variant = 'outlined';
     }, 1000);
 
-    if (dc) {
-      dc.SendData(
+    if ($dc) {
+      $dc.SendData(
         {
           command: 'repeat',
         },
@@ -233,16 +236,18 @@
 
   <TTS bind:this={tts}></TTS>
 
-  {#await Translate('Отправить', 'ru', $langs) then data}
-    <Button
-      on:click={() => {
-        // stt.SendRecognition()
-        SendDC(userInput[$llang]);
-      }}><Label>{data}</Label></Button
-    >
-  {/await}
+  {#if $dc}
 
-  {#if dc}
+    {#await Translate('Отправить', 'ru', $langs) then data}
+      <Button
+        on:click={() => {
+          // stt.SendRecognition()
+          SendDC(userInput[$llang]);
+        }}><Label>{data}</Label></Button
+      >
+    {/await}
+
+
     <div class="repeat_but">
       {#await Translate('Повторить', 'ru', $langs) then data}
         <Button on:click={() => SendRepeat()} {variant}>

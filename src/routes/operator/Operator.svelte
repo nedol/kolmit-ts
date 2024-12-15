@@ -30,7 +30,7 @@
   import CircularProgress from '@smui/circular-progress';
 
   // import {Dict} from '$lib/js/$dicts'
-  import Group from '../user/group/Group.svelte';
+  import Group from './Group.svelte';
   let group_data = getContext('group_data');
   let group = [];
 
@@ -99,7 +99,7 @@
   $call_but_status = 'inactive';
 
   import { editable } from '$lib/js/stores.js';
-  import { Translate } from '../translate/Transloc.ts';
+  import { Translate } from '../translate/Transloc';
   $: if ($editable) {
     edited_display = $editable;
   }
