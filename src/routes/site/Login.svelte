@@ -1,51 +1,30 @@
 <script>
 	import { onMount } from 'svelte';
-	import { applyAction, deserialize } from '$app/forms';
-
+	import { dicts } from '$lib/js/stores.js';
 	import Button from '@smui/button';
 	import Textfield from '@smui/textfield';
 	import loadImage from 'blueimp-load-image/js/load-image.js';
 	import 'blueimp-load-image/js/load-image-scale.js';
-	// import SelectMenu from './SelectMenu.svelte';
-	import { dicts } from '$lib/js/stores.js';
-	
 
-	let width, height, value, abonent, lvl;
 	let formData = {
-		name: '',//'WH',//
-		email: '',//,'white@house.usa'
-		psw: '',//'test',
-		confirmPassword: '',//'test',
-		picture: '',
-		lang: 'ru',//'en'
+		name: '',
+		email: '',
+		psw: '',
+		confirmPassword: '',
+		picture: '/assets/operator.svg',
+		lang: 'en',
 	};
 
-	if (!formData.picture) {
-		formData.picture = '/assets/operator.svg';
-	}
+	let abonent, lvl, lang = 'en';
+	let passwordMatch = true;
 
-	let lang = 'en';
-	$: if (lang) {
-		formData.lang = lang;
-	}
+	$: formData.lang = lang;
 
-	let psw;
-	let confirmPassword; // Поле для повторного ввода пароля
-	let passwordMatch = true; // Переменная для проверки совпадения паролей
-
-	onMount(async () => {
+	onMount(() => {
 		let url = new URL(window.location.href);
 		abonent = url.searchParams.get('abonent');
 		lvl = url.searchParams.get('lvl');
 		formData.email = url.searchParams.get('user');
-		// console.log(abonent);
-		// if (url.searchParams.get('psw')) {
-		// 	formData.name = url.searchParams.get('name');
-		// 	formData.psw = url.searchParams.get('psw');
-		// 	formData.email = url.searchParams.get('email');
-		// 	formData.lang = url.searchParams.get('lang');
-		// 	handleSubmit();
-		// }
 	});
 
 	function uploadImage(event) {
@@ -53,201 +32,141 @@
 		if (file) {
 			loadImage(
 				file,
-				function (img, data) {
+				(img) => {
 					if (img.type === 'error') {
 						console.error($dicts['Ошибка загрузки изображения'][lang]);
 					} else {
-						width = img.width;
-						height = img.height;
 						formData.picture = img.toDataURL();
 					}
 				},
-				{
-					orientation: true,
-					maxWidth: 100,
-					maxHeight: 100,
-					canvas: true
-				}
+				{ orientation: true, maxWidth: 100, maxHeight: 100, canvas: true }
 			);
 		}
 	}
 
 	async function handleSubmit() {
-		// Здесь вы можете обработать данные формы
-		let par = formData;
-		par.email = par.email.trim();
-		passwordMatch = par.confirmPassword === par.psw;
+		passwordMatch = formData.psw === formData.confirmPassword;
 		if (!passwordMatch) return;
-		par.func = 'operator';
-		par.lvl = lvl;
-		par.abonent = abonent;
-		const headers = {
-			'Content-Type': 'application/json'
-			// Authorization: `Bearer ${token}`
+
+		const requestData = {
+			...formData,
+			func: 'operator',
+			lvl,
+			abonent,
 		};
-		let res = await fetch(`/`, {
-			method: 'POST',
-			// mode: 'no-cors',
-			body: JSON.stringify({ par }),
-			headers: headers
-		});
-	
-		location.reload();
+
+		try {
+			const res = await fetch(`/`, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify(requestData),
+			});
+
+			if (!res.ok) throw new Error('Ошибка отправки данных');
+			location.reload();
+		} catch (error) {
+			console.error('Ошибка:', error);
+		}
 	}
 </script>
 
-<form on:submit|preventDefault={handleSubmit}>
-	<div class="columns margins">
-		<input name="lang" value={formData.lang} hidden />
+<div class="container">
+	<form on:submit|preventDefault={handleSubmit}>
+		<Textfield
+			name="email"
+			bind:value={formData.email}
+			label="{$dicts['Email'][lang]}:"
+			required
+		/>
+		<Textfield
+			name="name"
+			bind:value={formData.name}
+			label="{$dicts['Имя'][lang]}:"
+			required
+		/>
+		<Textfield
+			type="password"
+			name="psw"
+			bind:value={formData.psw}
+			label="{$dicts['Пароль'][lang]}:"
+			required
+		/>
+		<Textfield
+			type="password"
+			name="confirmPassword"
+			bind:value={formData.confirmPassword}
+			label="{$dicts['Повторить пароль'][lang]}:"
+			required
+		/>
+		{#if !passwordMatch}
+			<p style="color: red;">{$dicts['Пароли не совпадают'][lang]}</p>
+		{/if}
 		<div>
-			<Textfield
-				name="email"
-				bind:value={formData.email}
-				label="{$dicts['Email'][lang]}:"
-				required
-			/>
+			<input type="file" id="pic" on:change={uploadImage} accept="image/png, image/jpeg" hidden />
+			<img src={formData.picture} alt="Avatar" on:click={() => document.getElementById('pic').click()} />
 		</div>
-
-		<div>
-			<Textfield
-				type="text"
-				name="name"
-				bind:value={formData.name}
-				label="{$dicts['Имя'][lang]}:"
-				required
-			/>
-		</div>
-
-		<div>
-			<Textfield
-				type="password"
-				name="psw"
-				bind:value={formData.psw}
-				label="{$dicts['Пароль'][lang]}:"
-				required
-			/>
-		</div>
-
-		<div>
-			<Textfield
-				type="password"
-				name="confirmPassword"
-				bind:value={formData.confirmPassword}
-				label="{$dicts['Повторить пароль'][lang]}:"
-				required
-			/>
-		</div>
-
-		<div style="padding-top: 20px">
-			<input type="file" id="pic" on:change={uploadImage} accept="image/png, image/jpeg" />
-
-			<img
-				type="image"
-				id="oper_pic"
-				src={formData.picture}
-				on:click={() => document.getElementById('pic').click()}
-			/>
-		</div>
-
-		<div>
-			<Button class="upload-button">{$dicts['Зарегистрироваться'][lang]}</Button>
-		</div>
-	</div>
-</form>
-<!-- <SelectMenu bind:lang /> -->
-
-{#if !passwordMatch}
-	<p style="color: red;">{$dicts['Пароли не совпадают'][lang]}</p>
-{/if}
-
-
+		<Button type="submit" disabled={!passwordMatch}>
+			{$dicts['Зарегистрироваться'][lang]}
+		</Button>
+	</form>
+</div>
 
 <style>
-	/* Стили для мобильных устройств */
-
-	/* Стили для более крупных экранов */
-	@media screen and (min-width: 768px) {
-		/* Ваши стили для более крупных экранов здесь */
-		button {
-			padding: 6px 10px;
-			font-size: 14px;
-		}
-
-		input {
-			padding: 8px;
-			font-size: 14px;
-		}
-	}
-	/* Стили для мобильных устройств */
-	@media screen and (max-width: 767px) {
-		button {
-			padding: 6px 10px;
-			font-size: 14px;
-		}
-
-		input {
-			padding: 8px;
-			font-size: 14px;
-		}
+	.container {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		min-height: 100vh;
 	}
 
-	/* CSS стили для формы регистрации */
 	form {
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		max-width: 400px;
-		margin: 0 auto;
+		width: 100%;
+		max-width: 600px; /* Широкая форма */
 		padding: 20px;
 		border: 1px solid #ccc;
-		border-radius: 5px;
+		border-radius: 8px;
 		background-color: #fff;
+		box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+	}
+
+	.field {
+		margin-bottom: 15px;
+		width: 80%;
+	}
+
+	/* Принудительное расширение полей для SMUI */
+	:global(.mdc-text-field) {
+		width: 80% !important;
+	}
+
+	:global(.mdc-text-field__input) {
+		width: 80% !important;
+		box-sizing: border-box;
+		font-size: 16px;
+		padding: 10px;
 	}
 
 	img {
-		display: block;
-		margin-left: auto;
-		margin-right: auto;
-	}
-
-	label {
-		font-weight: bold;
-		margin-top: 10px;
-	}
-
-	input[type='email'],
-	input[type='text'],
-	input[type='psw'] {
-		width: 100%;
-		padding: 10px;
-		margin: 5px 0;
-		border: 1px solid #ccc;
-		border-radius: 5px;
-	}
-
-	input[type='file'] {
-		display: none;
-	}
-
-	.container {
-		text-align: center;
-		margin-top: 10px;
-	}
-
-	#oper_pic {
-		max-width: 100px;
-		max-height: 100px;
+		width: 120px;
+		height: 120px;
 		border-radius: 50%;
 		cursor: pointer;
+		margin: 10px 0;
 	}
 
 	.upload-button {
-		background-color: #0078d4;
-		color: #fff;
-		border: none;
+		margin-top: 15px;
 		padding: 10px 20px;
-		border-radius: 5px;
-		cursor: pointer;
-		margin-top: 10px;
+		font-size: 16px;
+	}
+
+	/* Адаптивность для мобильных устройств */
+	@media screen and (max-width: 768px) {
+		form {
+			padding: 15px;
+		}
 	}
 </style>

@@ -49,7 +49,7 @@
   let topAppBar;
   let abonent = '';
 
-  const lvl = getContext('lvl');
+  const lvl = getContext('lvl')||'';
 
   onMount(async () => {
     let params = new URL(document.location).searchParams;
