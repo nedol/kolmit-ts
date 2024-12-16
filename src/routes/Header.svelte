@@ -62,7 +62,7 @@
   $: if ($dicts && !$dicts['CLASS'][$langs]) {
     (async () => {
       try {
-        $dicts['CLASS'][$langs] = await translate(
+        $dicts['CLASS'][$langs] = await Translate(
           $dicts['CLASS']['en'],
           $langs
         );
@@ -80,7 +80,7 @@
   $: if ($dicts && !$dicts['LESSON'][$langs]) {
     (async () => {
       try {
-        $dicts['LESSON'][$langs] = await translate(
+        $dicts['LESSON'][$langs] = await Translate(
           $dicts['LESSON']['en'],
           $langs
         );
