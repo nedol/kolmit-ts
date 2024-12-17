@@ -42,13 +42,15 @@ export async function GET({ url, fetch, cookies }) {
         const oper = admin ? 'admin' : 'operator';
         let cookie = cookies.get(`kolmit.${oper}.${abonent}`);
 
-        cookie = JSON.parse(cookie);
-        cookie.lang = lang;
-        
-        cookies.set(`kolmit.${oper}.${abonent}`, JSON.stringify(cookie), {
-          path: '/',
-          maxAge: 60 * 60 * 24 * 400,
-        });
+        if(cookie){
+          cookie = JSON.parse(cookie);
+          cookie.lang = lang;
+          
+          cookies.set(`kolmit.${oper}.${abonent}`, JSON.stringify(cookie), {
+            path: '/',
+            maxAge: 60 * 60 * 24 * 400,
+          });
+        }
 
       } catch (ex) {
         console.log(ex);

@@ -14,6 +14,7 @@ const config = {
   // for more information about preprocessors
   // preprocess: vitePreprocess(),
   preprocess: [preprocess(), vitePreprocess({})],
+  
 
   css: (css) => {
     css.write("public/bundle.css");

@@ -19,7 +19,7 @@
     mdiFileWordBoxOutline,
   } from '@mdi/js';
   import Accordion, { Panel, Header, Content } from '@smui-extra/accordion';
-  import FormField from '@smui/form-field';
+  // import FormField from '@smui/form-field';
   import Checkbox from '@smui/checkbox';
   import Quiz from './quiz/Quiz.svelte';
 
@@ -379,7 +379,7 @@
                             {#if $call_but_status!=='inactive' && (quiz.type === 'dialog' || quiz.type === 'word')}
  
                               <div class="form-field-container">
-                                <FormField>
+                         
                                   <Checkbox
                                     on:click={$OnCheckQU}
                                     name={quiz.name[$llang]}
@@ -389,7 +389,7 @@
                                     ]}
                                     touch
                                   ></Checkbox>
-                                </FormField>
+                       
                               </div>
                             {/if}
                           </div>

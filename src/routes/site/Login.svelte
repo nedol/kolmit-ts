@@ -5,6 +5,11 @@
 	import Textfield from '@smui/textfield';
 	import loadImage from 'blueimp-load-image/js/load-image.js';
 	import 'blueimp-load-image/js/load-image-scale.js';
+	import { Translate } from '../translate/Transloc.ts';
+
+	import {
+		langs
+	} from '$lib/js/stores.js';
 
 	let formData = {
 		name: '',
@@ -45,28 +50,26 @@
 	}
 
 	async function handleSubmit() {
-		passwordMatch = formData.psw === formData.confirmPassword;
+		// Здесь вы можете обработать данные формы
+		let par = formData;
+		par.email = par.email.trim();
+		passwordMatch = par.confirmPassword === par.psw;
 		if (!passwordMatch) return;
-
-		const requestData = {
-			...formData,
-			func: 'operator',
-			lvl,
-			abonent,
+		par.func = 'operator';
+		par.lvl = lvl;
+		par.abonent = abonent;
+		const headers = {
+			'Content-Type': 'application/json'
+			// Authorization: `Bearer ${token}`
 		};
-
-		try {
-			const res = await fetch(`/`, {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify(requestData),
-			});
-
-			if (!res.ok) throw new Error('Ошибка отправки данных');
-			location.reload();
-		} catch (error) {
-			console.error('Ошибка:', error);
-		}
+		let res = await fetch(`/`, {
+			method: 'POST',
+			// mode: 'no-cors',
+			body: JSON.stringify({ par }),
+			headers: headers
+		});
+	
+		location.reload();
 	}
 </script>
 
@@ -78,37 +81,49 @@
 			label="{$dicts['Email'][lang]}:"
 			required
 		/>
+		{#await Translate('Имя', 'ru', $langs) then data}
 		<Textfield
 			name="name"
 			bind:value={formData.name}
-			label="{$dicts['Имя'][lang]}:"
+			label="{data}:"
 			required
 		/>
+		{/await}
+		{#await Translate('Пароль', 'ru', $langs) then data}
 		<Textfield
 			type="password"
 			name="psw"
 			bind:value={formData.psw}
-			label="{$dicts['Пароль'][lang]}:"
+			label="{data}:"
 			required
 		/>
+		{/await}
+		{#await Translate('Повторить пароль', 'ru', $langs) then data}
 		<Textfield
 			type="password"
 			name="confirmPassword"
 			bind:value={formData.confirmPassword}
-			label="{$dicts['Повторить пароль'][lang]}:"
+			label="{data}:"
 			required
 		/>
+		{/await}
 		{#if !passwordMatch}
-			<p style="color: red;">{$dicts['Пароли не совпадают'][lang]}</p>
+			{#await Translate('Пароли не совпадают', 'ru', $langs) then data}
+				<p style="color: red;">{data}</p>	
+			{/await}
 		{/if}
 		<div>
 			<input type="file" id="pic" on:change={uploadImage} accept="image/png, image/jpeg" hidden />
 			<img src={formData.picture} alt="Avatar" on:click={() => document.getElementById('pic').click()} />
 		</div>
-		<Button type="submit" disabled={!passwordMatch}>
-			{$dicts['Зарегистрироваться'][lang]}
-		</Button>
+		{#await Translate('Зарегистрироваться', 'ru', $langs) then data}
+			<Button type="submit" disabled={!passwordMatch}>
+				{data}
+			</Button>
+		{/await}
 	</form>
+
+
 </div>
 
 <style>
@@ -124,12 +139,12 @@
 		flex-direction: column;
 		align-items: center;
 		width: 100%;
-		max-width: 600px; /* Широкая форма */
+		max-width: 500px; /* Широкая форма */
 		padding: 20px;
-		border: 1px solid #ccc;
+		border: 0px solid #ccc;
 		border-radius: 8px;
-		background-color: #fff;
-		box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+		background-color: transparent;
+		/* box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); */
 	}
 
 	.field {

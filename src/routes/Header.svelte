@@ -178,7 +178,7 @@
                 lang_menu = !lang_menu;
               }}
               >{(() => {
-                return ISO6391.getNativeName($langs);
+                return $langs;
               })()}</span
             >
             {#if lang_menu}
