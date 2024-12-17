@@ -486,7 +486,7 @@
     top: 50px;
     left: 0;
     height: 100vh;
-    /* overflow-y: auto; */
+    overflow-y: auto;
     width: 100vw;
     margin: 0 auto;
     background-color: #fff;
@@ -527,6 +527,7 @@
     overflow-x: hidden;
     max-width: 100%;
     padding-top: 10px;
+    height: 120vh;
     scrollbar-width: none;
     -ms-overflow-style: none;
   }
