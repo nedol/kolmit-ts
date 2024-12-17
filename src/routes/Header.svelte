@@ -226,9 +226,10 @@
   }
 
   .lang_span {
-    font-size: smaller;
-    bottom: -15px;
+    font-size: medium;
+    bottom: -10px;
     position: relative;
+    margin:   25px;
   }
 
   .lang_list {
