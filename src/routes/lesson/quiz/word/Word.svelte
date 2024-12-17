@@ -708,7 +708,7 @@
                 tag="svg"
                 on:click={onPrev}
                 viewBox="0 0 24 24"
-                style="margin-top:0px; scale:.5; width:50px"
+                style="margin:10px 5px 10px 5px; scale:.5; width:50px"
               >
                 <path fill="white" d={mdiArrowLeft} />
               </Icon>
@@ -788,7 +788,7 @@
                 tag="svg"
                 on:click={nextWord}
                 viewBox="0 0 24 24"
-                style="margin-top:0px; scale:.5; width:50px"
+                style="margin:10px 5px 10px 5px; scale:.5; width:50px"
               >
                 <path fill="green" d={mdiArrowRight} />
               </Icon>
@@ -1085,6 +1085,7 @@
   }
 
   .lang_span {
+    visibility: hidden;
     font-size: large;
   }
 

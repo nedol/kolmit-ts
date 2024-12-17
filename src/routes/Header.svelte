@@ -185,7 +185,7 @@
         <div class="lang_list">
           {#each langs_list as lang}
             <div
-              style="color:black; margin:10px;font-size:smaller"
+              style="color:black;width:min-content; margin:10px;font-size:smaller"
               on:click={setLang}
             >
               {lang}
@@ -227,8 +227,9 @@
   .lang_span {
     font-size: medium;
     position: absolute;
-    top:25px;
+    top:5px;
     right: 25px;
+    margin: 10px;
   }
 
   .lang_list {
