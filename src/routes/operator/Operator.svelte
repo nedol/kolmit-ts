@@ -484,7 +484,7 @@
 </script>
 
 <!-- {@debug $view} -->
-<main>
+
 
 <!-- {#if $view === 'group'} -->
 <Group  {rtc} bind:group={group}/>
@@ -598,7 +598,7 @@
   <!-- {@debug $call_but_status} -->
 </div>
 
-</main>
+
 
 <style lang="scss">
   /* Hide everything above this component. */

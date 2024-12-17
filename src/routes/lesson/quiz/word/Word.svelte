@@ -698,7 +698,7 @@
 {/if}
 
 {#if words}
-  <main>
+
     <div class="top-app-bar-container flexor">
       <TopAppBar bind:this={topAppBar} variant="fixed">
         <Row>
@@ -807,8 +807,9 @@
       </TopAppBar>
     </div>
 
+    <div class="div_word">
     <span
-      style="display:block;position:relative;top: 60px;color: lightgray;font-style: italic;font-size:smaller;font-family: serif;"
+      style="display:block;position:relative;top: 20px;color: lightgray;font-style: italic;font-size:smaller;font-family: serif;"
       >{data.name}</span
     >
 
@@ -908,26 +909,28 @@
       {/if}
     </div>
      <div style="height:300px"/>
-  </main>
+    </div>
 {/if}
 
 <style>
-  main {
+    .top-app-bar-container{
+      position: relative;
+      top:0px; 
+      height: 60px;
+    /* transform: scale(1.2) translate(-4%,0%);
+    transform-origin: center ;  */
+    }
+  .div_word {
+    position: relative;
     display: inline-grid;
     /* background-color: #fff; */
     transition: transform 0.3s ease-in-out;
     /* width: 98%; */
     margin: 0 auto;
-    position: relative;
     /* transform-style: preserve-3d; */
     transition: transform 0.5s;
     /* height: 80vh; */
-    margin-top: 30px;
-  }
-
-  .flexor {
-    position: relative;
-    /* top: 30px; */
+    /* top: 10px; */
   }
   .title {
     font-size: medium;
@@ -1098,13 +1101,7 @@
 
   @media screen and (min-width: 768px) {
 		/* Ваши стили для более крупных экранов здесь */
-    main {
-     font-size: larger;
-    }
-    .top-app-bar-container{
-      /* top:0px;
-     transform: scale(1.2) translate(-4%,0%);
-     transform-origin: center ; */
-    }
+
+
 	}
 </style>

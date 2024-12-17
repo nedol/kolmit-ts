@@ -169,32 +169,31 @@
                 <!-- <IconButton class="material-icons" aria-label="Bookmark this page">bookmark</IconButton> -->
               </Section>
             {/if}
-          </div>
+      
+        </div>
 
-          <Section align="end">
-            <span
-              class="lang_span"
-              on:click={() => {
-                lang_menu = !lang_menu;
-              }}
-              >{(() => {
-                return $langs;
-              })()}</span
+        <span
+        class="lang_span"
+        on:click={() => {
+          lang_menu = !lang_menu;
+        }}
+        >{(() => {
+          return $langs;
+        })()}</span
+      >
+      {#if lang_menu}
+        <div class="lang_list">
+          {#each langs_list as lang}
+            <div
+              style="color:black; margin:10px;font-size:smaller"
+              on:click={setLang}
             >
-            {#if lang_menu}
-              <div class="lang_list">
-                {#each langs_list as lang}
-                  <div
-                    style="color:black; margin:10px;font-size:smaller"
-                    on:click={setLang}
-                  >
-                    {lang}
-                  </div>
-                {/each}
-              </div>
-            {/if}
-          </Section>
-        </Row>
+              {lang}
+            </div>
+          {/each}
+        </div>
+      {/if}
+    </Row>
       </TopAppBar>
       <div class="flexor-content"></div>
     </div>
@@ -227,13 +226,14 @@
 
   .lang_span {
     font-size: medium;
-    bottom: -10px;
-    position: relative;
-    margin:   25px;
+    position: absolute;
+    top:25px;
+    right: 25px;
   }
 
   .lang_list {
     position: absolute;
+    right: 0;
     top: 50px;
     height: 80vh;
     overflow: auto;
@@ -250,10 +250,11 @@
 
   .sec_items {
     position: absolute;
-    z-index: 2;
-    /* left: 30%; */
-    top: 15%;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%);
   }
+
 
   button.sec_right {
     left: 100px;
@@ -281,12 +282,5 @@
     flex-grow: 1;
     overflow: auto;
   }
-  /* Стили для мобильных устройств */
-  /* @media screen and (max-width: 767px) { */
-    .sec_items {
-      position: absolute;
-      left: 40%;
-      top: 15%;
-    }
-  /* } */
+
 </style>

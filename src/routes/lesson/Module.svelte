@@ -483,10 +483,10 @@
   }
   main {
     position: fixed;
-    top: 20px;
+    top: 50px;
     left: 0;
     height: 100vh;
-    overflow-y: auto;
+    /* overflow-y: auto; */
     width: 100vw;
     margin: 0 auto;
     background-color: #fff;
