@@ -620,7 +620,7 @@
   .dialog {
     position: fixed;
     background-color: aliceblue;
-    top: 50px;
+    top: 40px;
     width: 100vw;
     height: 90vh;
     right: 0vw;

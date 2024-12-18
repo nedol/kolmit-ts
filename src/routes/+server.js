@@ -30,6 +30,7 @@ export async function GET({ url, fetch, cookies }) {
   const key = url.searchParams.get('key');
   const func = url.searchParams.get('func');
   const lang = url.searchParams.get('lang');
+  const lvl = url.searchParams.get('lvl');
 
   // debugger;
   if (func === 'reset') {
@@ -40,13 +41,13 @@ export async function GET({ url, fetch, cookies }) {
     if (lang) {
       try {
         const oper = admin ? 'admin' : 'operator';
-        let cookie = cookies.get(`kolmit.${oper}.${abonent}`);
+        let cookie = cookies.get((lvl?`${lvl}.`:'')+`kolmit.${oper}.${abonent}`);
 
         if(cookie){
           cookie = JSON.parse(cookie);
           cookie.lang = lang;
           
-          cookies.set(`kolmit.${oper}.${abonent}`, JSON.stringify(cookie), {
+          cookies.set((lvl?`${lvl}.`:'')+`kolmit.${oper}.${abonent}`, JSON.stringify(cookie), {
             path: '/',
             maxAge: 60 * 60 * 24 * 400,
           });

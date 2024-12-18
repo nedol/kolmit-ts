@@ -49,7 +49,9 @@
   let topAppBar;
   let abonent = '';
 
-  const lvl = getContext('lvl')||'';
+  const lvl = new URL(window.location.href).searchParams.get('lvl')// getContext('lvl')||'';
+
+
 
   onMount(async () => {
     let params = new URL(document.location).searchParams;
@@ -100,7 +102,7 @@
     // console.log($langs);
     lang_menu = false;
 
-    fetch(`./?func=cookie&abonent=${abonent}&lang=${$langs}`)
+    fetch(`./?func=cookie&abonent=${abonent}&lang=${$langs}&lvl=${lvl}`)
       .then(() => console.log())
       .catch((error) => {
         console.log(error);
