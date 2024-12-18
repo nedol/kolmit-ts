@@ -769,7 +769,7 @@
             <Icon
               tag="svg"
               viewBox="0 0 24 24"
-              style="margin:10px 5px 10px 5px; scale:1; width:20px"
+              style="margin:10px 5px 10px 5px; scale:1.2; width:20px"
               on:click={ToggleTranslate}
             >
             {#if translate}
