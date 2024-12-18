@@ -16,7 +16,9 @@
     mdiTextBoxCheckOutline,
     mdiPlay,
     mdiEarHearing,
-    mdiTranslateVariant
+    mdiTranslateVariant,
+    mdiTranslate,
+    mdiTranslateOff
   } from '@mdi/js';
 
   // import words from './80.json';
@@ -64,6 +66,7 @@
     word,
     example,
     example_lang = $langs;
+  let translate = true;
   let shuffleWords;
   let hints;
   let currentWordIndex = 0;
@@ -664,12 +667,16 @@
   }
 
   function OnClickLBL(){
-    console.log()
+    return
     if(currentWord?.example[`lbl.${$langs}`]){
       example_lang =`lbl.${$langs}`;
       makeExample()
 
     }
+  }
+
+  function ToggleTranslate(){
+    translate = !translate
   }
 
   onDestroy(() => {
@@ -759,6 +766,21 @@
             {/if}
           </Section>
           <Section align="end">
+
+            <Icon
+              tag="svg"
+              on:click={nextWord}
+              viewBox="0 0 24 24"
+              style="margin:10px 5px 10px 5px; scale:.5; width:50px"
+            >
+            {#if translate}
+              <path fill="white" d={mdiTranslateOff} on:click={ToggleTranslate}/>
+            {:else}
+              <path fill="grey" d={mdiTranslate} on:click={ToggleTranslate}/>
+            {/if}
+            </Icon>
+
+            {#if false}
             <span
               class="lang_span"
               on:click={() => {
@@ -779,6 +801,7 @@
                   </div>
                 {/each}
               </div>
+            {/if}
             {/if}
           </Section>
 
@@ -817,27 +840,31 @@
       <div class="title">{data}:</div>
     {/await}
 
+    {#if translate}
     <div class="word" >
-      {#if example}
-      <!-- {@debug example} -->
-      {#if currentWord?.example[`lbl.${$langs}`] && 
-        currentWord?.example[`lbl.${$langs}`] !== currentWord?.example[$langs]}
-      <Icon tag="svg" on:click={OnClickLBL} viewBox="0 0 24 24" 
-        style="position: absolute;
-             left: 0;
-             margin-top:-40px; 
-             scale:.5; 
-             width:50px">
-      <path fill="lightgrey" d={mdiTranslateVariant} /></Icon>
-      {/if}
-        {@html example} 
 
-      {:else}
-        {#await Translate(example, 'ru', $langs) then data}
-          {@html data}
-        {/await}
-      {/if}
+        {#if example}
+        <!-- {@debug example} -->
+        {#if currentWord?.example[`lbl.${$langs}`] && 
+          currentWord?.example[`lbl.${$langs}`] !== currentWord?.example[$langs]}
+        <Icon tag="svg" on:click={OnClickLBL} viewBox="0 0 24 24" 
+          style="position: absolute;
+              left: 0;
+              margin-top:-40px; 
+              scale:.5; 
+              width:50px">
+        <path fill="lightgrey" d={mdiTranslateVariant} /></Icon>
+        {/if}
+      
+            {@html example} 
+          {:else}
+            {#await Translate(example, 'ru', $langs) then data}
+              {@html data}
+            {/await}
+          {/if}
+   
     </div>
+    {/if}
 
     <div class="input-container">
       {#if resultElement}
