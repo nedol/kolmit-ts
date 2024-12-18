@@ -766,43 +766,18 @@
             {/if}
           </Section>
           <Section align="end">
-
             <Icon
               tag="svg"
-              on:click={nextWord}
               viewBox="0 0 24 24"
-              style="margin:10px 5px 10px 5px; scale:.5; width:50px"
+              style="margin:10px 5px 10px 5px; scale:1; width:20px"
+              on:click={ToggleTranslate}
             >
             {#if translate}
-              <path fill="white" d={mdiTranslateOff} on:click={ToggleTranslate}/>
+              <path fill="white" d={mdiTranslateOff}/>
             {:else}
-              <path fill="grey" d={mdiTranslate} on:click={ToggleTranslate}/>
+              <path fill="grey" d={mdiTranslate}/>
             {/if}
             </Icon>
-
-            {#if false}
-            <span
-              class="lang_span"
-              on:click={() => {
-                lang_menu = !lang_menu;
-              }}
-              >{(() => {
-                return $llang;
-              })()}</span
-            >
-            {#if lang_menu}
-              <div class="lang_list">
-                {#each langs_list as lang}
-                  <div
-                    style="color:black; margin:10px;font-size:smaller"
-                    on:click={setLang}
-                  >
-                    {lang}
-                  </div>
-                {/each}
-              </div>
-            {/if}
-            {/if}
           </Section>
 
           <Section align="end">
