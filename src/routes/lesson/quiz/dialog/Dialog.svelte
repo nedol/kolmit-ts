@@ -781,7 +781,7 @@
     {#if dialog_data?.html }
     <span  on:click={() => (isCollapsed = !isCollapsed)}
       class="not_collapsed"
-        style="position:absolute; right:50px;color:lightgray;font-style: italic;font-size:smaller;font-family: serif;"     
+        style="position:absolute; right:50px;color:gray;font-style: italic;font-size:smaller;font-family: serif;"     
     >context</span>
 
       {#if !isCollapsed}
@@ -880,9 +880,20 @@
 
       <div class="border">
 
-        {#await Translate('Ответь', 'ru', $langs) then data}
+        {#await Translate('Переведи и ответь', 'ru', $langs) then data}
           <div class="title">{data}:</div>
         {/await}
+
+        <div class="user2_tr">
+          {#if a && visibility[0] === 'visible'}
+            {#if !a[$langs]}
+              {#await Translate(a['ru'].replace(/"([^"]*)"/g, '$1'), 'ru', $langs) then data}
+                {data}
+              {/await}
+            {:else}
+              {@html a[$langs].replace(/"([^"]*)"/g, '$1')}
+            {/if}
+          {/if}  
 
         <div class="user2">
           {#if a && visibility[2] === 'hidden'}
@@ -912,16 +923,7 @@
             </IconButton>
           </div>  
 
-          <div class="user2_tr">
-            {#if a && visibility[0] === 'visible'}
-              {#if !a[$langs]}
-                {#await Translate(a['ru'].replace(/"([^"]*)"/g, '$1'), 'ru', $langs) then data}
-                  {data}
-                {/await}
-              {:else}
-                {@html a[$langs].replace(/"([^"]*)"/g, '$1')}
-              {/if}
-            {/if}          
+        
 
      
         </div>
