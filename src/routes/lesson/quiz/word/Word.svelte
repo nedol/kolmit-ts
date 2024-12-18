@@ -807,7 +807,7 @@
 
     <div class="div_word">
     <span
-      style="display:block;position:relative;top: 20px;color: lightgray;font-style: italic;font-size:smaller;font-family: serif;"
+      style="display:block;position:relative;top: 0px;color: lightgray;font-style: italic;font-size:smaller;font-family: serif;"
       >{data.name}</span
     >
 
@@ -939,7 +939,7 @@
     color: coral;
     position: relative;
     text-align: center;
-    margin-top: 60px;
+    margin-top: 10px;
   }
 
   .hint_button {

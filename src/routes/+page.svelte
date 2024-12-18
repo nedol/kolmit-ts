@@ -30,7 +30,7 @@
 
   }
 
-  if (data.operator) {
+  if (data.operator && data.group.length>0) {
     Init();
   }
 
