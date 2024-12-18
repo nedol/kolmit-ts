@@ -2,14 +2,10 @@
   import { onMount, onDestroy, getContext } from 'svelte';
   import { langs } from '$lib/js/stores.js';
 
-  import {Speak} from './EasySpeech.js';
-
-  // let easyspeech;
-
   let audio;
 
   onMount(async () => {
-    // await easyspeech.initSpeech();
+
   });
 
   export async function Speak_google(lang, text,quiz, cb_end) {

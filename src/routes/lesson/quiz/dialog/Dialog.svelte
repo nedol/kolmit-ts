@@ -1201,7 +1201,7 @@
   .top-app-bar-container {
     /* display: inline-block; */
     position: relative;
-    top: 30px;
+    top: 0px;
     border: 1px solid
       var(--mdc-theme-text-hint-on-background, rgba(0, 0, 0, 0.1));
     margin: 0 18px 18px 0;
@@ -1397,7 +1397,7 @@
     transition: transform 0.3s ease-in-out;
     transform-style: preserve-3d;
     transition: transform 0.5s;
-    top: 80px;
+    top: 40px;
     overflow-y: auto;
     border-radius: 5px;
     margin: 0 auto;

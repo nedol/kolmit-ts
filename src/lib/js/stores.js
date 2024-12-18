@@ -13,17 +13,13 @@ export let langs = writable('en'); //current lang
 
 export let llang = writable('en'); //learning
 
-export let pswd = writable();
-
-export let audioCtx = writable();
-
 export let posterst = writable();
 
 export let msg = writable();
 
 export let signal = writable();
 
-export let wss = writable();
+// export let wss = writable();
 
 export let dicts = writable();
 
@@ -35,10 +31,8 @@ export let call_but_status = writable('inactive');
 
 export let ice_conf = writable();
 
-// export let pool = writable();
-
-export let rtcPool_st = writable();
-rtcPool_st.set({ });
+export let rtcPool_st = writable({ });
+// rtcPool_st.set({ });
 
 export let lesson = writable({ visible: true , data:''});
 
@@ -48,11 +42,9 @@ export let dc = writable();
 
 export let dc_state = writable('close');
 
-export let share_mode = writable(false);
+// export let share_mode = writable(false);
 
 export let muted = writable(true);
-
-// export let audioCtx = writable();
 
 export let showBottomAppBar = writable(true);
 

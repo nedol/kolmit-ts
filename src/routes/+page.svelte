@@ -1,7 +1,6 @@
 <script lang="ts">
   import { onMount, setContext } from 'svelte';
   import Header from './Header.svelte';
-  import { wss } from '$lib/js/stores.js';
   import Operator from './operator/Operator.svelte';
   import Login from './site/Login.svelte';
   import { SignalingChannel } from './signalingChannel.js';
