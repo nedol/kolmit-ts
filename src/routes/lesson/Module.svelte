@@ -323,6 +323,7 @@
                     <span style="color:red">({theme.new_cnt})</span>
                     {/if}<br />
                     {#if theme.grammar}
+                    <div class="grammar">grammatica:</div>
                     {#each theme.grammar as theme}          
                       <div class="grammar">{theme}</div>
                     {/each}
