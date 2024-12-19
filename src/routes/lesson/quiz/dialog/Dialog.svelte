@@ -901,7 +901,7 @@
               /(?<!")\b\p{L}+(?<!\s)(?!")/gu,
               (match) => {
                 return `<span class="span_hidden" onclick="(this.style.color='#2196f3')" 
-                style="display:inline-block; margin: 5px 0px; padding: 1px 5px;border:1px;border-style:groove;border-color:lightblue;
+                style="display:inline-block; font-size:1.4em ; margin: 5px 0px; padding: 1px 5px;border:1px;border-style:groove;border-color:lightblue;
                 color:transparent;">${match}</span>`;
               }
             )}
@@ -910,7 +910,7 @@
               /(?<!")\b\p{L}+(?<!\s)(?!")/gu,
               (match) => {
                 return `<span class="span_hidden"  
-                style="display:inline-block; margin: 5px 0px; padding: 1px 5px;border:1px;border-style:groove;border-color:lightblue;
+                style="display:inline-block;  font-size:1.4em; margin: 5px 0px; padding: 1px 5px;border:1px;border-style:groove;border-color:lightblue;
                 color:#2196f3">${match}</span>`;
               }
             )}
@@ -1416,6 +1416,7 @@
   }
   .hint_button {
     display: inline-block;
+    font-size: larger;
     border: solid 0.1em #9f3f3f;
     border-radius: 5px;
     text-align: center;
