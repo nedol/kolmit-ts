@@ -322,16 +322,17 @@
                     {#if theme.new_cnt>0}
                     <span style="color:red">({theme.new_cnt})</span>
                     {/if}<br />
-                    {#if theme.grammar}
-                    <div class="grammar">grammatica:</div>
-                    {#each theme.grammar as theme}          
-                      <div class="grammar">{theme}</div>
-                    {/each}
-                    {/if}
+
                   </div>
                   </Header
                 >{/await} 
               <Content>
+                {#if theme.grammar}
+                  <div class="grammar">grammatica:</div>
+                    {#each theme.grammar as theme}          
+                      <div class="grammar">{theme}</div>
+                    {/each}
+                {/if}
                 {#if theme.lessons}
                   {#each theme.lessons as lesson}
                     {#if lesson.quizes}
@@ -552,7 +553,7 @@
   }
 
   .grammar{
-    margin-left:7px;
+    margin-left:30px;
     font-style: italic;
     font-size: small;
     font-weight: 400;
