@@ -394,7 +394,7 @@
         // spanElement.style.width = "50px";
         resultElementWidth[i] = getTextWidth(wAr[i], '20px Arial');
       });
-    }, 0);
+    }, 100);
 
     function getSubArray(arr, index) {
       const totalElements = 10;
@@ -1043,7 +1043,7 @@
     position: relative;
     transition: transform 0.5s;
     /* height: 80vh; */
-    top: 30px;
+    top: 0px;
   }
 
   .flexor {
@@ -1055,7 +1055,8 @@
     position: relative;
     text-align: center;
     margin-top: 0px;
-    top: 60px;
+    top: 70px;
+    font-size: medium;
   }
 
   .hint_button {
@@ -1089,7 +1090,7 @@
   .word {
     position: relative;
     top: 60px;
-    font-size: larger;
+    font-size: large;
     flex-direction: column;
     align-items: center;
     margin: 2px;
@@ -1130,7 +1131,7 @@
   .input-container {
     display: inline-block;
     top: 60px;
-    font-size: larger;
+    font-size: large;
     font-weight: 700;
     position: relative;
     color: #2196f3;

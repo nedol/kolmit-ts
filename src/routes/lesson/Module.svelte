@@ -143,7 +143,7 @@
 
   function onClickQuiz(type, level, theme, name) {
     try {
-      data.theme = theme.name[$langs];
+      data.theme = theme.name[$llang];
       lesson_data?.module.themes.map((theme)=>{
         theme.new_cnt=0;
       })
@@ -322,6 +322,11 @@
                     {#if theme.new_cnt>0}
                     <span style="color:red">({theme.new_cnt})</span>
                     {/if}<br />
+                    {#if theme.grammar}
+                    {#each theme.grammar as theme}          
+                      <div class="grammar">{theme}</div>
+                    {/each}
+                    {/if}
                   </div>
                   </Header
                 >{/await} 
@@ -463,6 +468,11 @@
     --accent-color: rgba(225, 55, 55, 0.8);
   }
 
+  :global(.mdc-typography--subtitle2){
+    font-size: large;
+  }
+
+  
   .icon-wrapper {
     position: relative;
     display: inline-block; /* Позволяет корректно позиционировать вложенные элементы */
@@ -538,6 +548,13 @@
     align-items: center;
     padding: 5px; /* Установите желаемый отступ вокруг элемента */
     margin-top: 10px;
+  }
+
+  .grammar{
+    margin-left:7px;
+    font-style: italic;
+    font-size: small;
+    font-weight: 400;
   }
 
 

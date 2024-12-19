@@ -47,6 +47,7 @@ export class SignalingChannel {
   }
 
   startHeartbeat() {
+    // return;
     this.stopHeartbeat(); // Убедитесь, что старый таймер остановлен
     this.heartbeatInterval = setInterval(() => {
       if (this.socket && this.socket.readyState === WebSocket.OPEN) {
