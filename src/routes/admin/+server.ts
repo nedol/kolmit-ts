@@ -7,9 +7,9 @@ import {
 
 
 export async function GET({ url, fetch, cookies }) {
-  let resp;
-  const prompt = url.searchParams.get('prompt');
-   const quiz_name = url.searchParams.get('quiz_name');
+    let resp;
+    const prompt = url.searchParams.get('prompt');
+    const quiz_name = url.searchParams.get('quiz_name');
 	const quiz_level = url.searchParams.get('prompt_level');
 	const quiz_owner = url.searchParams.get('prompt_owner');
 	const quiz_theme = url.searchParams.get('prompt_theme');
@@ -19,7 +19,6 @@ export async function GET({ url, fetch, cookies }) {
   }
 
 	let response = new Response(JSON.stringify({ resp } ));
-    response.headers.append('Access-Control-Allow-Origin', `*`);
     return response;
 
 }

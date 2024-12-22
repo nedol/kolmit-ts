@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount, onDestroy, getContext, setContext } from 'svelte';
+  import { SignalingChannel } from '../signalingChannel.js';
   import { createEventDispatcher } from 'svelte';
   import '../assets/icofont/icofont.min.css';
   import BottomAppBar, {
@@ -157,8 +158,6 @@
       rtcSupportText = ' ';
     }
   }
-
-
 
   onMount(async () => {
     checkWebRTCSupport();
@@ -322,6 +321,8 @@
         } catch (ex) {
           console.log();
         }
+        // $signal = new SignalingChannel(operator.operator);
+
         rtc.Offer();
 
         $call_but_status = 'active';
@@ -329,6 +330,9 @@
 
       case 'active':
         $call_but_status = 'inactive';
+
+        $signal.socket.close();
+
         rtc.OnInactive();
 
         break;

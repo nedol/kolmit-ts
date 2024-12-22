@@ -117,7 +117,7 @@
     fetch(`/admin?prompt=words.${name}`)
       .then((response) => response.json())
       .then((data) => {
-        prompt = data.resp.prompt.system;
+        prompt = data.resp.prompt.system + data.resp.prompt.user;
         prompt = prompt;
       })
       .catch((error) => {

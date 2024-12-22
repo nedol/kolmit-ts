@@ -20,6 +20,8 @@
   } from '@mdi/js';
   import Accordion, { Panel, Header, Content } from '@smui-extra/accordion';
   // import FormField from '@smui/form-field';
+  import Textfield from '@smui/textfield';
+  import Autocomplete from '@smui-extra/autocomplete';
   import Checkbox from '@smui/checkbox';
   import Quiz from './quiz/Quiz.svelte';
 
@@ -39,6 +41,7 @@
   let lesson_data: any;
 
   export let group;
+  let gr_field = '';
   const operator = getContext('operator');
 
   function findPic(operator: any) {
@@ -57,6 +60,7 @@
   import { view } from '$lib/js/stores.js';
 
   import { lesson } from '$lib/js/stores.js';
+
 
   let disabled = [
     true,
@@ -327,12 +331,18 @@
                   </Header
                 >{/await} 
               <Content>
-                {#if theme.grammar}
-                  <div class="grammar">grammatica:</div>
-                    {#each theme.grammar as theme}          
-                      <div class="grammar">{theme}</div>
-                    {/each}
-                {/if}
+
+                  {#if theme.grammar}  
+                   <div>
+                      <Autocomplete  label="grammatica" style="pointer-events: none"/>                
+                      
+                        {#each theme.grammar as theme}          
+                          <div class="grammar">{theme}</div>
+                        {/each}
+                      
+                    </div>  
+                  {/if}
+
                 {#if theme.lessons}
                   {#each theme.lessons as lesson}
                     {#if lesson.quizes}
