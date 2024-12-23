@@ -334,7 +334,7 @@
 
                   {#if theme.grammar}  
                    <div>
-                      <Autocomplete  label="grammatica" style="pointer-events: none"/>                
+                      <Autocomplete  label="grammatica" style="pointer-events: none;font-size:small;margin-left:30px"/>                
                       
                         {#each theme.grammar as theme}          
                           <div class="grammar">{theme}</div>
@@ -382,7 +382,7 @@
                                 );
              
                               }}
-                              style="width:100%"
+                              style="width:100%;font-size:medium;"
                               {t}
                               type={quiz.type}
                               name={quiz.name[$llang]}
@@ -512,7 +512,7 @@
     width: 100vw;
     margin: 0 auto;
     background-color: #fff;
-    font-size: larger;
+    font-size: large;
     /*transition: transform 0.3s ease-in-out;
 
     position: relative;

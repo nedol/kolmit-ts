@@ -1,10 +1,13 @@
 // import {log} from './utils'n
-  import { msg} from '$lib/js/stores';
+  import { msg, signal} from '$lib/js/stores';
 
 export class Peer {
 	constructor(rtc, pc_config, pc_key) {
 		this.con = new RTCPeerConnection(pc_config);
-		this.signal = rtc.signal;
+		this.signal;
+		signal.subscribe((data) => {
+			this.signal = data;	  
+		  });
 		this.rtc = rtc;
 		this.pc_key = pc_key;
 		this.params = {};

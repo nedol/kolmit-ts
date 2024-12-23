@@ -774,14 +774,14 @@
   <!-- Ваш контент для лицевой стороны -->
   <div class="card">
     <span
-      style="display:block-inline;position:relative;color: lightgray;font-style: italic;font-size:smaller;font-family: serif;"
+      style="display:block-inline;position:relative;width:80%;color: lightgray;font-style: italic;font-size:smaller;font-family: serif;"
       >{dialog_data?.name}</span
     >
 
     {#if dialog_data?.html }
     <span  on:click={() => (isCollapsed = !isCollapsed)}
       class="not_collapsed"
-        style="position:absolute; right:50px;color:gray;font-style: italic;font-size:smaller;font-family: serif;"     
+        style="position:absolute; right:20px;color:gray;font-style: italic;font-size:smaller;font-family: serif;"     
     >context</span>
 
       {#if !isCollapsed}

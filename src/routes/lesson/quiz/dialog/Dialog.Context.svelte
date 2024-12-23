@@ -131,7 +131,7 @@
         </Icon>
       </IconButton>
     </div>
-    {@html data.html}
+    <iframe srcdoc={data.html} width="100%" height="80%" style="border:0;overflow-y:auto"></iframe>
   {/if}
 </div>
 

@@ -48,11 +48,11 @@ export class SignalingChannel {
   }
 
   startHeartbeat() {
-
+    // return;
     this.stopHeartbeat(); // Убедитесь, что старый таймер остановлен
     this.heartbeatInterval = setInterval(() => {
       if (this.socket && this.socket.readyState === WebSocket.OPEN) {
-        this.socket.send(JSON.stringify({ type: 'ping', operator:  this.operator}));
+        this.socket.send(JSON.stringify({ type: 'ping',operator:this.operator }));
         console.log('Пинг отправлен на сервер');
       }
     }, 5000); // Отправляем пинг каждые 5 секунд
