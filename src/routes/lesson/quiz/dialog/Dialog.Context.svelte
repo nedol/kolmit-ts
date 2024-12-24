@@ -67,6 +67,7 @@
     isPlayAuto = !isPlayAuto;
     if (!isPlayAuto) return;
 
+
     const textAr = htmlToText(text).split(/(?<=[.!?])\s+/);
     let ind = 0;
 
@@ -77,6 +78,10 @@
     function htmlToText(html) {
       let tempDiv = document.createElement('div');
       tempDiv.innerHTML = html;
+      
+      const styles = tempDiv.querySelectorAll('style');
+      styles.forEach(style => style.remove());
+
       return tempDiv.textContent || tempDiv.innerText || '';
     }
 
