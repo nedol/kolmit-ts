@@ -62,7 +62,7 @@ export async function Translate(text, from, to) {
       //   res = res.replace(/\<(.*?)\>/g, '<<$1>>');
         
       // } catch (ex) {
-      chunk = chunk.replace(/<</g, '<& ').replace(/>>/g, ' &>');
+      chunk = chunk.replace(/<</g, '<<<').replace(/>>/g, '>>>');
       // chunk = chunk.replace(/<</g, '<').replace(/>>/g, '"');//инверсия 
         
       translate.engine = 'google';
@@ -78,7 +78,7 @@ export async function Translate(text, from, to) {
 
 
       if (res){
-        res = res.replaceAll('<& ', '<<').replaceAll(' &>', '>>');
+        res = res.replace('<<<', '<<').replace('>>>', '>>');
         res = res?.replace(/<<\s*(.*?)\s*>>/g,'<<$1>>');
         translatedText += (res + ' '); // Добавление переведенной части к полному тексту
 

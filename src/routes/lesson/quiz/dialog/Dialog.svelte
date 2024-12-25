@@ -773,22 +773,28 @@
   </div>
   <!-- Ваш контент для лицевой стороны -->
   <div class="card">
-    <span
-      style="display:block-inline;position:relative;width:80%;color: lightgray;font-style: italic;font-size:smaller;font-family: serif;"
-      >{dialog_data?.name}</span
-    >
 
-    {#if dialog_data?.html }
-    <span  on:click={() => (isCollapsed = !isCollapsed)}
-      class="not_collapsed"
-        style="position:absolute; right:20px;color:gray;font-style: italic;font-size:smaller;font-family: serif;"     
-    >context</span>
+    {#if !dialog_data?.html}
+      <span
+        style="display:block-inline;position:relative;width:80%;color: lightgray;font-style: italic;font-size:smaller;font-family: serif;"
+        >{dialog_data?.name}</span
+      >
 
-      {#if !isCollapsed}
-          <div class="collapsible" in:slide={{ duration: 300 }}>
-            <ConText data={dialog_data} {tts} />
-          </div>
-      {/if}
+    {:else if dialog_data?.html}
+      <span on:click={() => (isCollapsed = !isCollapsed)}
+        style="display:block-inline;position:relative;width:80%;color: black;font-style: italic;font-size:smaller;font-family: serif;"
+        >{dialog_data?.name}</span
+      >
+    <!-- // <span  on:click={() => (isCollapsed = !isCollapsed)}
+    //   class="not_collapsed"
+    //     style="position:absolute; right:20px;color:gray;font-style: italic;font-size:smaller;font-family: serif;"     
+    // >context</span> -->
+
+        {#if !isCollapsed}
+            <div class="collapsible" in:slide={{ duration: 300 }}>
+              <ConText data={dialog_data} {tts} />
+            </div>
+        {/if}
     {/if}
 
    
@@ -880,8 +886,11 @@
 
       <div class="border">
 
-        {#await Translate('Переведи и ответь', 'ru', $langs) then data}
-          <div class="title">{data}:</div>
+        {#await Translate('Переведи и ответь', 'ru', $langs) then data_1}
+        <div class="title">{data_1}:</div>
+        {/await}
+        {#await Translate('(используй подсказки слов в случае необходимости)', 'ru', $langs) then data_2}
+          <div class="title title2">{data_2}:</div>
         {/await}
 
         <div class="user2_tr">
@@ -1317,6 +1326,10 @@
     text-align: center;
     font-size: 0.8em;
     background-color:transparent; 
+  }
+
+  .title2{
+    font-size: 0.7em;
   }
 
   .border{

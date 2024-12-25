@@ -116,7 +116,7 @@
   <header>
     <div class="top-app-bar-container flexor">
       <TopAppBar bind:this={topAppBar} variant="fixed" dense>
-        <span style="position:absolute;font-size:.8em;left:0;bottom:2px;color:white;">{lvl}</span>
+        <span class="level">{lvl}</span>
         <Row>
           <div class="sec_items">
             {#if $view !== 'login'}
@@ -223,17 +223,26 @@
       var(--mdc-theme-text-hint-on-background, rgba(0, 0, 0, 0.1));
     margin: 0 18px 18px 0;
     background-color: var(--mdc-theme-background, #fff);
-
     overflow: auto;
     display: inline-block;
+  }
+
+  .level{
+    position: absolute;
+    font-size: .6em;
+    left: 2px;
+    bottom: 0px;
+    color: rgb(148, 35, 35);
   }
 
   .lang_span {
     font-size: medium;
     position: absolute;
-    top:5px;
-    right: 25px;
-    margin: 10px;
+    top: 10px;
+    right: 20px;
+    border: 0px solid aliceblue;
+    padding: 5px;
+    border-radius: 2px;
   }
 
   .lang_list {

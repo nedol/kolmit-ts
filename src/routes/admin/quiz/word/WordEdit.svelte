@@ -22,6 +22,7 @@
    let anchorClasses: { [k: string]: boolean } = {};
 
   let active = 'Prompt';
+  let viewHTML = false;
 
   import { slide } from 'svelte/transition';
   let isCollapsed = true;
@@ -386,6 +387,13 @@
           </Tab>
         </TabBar>
         {#if active === context_title}
+        {#if viewHTML}
+        <!-- <div style="height: 350px; overflow-y:auto">
+          {@html dialog_data.html}
+        </div> -->
+        <iframe srcdoc={context} width="100%" height="350px"
+        ></iframe>
+        {:else}
           <Paper variant="unelevated">
             <Content>
               <textarea
@@ -398,6 +406,12 @@
               ></textarea>
             </Content>
           </Paper>
+          {/if}
+          <button
+          class="paste_content"
+          on:click={() => {
+            viewHTML = !viewHTML;
+          }}>HTML</button>
         {:else if active === 'Words'}
           <Paper variant="unelevated">
             <Content>

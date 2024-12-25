@@ -807,40 +807,42 @@
 
     <div class="div_word">
     <span
-      style="display:block;position:relative;top: 0px;color: lightgray;font-style: italic;font-size:smaller;font-family: serif;"
+      style="display:block;position:relative;top: 0px;left:5px;color: lightgray;font-style: italic;font-size:smaller;font-family: serif;"
       >{data.name}</span
     >
 
-    {#await Translate('Заполнить пропуски', 'ru', $langs) then data}
-      <div class="title">{data}:</div>
-    {/await}
+    <div style="border:1px solid lightgrey;border-radius:5px;padding:-10px">
 
-    {#if translate}
-    <div class="word" >
+      {#await Translate('Заполнить пропуски', 'ru', $langs) then data}
+        <div class="title">{data}:</div>
+      {/await}
 
-        {#if example}
-        <!-- {@debug example} -->
-        {#if currentWord?.example[`lbl.${$langs}`] && 
-          currentWord?.example[`lbl.${$langs}`] !== currentWord?.example[$langs]}
-        <Icon tag="svg" on:click={OnClickLBL} viewBox="0 0 24 24" 
-          style="position: absolute;
-              left: 0;
-              margin-top:-40px; 
-              scale:.5; 
-              width:50px">
-        <path fill="lightgrey" d={mdiTranslateVariant} /></Icon>
-        {/if}
-      
-            {@html example} 
-          {:else}
-            {#await Translate(example, 'ru', $langs) then data}
-              {@html data}
-            {/await}
+      {#if translate}
+      <div class="word" >
+
+          {#if example}
+          <!-- {@debug example} -->
+          {#if currentWord?.example[`lbl.${$langs}`] && 
+            currentWord?.example[`lbl.${$langs}`] !== currentWord?.example[$langs]}
+          <Icon tag="svg" on:click={OnClickLBL} viewBox="0 0 24 24" 
+            style="position: absolute;
+                left: 0;
+                margin-top:-40px; 
+                scale:.5; 
+                width:50px">
+          <path fill="lightgrey" d={mdiTranslateVariant} /></Icon>
           {/if}
-   
-    </div>
-    {/if}
-
+        
+              {@html example} 
+            {:else}
+              {#await Translate(example, 'ru', $langs) then data}
+                {@html data}
+              {/await}
+            {/if}
+    
+      </div>
+      {/if}
+    
     <div class="input-container">
       {#if resultElement}
         {@html resultElement}
@@ -875,6 +877,7 @@
         </IconButton>
       </div>
     </div>
+  </div>
 
     <!-- <br /> -->
     <!-- {#if hintIndex != 0} -->
@@ -1016,13 +1019,15 @@
 
   .input {
     position: relative;
-    /* top:3px; */
     height: 18px;
     display: inline-table;
     outline: none;
-    border: none;
-    background: rgba(0, 0, 0, 0.12);
+    border: 1px solid lightblue;
+    border-radius: 4px;
+    background: beige;
     text-align: center;
+    padding-left: 5px;
+    padding-right: 5px;
   }
 
   .input:focus {
