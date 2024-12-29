@@ -72,7 +72,13 @@ export class RTCOperator extends RTCBase {
   async Offer() {
     this.Init(() => {
       if (this.pcPull[this.abonent].con.signalingState !== 'closed') {
-        this.GetUserMedia({ audio: 1, video: 0 }, () => {
+        this.GetUserMedia({        
+          audio: {
+            echoCancellation: true, // Устранение эха
+            noiseSuppression: true, // Устранение шума
+          }, 
+          video: false 
+        }, () => {
           this.SendOffer(this.abonent);
         });
       }
@@ -96,7 +102,13 @@ export class RTCOperator extends RTCBase {
   Call(user) {
     this.user = user;
     this.Init(() => {
-      this.GetUserMedia({ audio: 1, video: 0 }, () => {
+      this.GetUserMedia({   
+        audio: {
+            echoCancellation: true, // Устранение эха
+            noiseSuppression: true, // Устранение шума
+        }, 
+        video: false 
+      }, () => {
         // document.getElementsByClassName('browser_container')[0].style.display = 'none';
         let par = {};
         par.proj = 'kolmit';
@@ -118,7 +130,13 @@ export class RTCOperator extends RTCBase {
   OnActive() {
     this.Init(() => {
       if (this.pcPull[this.abonent].con.signalingState !== 'closed') {
-        this.GetUserMedia({ audio: 1, video: 0 }, (res) => {
+        this.GetUserMedia({         
+          audio: {
+            echoCancellation: true, // Устранение эха
+            noiseSuppression: true, // Устранение шума
+          }, 
+          video: false  
+        }, (res) => {
           if (res) {
             this.SendOffer(this.abonent);
           }

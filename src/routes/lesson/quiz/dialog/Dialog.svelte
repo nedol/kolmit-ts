@@ -989,15 +989,18 @@
         {/if}
 
         {#if isRepeat}
-          <div class="repeat_alert" style="    margin-top: -4px;">
+          <div class="repeat_alert" style="margin-top: -4px;">
             <Button>
               <Label>{dict['Repeat'][$langs]}</Label>
             </Button>
           </div>
         {/if}
 
-        {#await Translate('Спроси', 'ru', $langs) then data}
+        {#await Translate('Переведи и спроси', 'ru', $langs) then data}
           <div class="title">{data}:</div>
+        {/await}
+        {#await Translate('(используй подсказки слов в случае необходимости)', 'ru', $langs) then data_2}
+          <div class="title title2">{data_2}:</div>
         {/await}
 
         <div class="user2_tr">

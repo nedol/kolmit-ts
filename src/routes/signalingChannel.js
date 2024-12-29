@@ -5,25 +5,31 @@ export class SignalingChannel {
     this.msg = msg;
     this.operator = operator;
     this.isOpen = false;
+
+    this.socketUrl = '';
     // this.socketUrl = 'wss://kolmit-server.onrender.com';
-    this.socketUrl =  window.location.hostname === 
-      'localhost'
-        ? 'ws://localhost:3000'
-        : 'wss://kolmit-server.onrender.com';
+    if(window.location.hostname.includes('onrender'))
+      this.socketUrl = 'wss://kolmit-server.onrender.com';
+    else if(window.location.hostname.includes('192.168.'))
+      this.socketUrl = `wss://192.168.2.10:3000`;
+    else
+      this.socketUrl =  `wss://localhost:3000`;
     this.socket = null;
     this.messageQueue = [];
     this.heartbeatInterval = null; // Таймер для пинга
     this.initializeWebSocket();
+    this.status = "inactive";
   }
 
   initializeWebSocket(reconnectAttempt = 1) {
     this.socket = new WebSocket(this.socketUrl);
+    this.status = "inactive";
 
     this.socket.onopen = () => {
       console.log('WebSocket соединение установлено');
       this.isOpen = true;
       reconnectAttempt = 1; // Сбросить попытки переподключения
-      this.startHeartbeat(); // Запуск пинга
+      // this.startHeartbeat(); // Запуск пинга
       this.processQueue();
     };
 
@@ -52,7 +58,7 @@ export class SignalingChannel {
     this.stopHeartbeat(); // Убедитесь, что старый таймер остановлен
     this.heartbeatInterval = setInterval(() => {
       if (this.socket && this.socket.readyState === WebSocket.OPEN) {
-        this.socket.send(JSON.stringify({ type: 'ping',operator:this.operator }));
+        this.socket.send(JSON.stringify({ type: 'ping',operator:this.operator,status:this.status }));
         console.log('Пинг отправлен на сервер');
       }
     }, 5000); // Отправляем пинг каждые 5 секунд
@@ -67,6 +73,8 @@ export class SignalingChannel {
 
   SendMessage(par, cb) {
     this.callback = cb;
+
+    this.status = par.status;
 
     try {
       if (this.socket && this.socket.readyState === WebSocket.OPEN) {

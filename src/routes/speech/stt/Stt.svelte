@@ -24,18 +24,7 @@
   let from_lang = 'en';
   let to_lang = 'en';
 
-  // Callback function to update model loading progress
-  // const initProgressCallback = (initProgress) => {
-  //   console.log(initProgress);
-  // };
-  // const selectedModel = 'Llama-3-8B-Instruct-q4f32_1-MLC';
-
   onMount(async () => {
-    // const engine = await CreateMLCEngine(
-    //   selectedModel,
-    //   { initProgressCallback } // engineConfig
-    // );
-    // await register(await connect());// не нужно?!
 
     try {
       mediaStream = await navigator.mediaDevices.getUserMedia({
@@ -48,7 +37,9 @@
           sampleSize: 16,
           volume: 1.0,
         },
+        video: false, // Если видео не нужно
       });
+
 
       // Проверка mediaStream на наличие
       if (mediaStream) {

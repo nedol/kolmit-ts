@@ -28,7 +28,7 @@
 	$: if (status === 'talk') {
 		$muted = false;
 	} else {
-		$muted = true;
+		// $muted = true;
 	}
 </script>
 

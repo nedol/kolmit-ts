@@ -167,29 +167,22 @@
       rtc = new RTCOperator(operator, name, $signal);
       initRTC();
 
-      try {
-        // Fix up for prefixing
-        if (!window.AudioContext) {
-          window.AudioContext =
-            window.AudioContext || window.webkitAudioContext;
-          window.AudioContext = new AudioContext();
+    } catch (ex) {
+        console.log();
+    }
 
-          rtc.localSoundSrc = window.AudioContext.createMediaElementSource(
-            window.user.localSound
-          );
-          rtc.localSoundSrc.connect(window.AudioContext.destination);
-        }
-      } catch (ex) {
-        console.log('Web Audio API is not supported in this browser');
-      }
+    try {
+
+    } catch (ex) {
+      console.log('Web Audio API is not supported in this browser');
+    }
+
 
       // Добавьте слушателя событий для скрытия списка команд при клике за его пределами
       // document.addEventListener('click', handleOutsideClick);
       if (detectDevice())
         document.addEventListener('visibilitychange', handleVisibilityChange);
-    } catch (ex) {
-      console.log();
-    }
+
 
     // setTimeout(()=>{
     //   OnClickCallButton();//активировать
@@ -259,7 +252,7 @@
         break;
     }
 
-  async function initRTC() {
+  function initRTC() {
     // rtc ..set(rtc .;
     //rtc .type = "operator";
 
@@ -322,12 +315,39 @@
         } catch (ex) {
           console.log();
         }
+
+        // // Проверка поддержки Web Audio API
+        // const AudioContext = window.AudioContext || window.webkitAudioContext;
+
+        // if (!window.AudioContext) {
+        //   throw new Error('Web Audio API is not supported in this browser');
+        // }
+
+        // // Создание экземпляра AudioContext
+        // let audioCtx = new AudioContext();
+
+        // // Источник звука (например, <audio> элемент)
+        // if (window.user?.localSound) {
+
+        //   const localSoundSrc = audioCtx.createMediaElementSource(window.user?.localSound);
+
+        //   // Подключение к выходному устройству
+        //   localSoundSrc.connect(audioCtx.destination);
+
+        //   // Сохранение источника (если необходимо)
+        //   rtc.localSoundSrc = localSoundSrc;
+          
+        // } else {
+        //   console.log('No local sound element found.');
+        // }
+
         rtc.Offer();
 
         $call_but_status = 'active';
         break;
 
       case 'active':
+
         $call_but_status = 'inactive';
         rtc.OnInactive();
 

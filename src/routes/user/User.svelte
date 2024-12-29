@@ -147,12 +147,13 @@
   //   // group = group;
   // }
 
-  $: if ($msg) {
-    OnMessage($msg);
-    // $msg = ''
-  }
+  // $: if ($msg) {
+  //   // OnMessage($msg);
+  //   // $msg = ''
+  // }
 
   function OnMessage(data) {
+    return;
     if (data.func === 'talk') {
       $call_but_status = 'talk';
     }
@@ -210,45 +211,45 @@
         })();
 
         break;
-      case 'call_':
-        status = 'inactive';
-        user_.display = 'none';
-        // $call_but_status = 'inactive';
+      // case 'call_':
+      //   status = 'inactive';
+      //   user_.display = 'none';
+      //   // $call_but_status = 'inactive';
 
-        local.audio.paused = true;
-        local.video.display = 'none';
-        video_button_display = 'none';
-        clearInterval(inter);
-        call_cnt = 10;
-        rtc.OnInactive();
-        $click_call_func = null; //operator -> OnClickCallButton
-        // parent_div?.appendChild(card);
-        break;
-      case 'talk_':
-        status = 'inactive';
-        user_.display = 'none';
-        // $call_but_status = 'inactive';
+      //   local.audio.paused = true;
+      //   local.video.display = 'none';
+      //   video_button_display = 'none';
+      //   clearInterval(inter);
+      //   call_cnt = 10;
+      //   rtc.OnInactive();
+      //   $click_call_func = null; //operator -> OnClickCallButton
+      //   // parent_div?.appendChild(card);
+      //   break;
+      // case 'talk_':
+      //   status = 'inactive';
+      //   user_.display = 'none';
+      //   // $call_but_status = 'inactive';
 
-        local.video.display = 'none';
-        // remote.video.display = 'none';
-        video_button_display = 'none';
-        rtc.OnInactive();
-        $click_call_func = null; //operator -> OnClickCallButton
-        // parent_div?.appendChild(card);
-        video_element.poster = '';
-        video_element.load();
+      //   local.video.display = 'none';
+      //   // remote.video.display = 'none';
+      //   video_button_display = 'none';
+      //   rtc.OnInactive();
+      //   $click_call_func = null; //operator -> OnClickCallButton
+      //   // parent_div?.appendChild(card);
+      //   video_element.poster = '';
+      //   video_element.load();
 
-        video_element.poster = remote.video?.poster;
-        break;
-      case 'muted_':
-        status = 'inactive';
-        user_.display = 'none';
-        // $call_but_status = 'inactive';
-        video_button_display = 'none';
-        $click_call_func = null; //operator -> OnClickCallButton
-        // parent_div?.appendChild(card);
-        break;
-      case 'busy_':
+      //   video_element.poster = remote.video?.poster;
+      //   break;
+      // case 'muted_':
+      //   status = 'inactive';
+      //   user_.display = 'none';
+      //   // $call_but_status = 'inactive';
+      //   video_button_display = 'none';
+      //   $click_call_func = null; //operator -> OnClickCallButton
+      //   // parent_div?.appendChild(card);
+      //   break;
+      // case 'busy':
         // rtc.Call();
         if ($call_but_status === 'talk') {
           status = 'inactive';
@@ -265,8 +266,8 @@
   $users[operator] = { OnClickCallButton: OnClickCallButton };
 
   function toggle_remote_audio() {
-    isRemoteAudioMute = !isRemoteAudioMute;
-    $muted = isRemoteAudioMute;
+    // isRemoteAudioMute = !isRemoteAudioMute;
+    // $muted = isRemoteAudioMute;
   }
 
   onDestroy(async () => {

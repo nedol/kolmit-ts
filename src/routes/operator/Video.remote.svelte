@@ -36,11 +36,11 @@
     rv.poster = poster;
   }
 
-  $: if (status === 'talk' && !isRemoteAudioMute) {
-    $muted = false;
-  } else {
-    $muted = true;
-  }
+  // $: if (status === 'talk' && !isRemoteAudioMute) {
+  //   $muted = false;
+  // } else {
+  //   $muted = true;
+  // }
 </script>
 
 <!-- <div
@@ -63,7 +63,7 @@
             on:click
   
             {status}
-            muted={$muted}
+
             autoplay
             playsinline
             poster={poster}
