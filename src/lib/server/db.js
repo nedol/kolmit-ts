@@ -499,6 +499,16 @@ export async function GetWords(q) {
   }
 }
 
+export async function GetBricks(q) {
+  try {
+    let res = await sql`SELECT * FROM bricks
+		WHERE name=${q.name} AND owner=${q.owner} AND level=${q.level}`;
+    return res[0];
+  } catch (ex) {
+    return JSON.stringify({ func: q.func, res: ex });
+  }
+}
+
 export async function GetDialog(q) {
   try {
     let res = await sql`SELECT dialog, html, subscribe FROM dialogs

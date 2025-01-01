@@ -2,6 +2,7 @@
     import CircularProgress from '@smui/circular-progress';
 
   import Dialog from './dialog/Dialog.svelte';
+  import Bricks from './bricks/Bricks.svelte';
   import Listen from './listen/Listen.svelte';
   import Numbers from './listen/Numbers.svelte';
   import Time from './listen/Time.svelte';
@@ -20,6 +21,8 @@
 {#if quiz}
   {#if quiz.includes('dialog')}
     <Dialog {data} />
+  {:else if quiz.includes('bricks')}
+    <Bricks {data} />
   {:else if quiz.includes('listen')}
     {#if data.name === 'Nummers'}
       <Numbers {data}></Numbers>

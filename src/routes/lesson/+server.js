@@ -7,6 +7,7 @@ import {
   GetListen,
   GetDict,
   GetWords,
+  GetBricks,
   UpdateQuizUsers,
 } from '$lib/server/db.js';
 // import { getContext } from 'svelte';
@@ -25,6 +26,7 @@ export async function GET({ url, fetch, cookies }) {
   const dict = url.searchParams.get('dict');
   const words = url.searchParams.get('words');
   const dialog = url.searchParams.get('dialog');
+  const bricks = url.searchParams.get('bricks');
   const lesson = url.searchParams.get('lesson');
   const listen = url.searchParams.get('listen');
   const lvl = url.searchParams.get('level');
@@ -53,12 +55,27 @@ export async function GET({ url, fetch, cookies }) {
     // let data = await resp.text();
     // let items = text.split('\r\n');
     //debugger;
-  } else if (words) {
+  }else if (words) {
+  const theme = url.searchParams.get('theme');
+  const name = url.searchParams.get('name');
+  const owner = url.searchParams.get('owner');
+  const level = url.searchParams.get('level');
+  data = await GetWords({
+    theme: theme,
+    name: name,
+    owner: owner,
+    level: level,
+  });
+
+  let response = new Response(JSON.stringify({ data }));
+  response.headers.append('Access-Control-Allow-Origin', `*`);
+  return response;
+  }else if (bricks) {
     const theme = url.searchParams.get('theme');
-    const name = url.searchParams.get('name');
+    const name = bricks;
     const owner = url.searchParams.get('owner');
     const level = url.searchParams.get('level');
-    data = await GetWords({
+    data = await GetBricks({
       theme: theme,
       name: name,
       owner: owner,

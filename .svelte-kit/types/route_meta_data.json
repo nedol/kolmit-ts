@@ -31,6 +31,9 @@
 		"src/routes/+layout.server.js",
 		"src/routes/lesson/+server.js"
 	],
+	"/lesson/quiz/bricks": [
+		"src/routes/lesson/quiz/bricks/+server.ts"
+	],
 	"/operator": [
 		"src/routes/operator/+server.js"
 	],

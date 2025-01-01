@@ -1,10 +1,8 @@
 <script lang="ts">
   import { onMount, onDestroy, getContext } from 'svelte';
 
-  import ConText from './Dialog.Context.svelte';
+  import ConText from '../Context.svelte';
 
-  import { Number2Words } from '$lib/tts/convert.nl.js';
-  import { NumberString, numberToDutchString } from '$lib/tts/Listen.numbers';
 
   // import BottomAppBar, { Section } from '@smui-extra/bottom-app-bar';
 
@@ -930,11 +928,7 @@
                 <path fill="currentColor" d={mdiPlay} />
               </Icon>
             </IconButton>
-          </div>  
-
-        
-
-     
+          </div>       
         </div>
 
           {#if !share_mode}
@@ -1144,7 +1138,6 @@
       {/if}
 
       <br />
-
      
     {:else}
       <div style="text-align:center">
