@@ -175,6 +175,17 @@
         formattedSentence[focusedIndex].word =  item.word ;
         formattedSentence[focusedIndex].class = "correct";
         checkCompletion();
+
+        // После того как слово присвоено, ищем следующий элемент для фокуса
+        focusedIndex = Math.min(focusedIndex + 1, formattedSentence.length - 1);
+
+        // Устанавливаем фокус на следующий элемент
+        requestAnimationFrame(() => {
+            const nextElement = document.querySelectorAll('.formatted-list span')[focusedIndex];
+            if (nextElement) {
+            nextElement.focus();
+            }
+        });        
     }
   </script>
 

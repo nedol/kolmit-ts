@@ -377,7 +377,7 @@
                             </div>
 
                             {#if quiz.type==='bricks'}
-                              <Icon tag="svg" viewBox="0 0 24 24" width="24px" height="24px"  fill="grey" >
+                              <Icon tag="svg" viewBox="0 0 24 24" width="30px" height="30px"  fill="grey" >
                                 <rect x="3" y="3" width="8" height="3" />
                                 <rect x="13" y="3" width="8" height="3" />
                                 <rect x="3" y="8" width="4" height="3" />
