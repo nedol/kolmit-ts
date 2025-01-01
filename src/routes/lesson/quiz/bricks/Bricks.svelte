@@ -203,7 +203,7 @@
             </div>
         {/if} 
     {/if}
-    <div>
+    <div class="trans">
       <!-- Исходное предложение -->
 
       {#await Translate(sentence, $llang, $langs) then data}
@@ -251,6 +251,15 @@
     }
     .collapsible{
         height:100vh
+    }
+
+    .trans {
+        font-size: 0.8em;
+        flex-direction: column;
+        align-items: center;
+        margin-top: 10px;
+        text-align: center;
+        line-height: 17px;
     }
     .placeholder {
       border-bottom: 1px dashed #000;
