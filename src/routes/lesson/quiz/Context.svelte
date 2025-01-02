@@ -160,7 +160,7 @@
     position:absolute; 
     z-index: 1;
     width: 98vw;
-    height:89vh; 
+    height:88vh; 
     border:0;
     /* overflow-y:auto; */
     background-color: aliceblue;

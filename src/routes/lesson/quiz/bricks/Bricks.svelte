@@ -109,7 +109,7 @@
 
         // Извлекаем текст и убираем переносы строк
         const text = tempDiv.textContent || tempDiv.innerText || "";
-        return text.replace(/[\n\r]+/g, " ").trim();
+        return text.replace(/[\n\r]+/g, " ").replace(/[\p{Emoji}]/gu, '').trim();
     }
   
     // Обработчик клика на слово
@@ -249,7 +249,7 @@
   <style>
     main{
         overflow-y: auto;
-        height: 90vh;
+        height: calc(90vh - 56px);
         margin:15px
     }
 
@@ -280,7 +280,7 @@
     .word-list, .formatted-list {
       display: flex;
       text-align: center; 
-      margin: 20px 0 20px 0;
+      margin: 20px 2px 20px 2px;
       gap: 4px;
       flex-wrap: wrap;
       color:#007BFF
