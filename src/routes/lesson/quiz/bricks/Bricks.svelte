@@ -191,7 +191,7 @@
 
 <Tts bind:this={tts}></Tts>
 
-<main>
+
     {#if bricks_data?.html}
         <span on:click={() => (isCollapsed = !isCollapsed)}
         style="display:block-inline;position:relative;width:80%;color: black;font-style: italic;font-size:smaller;font-family: serif;"
@@ -203,7 +203,8 @@
             </div>
         {/if} 
     {/if}
-  
+
+<main>
     <div>
       <!-- Предложение с замененными словами -->
       {#await Translate('Заполни поля, используя Набор слов', 'ru', $langs) then data}
@@ -247,10 +248,9 @@
   
   <style>
     main{
+        overflow-y: auto;
+        height: 90vh;
         margin:15px
-    }
-    .collapsible{
-
     }
 
     .trans {
