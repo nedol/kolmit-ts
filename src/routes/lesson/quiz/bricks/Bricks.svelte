@@ -208,11 +208,11 @@
     <div>
       <!-- Предложение с замененными словами -->
       {#await Translate('Заполни поля, используя Набор слов', 'ru', $langs) then data}
-      <div class="title">{data}:</div>
-  {/await}
-        {#await Translate('(используй подсказки слов в случае необходимости)', 'ru', $langs) then data_2}
+        <div class="title">{data}:</div>
+      {/await}
+        <!-- {#await Translate('(используй подсказки слов в случае необходимости)', 'ru', $langs) then data_2}
         <div class="title title2">{data_2}:</div>
-        {/await}
+        {/await} -->
         <div class="trans">
             <!-- Исходное предложение -->
             {#await Translate(sentence, $llang, $langs) then data}
@@ -287,7 +287,7 @@
     }
   
     .word-list span, .formatted-list span {
-      padding: 5px 10px;
+      padding: 3px 8px;
       border: 1px solid #ddd;
       border-radius: 5px;
       background: #f9f9f9;
