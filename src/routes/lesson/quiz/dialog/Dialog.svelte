@@ -917,7 +917,7 @@
               /(?<!")\b\p{L}+(?<!\s)(?!")/gu,
               (match) => {
                 return `<span class="span_hidden"  
-                style="display:inline-block;  font-size:1.4em; margin: 5px 0px; padding: 1px 5px;border:1px;border-style:groove;border-color:lightblue;
+                style="display:inline-block; font-size:1.4em; margin: 5px 0px; padding: 1px 5px;border:1px;border-style:groove;border-color:lightblue;
                 color:#2196f3">${match}</span>`;
               }
             )}
@@ -966,7 +966,7 @@
           {/if}
         </div>
 
-        <div style="text-align: center;   margin-top: 20px;">
+        <div style="text-align: center;  margin-top: 20px;">
           <span style="color: darkgreen;">
             {@html stt_text}
           </span>
@@ -1448,6 +1448,10 @@
 
   .highlight {
     background-color: yellow;
+  }
+
+  ::-webkit-scrollbar {
+    display: none; /* Для Chrome, Safari и Opera */
   }
 
   /* @keyframes fadeIn {

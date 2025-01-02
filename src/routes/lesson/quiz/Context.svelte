@@ -123,7 +123,7 @@
   }
 </script>
 
-<div style="height:300vh;overflow-y:auto;font-size:smaller;color:#2196f3">
+<div>
   {#if $dc_state === 'close'}
     <div class="speaker-button">
       <IconButton
@@ -136,7 +136,7 @@
         </Icon>
       </IconButton>
     </div>
-    <iframe srcdoc={data.html} width="100%" height="80%" style="border:0;overflow-y:auto"></iframe>
+    <iframe class="context" srcdoc={data.html}></iframe>
   {/if}
 </div>
 
@@ -154,5 +154,22 @@
     margin-right: 0px;
     margin-left: 10px;
     z-index: 2;
+  }
+
+  .context{
+    position:absolute; 
+    z-index: 1;
+    width: 98vw;
+    height:86vh; 
+    border:0;
+    /* overflow-y:auto; */
+    background-color: aliceblue;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE и Edge */
+  }
+
+
+  .context::-webkit-scrollbar {
+    display: none; /* Для Chrome, Safari и Opera */
   }
 </style>

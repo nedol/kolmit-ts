@@ -203,22 +203,22 @@
             </div>
         {/if} 
     {/if}
-    <div class="trans">
-      <!-- Исходное предложение -->
-
-      {#await Translate(sentence, $llang, $langs) then data}
-        <p>{data}</p>
-      {/await}    
-    </div>
   
     <div>
       <!-- Предложение с замененными словами -->
       {#await Translate('Заполни поля, используя Набор слов', 'ru', $langs) then data}
       <div class="title">{data}:</div>
   {/await}
-      {#await Translate('(используй подсказки слов в случае необходимости)', 'ru', $langs) then data_2}
-      <div class="title title2">{data_2}:</div>
-      {/await}
+        {#await Translate('(используй подсказки слов в случае необходимости)', 'ru', $langs) then data_2}
+        <div class="title title2">{data_2}:</div>
+        {/await}
+        <div class="trans">
+            <!-- Исходное предложение -->
+            {#await Translate(sentence, $llang, $langs) then data}
+            <p>{data}</p>
+            {/await}    
+        </div>
+
       <div class="formatted-list">
         {#each formattedSentence as item, index}
           <span class="{item.class}"
@@ -250,7 +250,7 @@
         margin:15px
     }
     .collapsible{
-        height:100vh
+
     }
 
     .trans {
@@ -279,6 +279,7 @@
     
     .word-list, .formatted-list {
       display: flex;
+      text-align: center; 
       margin: 20px 0 20px 0;
       gap: 4px;
       flex-wrap: wrap;
