@@ -4,6 +4,24 @@
     import ConText from '../Context.svelte';
     import { Translate } from '../../../translate/Transloc';
     import Tts from '../../../speech/tts/Tts.svelte';
+    import emojiRegex from 'emoji-regex';
+    import TopAppBar, { Row, Title, Section } from '@smui/top-app-bar';
+    import IconButton, { Icon } from '@smui/icon-button';
+    import Badge from '@smui-extra/badge';
+
+    let topAppBar;
+    let currentWordIndex = 0;
+
+    let span_equal = true;
+
+    let isPlayAuto = false;
+    let playAutoColor = 'currentColor';
+
+    $: if (isPlayAuto) {
+        playAutoColor = 'green';
+    } else {
+        playAutoColor = 'currentColor';
+    }
 
     import {
         lesson,
@@ -18,6 +36,22 @@
         showBottomAppBar,
         OnCheckQU,
     } from '$lib/js/stores.js';
+
+    import {
+        mdiFormatAlignLeft,
+        mdiArrowRight,
+        mdiArrowLeft,
+        mdiShuffle,
+        mdiPagePreviousOutline,
+        mdiChevronDownCircleOutline,
+        mdiHelp,
+        mdiTextBoxCheckOutline,
+        mdiPlay,
+        mdiEarHearing,
+        mdiTranslateVariant,
+        mdiTranslate,
+        mdiTranslateOff
+    } from '@mdi/js';
 
     let stt, tts;
     // Разделяем предложение на слова
@@ -45,7 +79,7 @@
     )
       .then((response) => response.json())
       .then((data) => {
-        console.log(data);
+
         bricks_data = data.data;
       
         bricks_data.text = htmlToText( bricks_data.html).split('.');
@@ -88,6 +122,7 @@
         if (firstElement) {
             firstElement.focus();
         }
+        onToggleWord()
     }
 
     // Функция для перемешивания массива
@@ -101,6 +136,11 @@
 
     // Функция для преобразования HTML в текст
     function htmlToText(html) {
+         // Удаляем эмодзи с помощью библиотеки
+        function removeEmojis(input) {
+            const regex = emojiRegex();
+            return input.replace(regex, '');
+        }
       let tempDiv = document.createElement('div');
       tempDiv.innerHTML = html;
       
@@ -109,7 +149,7 @@
 
         // Извлекаем текст и убираем переносы строк
         const text = tempDiv.textContent || tempDiv.innerText || "";
-        return text.replace(/[\n\r]+/g, " ").replace(/[\p{Emoji}]/gu, '').trim();
+        return removeEmojis(text).replace(/[\n\r]+/g, " ").trim();
     }
   
     // Обработчик клика на слово
@@ -150,7 +190,7 @@
 
     const SpeakText = async () => {
         function endSpeak() {
-            clearTimeout(t);
+            // clearTimeout(t);
             sentence = bricks_data.text[++cur].trim();
             // sentence = sentence;
             words = sentence.trim().split(/\s+/);  
@@ -165,9 +205,9 @@
         }
         if (sentence) await tts.Speak_server($llang, sentence, data.name, endSpeak);
 
-        const t = setTimeout(()=>{
-            endSpeak();
-        },sentence.length * 100)
+        // const t = setTimeout(()=>{
+        //     endSpeak();
+        // },sentence.length * 100)
     }
 
   
@@ -192,10 +232,86 @@
             }
         });        
     }
+
+    const onToggleWord = ()=>{
+
+
+        if(!span_equal){
+
+            formattedSentence.forEach((item)=>{
+                item.placeholder = item.value;
+                item.class = "invisible"
+            });
+        }else{
+            formattedSentence.forEach((item)=>{
+                item.placeholder = "\u00a0\u00a0\u00a0\u00a0\u00a0";
+                item.class = ""
+            });
+        }
+
+        formattedSentence = formattedSentence
+
+    }
   </script>
 
 <Tts bind:this={tts}></Tts>
+<div class="top-app-bar-container flexor">
+    <TopAppBar bind:this={topAppBar} variant="fixed">
+      <Row>
+        <Section align="start">
+          <!-- {#if currentWordIndex > 0}
+            <Icon
+              tag="svg"
+              on:click={onPrev}
+              viewBox="0 0 24 24"
+              style="margin:10px 5px 10px 5px; scale:.5; width:50px"
+            >
+              <path fill="white" d={mdiArrowLeft} />
+            </Icon>
+          {/if} -->
+        </Section>
+        <Section align="start">
 
+        </Section>
+        <Section>
+            <Icon
+                tag="svg"
+                on:click={()=>{span_equal = !span_equal; onToggleWord()}}
+                viewBox="0 0 24 24"
+                style="margin:10px 5px 10px 5px; scale:.5; width:50px"
+            >
+            <path fill="white" d={mdiFormatAlignLeft} />
+          </Icon>
+        </Section>
+
+        <Section align="end">
+          <div class="counter">
+            <p>
+              <span class="mdc-typography--overline" style="position:relative"
+                >{cur}
+                <Badge
+                  position="middle"
+                  align="bottom-end - bottom-middle"
+                  aria-label="unread count"
+                  style="margin-right:-10px;scale:.8">{bricks_data?.text.length}</Badge
+                >
+              </span>
+            </p>
+          </div>
+        </Section>
+        <Section align="end">
+
+        </Section>
+        <Section align="end">
+
+        </Section>
+
+        <Section align="end">
+
+        </Section>
+      </Row>
+    </TopAppBar>
+  </div>
 
     {#if bricks_data?.html}
         <span on:click={() => (isCollapsed = !isCollapsed)}
@@ -252,6 +368,49 @@
   </main>
   
   <style>
+    .top-app-bar-container{
+      position: relative;
+      top:0px; 
+      height: 60px;
+    /* transform: scale(1.2) translate(-4%,0%);
+    transform-origin: center ;  */
+    }
+    .hint-button {
+        border: 0px;
+        color: white;
+        background-color: #2196f3;
+        border-radius: 3px;
+        padding: 8px 10px;
+    }
+
+    .invisible{
+        color:transparent
+    }
+
+    .counter {
+        /* position: absolute; */
+        background-color: #f0f0f0;
+        padding: 0px;
+        border-radius: 25px;
+        width: 30px;
+        height: 30px;
+        top: -10px;
+        left: -6px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        text-align: center;
+    }
+
+    .counter p {
+        margin: 0;
+        font-size: 15px;
+        color: #333;
+    }
+
+    .counter span {
+        font-weight: 700;
+        font-size: 15px;
+        color: #ff5733; /* цвет счетчика */
+    }
     main{
         overflow-y: auto;
         height: calc(90vh - 56px);
@@ -311,6 +470,16 @@
     .incorrect{
         color:red
     }
+
+    .material-symbols-outlined {
+    font-size: 15px;
+    scale: 1.5;
+    font-variation-settings:
+      'FILL' 0,
+      'wght' 400,
+      'GRAD' 0,
+      'opsz' 24;
+  }
   </style>
   
 

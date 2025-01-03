@@ -81,6 +81,7 @@
     "axios": "^1.7.7",
     "blueimp-load-image": "^5.16.0",
     "dotenv": "^16.4.5",
+    "emoji-regex": "^10.4.0",
     "express": "^4.21.1",
     "extendable-media-recorder": "^9.1.11",
     "extendable-media-recorder-wav-encoder": "^7.0.106",
