@@ -193,7 +193,7 @@
             // clearTimeout(t);
             sentence = bricks_data.text[++cur].trim();
             // sentence = sentence;
-            words = sentence.trim().split(/\s+/);  
+            words = sentence.trim().split(/[\s,:\.]+/)  
                     // Создаём массив для предложения с placeholder'ами
             formattedSentence = words
                 .filter(word => word) // Оставляем только существующие слова
