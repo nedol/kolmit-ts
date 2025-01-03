@@ -82,7 +82,7 @@
 
         bricks_data = data.data;
       
-        bricks_data.text = htmlToText( bricks_data.html).split('.');
+        bricks_data.text = htmlToText( bricks_data.html).split(/[.?!]/);
      
         sentence = bricks_data.text[cur].trim();
 
