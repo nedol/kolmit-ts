@@ -148,8 +148,9 @@
         }
     };
 
-    const SpeakText = () => {
+    const SpeakText = async () => {
         function endSpeak() {
+            clearTimeout(t);
             sentence = bricks_data.text[++cur].trim();
             // sentence = sentence;
             words = sentence.trim().split(/\s+/);  
@@ -162,7 +163,11 @@
                 }));
             MakeBricks()
         }
-        if (sentence) tts.Speak_server($llang, sentence, data.name, endSpeak);
+        if (sentence) await tts.Speak_server($llang, sentence, data.name, endSpeak);
+
+        const t = setTimeout(()=>{
+            endSpeak();
+        },sentence.length * 100)
     }
 
   
@@ -207,7 +212,7 @@
 <main>
     <div>
       <!-- Предложение с замененными словами -->
-      {#await Translate('Заполни поля, используя Набор слов', 'ru', $langs) then data}
+      {#await Translate('Make up a sentence using the Set of words below', 'en', $langs) then data}
         <div class="title">{data}:</div>
       {/await}
         <!-- {#await Translate('(используй подсказки слов в случае необходимости)', 'ru', $langs) then data_2}
@@ -234,7 +239,7 @@
   
     <div>
       <!-- Горизонтальный список слов -->
-      {#await Translate('Набор слов', 'ru', $langs) then data}
+      {#await Translate('Set of words', 'en', $langs) then data}
           <div class="title">{data}:</div>
       {/await}
 
