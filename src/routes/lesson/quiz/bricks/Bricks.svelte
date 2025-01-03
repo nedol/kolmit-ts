@@ -424,7 +424,7 @@
         align-items: center;
         margin-top: 10px;
         text-align: center;
-        line-height: 17px;
+        line-height: 1.2;
     }
     .placeholder {
       border-bottom: 1px dashed #000;
@@ -452,7 +452,7 @@
     }
   
     .word-list span, .formatted-list span {
-      padding: 3px 8px;
+      padding: 2px 6px;
       border: 1px solid #ddd;
       border-radius: 5px;
       background: #f9f9f9;
@@ -473,14 +473,14 @@
     }
 
     .material-symbols-outlined {
-    font-size: 15px;
-    scale: 1.5;
-    font-variation-settings:
-      'FILL' 0,
-      'wght' 400,
-      'GRAD' 0,
-      'opsz' 24;
-  }
+        font-size: 15px;
+        scale: 1.5;
+        font-variation-settings:
+        'FILL' 0,
+        'wght' 400,
+        'GRAD' 0,
+        'opsz' 24;
+    }
   </style>
   
 
