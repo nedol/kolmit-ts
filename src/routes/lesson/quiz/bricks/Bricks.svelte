@@ -415,7 +415,7 @@
     main{
         overflow-y: auto;
         height: calc(90vh - 56px);
-        margin:15px
+        margin: 0px 15px 0 15px;
     }
 
     .trans {
@@ -445,7 +445,7 @@
     .word-list, .formatted-list {
       display: flex;
       text-align: center; 
-      margin: 20px 2px 20px 2px;
+      margin: 10px 2px 15px 2px;
       gap: 4px;
       flex-wrap: wrap;
       color:#007BFF
