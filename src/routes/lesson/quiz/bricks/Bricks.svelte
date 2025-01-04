@@ -87,7 +87,7 @@
         sentence = bricks_data.text[cur].trim();
 
         // Разбиваем на слова
-        words = sentence.trim().split(/\s+/);  
+        words = sentence.trim().split(/[\s,:\.]+/);  
   
         // Создаём массив для предложения с placeholder'ами
         formattedSentence = words
@@ -97,6 +97,7 @@
                 value: word.trim()
             }));
 
+        words =  Array.from(new Set(sentence.trim().split(/[\s,:\.]+/)))
 
 
         // Устанавливаем фокус на первый элемент
@@ -191,17 +192,21 @@
     const SpeakText = async () => {
         function endSpeak() {
             // clearTimeout(t);
-            sentence = bricks_data.text[++cur].trim();
-            // sentence = sentence;
-            words = sentence.trim().split(/[\s,:\.]+/)  
-                    // Создаём массив для предложения с placeholder'ами
-            formattedSentence = words
-                .filter(word => word) // Оставляем только существующие слова
-                .map((word) => ({
-                    placeholder: "\u00a0\u00a0\u00a0\u00a0\u00a0", 
-                    value: word.trim()
-                }));
-            MakeBricks()
+            setTimeout(()=>{
+                sentence = bricks_data.text[++cur].trim();
+                // sentence = sentence;
+                words = sentence.trim().split(/[\s,:\.]+/)  
+                        // Создаём массив для предложения с placeholder'ами
+                formattedSentence = words
+                    .filter(word => word) // Оставляем только существующие слова
+                    .map((word) => ({
+                        placeholder: "\u00a0\u00a0\u00a0\u00a0\u00a0", 
+                        value: word.trim()
+                    }));
+          
+                MakeBricks();
+            },1000)    
+           
         }
         if (sentence) await tts.Speak_server($llang, sentence, data.name, endSpeak);
 
@@ -274,14 +279,25 @@
 
         </Section>
         <Section>
-            <Icon
-                tag="svg"
-                on:click={()=>{span_equal = !span_equal; onToggleWord()}}
-                viewBox="0 0 24 24"
-                style="margin:10px 5px 10px 5px; scale:.5; width:50px"
-            >
-            <path fill="white" d={mdiFormatAlignLeft} />
-          </Icon>
+            
+            <Icon tag="svg" viewBox="0 0 24 24" width="30px" height="30px"  fill="white"  
+                on:click={()=>{span_equal = !span_equal; onToggleWord()}} >
+                <!-- Верхняя полоска -->
+                <rect x="2" y="4" width="14" height="2" />
+                <rect x="18" y="4" width="4" height="2" />
+                <!-- Вторая полоска (разделенная на две части) -->
+                <rect x="12" y="8" width="10" height="2" />
+                <rect x="2" y="8" width="8" height="2" />
+                <!-- Третья полоска -->
+                <rect x="2" y="12" width="20" height="2" />
+                <!-- Четвертая полоска (разделенная на две части) -->
+                <rect x="2" y="16" width="14" height="2" />
+                <rect x="18" y="16" width="4" height="2" />
+                <!-- Нижняя полоска -->
+                <rect x="12" y="20" width="10" height="2" />
+                <rect x="2" y="20" width="8" height="2" />
+            </Icon>
+
         </Section>
 
         <Section align="end">
