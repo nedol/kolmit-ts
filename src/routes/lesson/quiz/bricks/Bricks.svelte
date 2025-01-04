@@ -327,19 +327,21 @@
 
 <main>
     <div>
+      <div class="trans">
+            <!-- Исходное предложение -->
+            {#await Translate(sentence, $llang, $langs) then data}
+            <p>{data}</p>
+            {/await}    
+      </div>
       <!-- Предложение с замененными словами -->
-      {#await Translate('Make up a sentence using the Set of words below', 'en', $langs) then data}
+      {#await Translate('Make up a sentence', 'en', $langs) then data}
         <div class="title">{data}:</div>
       {/await}
         <!-- {#await Translate('(используй подсказки слов в случае необходимости)', 'ru', $langs) then data_2}
         <div class="title title2">{data_2}:</div>
         {/await} -->
-        <div class="trans">
-            <!-- Исходное предложение -->
-            {#await Translate(sentence, $llang, $langs) then data}
-            <p>{data}</p>
-            {/await}    
-        </div>
+
+      
 
       <div class="formatted-list">
         {#each formattedSentence as item, index}
@@ -355,7 +357,7 @@
   
     <div>
       <!-- Горизонтальный список слов -->
-      {#await Translate('Set of words', 'en', $langs) then data}
+      {#await Translate('using the Set of words', 'en', $langs) then data}
           <div class="title">{data}:</div>
       {/await}
 
@@ -369,10 +371,15 @@
   </main>
   
   <style>
+
+    :global(.mdc-top-app-bar__row){
+        height:45px
+    }
+
     .top-app-bar-container{
       position: relative;
       top:0px; 
-      height: 60px;
+      height: 45px;
     /* transform: scale(1.2) translate(-4%,0%);
     transform-origin: center ;  */
     }
@@ -424,7 +431,7 @@
         align-items: center;
         margin-top: 10px;
         text-align: center;
-        line-height: 1.2;
+        line-height: 1.2 !important;
     }
     .placeholder {
       border-bottom: 1px dashed #000;
@@ -452,7 +459,7 @@
     }
   
     .word-list span, .formatted-list span {
-      padding: 2px 6px;
+      padding: 0px 6px;
       border: 1px solid #ddd;
       border-radius: 5px;
       background: #f9f9f9;
