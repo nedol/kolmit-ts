@@ -156,11 +156,11 @@
     z-index: 2;
   }
 
-  .context{
+  iframe.context{
     position:absolute; 
     z-index: 1;
-    width: 98vw;
-    height:81vh; 
+    width: 100vw;
+    height: calc(100vh - 56px - 45px - 50px); 
     border:0;
     /* overflow-y:auto; */
     background-color: aliceblue;

@@ -135,23 +135,32 @@
         return array;
     }
 
-    // Функция для преобразования HTML в текст
     function htmlToText(html) {
-         // Удаляем эмодзи с помощью библиотеки
+        // Удаляем эмодзи с помощью библиотеки
         function removeEmojis(input) {
             const regex = emojiRegex();
             return input.replace(regex, '');
         }
-      let tempDiv = document.createElement('div');
-      tempDiv.innerHTML = html;
-      
-      const styles = tempDiv.querySelectorAll('style');
-      styles.forEach(style => style.remove());
 
-        // Извлекаем текст и убираем переносы строк
-        const text = tempDiv.textContent || tempDiv.innerText || "";
+        let tempDiv = document.createElement('div');
+        tempDiv.innerHTML = html;
+
+        // Удаляем стили
+        const styles = tempDiv.querySelectorAll('style');
+        styles.forEach(style => style.remove());
+
+        // Извлекаем текст только из <p> элементов
+        const paragraphs = tempDiv.querySelectorAll('p');
+        let text = Array.from(paragraphs)
+            .map(p => p.textContent || p.innerText || "")
+            .join(" ");
+        if(!text)
+            text = html;
+
+        // Убираем эмодзи и лишние переносы строк
         return removeEmojis(text).replace(/[\n\r]+/g, " ").trim();
     }
+
   
     // Обработчик клика на слово
     const handleClick = (word) => {
