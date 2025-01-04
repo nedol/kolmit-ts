@@ -504,21 +504,6 @@
         'GRAD' 0,
         'opsz' 24;
     }
-
-        /* Стили для мобильных устройств */
-    @media screen and (max-width: 767px) {
-        .trans {
-            font-size: 0.7em;
-        }
-        .word-list, .formatted-list {
-            font-size: 0.8em;
-            margin: 2px 10px;
-            padding: 0 4px
-        }
-        .title{
-            font-size: small;
-        }
-    }
   </style>
   
 
