@@ -14,4 +14,4 @@ vite.config.ts.timestamp-*
 /src/routes/speech/tts/audio
 /sql
 .vercel
-!./render-build.sh
+!render-build.sh
