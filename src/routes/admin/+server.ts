@@ -53,7 +53,7 @@ cron.schedule('26 21 * * 7', () => {
   });
 
   
-	generate_news()
+	//generate_news()
 
 
 
