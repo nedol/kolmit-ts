@@ -1,8 +1,6 @@
 import { json } from '@sveltejs/kit';
 import fs from 'fs';
 
-import {  SetSQL } from '$lib/server/db.admin.js'; 
-import { CreatePool_neon} from '$lib/server/db.js'; 
 
 import generate_news from './cron/cron_tasks.js'
 
@@ -11,11 +9,6 @@ import cron from 'node-cron';
 import {
 	GetGroups,UpdateDialog, UpdateLesson,  GetPrompt
 } from '$lib/server/db.admin.js';
-
-
-
-
-	CreatePool_neon();
 
 
 

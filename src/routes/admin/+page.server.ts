@@ -4,6 +4,8 @@ import os from 'os';
 
 import {  GetGroups } from '$lib/server/db.admin.js'; 
 
+import { CreatePool_neon} from '$lib/server/db.js'; 
+
 let kolmit;
 
 /** @type {import('./$types').PageServerLoad} */
@@ -18,6 +20,8 @@ export async function load({ fetch, cookies, route, url, stuff }) {
 	let name = url.searchParams.get('name');
 	let operator = url.searchParams.get('operator');
 	let psw = url.searchParams.get('psw');
+
+	CreatePool_neon();
 
 
 	let host = url.origin; //'http://localhost:3000'; //'https://kolmit-sveltekit-nedol.vercel.app'; //
