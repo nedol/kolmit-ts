@@ -6,12 +6,9 @@ config();
 import pkg_l from 'lodash';
 const { find, findKey } = pkg_l;
 
-import NewsAPI from 'newsapi'
 
-const NEWS_API_KEY = process.env.NEWS_API_KEY;
 const language = 'nl'
 
-const newsapi = new NewsAPI(NEWS_API_KEY);
 
 import puppeteer from 'puppeteer';
 
@@ -121,50 +118,5 @@ async function getRSSNews(url, content = 'link', newsContent = [], browser = nul
   
     return newsContent;
   }
-// --- STEP 1: Получение новостей ---
-const newsApiUrl = "https://newsapi.org/v2/everything";
-
-async function getNews(query = "Бельгия", language = "nl", pageSize = 5) {
-    const params = {
-        language: language,
-        apiKey: NEWS_API_KEY,
-        pageSize: pageSize,
-        country:'be',
-        category:'general'
-    };
-
-    try {
-        // const response = await fetch(newsApiUrl + '?' + new URLSearchParams(params));
-        // To query /v2/everything
-        // You must include at least one q, source, or domain
-        newsapi.v2.everything({
-            q: 'general',
-            sources: 'vrt.be',
-            domains: 'vrt.be',
-            from: '2025-01-01',
-            to: '2025-01-05',
-            language: language,
-            sortBy: 'relevancy',
-            page: 5
-        }).then(response => {
-            console.log(response);
-            /*
-            {
-                status: "ok",
-                articles: [...]
-            }
-            */
-        });
-
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-        const data = await response.json();
-        return data.articles || [];
-    } catch (error) {
-        console.error("Error getting news:", error);
-        return [];
-    }
-}
 
 
