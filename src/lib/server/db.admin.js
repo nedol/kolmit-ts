@@ -6,7 +6,13 @@ import { SendEmail } from './db';
 import pkg_l from 'lodash';
 const { find, remove, findIndex, difference } = pkg_l;
 
+import {sql_st} from '$lib/js/stores.js'
+
 let sql;
+
+sql_st.subscribe((data)=>{
+  sql = data;
+})
 
 let conStr = {
   connectionStringSupabase:
@@ -42,9 +48,8 @@ export async function CreatePool(resolve) {
   resolve(sql);
 }
 
-export async function SetSQL(sql_, resolve) {
+export async function SetSQL(sql_) {
   sql = sql_;
-  resolve();
 }
 
 export async function CreateAdmin(par) {

@@ -6,11 +6,19 @@ import { Translate } from '../../routes/translate/Translate'
 import md5 from 'md5';
 import { writable } from 'svelte/store';
 
+
+
 // import { tarifs } from './tarifs.json';
 
 import postgres from 'postgres';
 
-export let sql;
+import {sql_st} from '$lib/js/stores.js'
+
+let sql;
+
+sql_st.subscribe((data)=>{
+  sql = data;
+})
 
 let { PGHOST, PGDATABASE, PGUSER, PGPASSWORD, ENDPOINT_ID } = process.env;
 
@@ -22,26 +30,26 @@ let conStr = {
     'postgresql://postgres.abzyzzvokjdnwgjbitga:NissanPathfinder@386/aws-0-eu-central-1.pooler.supabase.com:5432',
 };
 
-export async function CreatePool_(resolve) {
-  sql = postgres(conStr.connectionStringSupabase, {
-    host: 'aws-0-eu-central-1.pooler.supabase.com', // Postgres ip address[s] or domain name[s]
-    port: 5432, // Postgres server port[s]
-    database: 'postgres', // Name of database to connect to
-    username: 'postgres.abzyzzvokjdnwgjbitga', // Username of database user
-    password: 'NissanPathfinder@386', // Password of database user
-    idle_timeout: 20,
-    max_lifetime: 60 * 30,
-  });
-  resolve(sql);
-}
+// export async function CreatePool_(resolve) {
+//   sql = postgres(conStr.connectionStringSupabase, {
+//     host: 'aws-0-eu-central-1.pooler.supabase.com', // Postgres ip address[s] or domain name[s]
+//     port: 5432, // Postgres server port[s]
+//     database: 'postgres', // Name of database to connect to
+//     username: 'postgres.abzyzzvokjdnwgjbitga', // Username of database user
+//     password: 'NissanPathfinder@386', // Password of database user
+//     idle_timeout: 20,
+//     max_lifetime: 60 * 30,
+//   });
+//   resolve(sql);
+// }
 
 let conStrNeon = {
   connectionString:
     'postgresql://nedooleg:nHLhfQB0WS5Y@ep-polished-bush-a2n4g5y9-pooler.eu-central-1.aws.neon.tech:5432/neondb?sslmode=require',
 };
 
-export async function CreatePool_render(resolve) {
-  sql = postgres(conStrNeon.connectionString, {
+export async function CreatePool_render() {
+  sql_st.set(postgres(conStrNeon.connectionString, {
     host: 'dpg-ctdjkkjv2p9s73c6iua0-a.frankfurt-postgres.render.com', // Postgres ip address[s] or domain name[s]
     port: 5432, // Postgres server port[s]
     database: 'kolmit_jzl1', // Name of database to connect to
@@ -49,19 +57,19 @@ export async function CreatePool_render(resolve) {
     password: 'ncEr4gySWNJmCIUyahHROsST2gny0Mki', // Password of database user
     idle_timeout: 20,
     max_lifetime: 60 * 30,
-  });
-  resolve(sql);
+  }));
+
 }
 
-export async function CreatePool_neon(resolve) {
-  sql = postgres(conStrNeon.connectionString, {
+export async function CreatePool_neon() {
+  sql_st.set(postgres(conStrNeon.connectionString, {
     host: 'ep-polished-bush-a2n4g5y9-pooler.eu-central-1.aws.neon.tech', // Postgres ip address[s] or domain name[s]
     port: 5432, // Postgres server port[s]
     database: 'neondb', // Name of database to connect to
     username: 'nedooleg', // Username of database user
     password: 'nHLhfQB0WS5Y', // Password of database user
-  });
-  resolve(sql);
+  }));
+
 }
 
 
