@@ -12,15 +12,14 @@ import {
 	GetGroups,UpdateDialog, UpdateLesson,  GetPrompt
 } from '$lib/server/db.admin.js';
 
-let sql = ''
 
 let prom = new Promise((resolve, reject) => {
 	CreatePool_neon(resolve);
 });
 
-sql = await prom;
+let sql = await prom;
 
-SetSQL(sql)
+await SetSQL(sql)
 
 // Пример cron-задачи, которая запускается каждый день в полночь
 cron.schedule('26 21 * * 7', () => {
