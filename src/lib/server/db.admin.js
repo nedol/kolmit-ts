@@ -42,8 +42,9 @@ export async function CreatePool(resolve) {
   resolve(sql);
 }
 
-export async function SetSQL(sql_) {
+export async function SetSQL(sql_, resolve) {
   sql = sql_;
+  resolve();
 }
 
 export async function CreateAdmin(par) {

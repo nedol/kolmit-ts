@@ -3,8 +3,7 @@ import md5 from 'md5';
 import dict from '$lib/dict/dict.json';
 import os from 'os';
 
-import { CreatePool_neon, GetUsers } from '$lib/server/db.js'; //src\lib\server\server.db.js
-import {  SetSQL, GetGroups } from '$lib/server/db.admin.js'; 
+import {  GetGroups } from '$lib/server/db.admin.js'; 
 
 let kolmit;
 

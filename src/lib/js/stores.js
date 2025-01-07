@@ -42,7 +42,7 @@ export let dc = writable();
 
 export let dc_state = writable('close');
 
-// export let share_mode = writable(false);
+export let sql_st = writable();
 
 export let muted = writable(true);
 
