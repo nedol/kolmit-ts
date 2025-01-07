@@ -33,7 +33,7 @@ export default async function generate_news(){
     let prompt = data.prompt.system;
  
     prompt = prompt.replace(/\$\{date\}/g, date );
-    const articles = await getRSSNews('https://www.vrt.be/vrtnws/nl/regio/antwerpen');//'Belgium', language);
+    const articles = await getNews('https://www.vrt.be/vrtnws/nl/regio/antwerpen');//'Belgium', language);
     return;
     let content = articles.map((item)=>{
         return item.content
@@ -60,7 +60,7 @@ export default async function generate_news(){
 }
 
 
-async function getRSSNews(url, content = 'link', newsContent = [], browser = null) {
+async function getNews(url, content = 'link', newsContent = [], browser = null) {
     const feedUrl = url;
   
     // Открываем браузер, если он ещё не открыт
@@ -74,17 +74,38 @@ async function getRSSNews(url, content = 'link', newsContent = [], browser = nul
       await page.goto(feedUrl, { waitUntil: 'domcontentloaded' });
   
       if (content === 'link') {
+        // Получение текущей даты в формате ГГГГ/ММ/ДД
+        const today = new Date();
+        const year = today.getFullYear();
+        const month = String(today.getMonth() + 1).padStart(2, '0');
+        const day = String(today.getDate()).padStart(2, '0');
+
+        // Формирование строки даты
+        const currentDate = `${year}/${month}/${day}`;
         // Извлечение ссылок новостей
-        const links = await page.evaluate(() => {
-          return Array.from(document.querySelectorAll('a[href*="2025/01/07"]')).map(h => h.href.trim());
-        });
+        const links = await page.evaluate((currentDate) => {
+          return Array.from(document.querySelectorAll(`a[href*="${currentDate}"]`)).map(h => h.href.trim());
+        }, currentDate);
   
         console.log('Найдено ссылок:', links);
-  
+        let cnt = 0
         // Асинхронно обрабатываем каждую ссылку
         for (const link of links) {
-          await getRSSNews(link, 'content', newsContent, browser);
+          await getNews(link, 'content', newsContent, browser);
+          if(cnt++>5)
+            break;
         }
+            // Закрытие браузера, если это последний вызов
+        try {
+          if (browser.isConnected()) {
+            await browser.close();
+          }
+        } catch (error) {
+          console.error('Ошибка при закрытии браузера:', error);
+        }
+
+        return newsContent;
+
       } else {
         // Извлечение контента
         const content = await page.evaluate(() => {
@@ -93,30 +114,21 @@ async function getRSSNews(url, content = 'link', newsContent = [], browser = nul
   
         newsContent.push({ url, content });
         console.log(`Контент из ${url}:`, content);
+        if (page) {
+          try {
+            await page.close(); // Закрытие страницы
+          } catch (error) {
+            console.error('Ошибка при закрытии страницы:', error);
+          }
+        }
       }
   
     } catch (error) {
       console.error('Ошибка при обработке страницы:', error);
     } finally {
-      if (page) {
-        try {
-          await page.close(); // Закрытие страницы
-        } catch (error) {
-          console.error('Ошибка при закрытии страницы:', error);
-        }
-      }
-    }
-  
-    // Закрытие браузера, если это последний вызов
-    try {
-      if (browser.isConnected()) {
-        await browser.close();
-      }
-    } catch (error) {
-      console.error('Ошибка при закрытии браузера:', error);
-    }
-  
-    return newsContent;
+
+    } 
+
   }
 
 

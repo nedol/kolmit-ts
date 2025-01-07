@@ -1,6 +1,6 @@
 import { json } from '@sveltejs/kit';
 import fs from 'fs';
-
+import { CreatePool_neon} from '$lib/server/db.js'; 
 
 import generate_news from './cron/cron_tasks.js'
 
@@ -11,7 +11,7 @@ import {
 } from '$lib/server/db.admin.js';
 
 
-
+CreatePool_neon();
 
 // Пример cron-задачи, которая запускается каждый день в полночь
 cron.schedule('26 21 * * 7', () => {
