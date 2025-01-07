@@ -5,12 +5,7 @@ import generate_news from './cron/cron_tasks.js'
 
 import cron from 'node-cron';
 
-import {
-	CreatePool_neon,  UpdateLesson,  GetPrompt
-} from '$lib/server/db.admin.js';
 
-
-CreatePool_neon();
 
 // Пример cron-задачи, которая запускается каждый день в полночь
 cron.schedule('26 21 * * 7', () => {

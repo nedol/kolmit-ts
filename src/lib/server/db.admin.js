@@ -6,13 +6,7 @@ import { SendEmail } from './db';
 import pkg_l from 'lodash';
 const { find, remove, findIndex, difference } = pkg_l;
 
-import {sql_st} from '$lib/js/stores.js'
-
 let sql;
-
-sql_st.subscribe((data)=>{
-  sql = data;
-})
 
 let conStr = {
   connectionStringSupabase:
@@ -38,13 +32,13 @@ let conStrNeon = {
 };
 
 export async function CreatePool_neon() {
-  sql_st.set(postgres(conStrNeon.connectionString, {
+  sql = postgres(conStrNeon.connectionString, {
     host: 'ep-polished-bush-a2n4g5y9-pooler.eu-central-1.aws.neon.tech', // Postgres ip address[s] or domain name[s]
     port: 5432, // Postgres server port[s]
     database: 'neondb', // Name of database to connect to
     username: 'nedooleg', // Username of database user
     password: 'nHLhfQB0WS5Y', // Password of database user
-  }));
+  });
 }
 
 export async function CreateAdmin(par) {
