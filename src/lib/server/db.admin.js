@@ -37,19 +37,14 @@ let conStrNeon = {
     'postgresql://nedooleg:nHLhfQB0WS5Y@ep-polished-bush-a2n4g5y9-pooler.eu-central-1.aws.neon.tech:5432/neondb?sslmode=require',
 };
 
-export async function CreatePool(resolve) {
-  sql = postgres(conStrNeon.connectionString, {
+export async function CreatePool_neon() {
+  sql_st.set(postgres(conStrNeon.connectionString, {
     host: 'ep-polished-bush-a2n4g5y9-pooler.eu-central-1.aws.neon.tech', // Postgres ip address[s] or domain name[s]
     port: 5432, // Postgres server port[s]
     database: 'neondb', // Name of database to connect to
     username: 'nedooleg', // Username of database user
     password: 'nHLhfQB0WS5Y', // Password of database user
-  });
-  resolve(sql);
-}
-
-export async function SetSQL(sql_) {
-  sql = sql_;
+  }));
 }
 
 export async function CreateAdmin(par) {
