@@ -1,9 +1,6 @@
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-import { STT } from "vocalfusion.io/dist/index.esm.js";
-
-
 import ISO6391 from 'iso-google-locales';
 
 import { Translate } from '../../translate/Translate';

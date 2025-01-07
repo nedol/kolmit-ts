@@ -165,7 +165,7 @@
     // Обработчик клика на слово
     const handleClick = (word) => {
         // Присваиваем выбранное слово фокусируемому элементу
-        if(formattedSentence[focusedIndex].value === word){
+        if(formattedSentence[focusedIndex].value.toLowerCase() === word.toLowerCase()){
 
             formattedSentence[focusedIndex].word =  word ;
             formattedSentence[focusedIndex].class = "correct";
