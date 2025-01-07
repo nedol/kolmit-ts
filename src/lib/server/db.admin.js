@@ -198,16 +198,19 @@ export async function UpdateWords(q) {
   }
 }
 
-export async function GetPrompt(prompt, quiz_name, owner, level, theme) {
+export async function GetPrompt(prompt = '', quiz_name= '', owner= '', level= '', theme= '') {
   let prompt_res, words_res, gram_res, gram;
   try {
-    prompt_res = await sql`SELECT * FROM prompts WHERE name=${prompt}`;
-    words_res = await sql`SELECT * FROM word WHERE name=${quiz_name}`;
-    gram_res =
-      await sql`SELECT * FROM grammar WHERE owner=${owner} AND level=${level}`;
-    gram = find(gram_res[0].data, { theme: theme });
+    if(prompt)
+      prompt_res = await sql`SELECT * FROM prompts WHERE name=${prompt}`;
+    if(quiz_name)
+      words_res = await sql`SELECT * FROM word WHERE name=${quiz_name}`;
+    if(owner && level){
+      gram_res = await sql`SELECT * FROM grammar WHERE owner=${owner} AND level=${level}`;
+      gram = find(gram_res[0].data, { theme: theme });
+    }
   } catch (ex) {
-    // return JSON.stringify({ res: ex });
+    console.log(JSON.stringify({ res: ex }));
   }
   return {
     prompt: prompt_res[0],

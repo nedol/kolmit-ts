@@ -65,7 +65,7 @@
   let levels: any = [];
   let module_input: any;
 
-  const quizes = ['выбери quiz...', 'listen', 'dialog', 'word'];
+  const quizes = ['выбери quiz...',  'dialog', 'word', 'bricks'];
 
   let containerWidth = '100%'; // Исходная ширина - 100% ширины родительского окна
   let containerHeight = '100vh';
@@ -551,15 +551,25 @@
                                         d={mdiFileWordBoxOutline}
                                       />
                                     </Icon>
-                                  {:else if quiz.type === 'listen'}
+                                  {:else if quiz.type === 'bricks'}
                                     <Icon
                                       tag="svg"
                                       viewBox="0 0 24 24"
                                       width="30px"
                                       height="30px"
-                                    >
-                                      <path fill="grey" d={mdiEarHearing} />
+                                    >                          
+                                      <rect x="3" y="3" width="8" height="3" />
+                                      <rect x="13" y="3" width="8" height="3" />
+                                      <rect x="3" y="8" width="4" height="3" />
+                                      <rect x="9" y="8" width="6" height="3" />
+                                      <rect x="17" y="8" width="4" height="3" />
+                                      <rect x="3" y="13" width="8" height="3" />
+                                      <rect x="13" y="13" width="8" height="3" />
+                                      <rect x="3" y="18" width="4" height="3" />
+                                      <rect x="9" y="18" width="6" height="3" />
+                                      <rect x="17" y="18" width="4" height="3" />
                                     </Icon>
+                  
                                   {:else if quiz.type === 'quiz'}
                                     <select
                                       on:click|preventDefault|once|stopPropagation={() => {}}

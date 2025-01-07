@@ -82,12 +82,12 @@
 
         bricks_data = data.data;
       
-        bricks_data.text = htmlToText( bricks_data.html).split(/[.?!]/);
+        bricks_data.text = htmlToText( bricks_data.html).split(/(?<=[.?!])\s+/);
      
         sentence = bricks_data.text[cur].trim();
 
         // Разбиваем на слова
-        words = sentence.trim().split(/[\s,:\.]+/);  
+        words = Array.from(new Set(sentence.trim().split(/[\s,:\.]+/).filter(word => word !== "")))  
   
         // Создаём массив для предложения с placeholder'ами
         formattedSentence = words
@@ -97,7 +97,7 @@
                 value: word.trim()
             }));
 
-        words =  Array.from(new Set(sentence.trim().split(/[\s,:\.]+/)))
+        words =  Array.from(new Set(sentence.trim().split(/[\s,:\.]+/).filter(word => word !== "")))
 
 
         // Устанавливаем фокус на первый элемент
@@ -204,8 +204,8 @@
             setTimeout(()=>{
                 sentence = bricks_data.text[++cur].trim();
                 // sentence = sentence;
-                words = sentence.trim().split(/[\s,:\.]+/)  
-                        // Создаём массив для предложения с placeholder'ами
+                words = Array.from(new Set(sentence.trim().split(/[\s,:\.]+/).filter(word => word !== "")))  
+                // Создаём массив для предложения с placeholder'ами
                 formattedSentence = words
                     .filter(word => word) // Оставляем только существующие слова
                     .map((word) => ({

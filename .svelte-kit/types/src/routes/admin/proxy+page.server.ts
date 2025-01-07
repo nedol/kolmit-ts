@@ -20,15 +20,7 @@ export async function load({ fetch, cookies, route, url, stuff }) {
 	let name = url.searchParams.get('name');
 	let operator = url.searchParams.get('operator');
 	let psw = url.searchParams.get('psw');
-	let sql = ''
 
-	let prom = new Promise((resolve, reject) => {
-		CreatePool_neon(resolve);
-	});
-
-	sql = await prom;
-
-	SetSQL(sql)
 
 	let host = url.origin; //'http://localhost:3000'; //'https://kolmit-sveltekit-nedol.vercel.app'; //
 
