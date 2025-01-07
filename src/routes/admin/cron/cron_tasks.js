@@ -65,7 +65,7 @@ async function getRSSNews(url, content = 'link', newsContent = [], browser = nul
   
     // Открываем браузер, если он ещё не открыт
     if (!browser) {
-      browser =  await puppeteer.launch({ headless: false });
+      browser =  await puppeteer.launch({ headless: true });
     }
   
     let page;
@@ -76,7 +76,7 @@ async function getRSSNews(url, content = 'link', newsContent = [], browser = nul
       if (content === 'link') {
         // Извлечение ссылок новостей
         const links = await page.evaluate(() => {
-          return Array.from(document.querySelectorAll('a[href*="2025/01/05"]')).map(h => h.href.trim());
+          return Array.from(document.querySelectorAll('a[href*="2025/01/07"]')).map(h => h.href.trim());
         });
   
         console.log('Найдено ссылок:', links);
