@@ -854,7 +854,7 @@
           <div class="user1" style="visibility:{visibility[1]}">
             <span>
               {#if !q[$langs]}
-                {#await Translate(q['ru'].replace(/"([^"]*)"/g, '$1'), 'ru', $langs) then data}
+                {#await Translate(q[$llang].replace(/"([^"]*)"/g, '$1'), $llang, $langs) then data}
                   {@html data}
                 {/await}
               {:else}
@@ -894,7 +894,7 @@
         <div class="user2_tr">
           {#if a && visibility[0] === 'visible'}
             {#if !a[$langs]}
-              {#await Translate(a['ru'].replace(/"([^"]*)"/g, '$1'), 'ru', $langs) then data}
+              {#await Translate(a[$llang].replace(/"([^"]*)"/g, '$1'), $llang, $langs) then data}
                 {data}
               {/await}
             {:else}

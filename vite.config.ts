@@ -34,6 +34,7 @@ export default defineConfig({
   build: {
     // Устанавливаем dev: true только для целей разработки
     dev: true,
+    sourcemap: true
   },
 
   server: {

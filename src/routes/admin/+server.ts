@@ -6,6 +6,16 @@ import generate_news from './cron/cron_tasks.js'
 import cron from 'node-cron';
 
 
+import {
+	UpdateDialog,
+	UpdateLesson,
+	UpdateListen,
+	UpdateWords,
+	GetGroups
+  
+  } from '$lib/server/db.admin.js';
+
+
 
 // Пример cron-задачи, которая запускается каждый день в полночь
 cron.schedule('26 21 * * 7', () => {
@@ -38,7 +48,7 @@ cron.schedule('26 21 * * 7', () => {
   });
 
   
-	generate_news()
+	// generate_news()
 
 
 
