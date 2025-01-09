@@ -198,22 +198,28 @@
         }
     };
 
+    
+    const nextSentence = ()=>{
+
+      sentence = bricks_data.text[++cur].trim();
+        // sentence = sentence;
+        words = Array.from(new Set(sentence.trim().split(/[\s,:\.]+/).filter(word => word !== "")))  
+        // Создаём массив для предложения с placeholder'ами
+        formattedSentence = words
+            .filter(word => word) // Оставляем только существующие слова
+            .map((word) => ({
+                placeholder: "\u00a0\u00a0\u00a0\u00a0\u00a0", 
+                value: word.trim()
+            }));
+  
+        MakeBricks();
+    }
+
     const SpeakText = async () => {
         function endSpeak() {
             // clearTimeout(t);
             setTimeout(()=>{
-                sentence = bricks_data.text[++cur].trim();
-                // sentence = sentence;
-                words = Array.from(new Set(sentence.trim().split(/[\s,:\.]+/).filter(word => word !== "")))  
-                // Создаём массив для предложения с placeholder'ами
-                formattedSentence = words
-                    .filter(word => word) // Оставляем только существующие слова
-                    .map((word) => ({
-                        placeholder: "\u00a0\u00a0\u00a0\u00a0\u00a0", 
-                        value: word.trim()
-                    }));
-          
-                MakeBricks();
+              nextSentence()
             },1000)    
            
         }
@@ -249,7 +255,6 @@
 
     const onToggleWord = ()=>{
 
-
         if(!span_equal){
 
             formattedSentence.forEach((item)=>{
@@ -266,6 +271,7 @@
         formattedSentence = formattedSentence
 
     }
+
   </script>
 
 <Tts bind:this={tts}></Tts>
@@ -332,7 +338,14 @@
         </Section>
 
         <Section align="end">
-
+          <Icon
+            tag="svg"
+            on:click={nextSentence}
+            viewBox="0 0 24 24"
+            style="margin:10px 5px 10px 5px; scale:.5; width:50px"
+          >
+          <path fill="green" d={mdiArrowRight} />
+        </Icon>
         </Section>
       </Row>
     </TopAppBar>

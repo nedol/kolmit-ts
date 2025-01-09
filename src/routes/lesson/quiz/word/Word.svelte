@@ -191,9 +191,7 @@
 
     return new Promise(async (resolve, reject) => {
 
-      if (currentWord?.example[example_lang]) {
-        example = await currentWord.example[example_lang];
-      } else if (currentWord.example[$llang]) {
+     if (currentWord.example[$llang]) {
         example = await Translate(currentWord.example[$llang], $llang, $langs);
       }
 
@@ -202,7 +200,7 @@
       const regex = /(<<\w+>>)\s+(<<\w+>>)/;
       const match = currentWord?.example[$llang]
         ? currentWord?.example[$llang].match(regex)
-        : '';
+        : '';       
       let original = '';
       if (match) {
         original = `${match[0]} ${match[1]}`;
@@ -835,7 +833,7 @@
         
               {@html example} 
             {:else}
-              {#await Translate(example, 'ru', $langs) then data}
+              {#await Translate(example, $llang, $langs) then data}
                 {@html data}
               {/await}
             {/if}
