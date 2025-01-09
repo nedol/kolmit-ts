@@ -87,7 +87,7 @@
         sentence = bricks_data.text[cur].trim();
 
         // Разбиваем на слова
-        words = Array.from(new Set(sentence.trim().split(/[\s,:\.]+/).filter(word => word !== "")))  
+        words = sentence.trim().split(/[\s,:\.]+/)  
   
         // Создаём массив для предложения с placeholder'ами
         formattedSentence = words
@@ -203,7 +203,7 @@
 
       sentence = bricks_data.text[++cur].trim();
         // sentence = sentence;
-        words = Array.from(new Set(sentence.trim().split(/[\s,:\.]+/).filter(word => word !== "")))  
+        words = sentence.trim().split(/[\s,:\.]+/); 
         // Создаём массив для предложения с placeholder'ами
         formattedSentence = words
             .filter(word => word) // Оставляем только существующие слова
@@ -211,6 +211,8 @@
                 placeholder: "\u00a0\u00a0\u00a0\u00a0\u00a0", 
                 value: word.trim()
             }));
+
+        words =  Array.from(new Set(sentence.trim().split(/[\s,:\.]+/).filter(word => word !== "")))    
   
         MakeBricks();
     }
