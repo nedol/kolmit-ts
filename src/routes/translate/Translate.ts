@@ -26,69 +26,45 @@ export async function Translate_(text, from, to) {
 }
 
 export async function Translate(text, from, to) {
-  // let deepl = deepl_langs_list.indexOf(to);
+  if (!text) return '';
 
-    if (!text) return;
-    translate.from = from;
-    text = text.replace(/\r\n/g, '');
+  // Удаляем лишние символы новой строки
+  text = text.replace(/\r\n/g, ' ');
 
-    // Разделение текста на предложения
-    const sentences = text.match(/[^.!?]+[.!?]+|[^.!?]+$/g);//text.split(/([.!?]\s+|$)/);//text.split(/[.!?]/);
-    let translatedText = '';
+  // Разбиваем текст на предложения
+  const sentences = text.match(/[^.!?]+[.!?]+|[^.!?]+$/g) || [];
+  let translatedText = '';
 
-    // Перевод каждой части текста (по 2 предложения)
-    for (let i  in sentences ) {
-      let chunk = sentences[i];//sentences.slice(i, i + 2).join('. '); // Объединение 10 предложений в одну часть
-      if (!chunk)
-        continue;
-        
-      let res;
+  // Формируем группы из трёх предложений
+  for (let i = 0; i < sentences.length; i += 3) {
+    const chunkGroup = sentences.slice(i, i + 3).join(' ').trim();
+    if (!chunkGroup) continue;
 
-      let isQuotes = false;
+    let chunk = chunkGroup;
+    let res = '';
 
-      if(chunk.search("<<")!=-1){
-        isQuotes = true
-      }
-
-
-      // try {
-
-        // chunk = chunk.replace(/<</g, '« ');
-        // chunk = chunk.replace(/>>/g, ' »');
- 
-      //   translate.engine = 'deepl';
-      //   res = await translate(chunk, to);
-
-      //   res = res.replace(/\<(.*?)\>/g, '<<$1>>');
-        
-      // } catch (ex) {
-      chunk = chunk.replace(/<</g, '<<<').replace(/>>/g, '>>>');
-      // chunk = chunk.replace(/<</g, '<').replace(/>>/g, '"');//инверсия 
-        
-      translate.engine = 'google';
-      
-      try {
-     
-          res = await translate(chunk, { to: to, from: from });
-        } catch (error) {
-          console.error('Translation error:', error);
-
-          // text; // или другое подходящее значение по умолчанию
-      }
-
-
-      if (res){
-        res = res.replace('<<<', '<<').replace('>>>', '>>');
-        res = res?.replace(/<<\s*(.*?)\s*>>/g,'<<$1>>');
-        translatedText += (res + ' '); // Добавление переведенной части к полному тексту
-
-      }else{
-        translatedText += res;
-      }
-
+    // Проверяем наличие << >> и заменяем на безопасные символы
+    const hasQuotes = chunk.includes('<<');
+    if (hasQuotes) {
+      chunk = chunk.replace(/<</g, '[').replace(/>>/g, ']');
     }
 
-    return translatedText.trim(); // Удаление лишних пробелов в конце текста
-    
+    // Попытка перевода через Google Translate API
+    try {
+      res = await translate(chunk, { to, from });
+    } catch (error) {
+      console.error('Translation error:', error);
+      res = chunk; // Если перевод не удался, возвращаем оригинальный текст
+    }
 
+    // Восстанавливаем << >> после перевода
+    if (hasQuotes) {
+      res = res.replace(/\[(.*?)\]/g, '<<$1>>')
+    }
+
+    translatedText += `${res} `;
+  }
+
+  // Убираем лишние пробелы
+  return translatedText.trim();
 }

@@ -78,11 +78,22 @@
       `./lesson?bricks=${data.name}&theme=${data.theme}&owner=${operator.abonent}&level=${data.level}`
     )
       .then((response) => response.json())
-      .then((data) => {
+      .then(async (data) => {
 
         bricks_data = data.data;
       
-        bricks_data.text = htmlToText( bricks_data.html).split(/(?<=[.?!])\s+/);
+        // Преобразуем HTML в текст и разбиваем на массив предложений
+        bricks_data.text = htmlToText(bricks_data.html).split(/(?<=[.?!])\s+/);
+
+        // Объединяем массив предложений в единый текст
+        const textToTranslate = bricks_data.text.join(' ');
+
+        // Переводим единый текст и преобразуем результат обратно в массив предложений
+        bricks_data.translate = (await Translate(JSON.stringify(textToTranslate), $llang, $langs))
+        .replace(/^[\"«]|[\"»]$/g, '')
+        .split(/(?<=[.?!])\s+/) // Разбиваем на предложения
+        .map(sentence => sentence.trim()) // Убираем лишние пробелы
+        .filter(sentence => sentence !== ''); 
      
         sentence = bricks_data.text[cur].trim();
 
@@ -201,7 +212,12 @@
     
     const nextSentence = ()=>{
 
-      sentence = bricks_data.text[++cur].trim();
+      cur++;
+
+      if(cur>bricks_data.translate.length-1)
+        cur = 0;
+
+      sentence = bricks_data.text[cur].trim();
         // sentence = sentence;
         words = sentence.trim().split(/[\s,:\.]+/); 
         // Создаём массив для предложения с placeholder'ами
@@ -321,7 +337,7 @@
           <div class="counter">
             <p>
               <span class="mdc-typography--overline" style="position:relative"
-                >{cur}
+                >{cur+1}
                 <Badge
                   position="middle"
                   align="bottom-end - bottom-middle"
@@ -369,9 +385,9 @@
     <div>
       <div class="trans">
             <!-- Исходное предложение -->
-            {#await Translate(sentence, $llang, $langs) then data}
-            <p>{data}</p>
-            {/await}    
+            {#if bricks_data?.translate}
+            <p>{bricks_data.translate[cur]}</p>
+            {/if}
       </div>
       <!-- Предложение с замененными словами -->
       {#await Translate('Make up a sentence', 'en', $langs) then data}
