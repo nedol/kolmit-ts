@@ -83,7 +83,7 @@
         bricks_data = data.data;
       
         // Преобразуем HTML в текст и разбиваем на массив предложений
-        bricks_data.text = htmlToText(bricks_data.html).split(/(?<=[.?!])\s+/);
+        bricks_data.text = htmlToText(bricks_data.html).replaceAll('"','').split(/(?<=[.?!])\s+/);
 
         // Объединяем массив предложений в единый текст
         const textToTranslate = bricks_data.text.join(' ');

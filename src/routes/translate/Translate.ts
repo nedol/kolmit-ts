@@ -32,7 +32,7 @@ export async function Translate(text, from, to) {
   text = text.replace(/\r\n/g, ' ');
 
   // Разбиваем текст на предложения
-  const sentences = text.match(/(?:[^.!?]|\d\.)+[.!?] (?=[A-ZА-Я]|$)|.+$/g) || [];
+  const sentences = text.match(/[^.!?]+[.!?](?=\s|$|<)|[^.!?]+$/g) || [];
   let translatedText = '';
 
   // Формируем группы из трёх предложений
@@ -40,7 +40,7 @@ export async function Translate(text, from, to) {
     const chunkGroup = sentences.slice(i, i + 3).join(' ').trim();
     if (!chunkGroup) continue;
 
-    let chunk = chunkGroup;
+    let chunk = chunkGroup.replaceAll('"','');
     let res = '';
 
     // Проверяем наличие << >> и заменяем на безопасные символы
