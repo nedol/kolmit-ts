@@ -38,7 +38,7 @@ export async function Translate(text, from, to) {
   // Формируем группы из трёх предложений
   for (let i = 0; i < sentences.length; i += 3) {
     const chunkGroup = sentences.slice(i, i + 3).join(' ').trim();
-    if (!chunkGroup) continue;
+    if (!chunkGroup || chunkGroup=='"') continue;
 
     let chunk = chunkGroup.replaceAll('"','');
     let res = '';
