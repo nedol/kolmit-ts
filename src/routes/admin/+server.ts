@@ -11,7 +11,8 @@ import {
 	UpdateLesson,
 	UpdateListen,
 	UpdateWords,
-	GetGroups
+	GetGroups,
+	GetPrompt
   
   } from '$lib/server/db.admin.js';
 

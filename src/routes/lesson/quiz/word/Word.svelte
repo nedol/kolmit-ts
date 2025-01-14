@@ -66,7 +66,7 @@
     word,
     example,
     example_lang = $langs;
-  let translate = true;
+  let translate = false;
   let shuffleWords;
   let hints;
   let currentWordIndex = 0;
@@ -770,11 +770,11 @@
               style="margin:10px 5px 10px 5px; scale:1.2; width:20px"
               on:click={ToggleTranslate}
             >
-            {#if translate}
-              <path fill="white" d={mdiTranslateOff}/>
-            {:else}
-              <path fill="grey" d={mdiTranslate}/>
-            {/if}
+              {#if translate}
+                <path fill="white" d={mdiTranslateOff}/>
+              {:else}
+                <path fill="grey" d={mdiTranslate}/>
+              {/if}
             </Icon>
           </Section>
 

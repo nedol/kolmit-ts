@@ -48,18 +48,7 @@
 
   export async  function Speak_server(lang, text, quiz, cb_end) {
 
-    async function onEnd(res){
-      // if(!res){
-      //   await Speak_google(lang, text, cb_end);
-      //   text=''
-       
-      // }
-      // else{
-      if(cb_end)
-        cb_end();
-      //}
-    }
-    await Speak_google(lang, text, quiz, onEnd);
+    await Speak_google(lang, text, quiz, cb_end);
      
   }
 

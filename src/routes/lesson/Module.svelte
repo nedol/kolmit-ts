@@ -377,7 +377,7 @@
                             </div>
 
                             {#if quiz.type==='bricks'}
-                              <Icon tag="svg" viewBox="0 0 24 24" width="30px" height="30px"  fill="grey" >
+                              <Icon tag="svg" viewBox="0 0 24 24" width="20px" height="20px"  fill="grey" scale='.5'>
                                 <rect x="3" y="3" width="8" height="3" />
                                 <rect x="13" y="3" width="8" height="3" />
                                 <rect x="3" y="8" width="4" height="3" />
@@ -391,7 +391,7 @@
                               </Icon>
 
                             {:else if icons[quiz.type]}
-                              <Icon tag="svg" viewBox="0 0 24 24" width="30px" height="30px">
+                              <Icon tag="svg" viewBox="0 0 24 24" width="20px" height="20px">
                                 <path fill="grey" d={icons[quiz.type]} />
                               </Icon>
                             {/if}
@@ -515,8 +515,8 @@
   .icon-wrapper {
     position: relative;
     display: inline-block; /* Позволяет корректно позиционировать вложенные элементы */
-    width: 30px;
-    height: 30px;
+    width: 20px;
+    height: 20px;
   }
 
   .new-badge {
