@@ -6,7 +6,7 @@
     Media,
     MediaContent,
   } from '@smui/card';
-  import { muted } from '$lib/js/stores.js';
+
   export let display = 'block';
   export let status;
 
@@ -36,11 +36,7 @@
     rv.poster = poster;
   }
 
-  // $: if (status === 'talk' && !isRemoteAudioMute) {
-  //   $muted = false;
-  // } else {
-  //   $muted = true;
-  // }
+
 </script>
 
 <!-- <div
@@ -61,7 +57,8 @@
             class="oper_video_remote"
             bind:this={video}
             on:click
-  
+            on:mute
+						muted={isRemoteAudioMute}
             {status}
 
             autoplay

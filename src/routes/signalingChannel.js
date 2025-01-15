@@ -11,7 +11,7 @@ export class SignalingChannel {
     if(window.location.hostname.includes('onrender'))
       this.socketUrl = 'wss://kolmit-server.onrender.com';
     else if(window.location.hostname.includes('192.168.'))
-      this.socketUrl = `wss://192.168.2.10:3000`;
+      this.socketUrl = `wss://192.168.0.6:3000`;
     else
       this.socketUrl =  `wss://localhost:3000`;
     this.socket = null;

@@ -242,6 +242,13 @@ export class DataChannelOperator {
     // that.rtc.OnOpenDataChannel();
   }
 
+    CloseDC(){
+		setTimeout(()=>{
+			this.dc.close();
+			this.rtc.ClosePull()
+		},100)		
+	}
+
 	SendDCHangup(cb) {
 		let par = {};
 		par.proj = 'kolmit';
@@ -251,7 +258,7 @@ export class DataChannelOperator {
 		this.SendData(par, cb);
 	}
 
-	SendDCClose(cb) {
+	SendDCClose(cb) {		
 		let par = {};
 		par.proj = 'kolmit';
 		par.func = 'close';

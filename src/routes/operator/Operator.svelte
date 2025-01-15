@@ -21,7 +21,6 @@
     click_call_func,
     dc_state,
     call_but_status,
-    muted,
     dicts,
     langs,
     showBottomAppBar,
@@ -301,7 +300,7 @@
 
 
   function OnClickCallButton() {
-
+    console.log('OnClickCallButton')
     switch ($call_but_status) {
       case 'inactive':
         try {
@@ -355,7 +354,7 @@
       case 'call':
         if ($dc_state && !$click_call_func) {
           $call_but_status = 'talk';         
-          $muted = false;
+          isRemoteAudioMute = false;
           rtc.OnTalk();
           video_button_display = true;
           remote.text.display = 'none';
@@ -386,23 +385,13 @@
 
         $call_but_status = 'inactive';
         rtc.DC.SendDCClose();
+
+        rtc.DC.CloseDC();
+
         rtc.OnInactive();
         
         $users = $users;
 
-        break;
-      case 'muted_':
-        $call_but_status = 'inactive';
-
-        local.video.srcObject = '';
-
-        remote.video.display = 'none';
-        remote.video.srcObject = '';
-        remote.video.poster = '';
-        remote.text.display = 'none';
-        // local.video.poster = UserSvg;
-        rtc.DC.SendDCClose();
-        rtc.OnInactive();
         break;
       default:
         return;
@@ -449,8 +438,8 @@
 
   function OnMessage(data: any, resolve: any) {
     if (data.func === 'close') {
-      rtc?.OnInactive();
       $call_but_status = 'inactive';
+      rtc.DC.CloseDC();
       remote.video.display = 'none'
       local.audio.paused = true;
     }
@@ -474,13 +463,13 @@
       if($click_call_func)
         rtc.OnCall()
     }
+
     if (data.func === 'talk') {
       $call_but_status = 'talk';
       local.audio.paused = true;
       video_button_display = true;
       remote.text.display = 'none';
     }
-
 
     if (data.camera) {
       local.video.src = that.localStream;
@@ -494,7 +483,6 @@
 
   function toggle_remote_audio() {
     isRemoteAudioMute = !isRemoteAudioMute;
-    $muted = isRemoteAudioMute;
   }
 
   onDestroy(() => {

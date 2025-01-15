@@ -235,4 +235,10 @@ export class RTCBase {
 			});
 		}
 	}
+
+	ClosePull(){
+		Object.keys(this.pcPull).map((key)=>{
+			this.pcPull[key].con.close()
+		})
+	}
 }

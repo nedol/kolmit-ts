@@ -271,7 +271,7 @@
   }
 
   onDestroy(async () => {
-    $dc?.SendDCClose(() => {});
+    // $dc?.SendDCClose(() => {});
 
     // $call_but_status = 'inactive';
     local.video.display = 'none';
