@@ -102,6 +102,9 @@ let cur = 0;
   
    const InitData = async()=>{
 
+    if(!bricks_data)
+    return
+
     // Объединяем массив предложений в единый текст
     const textToTranslate = bricks_data.text.join(' ');
 
@@ -217,7 +220,7 @@ let cur = 0;
   const checkCompletion = () => {
       // Если все элементы имеют класс "correct", вызываем функцию Speak
       if (formattedSentence.every(item => item.class === "correct")) {
-          SpeakText();
+          SpeakText(true);
       }
   };
 
@@ -245,9 +248,10 @@ let cur = 0;
       MakeBricks();
   }
 
-  const SpeakText = async () => {
-      function endSpeak() {
+  const SpeakText = async (isEndSpeak) => {
+      const endSpeak = ()=> {
           // clearTimeout(t);
+          if(isEndSpeak===true)
           setTimeout(()=>{
             nextSentence()
           },1000)    
@@ -305,6 +309,7 @@ let cur = 0;
   function ToggleTranslate(){
     translate = !translate
   }
+
 
 </script>
 
@@ -434,6 +439,13 @@ let cur = 0;
           {item.word || item.placeholder}
         </span>
       {/each}
+      <div class="speaker-button" on:click={SpeakText}>
+        <IconButton>
+          <Icon tag="svg" viewBox="0 0 24 24">
+            <path fill="currentColor" d={mdiPlay} />
+          </Icon>
+        </IconButton>
+      </div> 
     </div>
   </div>
 
@@ -475,6 +487,16 @@ let cur = 0;
 
   .invisible{
       color:transparent
+  }
+
+  .speaker-button {
+    display: inline-flex;
+    float: right;
+    font-size: large;
+    border-radius: 25px;
+    margin-right: 0px;
+    margin-left: 10px;
+    z-index: 2;
   }
 
   .counter {
@@ -535,7 +557,7 @@ let cur = 0;
     display: flex;
     text-align: center; 
     margin: 10px 2px 15px 2px;
-    gap: 4px;
+    gap: 6px;
     flex-wrap: wrap;
     color:#007BFF
   }
@@ -578,7 +600,7 @@ let cur = 0;
       }
       .word-list, .formatted-list {
           font-size: 0.8em;
-          margin: 2px 10px;
+          /* margin: 2px 10px; */
           padding: 0 4px
       }
       .title{
