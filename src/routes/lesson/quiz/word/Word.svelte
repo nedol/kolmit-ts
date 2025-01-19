@@ -21,6 +21,8 @@
     mdiTranslateOff
   } from '@mdi/js';
 
+  import md5 from 'md5'
+
   // import words from './80.json';
   import { Translate } from '../../../translate/Transloc';
   // translate.engine = 'google';
@@ -87,6 +89,7 @@
   let showSpeakerButton = false;
   let focus_pos = 0;
   let speak_text = '';
+  let speechData = {};
 
   // defineWordsArray();
 
@@ -101,9 +104,15 @@
     `./lesson?words=theme&theme=${data.theme}&name=${data.name}&owner=${abonent}&level=${data.level}`
   )
     .then((response) => response.json())
-    .then((data) => {
+    .then(async(data) => {
       words = data.data.data;
       if (!words[0]) return;
+
+      for (let w of words) {
+        const text =  w.example[$llang].replace(/<<|>>/g, '');
+        const resp = await tts.GetGoogleTTS($llang, text,  names[0]);
+        speechData[md5(text)] = resp.resp.audio;
+      }
 
       currentWord = words[currentWordIndex];
       makeExample();
@@ -589,8 +598,15 @@
   function speak(text) {
     text = text.replace(/<<|>>/g, '');
     text = text.replace(/_/g, ' ');
-    // Speak(text);
-    tts.Speak_server($llang, text, data.name);
+    const hash = md5(text);
+    if(speechData[hash]){
+        let audio = new Audio(speechData[hash]);
+        audio.playbackRate = 0.9;   
+        // audio.text = text;
+        audio.play();
+    }else{
+      tts.Speak_server($llang, text, data.name);
+    }
 
     // setFocus();
   }
@@ -681,6 +697,7 @@
     // Очищаем интервал при размонтировании компонента
     $llang = _llang;
     $lesson.data = { quiz: '' };
+    speechData = ''
   });
 </script>
 

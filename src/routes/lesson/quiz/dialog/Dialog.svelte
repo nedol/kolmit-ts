@@ -6,7 +6,7 @@
 
   // import BottomAppBar, { Section } from '@smui-extra/bottom-app-bar';
 
-  //  import '$lib/css/_Colored.scss';
+  //import '$lib/css/_Colored.scss';
 
   import TopAppBar, { Row, Title, Section } from '@smui/top-app-bar';
   import Button, { Label } from '@smui/button';
@@ -20,6 +20,8 @@
   import CircularProgress from '@smui/circular-progress';
   import Chip, { Set, LeadingIcon, TrailingIcon, Text } from '@smui/chips';
   import '$lib/css/Typography.scss';
+
+  import md5 from 'md5'
 
   import {
     lesson,
@@ -131,6 +133,8 @@
   let share_button_class = 'button_shared_false';
 
   let variant = 'outlined';
+
+  let speechData:any = {}
 
   $: if ($msg) {
     if ($msg.lesson?.quiz === 'dialog') {
@@ -259,7 +263,7 @@
       `./lesson?dialog=${data.name}&owner=${operator.abonent}&level=${data.level}`
     )
       .then((response) => response.json())
-      .then((dlg_data) => {
+      .then(async(dlg_data) => {
         dialog_data = dlg_data.data.dialog;
         total_cnt = dialog_data.content.length;
         if (dlg_data.data.html) {
@@ -267,6 +271,15 @@
         }
         dialog_data.name = data.name;
         Dialog();
+
+        for(let t in dialog_data.content ){
+          const item = dialog_data.content[t]
+          let resp = await tts.GetGoogleTTS($llang, item.user1[$llang],  dialog_data.name);
+          speechData[md5(item.user1[$llang])] = resp.resp.audio;
+          resp = await tts.GetGoogleTTS($llang, item.user2[$llang], dialog_data.name);
+          speechData[md5(item.user2[$llang])] = resp.resp.audio;
+        }
+
       })
       .catch((error) => {
         console.log(error);
@@ -471,7 +484,17 @@
 
   async function speak(text, cb_end) {
     function endSpeak() {}
-    if (text) tts.Speak_server($llang, text, data.name, endSpeak);
+    if (!text)
+      return;
+    const hash = md5(text);
+    if(speechData[hash]){
+        let audio = new Audio(speechData[hash]);
+        audio.playbackRate = 0.9;   
+        // audio.text = text;
+        audio.play();
+    }else{
+      tts.Speak_server($llang, text, dialog_data.name, endSpeak);
+    }
   }
 
   function onClickMicrophone() {
@@ -648,6 +671,7 @@
         tts.Speak_server($llang, active, onEndSpeak);
       }
     }
+
     visibility[1] = 'visible';
     let active = q[$langs];
     tts.Speak_server($langs, active, onEndSpeak);

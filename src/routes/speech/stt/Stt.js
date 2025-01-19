@@ -112,22 +112,22 @@ function startRecording() {
 
 	mediaRecorder = new MediaRecorder(mediaStream, options);
 	const audioTrack = mediaStream.getAudioTracks()[0];
-  mediaRecorder.ondataavailable = (e) => {
-    if (false && audioChunks.length < 20) {
-      audioChunks.push(e.data);
-    } else {
-      audioChunks.push(e.data);
+	mediaRecorder.ondataavailable = (e) => {
+		if (false && audioChunks.length < 20) {
+		audioChunks.push(e.data);
+		} else {
+		audioChunks.push(e.data);
 
-      const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+		const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
 
-      sendAudioToRecognition(audioBlob);
-    }
-  };
+		sendAudioToRecognition(audioBlob);
+		}
+	};
 
-  mediaRecorder.onstop = (e) => {
-    stopRecording();
+	mediaRecorder.onstop = (e) => {
+		stopRecording();
 
-  };
+	};
 
   mediaRecorder.start();
   isRecording = true;

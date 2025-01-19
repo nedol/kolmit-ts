@@ -10,7 +10,6 @@
   import Badge from '@smui-extra/badge';
 
   let topAppBar;
-  let currentWordIndex = 0;
 
   let translate = false;
 
@@ -71,6 +70,10 @@ let isCollapsed = true;
 
 let cur = 0;
 
+let speechData = '';
+let current_word = 0;
+let audio;
+
   export let data;
   const operator = getContext('operator');
   // Исходное предложение
@@ -110,12 +113,14 @@ let cur = 0;
 
     // Переводим единый текст и преобразуем результат обратно в массив предложений
     bricks_data.translate = (await Translate(JSON.stringify(textToTranslate), $llang, $langs))
-    .replace(/^[\"«]|[\"»]$/g, '')
-    .split(/(?<=[.?!])\s+/) // Разбиваем на предложения
-    .map(sentence => sentence.trim()) // Убираем лишние пробелы
-    .filter(sentence => sentence !== ''); 
+      .replace(/^[\"«]|[\"»]$/g, '')
+      .split(/(?<=[.?!])\s+/) // Разбиваем на предложения
+      .map(sentence => sentence.trim()) // Убираем лишние пробелы
+      .filter(sentence => sentence !== ''); 
 
     sentence = bricks_data.text[cur].trim();
+
+    speechData = (await tts.GetGoogleTTS($llang, sentence,  data.name)).resp;
 
     // Разбиваем на слова
     words = sentence.trim().split(/[\s,:\.]+/)  
@@ -129,14 +134,11 @@ let cur = 0;
         }));
 
     words =  Array.from(new Set(sentence.trim().split(/[\s,:\.]+/).filter(word => word !== "")))
-
-
     // Устанавливаем фокус на первый элемент
     setTimeout(() => {
         MakeBricks();
     }, 0);
   }
-
 
   onMount(() => {
 
@@ -225,14 +227,20 @@ let cur = 0;
   };
 
   
-  const nextSentence = ()=>{
+  const nextSentence = async()=>{
 
     cur++;
 
-    if(cur>bricks_data.translate.length-1)
+    current_word = 0;
+
+    if(cur>bricks_data.translate.length)
       cur = 0;
 
     sentence = bricks_data.text[cur].trim();
+
+    const resp = await tts.GetGoogleTTS($llang, sentence,  data.name);
+      speechData = resp.resp;
+      console.log('speechData:',speechData)
       // sentence = sentence;
       words = sentence.trim().split(/[\s,:\.]+/); 
       // Создаём массив для предложения с placeholder'ами
@@ -251,13 +259,38 @@ let cur = 0;
   const SpeakText = async (isEndSpeak) => {
       const endSpeak = ()=> {
           // clearTimeout(t);
+          console.log()
           if(isEndSpeak===true)
           setTimeout(()=>{
             nextSentence()
           },1000)    
          
       }
-      if (sentence)  tts.Speak_server($llang, sentence, data.name, endSpeak);
+      if (sentence) {
+        audio = new Audio(speechData.audio);
+        let  endTime;
+        audio.playbackRate = 0.9;   
+        if(speechData?.ts?.length>0){
+          audio.currentTime = speechData.ts[focusedIndex].start;
+          if(focusedIndex!=0)
+            audio.playbackRate = 0.7;     
+          // endTime =  speechData.ts[current_word+3].end
+        }
+        // audio.text = text;
+
+        if (isEndSpeak)
+          audio.addEventListener('ended', function () {
+            endSpeak();
+            audio = '';
+          });
+         
+         // Отслеживание текущего времени
+        //  if( false && endTime)
+          audio.addEventListener('timeupdate', () => {
+
+          });
+         audio.play();
+      } 
 
       // const t = setTimeout(()=>{
       //     endSpeak();

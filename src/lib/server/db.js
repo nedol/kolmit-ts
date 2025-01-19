@@ -661,28 +661,36 @@ export async function GetDict(q) {
 export async function WriteSpeech(q) {
   try {
     await sql.begin(async (sql) => {
-      await sql`INSERT INTO speech (lang, key, text, data, quiz)
-                VALUES (${q.lang}, ${q.key}, ${q.text}, ${q.data}, ${q.quiz})
+      await sql`INSERT INTO speech (lang, key, text, data, quiz, timestamps)
+                VALUES (${q.lang}, ${q.key}, ${q.text}, ${q.data}, ${q.quiz}, ${q.timestamps})
                 ON CONFLICT (key) 
                 DO UPDATE SET 
-                    lang = ${q.lang}, 
-                    text = ${q.text}, 
-                    data = ${q.data}, 
-                    quiz = ${q.quiz}`;
+                    lang = EXCLUDED.lang, 
+                    text = EXCLUDED.text, 
+                    data = EXCLUDED.data, 
+                    quiz = EXCLUDED.quiz,
+                    timestamps = EXCLUDED.timestamps`;
     });
+    return { success: true, message: "Data written successfully." };
   } catch (ex) {
-      console.log()
+    console.error("Error writing speech:", ex);
+    return { success: false, message: "Failed to write data.", error: ex };
   }
 }
 
+
 export async function ReadSpeech(q) {
   try {
-    let res = await sql`SELECT data FROM speech
-		WHERE key= ${q.key} AND quiz IS NOT NULL`;
+    let res = await sql`SELECT data, timestamps FROM speech
+                        WHERE key = ${q.key} AND quiz IS NOT NULL`;
     if (res[0]) {
-      return res[0].data;
+      return res[0];
+    } else {
+      return null; // Явно возвращаем null, если записи не найдены
     }
   } catch (ex) {
-    return JSON.stringify('');
+    console.error('Database query failed:', ex); // Логируем ошибку
+    return { error: 'Database query failed' }; // Возвращаем объект ошибки
   }
 }
+
