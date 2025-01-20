@@ -395,8 +395,7 @@
                                 <path fill="grey" d={icons[quiz.type]} />
                               </Icon>
                             {/if}
-                          </div>
-                        
+                          </div>                        
                             <a
                               href="#"
                               use:disablePanel
@@ -489,6 +488,7 @@
                           {/if}
                         {/if}
                       {/each}
+                      <div  style="height:150px"></div>
                     {/if}
                   {/each}
                 {/if}

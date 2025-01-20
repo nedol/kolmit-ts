@@ -357,7 +357,7 @@ let audio;
             viewBox="0 0 24 24"
             style="margin:10px 5px 10px 5px; scale:.5; width:50px"
           >
-            <path fill="white" d={mdiArrowLeft} />
+            <path path fill="none" stroke="white" stroke-width="2" stroke-linejoin="round"  d={mdiArrowLeft} />
           </Icon>
         {/if}
       </Section>
@@ -421,9 +421,9 @@ let audio;
           tag="svg"
           on:click={()=>{navSentence(++curSentence)}}
           viewBox="0 0 24 24"
-          style="margin:10px 5px 10px 5px; scale:.5; width:50px"
+          style="margin:10px 5px 10px 5px; scale:.5; width:50px;"
         >
-        <path fill="green" d={mdiArrowRight} />
+        <path fill="none" stroke="white" stroke-width="2" stroke-linejoin="round" d={mdiArrowRight} />
       </Icon>
       </Section>
     </Row>
@@ -528,7 +528,7 @@ let audio;
     border-radius: 25px;
     margin-right: 0px;
     margin-left: 10px;
-    z-index: 2;
+    z-index: 0;
   }
 
   .counter {
