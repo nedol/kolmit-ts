@@ -68,7 +68,7 @@ let bricks_data;
 
 let isCollapsed = true;
 
-let cur = 0;
+let curSentence = 0;
 
 let speechData = '';
 let current_word = 0;
@@ -118,7 +118,7 @@ let audio;
       .map(sentence => sentence.trim()) // Убираем лишние пробелы
       .filter(sentence => sentence !== ''); 
 
-    sentence = bricks_data.text[cur].trim();
+    sentence = bricks_data.text[curSentence].trim();
 
     speechData = (await tts.GetGoogleTTS($llang, sentence,  data.name)).resp;
 
@@ -226,17 +226,16 @@ let audio;
       }
   };
 
-  
-  const nextSentence = async()=>{
 
-    cur++;
+  
+  const navSentence = async(curSentence)=>{
 
     current_word = 0;
 
-    if(cur>bricks_data.translate.length)
-      cur = 0;
+    if(curSentence>bricks_data.translate.length)
+      curSentence = 0;
 
-    sentence = bricks_data.text[cur].trim();
+    sentence = bricks_data.text[curSentence].trim();
 
     const resp = await tts.GetGoogleTTS($llang, sentence,  data.name);
       speechData = resp.resp;
@@ -262,7 +261,7 @@ let audio;
           console.log()
           if(isEndSpeak===true)
           setTimeout(()=>{
-            nextSentence()
+            navSentence(++curSentence)
           },1000)    
          
       }
@@ -270,7 +269,7 @@ let audio;
         audio = new Audio(speechData.audio);
         let  endTime;
         audio.playbackRate = 0.9;   
-        if(speechData?.ts?.length>0){
+        if(speechData?.ts?.length>0 && focusedIndex<speechData.length){
           audio.currentTime = speechData.ts[focusedIndex].start;
           if(focusedIndex!=0)
             audio.playbackRate = 0.7;     
@@ -351,16 +350,16 @@ let audio;
   <TopAppBar bind:this={topAppBar} variant="fixed">
     <Row>
       <Section align="start">
-        <!-- {#if currentWordIndex > 0}
+        {#if curSentence > 0}
           <Icon
             tag="svg"
-            on:click={onPrev}
+            on:click={()=>{navSentence(--curSentence)}}
             viewBox="0 0 24 24"
             style="margin:10px 5px 10px 5px; scale:.5; width:50px"
           >
             <path fill="white" d={mdiArrowLeft} />
           </Icon>
-        {/if} -->
+        {/if}
       </Section>
       <Section align="start">
 
@@ -391,7 +390,7 @@ let audio;
         <div class="counter">
           <p>
             <span class="mdc-typography--overline" style="position:relative"
-              >{cur+1}
+              >{curSentence+1}
               <Badge
                 position="middle"
                 align="bottom-end - bottom-middle"
@@ -420,7 +419,7 @@ let audio;
       <Section align="end">
         <Icon
           tag="svg"
-          on:click={nextSentence}
+          on:click={()=>{navSentence(++curSentence)}}
           viewBox="0 0 24 24"
           style="margin:10px 5px 10px 5px; scale:.5; width:50px"
         >
@@ -449,7 +448,7 @@ let audio;
       <div class="trans">
             <!-- Исходное предложение -->
             {#if bricks_data?.translate}
-            <p>{bricks_data.translate[cur]}</p>
+            <p>{bricks_data.translate[curSentence]}</p>
             {/if}
       </div>
     {/if}
@@ -591,6 +590,7 @@ let audio;
     text-align: center; 
     margin: 10px 2px 15px 2px;
     gap: 6px;
+    font-weight: 700;
     flex-wrap: wrap;
     color:#007BFF
   }
