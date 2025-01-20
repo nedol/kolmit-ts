@@ -32,7 +32,7 @@ export async function Translate(text, from, to) {
   text = text.replace(/\r\n/g, ' ');
 
   // Разбиваем текст на предложения
-  const sentences = text.match(/[^.!?]+[.!?](?=\s|$|<)|[^.!?]+$/g) || [];
+  const sentences = text.split(/(?<=[.!?])\s+/);
   let translatedText = '';
 
   // Формируем группы из трёх предложений

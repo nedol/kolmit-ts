@@ -6,7 +6,6 @@
       if (from_lang === to_lang) return text;
 
       let question = { text: text, from_lang: from_lang, to_lang: to_lang };
-
       
       text = text?.trim();
 

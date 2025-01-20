@@ -8,6 +8,7 @@
   import TopAppBar, { Row, Title, Section } from '@smui/top-app-bar';
   import IconButton, { Icon } from '@smui/icon-button';
   import Badge from '@smui-extra/badge';
+  import CircularProgress from '@smui/circular-progress';
 
   let topAppBar;
 
@@ -120,7 +121,10 @@ let audio;
 
     sentence = bricks_data.text[curSentence].trim();
 
-    speechData = (await tts.GetGoogleTTS($llang, sentence,  data.name)).resp;
+    setTimeout(async()=>{
+      speechData = (await tts.GetGoogleTTS($llang, sentence,  data.name)).resp;
+    },1000)
+
 
     // Разбиваем на слова
     words = sentence.trim().split(/[\s,:\.]+/)  
@@ -228,12 +232,19 @@ let audio;
 
 
   
-  const navSentence = async(curSentence)=>{
+  const navSentence = async(nav)=>{
+
+    if(nav==='prev'){
+      --curSentence
+    }else if(nav==='next'){
+      ++curSentence
+    }
 
     current_word = 0;
 
-    if(curSentence>bricks_data.translate.length)
+    if(curSentence >= bricks_data.translate.length){
       curSentence = 0;
+    }
 
     sentence = bricks_data.text[curSentence].trim();
 
@@ -261,7 +272,7 @@ let audio;
           console.log()
           if(isEndSpeak===true)
           setTimeout(()=>{
-            navSentence(++curSentence)
+            navSentence('next')
           },1000)    
          
       }
@@ -342,10 +353,20 @@ let audio;
     translate = !translate
   }
 
-
 </script>
 
 <Tts bind:this={tts}></Tts>
+
+{#if bricks_data?.length < 1}
+  <div style="text-align:center">
+    <span
+      class="material-symbols-outlined"
+      style="font-size: 20px; color: blue; scale:1.5;"
+    >
+      <CircularProgress style="height: 50px; width: 50px;" indeterminate />
+    </span>
+  </div>
+{/if}
 <div class="top-app-bar-container flexor">
   <TopAppBar bind:this={topAppBar} variant="fixed">
     <Row>
@@ -353,7 +374,7 @@ let audio;
         {#if curSentence > 0}
           <Icon
             tag="svg"
-            on:click={()=>{navSentence(--curSentence)}}
+            on:click={()=>{navSentence('prev')}}
             viewBox="0 0 24 24"
             style="margin:10px 5px 10px 5px; scale:.5; width:50px"
           >
@@ -390,7 +411,7 @@ let audio;
         <div class="counter">
           <p>
             <span class="mdc-typography--overline" style="position:relative"
-              >{curSentence+1}
+              >{1+curSentence}
               <Badge
                 position="middle"
                 align="bottom-end - bottom-middle"
@@ -419,7 +440,7 @@ let audio;
       <Section align="end">
         <Icon
           tag="svg"
-          on:click={()=>{navSentence(++curSentence)}}
+          on:click={()=>{navSentence('next')}}
           viewBox="0 0 24 24"
           style="margin:10px 5px 10px 5px; scale:.5; width:50px;"
         >

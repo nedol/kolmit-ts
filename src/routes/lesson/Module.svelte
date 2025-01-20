@@ -375,7 +375,8 @@
                                 {/await}
                               {/if}
                             </div>
-
+                      
+                          
                             {#if quiz.type==='bricks'}
                               <Icon tag="svg" viewBox="0 0 24 24" width="20px" height="20px"  fill="grey" scale='.5'>
                                 <rect x="3" y="3" width="8" height="3" />
@@ -517,6 +518,7 @@
     display: inline-block; /* Позволяет корректно позиционировать вложенные элементы */
     width: 20px;
     height: 20px;
+    left:-5px;
   }
 
   .new-badge {
@@ -524,7 +526,7 @@
     color: red;
     font-size: 10px; /* Подбирайте размер шрифта для лучшей читаемости */
     top: -12px; /* Расположение над иконкой */
-    right: 8px; /* Расположение справа */
+    left: -5px; /* Расположение справа */
     background-color: transparent; /* Для контраста, опционально */
     border-radius: 3px; /* Слегка закругляем для стилистики */
     padding: 1px 1px; /* Отступы для лучшего внешнего вида */
