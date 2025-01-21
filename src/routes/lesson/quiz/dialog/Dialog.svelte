@@ -932,17 +932,19 @@
               /(?<!")\b\p{L}+(?<!\s)(?!")/gu,
               (match) => {
                 return `<span class="span_hidden" onclick="(this.style.color='#2196f3')" 
-                style="display:inline-block; font-size:1.4em ; margin: 5px 0px; padding: 1px 5px;border:1px;border-style:groove;border-color:lightblue;
-                color:transparent;">${match}</span>`;
+                style="display:inline-block; font-size:1.2em ; margin: 5px 0px; padding: 1px 5px;font-weight: 600;
+                border:1px;border-style:groove;border-color:lightblue;
+                border-radius: 5px;color:transparent;">${match}</span>`;
               }
             )}
           {:else if visibility[2] === 'visible'}
             {@html a[$llang].replace(
               /(?<!")\b\p{L}+(?<!\s)(?!")/gu,
               (match) => {
-                return `<span class="span_hidden"  
-                style="display:inline-block; font-size:1.4em; margin: 5px 0px; padding: 1px 5px;border:1px;border-style:groove;border-color:lightblue;
-                color:#2196f3">${match}</span>`;
+                return `<span class="span_visible"  
+                style="display:inline-block; font-size:1.2em; margin: 5px 0px; padding: 1px 5px;font-weight: 600;
+                border:1px; border-style:groove;border-color:lightblue;
+                border-radius: 5px;color:#2196f3">${match}</span>`;
               }
             )}
           {/if}
@@ -1034,68 +1036,69 @@
         </div>
 
         <div class="user2">
-          {#if a && visibility[1] === 'hidden'}
-            {@html a[$llang].replace(
-              /(?<!")\b[\p{L}\p{M}]+\b(?!")/gu,
-              (match) => {
-                return `<span class="span_hidden" onclick="(this.style.color='#2196f3')" 
-                style="display:inline-block;margin: 5px 0px;border:1px;border-style:groove;border-color:light-blue;
-                color:transparent; backgroung-color:white">${match}</span>`;
-              }
-            )}
-          {:else if visibility[1] === 'visible'}
-            {@html a[$llang].replace(
-              /(?<!")\b[\p{L}\p{M}]+\b(?!")/gu,
-              (match) => {
-                return `<span class="span_hidden"  
-                style="display:inline-block;margin: 5px 0px;border:1px;border-style:groove;border-color:light-blue;
-                color:#2196f3;backgroung-color:white"">${match}</span>`;
-              }
-            )}
-          {/if}
+            {#if a && visibility[1] === 'hidden'}
+              {@html a[$llang].replace(
+                /(?<!")\b[\p{L}\p{M}]+\b(?!")/gu,
+                (match) => {
+                  return `<span class="span_hidden" onclick="(this.style.color='#2196f3')" 
+                  style="display:inline-block;margin: 5px 0px;border:1px;border-style:groove;border-color:light-blue;
+                  color:transparent; backgroung-color:white">${match}</span>`;
+                }
+              )}
+            {:else if visibility[1] === 'visible'}
+              {@html a[$llang].replace(
+                /(?<!")\b[\p{L}\p{M}]+\b(?!")/gu,
+                (match) => {
+                  return `<span class="span_hidden"  
+                  style="display:inline-block;margin: 5px 0px;border:1px;border-style:groove;border-color:light-blue;
+                  color:#2196f3;backgroung-color:white"">${match}</span>`;
+                }
+              )}
+            {/if}
 
-          <div class="speaker-button" on:click={speak(a[$llang])}>
-            <IconButton>
-              <Icon tag="svg" viewBox="0 0 24 24">
-                <path fill="currentColor" d={mdiPlay} />
-              </Icon>
-            </IconButton>
-          </div>
-          {#if !share_mode}
-            <div
-              class="margins"
-              style="text-align: center; display: flex; align-items: center; justify-content: space-between;"
-            >
-              <div>
-                <IconButton
-                  class="material-icons"
-                  aria-label="Back"
-                  on:click={onClickMicrophone}
-                >
-                  <Icon tag="svg" viewBox="0 0 24 24">
-                    {#if isListening}
-                      <path fill="currentColor" d={mdiMicrophone} />
-                    {:else}
-                      <path fill="currentColor" d={mdiMicrophoneOutline} />
-                    {/if}
-                  </Icon>
-                </IconButton>
-              </div>
-              <Stt
-                bind:this={stt}
-                {SttResult}
-                {StopListening}
-                bind:display_audio
-              ></Stt>
+            <div class="speaker-button" on:click={speak(a[$llang])}>
+              <IconButton>
+                <Icon tag="svg" viewBox="0 0 24 24">
+                  <path fill="currentColor" d={mdiPlay} />
+                </Icon>
+              </IconButton>
             </div>
-          {/if}
-        </div>
 
-        <div style="text-align: center;   margin-top: 10px; ">
-          <span style="color: darkgreen;">
-            {@html stt_text}
-          </span>
-        </div>
+            {#if !share_mode}
+              <div
+                class="margins"
+                style="text-align: center; display: flex; align-items: center; justify-content: space-between;"
+              >
+                <div>
+                  <IconButton
+                    class="material-icons"
+                    aria-label="Back"
+                    on:click={onClickMicrophone}
+                  >
+                    <Icon tag="svg" viewBox="0 0 24 24">
+                      {#if isListening}
+                        <path fill="currentColor" d={mdiMicrophone} />
+                      {:else}
+                        <path fill="currentColor" d={mdiMicrophoneOutline} />
+                      {/if}
+                    </Icon>
+                  </IconButton>
+                </div>
+                <Stt
+                  bind:this={stt}
+                  {SttResult}
+                  {StopListening}
+                  bind:display_audio
+                ></Stt>
+              </div>
+            {/if}
+          </div>
+
+          <div style="text-align: center;   margin-top: 10px; ">
+            <span style="color: darkgreen;">
+              {@html stt_text}
+            </span>
+          </div>
         </div>
         <div class="border">
         <div class="container">

@@ -10,11 +10,20 @@
   import Badge from '@smui-extra/badge';
   import CircularProgress from '@smui/circular-progress';
 
+  import Stt from '../../../speech/stt/Stt.svelte';
+
+  
+  let isListening = false;
+
+  let isComplete = false;
+
   let topAppBar;
 
   let translate = false;
 
   let span_equal = true;
+
+  let stt_text = '';
 
   let isPlayAuto = false;
   let playAutoColor = 'currentColor';
@@ -43,8 +52,8 @@
       mdiFormatAlignLeft,
       mdiArrowRight,
       mdiArrowLeft,
-      mdiShuffle,
-      mdiPagePreviousOutline,
+      mdiMicrophoneOutline ,
+      mdiMicrophone,
       mdiChevronDownCircleOutline,
       mdiHelp,
       mdiTextBoxCheckOutline,
@@ -74,6 +83,7 @@ let curSentence = 0;
 let speechData = '';
 let current_word = 0;
 let audio;
+let display_audio;
 
   export let data;
   const operator = getContext('operator');
@@ -226,6 +236,7 @@ let audio;
   const checkCompletion = () => {
       // Если все элементы имеют класс "correct", вызываем функцию Speak
       if (formattedSentence.every(item => item.class === "correct")) {
+
           SpeakText(true);
       }
   };
@@ -241,6 +252,8 @@ let audio;
     }
 
     current_word = 0;
+    isComplete = false;
+    stt_text = ''
 
     if(curSentence >= bricks_data.translate.length){
       curSentence = 0;
@@ -272,27 +285,30 @@ let audio;
           console.log()
           if(isEndSpeak===true)
           setTimeout(()=>{
-            navSentence('next')
-          },1000)    
+            isComplete = true;
+          },500)    
          
       }
       if (sentence) {
         audio = new Audio(speechData.audio);
         let  endTime;
         audio.playbackRate = 0.9;   
-        if(speechData?.ts?.length>0 && focusedIndex<speechData.length){
-          audio.currentTime = speechData.ts[focusedIndex].start;
+        if(speechData?.ts?.length>0 && focusedIndex < speechData.ts.length){
+          audio.currentTime = speechData.ts[focusedIndex].start-.01;
           if(focusedIndex!=0)
-            audio.playbackRate = 0.7;     
+            audio.playbackRate = 0.8;     
           // endTime =  speechData.ts[current_word+3].end
         }
         // audio.text = text;
 
-        if (isEndSpeak)
+        if (focusedIndex >= speechData.ts.length-1){
+          audio.playbackRate = 0.9;   
+          audio.currentTime  = 0;
           audio.addEventListener('ended', function () {
             endSpeak();
             audio = '';
           });
+        }
          
          // Отслеживание текущего времени
         //  if( false && endTime)
@@ -353,6 +369,103 @@ let audio;
     translate = !translate
   }
 
+  function onClickMicrophone() {
+    if (isListening) {
+      stt.MediaRecorderStop();
+      isListening = false;
+      return;
+    }
+
+    stt.startAudioMonitoring($llang, $langs);
+
+    // const text = dialog_data.content[cur_qa].user1[llang].replace(/[^\w\s]/gi, ''); //.split(' ');
+
+    isListening = true;
+  }
+
+  function StopListening() {
+    isListening = false;
+  }
+
+  function SttResult(text) {
+    stt_text = text[$llang];
+
+    const numbers = sentence.match(/\b\d+\b/g);
+    if (numbers)
+      sentence = sentence.replace(/\b\d+\b/g, numberToDutchString(numbers[0]));
+
+    if (stt_text) {
+      const similarity = compareStrings(
+        sentence
+          .toLowerCase()
+          .trim()
+          .replace(/[^\w\s]|_/g, ''),
+        stt_text
+          .toLowerCase()
+          .trim()
+          .replace(/[^\w\s]|_/g, '') //replace(/[0-9!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~]/g, '')
+      );
+      stt_text += ` (${similarity.toFixed(0)}%)`;
+      if (similarity > 75) {
+        setTimeout(() => {
+          // onNextQA();
+        }, 3000);
+      }
+    }
+  }
+
+  function compareStrings(str1, str2) {
+    // Используем алгоритм Левенштейна для вычисления расстояния между строками
+
+    function levenshteinDistance(s, t) {
+      const d = []; // Массив для хранения результатов вычислений
+
+      // Заполняем массив нулями
+      for (let i = 0; i <= s.length; i++) {
+        d[i] = [i];
+      }
+      for (let j = 0; j <= t.length; j++) {
+        d[0][j] = j;
+      }
+
+      // Вычисляем расстояние Левенштейна
+      for (let j = 1; j <= t.length; j++) {
+        for (let i = 1; i <= s.length; i++) {
+          if (s.charAt(i - 1) === t.charAt(j - 1)) {
+            d[i][j] = d[i - 1][j - 1];
+          } else {
+            d[i][j] = Math.min(
+              d[i - 1][j] + 1, // удаление
+              d[i][j - 1] + 1, // вставка
+              d[i - 1][j - 1] + 1 // замена
+            );
+          }
+        }
+      }
+
+      // Расстояние Левенштейна между строками находится в d[s.length][t.length]
+      return d[s.length][t.length];
+    }
+
+    // Вычисляем длины строк
+    const len1 = str1.length;
+    const len2 = str2.length;
+
+    // Вычисляем максимальную длину строки из двух строк
+    const maxLength = Math.max(len1, len2);
+
+    // Вычисляем расстояние Левенштейна между строками
+    const distance = levenshteinDistance(str1, str2);
+
+    // Вычисляем процент совпадения
+    const similarity = (1 - distance / maxLength) * 100;
+
+    console.log('similarityPercentage', similarity);
+
+    // Возвращаем true, если процент совпадения больше 75, иначе false
+    return similarity;
+  }
+
 </script>
 
 <Tts bind:this={tts}></Tts>
@@ -382,10 +495,10 @@ let audio;
           </Icon>
         {/if}
       </Section>
-      <Section align="start">
+      <!-- <Section align="start">
 
-      </Section>
-      <Section>
+      </Section> -->
+      <Section align="start">
           
           <Icon tag="svg" viewBox="0 0 24 24" width="30px" height="30px"  fill="white"  
               on:click={()=>{span_equal = !span_equal; onToggleWord()}} >
@@ -481,7 +594,6 @@ let audio;
       <div class="title title2">{data_2}:</div>
       {/await} -->
 
-    
 
     <div class="formatted-list">
       {#each formattedSentence as item, index}
@@ -502,6 +614,43 @@ let audio;
     </div>
   </div>
 
+  {#if isComplete}
+  {#await Translate('Check a pronanciation', 'en', $langs) then data}
+    <div class="title">{data}:</div>
+  {/await}
+      
+  <div class="margins"
+    style="text-align: center; display: flex; align-items: center; justify-content: space-between;">
+    <div>
+      <IconButton
+        class="material-icons"
+        aria-label="Back"
+        on:click={onClickMicrophone}
+      >
+        <Icon tag="svg" viewBox="0 0 24 24">
+          {#if isListening}
+            <path fill="currentColor" d={mdiMicrophone} />
+          {:else}
+            <path fill="currentColor" d={mdiMicrophoneOutline} />
+          {/if}
+        </Icon>
+      </IconButton>
+    </div>
+    <Stt
+      bind:this={stt}
+      {SttResult}
+      {StopListening}
+      bind:display_audio
+    ></Stt>
+  </div>
+  <div style="text-align: center;  margin-top: 20px;">
+    <span style="color: darkgreen;">
+      {@html stt_text}
+    </span>
+  </div>
+
+  {:else}
+
   <div>
     <!-- Горизонтальный список слов -->
     {#await Translate('using the Set of words', 'en', $langs) then data}
@@ -514,6 +663,7 @@ let audio;
       {/each}
     </div>
   </div>
+{/if}
   <div style="height:200px"></div>
 </main>
 
@@ -608,12 +758,12 @@ let audio;
   
   .word-list, .formatted-list {
     display: flex;
-    text-align: center; 
+    text-align: center;
     margin: 10px 2px 15px 2px;
-    gap: 6px;
-    font-weight: 700;
+    gap: 10px;
+    font-weight: 500;
     flex-wrap: wrap;
-    color:#007BFF
+    color: #007BFF;
   }
 
   .word-list span, .formatted-list span {

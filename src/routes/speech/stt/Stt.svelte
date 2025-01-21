@@ -5,6 +5,8 @@
   // import { CreateMLCEngine } from '@mlc-ai/web-llm';
   // import { connect } from 'extendable-media-recorder-wav-encoder';
   // import { createModel, KaldiRecognizer } from 'vosk-browser';
+  // import whisper from "whisper-node";
+
 
   export let SttResult, StopListening, display_audio;
 
