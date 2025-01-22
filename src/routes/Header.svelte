@@ -115,15 +115,17 @@
 {#if $dicts && $langs && $dicts['CLASS'][$langs]}
   <header>
     <div class="top-app-bar-container flexor">
-      <TopAppBar bind:this={topAppBar} variant="fixed" dense>
-        <span class="level">{lvl}</span>
+      <TopAppBar bind:this={topAppBar} variant="fixed">
+      
         <Row>
-          <div class="sec_items">
+  
             {#if $view !== 'login'}
-              <Section>
-                {#await Translate('Quit the exercise?', 'en', $langs) then data}
-                <div class={$view !== 'lesson' ? 'active' : ''}>
-              
+              <Section align="start">
+                <span class="level">{lvl}</span>
+              </Section>
+              <Section align="start">
+  
+                <div class={$view !== 'lesson' ? 'active' : ''}>               
                   <Title
                     on:click={() => {
                       if ($lesson.data?.quiz) {
@@ -146,16 +148,22 @@
 
                   </Title>
                 </div>
+     
+              </Section>
+              <Section>
                 
                 <div class={$view === 'lesson' ? 'active' : ''}>
+                  {#await Translate('Quit the exercise?', 'en', $langs) then data}
                   <Title
                     on:click={async () => {
                       if ($lesson.data?.quiz) {
+                       
                         if (confirm(data)) {
                           $lesson.data = { quiz: '' };
                           $view = 'lesson';
                           $showBottomAppBar = true;
                         }
+                       
                       } else {
                         $lesson.data = { quiz: '' };
                         $view = 'lesson';
@@ -164,39 +172,43 @@
                     }}
                   >
                     {#await Translate('УРОК', 'ru', $langs) then data}
-                    <span>{data.toUpperCase()}</span>
-                  {/await}
+                       <span>{data.toUpperCase()}</span>
+                    {/await}
                   </Title>
+                  {/await}
                 </div>
                 
-                {/await}
+      
                 <!-- <IconButton class="material-icons" aria-label="Bookmark this page">bookmark</IconButton> -->
+              </Section>
+              <Section align="end">
+                <span
+                class="lang_span"
+                on:click={() => {
+                  lang_menu = !lang_menu;
+                }}
+                >{(() => {
+                  return $langs;
+                })()}</span
+              >
+              {#if lang_menu}
+                <div class="lang_list">
+                  {#each langs_list as lang}
+                    <div
+                      style="color:black;width:min-content; margin:10px;font-size:smaller"
+                      on:click={setLang}
+                    >
+                      {lang}
+                    </div>
+                  {/each}
+                </div>
+              {/if}
               </Section>
             {/if}
       
-        </div>
 
-        <span
-        class="lang_span"
-        on:click={() => {
-          lang_menu = !lang_menu;
-        }}
-        >{(() => {
-          return $langs;
-        })()}</span
-      >
-      {#if lang_menu}
-        <div class="lang_list">
-          {#each langs_list as lang}
-            <div
-              style="color:black;width:min-content; margin:10px;font-size:smaller"
-              on:click={setLang}
-            >
-              {lang}
-            </div>
-          {/each}
-        </div>
-      {/if}
+
+
     </Row>
       </TopAppBar>
       <div class="flexor-content"></div>
@@ -228,16 +240,16 @@
   }
 
   .level{
-    position: absolute;
+    position: relative;
     font-size: .6em;
-    left: 2px;
-    bottom: 0px;
+    top:15px;
+    left: 10px;
     color: rgb(148, 35, 35);
   }
 
   .lang_span {
     font-size: medium;
-    position: absolute;
+    position: relative;
     top: 10px;
     right: 20px;
     border: 0px solid aliceblue;
@@ -262,12 +274,12 @@
     opacity: 100%;
   }
 
-  .sec_items {
+  /* .sec_items {
     position: absolute;
     top: 40%;
     left: 50%;
     transform: translate(-50%, -50%);
-  }
+  } */
 
 
   button.sec_right {

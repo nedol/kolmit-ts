@@ -320,7 +320,7 @@
     <!-- {@debug data} -->
     <Quiz {data} />
   {:else if module}
-    <div class="lesson-container">
+
 
       {#each module.themes as theme, t}
         <br />
@@ -498,8 +498,8 @@
           </Accordion>
         </div>
       {/each}
-    </div>
-    <div style="height:100px"></div>
+
+    <div style="height:50px"></div>
   {/if}
 </main>
 

@@ -49,17 +49,12 @@
   } from '$lib/js/stores.js';
 
   import {
-      mdiFormatAlignLeft,
       mdiArrowRight,
       mdiArrowLeft,
       mdiMicrophoneOutline ,
       mdiMicrophone,
-      mdiChevronDownCircleOutline,
-      mdiHelp,
-      mdiTextBoxCheckOutline,
-      mdiPlay,
       mdiEarHearing,
-      mdiTranslateVariant,
+      mdiPlay,
       mdiTranslate,
       mdiTranslateOff
   } from '@mdi/js';
@@ -476,6 +471,10 @@ let display_audio;
     isSTT = !isSTT
   }
 
+  function PlayAutoContent(){
+
+  }
+
 </script>
 
 <Tts bind:this={tts}></Tts>
@@ -505,9 +504,15 @@ let display_audio;
           </Icon>
         {/if}
       </Section>
-      <!-- <Section align="start">
+      <Section align="start">
+ 
+          <IconButton on:click={PlayAutoContent}>
+            <Icon tag="svg" viewBox="0 0 24 24">
+              <path fill={playAutoColor} d={mdiEarHearing} />
+            </Icon>
+          </IconButton>
 
-      </Section> -->
+      </Section>
       <Section align="start">
           
           <Icon tag="svg" viewBox="0 0 24 24" width="30px" height="30px"  fill="white"  
@@ -539,7 +544,7 @@ let display_audio;
                 position="middle"
                 align="bottom-end - bottom-middle"
                 aria-label="unread count"
-                style="margin-right:-10px;scale:.8">{bricks_data?.text.length}</Badge
+                style="position:relative;top:-30px;right:-5px;scale:.8">{bricks_data?.text.length}</Badge
               >
             </span>
           </p>
@@ -553,10 +558,10 @@ let display_audio;
             on:click={onSTT}
           >
             <Icon tag="svg" viewBox="0 0 24 24">
-              {#if isListening}
-                <path fill="currentColor" d={mdiMicrophone} />
+              {#if isSTT}
+                <path fill="grey" d={mdiMicrophone} />
               {:else}
-                <path fill="currentColor" d={mdiMicrophoneOutline} />
+                <path fill="white" d={mdiMicrophoneOutline} />
               {/if}
             </Icon>
           </IconButton>
@@ -732,14 +737,13 @@ let display_audio;
   }
 
   .counter {
-      /* position: absolute; */
+      position: relative;
       background-color: #f0f0f0;
-      padding: 0px;
       border-radius: 25px;
       width: 30px;
       height: 30px;
-      top: -10px;
-      left: -6px;
+      top: 0px;
+      left: -5px;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
       text-align: center;
   }
