@@ -37,12 +37,16 @@
 
   export async  function Speak_server(lang, text, quiz, cb_end) {
 
-    const resp = await GetGoogleTTS(lang, text, quiz, cb_end);
+    const resp = await GetGoogleTTS(lang, text, quiz);
 
     audio = new Audio(resp.resp.audio);
       audio.type = 'audio/mpeg';
       audio.text = text;
       audio.playbackRate = lang === $langs ? 1 : 0.9;
+      if(cb_end)
+      audio.addEventListener('ended', function () {
+        cb_end();
+      });
       audio.play();
   }
 

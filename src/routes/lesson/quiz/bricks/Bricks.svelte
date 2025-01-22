@@ -26,6 +26,7 @@
   let stt_text = '';
 
   let isPlayAuto = false;
+
   let playAutoColor = 'currentColor';
 
   $: if (isPlayAuto) {
@@ -276,13 +277,10 @@ let display_audio;
 
   const SpeakText = async (isEndSpeak) => {
       const endSpeak = ()=> {
-          // clearTimeout(t);
-          console.log()
           if(isEndSpeak===true)
           setTimeout(()=>{
             navSentence(++curSentence)
-          },500)    
-         
+          },500)          
       }
       if (sentence) {
         audio = new Audio(speechData.audio);
@@ -295,12 +293,9 @@ let display_audio;
           // endTime =  speechData.ts[current_word+3].end
         }
 
-
-
         if (focusedIndex >= formattedSentence.length-1){
           audio.playbackRate = 0.9;   
           audio.currentTime  = 0;
-
         }
 
         if(!isSTT)
@@ -318,10 +313,6 @@ let display_audio;
           });
          audio.play();
       } 
-
-      // const t = setTimeout(()=>{
-      //     endSpeak();
-      // },sentence.length * 100)
   }
 
 
@@ -473,6 +464,30 @@ let display_audio;
 
   function PlayAutoContent(){
 
+    if (!isPlayAuto) return;
+
+    async function endSpeak() {
+
+      async function endLangSpeak(){
+        await navSentence('next');
+        PlayAutoContent();
+      }
+
+      tts.Speak_server($langs, bricks_data.translate[curSentence],data.name,endLangSpeak)
+
+    }
+
+    if (sentence) {
+        audio = new Audio(speechData.audio);
+        let  endTime;
+        audio.playbackRate = 0.9;   
+        audio.addEventListener('ended', function () {
+          endSpeak();
+          audio = '';
+        });
+        audio.play();
+    }
+
   }
 
 </script>
@@ -506,7 +521,7 @@ let display_audio;
       </Section>
       <Section align="start">
  
-          <IconButton on:click={PlayAutoContent}>
+          <IconButton on:click={()=>{ isPlayAuto = !isPlayAuto; PlayAutoContent()}}>
             <Icon tag="svg" viewBox="0 0 24 24">
               <path fill={playAutoColor} d={mdiEarHearing} />
             </Icon>

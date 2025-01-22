@@ -305,7 +305,7 @@
 
   function isNew(publishedDate,theme) {
 
-    if(Date.now() - new Date(publishedDate).getTime() < 10 * 24 * 60 * 60 * 1000){
+    if(Date.now() - new Date(publishedDate).getTime() < 5 * 24 * 60 * 60 * 1000){
       if(!theme.new_cnt)
         theme.new_cnt = 0;
       theme.new_cnt++;
