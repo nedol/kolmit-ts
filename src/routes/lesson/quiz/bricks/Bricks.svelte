@@ -15,7 +15,7 @@
   
   let isListening = false;
 
-  let isComplete = false;
+  let isSTT = false;
 
   let topAppBar;
 
@@ -252,7 +252,7 @@ let display_audio;
     }
 
     current_word = 0;
-    isComplete = false;
+    isSTT = false;
     stt_text = ''
 
     if(curSentence >= bricks_data.translate.length){
@@ -285,7 +285,7 @@ let display_audio;
           console.log()
           if(isEndSpeak===true)
           setTimeout(()=>{
-            isComplete = true;
+            navSentence(++curSentence)
           },500)    
          
       }
@@ -294,26 +294,30 @@ let display_audio;
         let  endTime;
         audio.playbackRate = 0.9;   
         if(speechData?.ts?.length>0 && focusedIndex < speechData.ts.length){
-          audio.currentTime = speechData.ts[focusedIndex].start-.01;
+          audio.currentTime = speechData.ts[focusedIndex].start-.001;
           if(focusedIndex!=0)
             audio.playbackRate = 0.8;     
           // endTime =  speechData.ts[current_word+3].end
         }
-        // audio.text = text;
 
-        if (focusedIndex >= speechData.ts.length-1){
+
+
+        if (focusedIndex >= speechData.ts?.length-1){
           audio.playbackRate = 0.9;   
           audio.currentTime  = 0;
+          if(!isSTT)
           audio.addEventListener('ended', function () {
             endSpeak();
             audio = '';
           });
         }
-         
+                 
          // Отслеживание текущего времени
         //  if( false && endTime)
           audio.addEventListener('timeupdate', () => {
-
+            endTime = speechData.ts[current_word + 5].end;
+            // if(audio.currentTime  >= endTime)
+            //   audio.pause()
           });
          audio.play();
       } 
@@ -466,6 +470,10 @@ let display_audio;
     return similarity;
   }
 
+  function onSTT(){
+    isSTT = !isSTT
+  }
+
 </script>
 
 <Tts bind:this={tts}></Tts>
@@ -533,6 +541,23 @@ let display_audio;
               >
             </span>
           </p>
+        </div>
+      </Section>
+      <Section align="end">
+        <div>
+          <IconButton
+            class="material-icons"
+            aria-label="Back"
+            on:click={onSTT}
+          >
+            <Icon tag="svg" viewBox="0 0 24 24">
+              {#if isListening}
+                <path fill="currentColor" d={mdiMicrophone} />
+              {:else}
+                <path fill="currentColor" d={mdiMicrophoneOutline} />
+              {/if}
+            </Icon>
+          </IconButton>
         </div>
       </Section>
       <Section align="end">
@@ -614,7 +639,7 @@ let display_audio;
     </div>
   </div>
 
-  {#if isComplete}
+  {#if isSTT}
   {#await Translate('Check a pronanciation', 'en', $langs) then data}
     <div class="title">{data}:</div>
   {/await}
@@ -671,6 +696,10 @@ let display_audio;
 
   :global(.mdc-top-app-bar__row){
       height:45px
+  }
+
+  :global(.mdc-icon-button){
+    top:5px
   }
 
   .top-app-bar-container{
