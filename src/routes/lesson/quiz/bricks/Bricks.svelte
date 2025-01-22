@@ -293,7 +293,7 @@ let display_audio;
         audio = new Audio(speechData.audio);
         let  endTime;
         audio.playbackRate = 0.9;   
-        if(speechData?.ts?.length>0 && focusedIndex < speechData.ts.length){
+        if(speechData?.ts?.length>0 && focusedIndex < formattedSentence.length-1){
           audio.currentTime = speechData.ts[focusedIndex].start-.001;
           if(focusedIndex!=0)
             audio.playbackRate = 0.8;     
@@ -302,15 +302,17 @@ let display_audio;
 
 
 
-        if (focusedIndex >= speechData.ts?.length-1){
+        if (focusedIndex >= formattedSentence.length-1){
           audio.playbackRate = 0.9;   
           audio.currentTime  = 0;
-          if(!isSTT)
-          audio.addEventListener('ended', function () {
-            endSpeak();
-            audio = '';
-          });
+
         }
+
+        if(!isSTT)
+            audio.addEventListener('ended', function () {
+              endSpeak();
+              audio = '';
+            });
                  
          // Отслеживание текущего времени
         //  if( false && endTime)
@@ -618,8 +620,6 @@ let display_audio;
       <!-- {#await Translate('(используй подсказки слов в случае необходимости)', 'ru', $langs) then data_2}
       <div class="title title2">{data_2}:</div>
       {/await} -->
-
-
     <div class="formatted-list">
       {#each formattedSentence as item, index}
         <span class="{item.class}"
@@ -674,7 +674,7 @@ let display_audio;
     </span>
   </div>
 
-  {:else}
+  {/if}
 
   <div>
     <!-- Горизонтальный список слов -->
@@ -688,7 +688,7 @@ let display_audio;
       {/each}
     </div>
   </div>
-{/if}
+
   <div style="height:200px"></div>
 </main>
 
