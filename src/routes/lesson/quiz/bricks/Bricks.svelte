@@ -307,7 +307,12 @@ let display_audio;
          // Отслеживание текущего времени
         //  if( false && endTime)
           audio.addEventListener('timeupdate', () => {
-            endTime = speechData.ts[current_word + 5].end;
+            let endTime;
+            if (speechData.ts.length > current_word + 5) {
+              endTime = speechData.ts[current_word + 5].end;
+            } else {
+              endTime = speechData.ts[speechData.ts.length].end; // Если выходит за пределы массива, берем последний элемент
+            }
             // if(audio.currentTime  >= endTime)
             //   audio.pause()
           });
@@ -509,20 +514,26 @@ let display_audio;
     <Row>
       <Section align="start">
         {#if curSentence > 0}
-          <Icon
-            tag="svg"
-            on:click={()=>{navSentence('prev')}}
-            viewBox="0 0 24 24"
-            style="margin:10px 5px 10px 5px; scale:.5; width:50px"
-          >
-            <path path fill="none" stroke="white" stroke-width="2" stroke-linejoin="round"  d={mdiArrowLeft} />
-          </Icon>
-        {/if}
+        <Icon
+          tag="svg"
+          on:click={() => { navSentence('prev') }}
+          viewBox="0 0 24 24"
+          style="margin:10px 5px 10px 5px; scale:1.3; width:20px; visibility: {curSentence > 0 ? 'visible' : 'hidden'}"
+        >
+          <path fill="white" stroke="white" stroke-width="1.5" stroke-linejoin="round" d={mdiArrowLeft} />
+        </Icon>
+      {:else}
+        <Icon
+          tag="svg"
+          viewBox="0 0 24 24"
+          style="margin:10px 5px 10px 5px; scale:1.3; width:20px; visibility: hidden;"
+        />
+      {/if}
       </Section>
       <Section align="start">
  
           <IconButton on:click={()=>{ isPlayAuto = !isPlayAuto; PlayAutoContent()}}>
-            <Icon tag="svg" viewBox="0 0 24 24">
+            <Icon tag="svg" viewBox="0 0 24 24" style="position:absolute;margin:0px 10px 5px 10px ;scale:1.3;width:20px">
               <path fill={playAutoColor} d={mdiEarHearing} />
             </Icon>
           </IconButton>
@@ -572,7 +583,7 @@ let display_audio;
             aria-label="Back"
             on:click={onSTT}
           >
-            <Icon tag="svg" viewBox="0 0 24 24">
+            <Icon tag="svg" viewBox="0 0 24 24" style="position:absolute; margin:10px 5px 10px 5px; scale:1.4;width:20px">
               {#if isSTT}
                 <path fill="grey" d={mdiMicrophone} />
               {:else}
@@ -602,9 +613,9 @@ let display_audio;
           tag="svg"
           on:click={()=>{navSentence('next')}}
           viewBox="0 0 24 24"
-          style="margin:10px 5px 10px 5px; scale:.5; width:50px;"
+          style="margin:10px 5px 10px 5px; scale:1.3; width:20px;"
         >
-        <path fill="none" stroke="white" stroke-width="2" stroke-linejoin="round" d={mdiArrowRight} />
+        <path fill="white" stroke="white" stroke-width="1.5" stroke-linejoin="round" d={mdiArrowRight} />
       </Icon>
       </Section>
     </Row>
@@ -659,6 +670,21 @@ let display_audio;
     </div>
   </div>
 
+  <div>
+    <!-- Горизонтальный список слов -->
+    {#await Translate('using the Set of words', 'en', $langs) then data}
+        <div class="title">{data}:</div>
+    {/await}
+
+    <div class="word-list">
+      {#each words as word, index}
+        <span on:click={() => handleClick(words[index])}>{word}</span>
+      {/each}
+    </div>
+  </div>
+
+
+
   {#if isSTT}
   {#await Translate('Check a pronanciation', 'en', $langs) then data}
     <div class="title">{data}:</div>
@@ -696,26 +722,14 @@ let display_audio;
 
   {/if}
 
-  <div>
-    <!-- Горизонтальный список слов -->
-    {#await Translate('using the Set of words', 'en', $langs) then data}
-        <div class="title">{data}:</div>
-    {/await}
-
-    <div class="word-list">
-      {#each words as word, index}
-        <span on:click={() => handleClick(words[index])}>{word}</span>
-      {/each}
-    </div>
-  </div>
-
   <div style="height:200px"></div>
+
 </main>
 
 <style>
 
   :global(.mdc-top-app-bar__row){
-      height:45px
+      height:48px
   }
 
   :global(.mdc-icon-button){

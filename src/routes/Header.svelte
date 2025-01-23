@@ -240,16 +240,16 @@
   }
 
   .level{
-    position: relative;
+    position: absolute;
     font-size: .6em;
-    top:15px;
+    top:25px;
     left: 10px;
     color: rgb(148, 35, 35);
   }
 
   .lang_span {
     font-size: medium;
-    position: relative;
+    position: absolute;
     top: 10px;
     right: 20px;
     border: 0px solid aliceblue;
