@@ -110,7 +110,7 @@ let display_audio;
     });
 
   
-   const InitData = async()=>{
+  const InitData = async()=>{
 
     if(!bricks_data)
     return
@@ -241,6 +241,7 @@ let display_audio;
   
   const navSentence = async(nav)=>{
 
+
     if(nav==='prev'){
       --curSentence
     }else if(nav==='next'){
@@ -248,7 +249,7 @@ let display_audio;
     }
 
     current_word = 0;
-    isSTT = false;
+    // isSTT = false;
     stt_text = ''
 
     if(curSentence >= bricks_data.translate.length){
@@ -279,7 +280,8 @@ let display_audio;
       const endSpeak = ()=> {
           if(isEndSpeak===true)
           setTimeout(()=>{
-            navSentence(++curSentence)
+            if(!isSTT)
+              navSentence(++curSentence)
           },500)          
       }
       if (sentence) {

@@ -1,6 +1,12 @@
 import pkg from 'lodash';
 const { findIndex } = pkg;
 
+import ISO6391 from 'iso-google-locales';
+
+
+import Reverso from 'reverso-api'
+const reverso = new Reverso()
+
 // const translate = require('google-translate-api');
 // import pkg from 'google-translate-api';
 // const translate = require('google-translate-free')
@@ -51,7 +57,7 @@ export async function Translate(text, from, to) {
 
     // Попытка перевода через Google Translate API
     try {
-      res = await translate(chunk, { to, from });
+      res = await translate(chunk, { to, from });// reversoTranslate(chunk, { to, from })//
     } catch (error) {
       console.error('Translation error:', error);
       res = chunk; // Если перевод не удался, возвращаем оригинальный текст
@@ -67,4 +73,18 @@ export async function Translate(text, from, to) {
 
   // Убираем лишние пробелы
   return translatedText.trim();
+}
+
+async function reversoTranslate(text, lang){
+  let from = ISO6391.getName(lang.from).toLowerCase();
+  const to =  ISO6391.getName(lang.to).toLowerCase();
+  await reverso.getTranslation(
+    text,
+    from,
+    to,
+    (err, response) => {
+        if (err) throw new Error(err.message)
+        return response.translations[0];
+      }
+    )
 }
