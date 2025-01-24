@@ -665,11 +665,7 @@ export async function WriteSpeech(q) {
                 VALUES (${q.lang}, ${q.key}, ${q.text}, ${q.data}, ${q.quiz}, ${q.timestamps})
                 ON CONFLICT (key) 
                 DO UPDATE SET 
-                    lang = EXCLUDED.lang, 
-                    text = EXCLUDED.text, 
-                    data = EXCLUDED.data, 
-                    quiz = EXCLUDED.quiz,
-                    timestamps = EXCLUDED.timestamps`;
+                    data = EXCLUDED.data`;
     });
     return { success: true, message: "Data written successfully." };
   } catch (ex) {

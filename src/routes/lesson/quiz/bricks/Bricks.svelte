@@ -99,7 +99,8 @@ let display_audio;
       bricks_data = data.data;
     
       // Преобразуем HTML в текст и разбиваем на массив предложений
-      bricks_data.text = htmlToText(bricks_data.html).replaceAll('"','').split(/(?<=[.?!])\s+/);
+      // bricks_data.text = htmlToText(bricks_data.html).replaceAll('"','').split(/(?<=[.?!])\s+/);
+      bricks_data.text = splitHtmlIntoSentencesWithInnerTags(bricks_data.html);//.replaceAll('"','').split(/(?<=[.?!])\s+/);
 
       InitData();
 
@@ -109,6 +110,10 @@ let display_audio;
       return [];
     });
 
+  function extractTagName(tagString) {
+      const match = tagString.match(/^<(\w+)/); // Находим первую часть тега
+      return match ? match[1] : ''; // Возвращаем название тега или null, если не найдено
+  }
   
   const InitData = async()=>{
 
@@ -119,31 +124,39 @@ let display_audio;
     const textToTranslate = bricks_data.text.join(' ');
 
     // Переводим единый текст и преобразуем результат обратно в массив предложений
-    bricks_data.translate = (await Translate(JSON.stringify(textToTranslate), $llang, $langs))
-      .replace(/^[\"«]|[\"»]$/g, '')
-      .split(/(?<=[.?!])\s+/) // Разбиваем на предложения
-      .map(sentence => sentence.trim()) // Убираем лишние пробелы
-      .filter(sentence => sentence !== ''); 
+    // bricks_data.translate = (await Translate(JSON.stringify(textToTranslate), $llang, $langs))
+    //   .replace(/^[\"«]|[\"»]$/g, '')
+    //   .split(/(?<=[.?!])\s+/) // Разбиваем на предложения
+    //   .map(sentence => sentence.trim()) // Убираем лишние пробелы
+    //   .filter(sentence => sentence !== ''); 
 
     sentence = bricks_data.text[curSentence].trim();
 
     setTimeout(async()=>{
-      speechData = (await tts.GetGoogleTTS($llang, sentence,  data.name)).resp;
+      speechData = (await tts.GetGoogleTTS($llang, sentence.replace(/<[^>]*>/g, ''),  data.name)).resp;
     },1000)
 
 
     // Разбиваем на слова
-    words = sentence.trim().split(/[\s,:\.]+/)  
-
-    // Создаём массив для предложения с placeholder'ами
-    formattedSentence = words
+    words =  sentence.trim().split(/[\s,:\.]+/) 
         .filter(word => word) // Оставляем только существующие слова
         .map((word) => ({
+            gr: extractTagName(word),
             placeholder: "\u00a0\u00a0\u00a0\u00a0\u00a0", 
             value: word.trim()
         }));
 
-    words =  Array.from(new Set(sentence.trim().split(/[\s,:\.]+/).filter(word => word !== "")))
+
+    // Создаём массив для предложения с placeholder'ами
+    formattedSentence = sentence.trim().split(/[\s,:\.]+/)  
+        .filter(word => word) // Оставляем только существующие слова
+        .map((word) => ({
+            gr: extractTagName(word),
+            placeholder: "\u00a0\u00a0\u00a0\u00a0\u00a0", 
+            value: word.trim()
+        }));
+
+    // words =  Array.from(new Set(sentence.trim().split(/[\s,:\.]+/).filter(word => word !== "")))
     // Устанавливаем фокус на первый элемент
     setTimeout(() => {
         MakeBricks();
@@ -172,6 +185,45 @@ let display_audio;
       }
       return array;
   }
+
+  function splitHtmlByParagraphs(html) {
+    let tempDiv = document.createElement('div');
+    tempDiv.innerHTML = html;
+
+    // Находим все <p> элементы
+    const paragraphs = tempDiv.querySelectorAll('p');
+
+    // Создаём массив с содержимым каждого <p>
+    const parts = Array.from(paragraphs).map(p => p.innerHTML || "");
+
+    return parts;
+  }
+
+  function splitHtmlIntoSentencesWithInnerTags(html) {
+    // Удаляем эмодзи с помощью регулярного выражения
+    function removeEmojis(input) {
+          const regex = emojiRegex();
+          return input.replace(regex, '');
+    }
+
+    // Создаём временный элемент для парсинга HTML
+    let tempDiv = document.createElement('div');
+    tempDiv.innerHTML = html;
+
+    // Извлекаем все <p> элементы
+    const paragraphs = tempDiv.querySelectorAll('p');
+
+    // Обрабатываем каждый <p>, удаляя эмодзи и разбивая на предложения
+    const sentences = Array.from(paragraphs).flatMap(p => {
+        // Убираем эмодзи из содержимого <p>
+        const cleanedContent = removeEmojis(p.innerHTML);
+
+        // Разбиваем содержимое на предложения, сохраняя внутренние теги
+        return cleanedContent.match(/[^.!?]+[.!?]+|[^.!?]+$/g) || [];
+    });
+
+    return sentences;
+}
 
   function htmlToText(html) {
       // Удаляем эмодзи с помощью библиотеки
@@ -203,9 +255,9 @@ let display_audio;
   // Обработчик клика на слово
   const handleClick = (word) => {
       // Присваиваем выбранное слово фокусируемому элементу
-      if(formattedSentence[focusedIndex].value.toLowerCase() === word.toLowerCase()){
+      if(formattedSentence[focusedIndex].value.toLowerCase() === word.value.toLowerCase()){
 
-          formattedSentence[focusedIndex].word =  word ;
+          formattedSentence[focusedIndex].word =  word.value ;
           formattedSentence[focusedIndex].class = "correct";
 
           // После того как слово присвоено, ищем следующий элемент для фокуса
@@ -223,7 +275,7 @@ let display_audio;
           checkCompletion();
 
       }else{
-          formattedSentence[focusedIndex].word =  word ;
+          formattedSentence[focusedIndex].word =  word.value ;
           formattedSentence[focusedIndex].class = "incorrect";
       }
   };
@@ -241,7 +293,6 @@ let display_audio;
   
   const navSentence = async(nav)=>{
 
-
     if(nav==='prev'){
       --curSentence
     }else if(nav==='next'){
@@ -252,26 +303,33 @@ let display_audio;
     // isSTT = false;
     stt_text = ''
 
-    if(curSentence >= bricks_data.translate.length){
+    if(curSentence >= bricks_data.text.length){
       curSentence = 0;
     }
 
     sentence = bricks_data.text[curSentence].trim();
 
-    const resp = await tts.GetGoogleTTS($llang, sentence,  data.name);
+    const resp = await tts.GetGoogleTTS($llang, sentence.replace(/<[^>]*>/g, ''),  data.name);
       speechData = resp.resp;
       console.log('speechData:',speechData)
       // sentence = sentence;
-      words = sentence.trim().split(/[\s,:\.]+/); 
+      words = sentence.trim().split(/[\s,:\.]+/)
+        .filter(word => word) // Оставляем только существующие слова
+        .map((word) => ({
+            gr: extractTagName(word),
+            placeholder: "\u00a0\u00a0\u00a0\u00a0\u00a0", 
+            value: word.trim()
+        })); 
       // Создаём массив для предложения с placeholder'ами
-      formattedSentence = words
+      formattedSentence = sentence.trim().split(/[\s,:\.]+/)
           .filter(word => word) // Оставляем только существующие слова
           .map((word) => ({
-              placeholder: "\u00a0\u00a0\u00a0\u00a0\u00a0", 
-              value: word.trim()
+            gr: extractTagName(word),
+            placeholder: "\u00a0\u00a0\u00a0\u00a0\u00a0", 
+            value: word.trim()
           }));
 
-      words =  Array.from(new Set(sentence.trim().split(/[\s,:\.]+/).filter(word => word !== "")))    
+      // words =  Array.from(new Set(sentence.trim().split(/[\s,:\.]+/).filter(word => word !== "")))    
 
       MakeBricks();
   }
@@ -312,7 +370,7 @@ let display_audio;
             let endTime;
             if (speechData.ts.length > current_word + 5) {
               endTime = speechData.ts[current_word + 5].end;
-            } else {
+            } else if(speechData.ts.length>0){
               endTime = speechData.ts[speechData.ts.length].end; // Если выходит за пределы массива, берем последний элемент
             }
             // if(audio.currentTime  >= endTime)
@@ -340,7 +398,7 @@ let display_audio;
       requestAnimationFrame(() => {
           const nextElement = document.querySelectorAll('.formatted-list span')[focusedIndex];
           if (nextElement) {
-          nextElement.focus();
+            nextElement.focus();
           }
       });        
   }
@@ -535,7 +593,7 @@ let display_audio;
       <Section align="start">
  
           <IconButton on:click={()=>{ isPlayAuto = !isPlayAuto; PlayAutoContent()}}>
-            <Icon tag="svg" viewBox="0 0 24 24" style="position:absolute;margin:0px 10px 5px 10px ;scale:1.3;width:20px">
+            <Icon tag="svg" viewBox="0 0 24 24" style="position:absolute;margin:0px 10px 5px 10px ;scale:1.3;width:30px">
               <path fill={playAutoColor} d={mdiEarHearing} />
             </Icon>
           </IconButton>
@@ -585,7 +643,7 @@ let display_audio;
             aria-label="Back"
             on:click={onSTT}
           >
-            <Icon tag="svg" viewBox="0 0 24 24" style="position:absolute; margin:10px 5px 10px 5px; scale:1.4;width:20px">
+            <Icon tag="svg" viewBox="0 0 24 24" style="position:absolute; margin:10px 5px 10px 5px; scale:1.3;width:30px">
               {#if isSTT}
                 <path fill="grey" d={mdiMicrophone} />
               {:else}
@@ -599,13 +657,13 @@ let display_audio;
         <Icon
           tag="svg"
           viewBox="0 0 24 24"
-          style="margin:10px 5px 10px 5px; scale:1.2; width:20px"
+          style="margin:10px 5px 10px 5px; scale:1.1; width:30px"
           on:click={ToggleTranslate}
         >
         {#if translate}
-          <path fill="white" d={mdiTranslateOff}/>
+          <path fill="grey" d={mdiTranslateOff}/>
         {:else}
-          <path fill="grey" d={mdiTranslate}/>
+          <path fill="white" d={mdiTranslate}/>
         {/if}
         </Icon>
       </Section>
@@ -641,9 +699,9 @@ let display_audio;
     {#if translate}
       <div class="trans">
             <!-- Исходное предложение -->
-            {#if bricks_data?.translate}
-            <p>{bricks_data.translate[curSentence]}</p>
-            {/if}
+            {#await Translate(sentence.replace(/<[^>]*>/g, ''), $llang, $langs) then data}
+            <p>{data}</p>
+            {/await}
       </div>
     {/if}
     <!-- Предложение с замененными словами -->
@@ -655,11 +713,11 @@ let display_audio;
       {/await} -->
     <div class="formatted-list">
       {#each formattedSentence as item, index}
-        <span class="{item.class}"
+        <span class={`${item.class} ${item.gr}`}
           tabindex="0" 
           on:click={() => {item.word=item.value; handleFormatted(item)}}
           on:focus={() => handleFocus(index)}>
-          {item.word || item.placeholder}
+          {@html item.word || item.placeholder}
         </span>
       {/each}
       <div class="speaker-button" on:click={SpeakText}>
@@ -680,7 +738,7 @@ let display_audio;
 
     <div class="word-list">
       {#each words as word, index}
-        <span on:click={() => handleClick(words[index])}>{word}</span>
+        <span class={word.gr} on:click={() => handleClick(words[index])}>{@html word.value}</span>
       {/each}
     </div>
   </div>
@@ -827,10 +885,11 @@ let display_audio;
     gap: 10px;
     font-weight: 500;
     flex-wrap: wrap;
-    color: #007BFF;
+    color: rgb(67, 65, 65);
   }
 
-  .word-list span, .formatted-list span {
+  .word-list span:not(.ver):not(.subj):not(.tijd):not(.plaats), 
+  .formatted-list span:not(.ver):not(.subj):not(.tijd):not(.plaats) {
     padding: 0px 6px;
     border: 1px solid #ddd;
     border-radius: 5px;
@@ -840,15 +899,16 @@ let display_audio;
   }
 
   .formatted-list span:focus {
-    outline: 2px solid #007BFF;
+    outline: 2px solid #5b91cb;
   }
 
   .correct{
-      color:green
+      /* color:green */
   }
 
   .incorrect{
-      color:red
+      color:red;
+      animation: blink 1s infinite;
   }
 
   .material-symbols-outlined {
@@ -860,6 +920,88 @@ let display_audio;
       'GRAD' 0,
       'opsz' 24;
   }
+  /* :global(ver){
+    border-radius: 5px;
+    border:2px solid;
+    padding: 5px 10px;
+    border-color: red;
+  }  */
+
+ .ver {
+    position: relative;
+    border:2px solid; 
+    border-color: rgb(225, 111, 111); 
+    border-radius: 5px;
+    /* background-color: lightcoral; */
+    padding: 0px 6px;
+  } 
+
+  .word-list .ver,.formatted-list .ver{
+    color: rgb(225, 111, 111); 
+  }
+
+  /* :global(subj){
+    border-radius: 5px;
+    border:2px solid;
+    padding: 5px 10px;
+    border-color: lightblue;
+  }  */
+
+  .subj{
+    position: relative;
+    border:2px solid; 
+    border-color: rgb(101, 101, 192); 
+    border-radius: 7px;
+    /* background-color:lightskyblue; */
+    padding: 0px 6px;
+  } 
+
+  .word-list .subj{
+    color: rgb(101, 101, 192); 
+  }
+
+  .tijd{
+    position: relative;
+    border:2px solid; 
+    border-color: rgb(119, 201, 119); 
+    border-radius: 5px;
+    /* background-color: lightgreen; */
+    padding: 0px 6px;
+  } 
+
+  .word-list .tijd{
+    color: rgb(119, 201, 119);
+  }
+
+  .plaats{
+    position: relative;
+    border:2px solid; 
+    border-color:  darkmagenta;
+    /* background-color: lightcyan ; */
+    border-radius: 5px;
+    padding: 0px 6px;
+  } 
+  .word-list .plaats{
+    color:  darkmagenta
+  }
+
+  /* Анимация мигания */
+  @keyframes blink {
+    0%, 100% {
+      color:red;
+      box-shadow: 0 0 10px 2px rgba(124, 152, 183, 0.8); /* Синий свет */
+    }
+    50% {
+      color:white;
+      box-shadow: 0 0 10px 2px rgba(0, 123, 255, 0); /* Исчезает */
+    }
+  }
+
+   /* Эффект мигания при фокусе */
+   span:focus {
+      border-color: transparent;
+      animation: blink 1s infinite; /* Запускает мигание */
+    }
 
       /* Стили для мобильных устройств */
   @media screen and (max-width: 767px) {
@@ -867,9 +1009,9 @@ let display_audio;
           font-size: 0.7em;
       }
       .word-list, .formatted-list {
-          font-size: 0.8em;
+          font-size: 0.9em;
           /* margin: 2px 10px; */
-          padding: 0 4px
+          padding: 0 2px
       }
       .title{
           font-size: small;
