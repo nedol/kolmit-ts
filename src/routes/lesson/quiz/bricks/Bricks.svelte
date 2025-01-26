@@ -91,7 +91,7 @@ let display_audio;
     
       // Преобразуем HTML в текст и разбиваем на массив предложений
       // bricks_data.text = htmlToText(bricks_data.html).replaceAll('"','').split(/(?<=[.?!])\s+/);
-      bricks_data.text = splitHtmlIntoSentencesWithInnerTags(bricks_data.html);//.replaceAll('"','').split(/(?<=[.?!])\s+/);
+      bricks_data.text = splitHtmlIntoSentencesWithInnerTags(bricks_data.html.replaceAll('"',''));//.replaceAll('"','').split(/(?<=[.?!])\s+/);
 
       InitData();
 
@@ -209,7 +209,7 @@ let display_audio;
     const sentences = Array.from(paragraphs).flatMap(p => {
         // Убираем эмодзи из содержимого <p>
         const cleanedContent = removeEmojis(p.innerHTML.trim());
-        if (cleanedContent !== "") {
+        if (cleanedContent !== "" && cleanedContent.length>3)  {
             // Разбиваем содержимое на предложения, сохраняя внутренние теги
             return cleanedContent.match(/[^.!?]+[.!?]+|[^.!?]+$/g) || [];
         }
