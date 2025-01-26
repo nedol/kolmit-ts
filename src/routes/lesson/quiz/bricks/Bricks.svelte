@@ -110,16 +110,20 @@ let display_audio;
 
     if(!bricks_data)
     return
-
+ 
     // Объединяем массив предложений в единый текст
-    const textToTranslate = bricks_data.text.join(' ');
+    const textToTranslate = bricks_data.text.join(' ').replace(/<[^>]*>/g, '');
 
     //Переводим единый текст и преобразуем результат обратно в массив предложений
-    bricks_data.translate = (await Translate(JSON.stringify(textToTranslate), $llang, $langs))
+    setTimeout(async()=>{
+      bricks_data.translate = (await Translate(JSON.stringify(textToTranslate), $llang, $langs))
       .replace(/^[\"«]|[\"»]$/g, '')
       .split(/(?<=[.?!])\s+/) // Разбиваем на предложения
       .map(sentence => sentence.trim()) // Убираем лишние пробелы
       .filter(sentence => sentence !== ''); 
+      bricks_data.translate  = bricks_data.translate 
+    },100)
+
 
     sentence = bricks_data.text[curSentence].trim().replace(/<[^>]*>/g, '');
 
