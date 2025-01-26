@@ -36,17 +36,8 @@
   }
 
   import {
-      lesson,
       langs,
-      dicts,
       llang,
-      view,
-      dc,
-      dc_state,
-      msg,
-      call_but_status,
-      showBottomAppBar,
-      OnCheckQU,
   } from '$lib/js/stores.js';
 
   import {
@@ -130,10 +121,10 @@ let display_audio;
     //   .map(sentence => sentence.trim()) // Убираем лишние пробелы
     //   .filter(sentence => sentence !== ''); 
 
-    sentence = bricks_data.text[curSentence].trim();
+    sentence = bricks_data.text[curSentence].trim().replace(/<[^>]*>/g, '');
 
     setTimeout(async()=>{
-      speechData = (await tts.GetGoogleTTS($llang, sentence.replace(/<[^>]*>/g, ''),  data.name)).resp;
+      speechData = (await tts.GetGoogleTTS($llang, sentence,  data.name)).resp;
     },1000)
 
 
@@ -169,7 +160,7 @@ let display_audio;
 
   function MakeBricks(){
       // Перемешиваем formattedSentence
-      words = shuffleArray(words);
+
       const firstElement = document.querySelector('.formatted-list span');
       if (firstElement) {
           firstElement.focus();
@@ -284,7 +275,6 @@ let display_audio;
   const checkCompletion = () => {
       // Если все элементы имеют класс "correct", вызываем функцию Speak
       if (formattedSentence.every(item => item.class === "correct")) {
-
           SpeakText(true);
       }
   };
@@ -407,19 +397,50 @@ let display_audio;
 
       if(!span_equal){
 
-          formattedSentence.forEach((item)=>{
-              item.placeholder = item.value;
-              item.class = "invisible"
-          });
+        sentence = bricks_data.text[curSentence].trim();
+
+        formattedSentence = sentence.trim().split(/[\s,:\.]+/)
+          .filter(word => word) // Оставляем только существующие слова
+          .map((word) => ({
+            gr: extractTagName(word),
+            placeholder: "\u00a0\u00a0\u00a0\u00a0\u00a0", 
+            value: word.trim()
+          }));
+
+        formattedSentence.forEach((item)=>{
+            item.placeholder = item.value;
+            item.class = "invisible"
+        });
+
       }else{
-          formattedSentence.forEach((item)=>{
-              item.placeholder = "\u00a0\u00a0\u00a0\u00a0\u00a0";
-              item.class = ""
-          });
+        sentence = bricks_data.text[curSentence].trim().replace(/<[^>]*>/g, '');
+        formattedSentence = sentence.trim().split(/[\s,:\.]+/)
+          .filter(word => word) // Оставляем только существующие слова
+          .map((word) => ({
+            gr: extractTagName(word),
+            placeholder: "\u00a0\u00a0\u00a0\u00a0\u00a0", 
+            value: word.trim()
+          }));
+        formattedSentence.forEach((item)=>{
+            item.placeholder = "\u00a0\u00a0\u00a0\u00a0\u00a0";
+            item.class = ""
+        });
+        
+
+
       }
+          // Разбиваем на слова
+      words =  sentence.trim().split(/[\s,:\.]+/) 
+      .filter(word => word) // Оставляем только существующие слова
+      .map((word) => ({
+          gr: extractTagName(word),
+          placeholder: "\u00a0\u00a0\u00a0\u00a0\u00a0", 
+          value: word.trim()
+      }));
+
+      words = shuffleArray(words);
 
       formattedSentence = formattedSentence
-
   }
 
   function ToggleTranslate(){
@@ -586,38 +607,58 @@ let display_audio;
         <Icon
           tag="svg"
           viewBox="0 0 24 24"
+
           style="margin:10px 5px 10px 5px; scale:1.3; width:20px; visibility: hidden;"
         />
       {/if}
       </Section>
-      <Section align="start">
- 
+      <Section align="start"> 
           <IconButton on:click={()=>{ isPlayAuto = !isPlayAuto; PlayAutoContent()}}>
-            <Icon tag="svg" viewBox="0 0 24 24" style="position:absolute;margin:0px 10px 5px 10px ;scale:1.3;width:30px">
+            <Icon tag="svg" viewBox="0 0 24 24" style="position:absolute;margin:0px 10px 5px 10px ;scale:1.1;width:30px">
               <path fill={playAutoColor} d={mdiEarHearing} />
             </Icon>
           </IconButton>
 
       </Section>
       <Section align="start">
-          
+          {#if span_equal}
           <Icon tag="svg" viewBox="0 0 24 24" width="30px" height="30px"  fill="white"  
               on:click={()=>{span_equal = !span_equal; onToggleWord()}} >
               <!-- Верхняя полоска -->
-              <rect x="2" y="4" width="14" height="2" />
+              <rect x="2" y="4" width="14" height="2" fill="red"/>
               <rect x="18" y="4" width="4" height="2" />
               <!-- Вторая полоска (разделенная на две части) -->
-              <rect x="12" y="8" width="10" height="2" />
+              <rect x="12" y="8" width="10" height="2" fill="lightblue" />
               <rect x="2" y="8" width="8" height="2" />
               <!-- Третья полоска -->
               <rect x="2" y="12" width="20" height="2" />
               <!-- Четвертая полоска (разделенная на две части) -->
-              <rect x="2" y="16" width="14" height="2" />
-              <rect x="18" y="16" width="4" height="2" />
+              <rect x="2" y="16" width="14" height="2" fill="green"/>
+              <rect x="18" y="16" width="4" height="2"  />
               <!-- Нижняя полоска -->
-              <rect x="12" y="20" width="10" height="2" />
+              <rect x="12" y="20" width="10" height="2"  fill="blue"/>
               <rect x="2" y="20" width="8" height="2" />
           </Icon>
+          {:else}
+          <Icon tag="svg" viewBox="0 0 24 24" width="30px" height="30px"  fill="white"  
+              on:click={()=>{span_equal = !span_equal; onToggleWord()}} >
+              <!-- Верхняя полоска -->
+              <rect x="2" y="4" width="14" height="2"/>
+              <rect x="18" y="4" width="4" height="2" />
+              <!-- Вторая полоска (разделенная на две части) -->
+              <rect x="12" y="8" width="10" height="2"/>
+              <rect x="2" y="8" width="8" height="2" />
+              <!-- Третья полоска -->
+              <rect x="2" y="12" width="20" height="2" />
+              <!-- Четвертая полоска (разделенная на две части) -->
+              <rect x="2" y="16" width="14" height="2"/>
+              <rect x="18" y="16" width="4" height="2"  />
+              <!-- Нижняя полоска -->
+              <rect x="12" y="20" width="10" height="2"/>
+              <rect x="2" y="20" width="8" height="2" />
+          </Icon>
+
+          {/if}
 
       </Section>
 
@@ -643,7 +684,7 @@ let display_audio;
             aria-label="Back"
             on:click={onSTT}
           >
-            <Icon tag="svg" viewBox="0 0 24 24" style="position:absolute; margin:10px 5px 10px 5px; scale:1.3;width:30px">
+            <Icon tag="svg" viewBox="0 0 24 24" style="position:absolute; margin:10px 5px 10px 5px; scale:1.1;width:30px">
               {#if isSTT}
                 <path fill="grey" d={mdiMicrophone} />
               {:else}
@@ -657,7 +698,7 @@ let display_audio;
         <Icon
           tag="svg"
           viewBox="0 0 24 24"
-          style="margin:10px 5px 10px 5px; scale:1.1; width:30px"
+          style="margin:10px 5px 10px 5px; scale:1.1; width:25px"
           on:click={ToggleTranslate}
         >
         {#if translate}
@@ -682,17 +723,17 @@ let display_audio;
   </TopAppBar>
 </div>
 
-  {#if bricks_data?.html}
-      <span on:click={() => (isCollapsed = !isCollapsed)}
-      style="display:block-inline;position:relative;width:80%;color: black;font-style: italic;font-size:smaller;font-family: serif;"
-      >{bricks_data?.name}</span
-      >
-      {#if !isCollapsed}
-          <div class="collapsible" in:slide={{ duration: 300 }}>
-              <ConText data={bricks_data} {tts} />
-          </div>
-      {/if} 
-  {/if}
+{#if bricks_data?.html}
+  <span on:click={() => (isCollapsed = !isCollapsed)}
+  style="display:block-inline;position:relative;width:80%;color: black;font-style: italic;font-size:smaller;font-family: serif;"
+  >{bricks_data?.name}</span
+  >
+  {#if !isCollapsed}
+      <div class="collapsible" in:slide={{ duration: 300 }}>
+          <ConText data={bricks_data} {tts} />
+      </div>
+  {/if} 
+{/if}
 
 <main>
   <div>
@@ -899,7 +940,7 @@ let display_audio;
   }
 
   .formatted-list span:focus {
-    outline: 2px solid #5b91cb;
+    outline: 2px solid transparent
   }
 
   .correct{
@@ -908,7 +949,7 @@ let display_audio;
 
   .incorrect{
       color:red;
-      animation: blink 1s infinite;
+      animation: color-blink 1s infinite;
   }
 
   .material-symbols-outlined {
@@ -920,43 +961,33 @@ let display_audio;
       'GRAD' 0,
       'opsz' 24;
   }
-  /* :global(ver){
-    border-radius: 5px;
-    border:2px solid;
-    padding: 5px 10px;
-    border-color: red;
-  }  */
+
 
  .ver {
     position: relative;
     border:2px solid; 
-    border-color: rgb(225, 111, 111); 
+    border-color: rgb(225, 111, 111);
+    --border-color: rgb(225, 111, 111); /* Красный для .ver */
     border-radius: 5px;
     /* background-color: lightcoral; */
     padding: 0px 6px;
   } 
 
-  .word-list .ver,.formatted-list .ver{
+  .word-list .ver,.formatted-list .ver:not(.invisible){
     color: rgb(225, 111, 111); 
   }
-
-  /* :global(subj){
-    border-radius: 5px;
-    border:2px solid;
-    padding: 5px 10px;
-    border-color: lightblue;
-  }  */
 
   .subj{
     position: relative;
     border:2px solid; 
     border-color: rgb(101, 101, 192); 
+    --border-color: rgb(101, 101, 192); 
     border-radius: 7px;
     /* background-color:lightskyblue; */
     padding: 0px 6px;
   } 
 
-  .word-list .subj{
+  .word-list .subj,.formatted-list .subj:not(.invisible){
     color: rgb(101, 101, 192); 
   }
 
@@ -964,12 +995,13 @@ let display_audio;
     position: relative;
     border:2px solid; 
     border-color: rgb(119, 201, 119); 
+    --border-color: rgb(119, 201, 119); 
     border-radius: 5px;
     /* background-color: lightgreen; */
     padding: 0px 6px;
   } 
 
-  .word-list .tijd{
+  .word-list .tijd,.formatted-list .tijd:not(.invisible){
     color: rgb(119, 201, 119);
   }
 
@@ -977,30 +1009,43 @@ let display_audio;
     position: relative;
     border:2px solid; 
     border-color:  darkmagenta;
+    --border-color:  darkmagenta;
     /* background-color: lightcyan ; */
     border-radius: 5px;
     padding: 0px 6px;
   } 
-  .word-list .plaats{
+  .word-list .plaats,.formatted-list .plaats:not(.invisible){
     color:  darkmagenta
   }
 
   /* Анимация мигания */
-  @keyframes blink {
+  @keyframes color-blink {
     0%, 100% {
       color:red;
-      box-shadow: 0 0 10px 2px rgba(124, 152, 183, 0.8); /* Синий свет */
+
     }
     50% {
       color:white;
-      box-shadow: 0 0 10px 2px rgba(0, 123, 255, 0); /* Исчезает */
+
     }
   }
 
+  @keyframes border-blink {
+    0%, 100% {
+
+      box-shadow: 0 0 0px 0 var(--border-color, blue); /* Без тени */
+  }
+  50% {
+
+      box-shadow: 0 0 10px 4px var(--border-color, blue); /* Тень цвета рамки */
+  }
+}
+
    /* Эффект мигания при фокусе */
    span:focus {
-      border-color: transparent;
-      animation: blink 1s infinite; /* Запускает мигание */
+      /*outline: none; /* Убираем стандартный outline браузера */
+      animation: border-blink 1s infinite; /* Запускает мигание */
+      border-width: 2px; /* Устанавливаем ширину рамки для чёткости */
     }
 
       /* Стили для мобильных устройств */
@@ -1011,7 +1056,7 @@ let display_audio;
       .word-list, .formatted-list {
           font-size: 0.9em;
           /* margin: 2px 10px; */
-          padding: 0 2px
+          padding: 0 5px
       }
       .title{
           font-size: small;

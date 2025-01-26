@@ -1280,8 +1280,8 @@
     border: none;
     border-radius: 5px;
     cursor: pointer;
-
     width: 50px;
+    bottom:5px;
   }
 
   .speaker-button {
