@@ -114,12 +114,12 @@ let display_audio;
     // Объединяем массив предложений в единый текст
     const textToTranslate = bricks_data.text.join(' ');
 
-    // Переводим единый текст и преобразуем результат обратно в массив предложений
-    // bricks_data.translate = (await Translate(JSON.stringify(textToTranslate), $llang, $langs))
-    //   .replace(/^[\"«]|[\"»]$/g, '')
-    //   .split(/(?<=[.?!])\s+/) // Разбиваем на предложения
-    //   .map(sentence => sentence.trim()) // Убираем лишние пробелы
-    //   .filter(sentence => sentence !== ''); 
+    //Переводим единый текст и преобразуем результат обратно в массив предложений
+    bricks_data.translate = (await Translate(JSON.stringify(textToTranslate), $llang, $langs))
+      .replace(/^[\"«]|[\"»]$/g, '')
+      .split(/(?<=[.?!])\s+/) // Разбиваем на предложения
+      .map(sentence => sentence.trim()) // Убираем лишние пробелы
+      .filter(sentence => sentence !== ''); 
 
     sentence = bricks_data.text[curSentence].trim().replace(/<[^>]*>/g, '');
 
@@ -746,9 +746,9 @@ let display_audio;
     {#if translate}
       <div class="trans">
             <!-- Исходное предложение -->
-            {#await Translate(sentence.replace(/<[^>]*>/g, ''), $llang, $langs) then data}
-            <p>{data}</p>
-            {/await}
+            {#if bricks_data?.translate}
+            <p>{bricks_data.translate[curSentence]}</p>
+            {/if}
       </div>
     {/if}
     <!-- Предложение с замененными словами -->
