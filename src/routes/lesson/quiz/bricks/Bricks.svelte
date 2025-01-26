@@ -123,6 +123,7 @@ let display_audio;
 
     sentence = bricks_data.text[curSentence].trim().replace(/<[^>]*>/g, '');
 
+
     setTimeout(async()=>{
       speechData = (await tts.GetGoogleTTS($llang, sentence,  data.name)).resp;
     },1000)
@@ -193,8 +194,8 @@ let display_audio;
   function splitHtmlIntoSentencesWithInnerTags(html) {
     // Удаляем эмодзи с помощью регулярного выражения
     function removeEmojis(input) {
-          const regex = emojiRegex();
-          return input.replace(regex, '');
+        const regex = emojiRegex();
+        return input.replace(regex, '');
     }
 
     // Создаём временный элемент для парсинга HTML
@@ -207,14 +208,19 @@ let display_audio;
     // Обрабатываем каждый <p>, удаляя эмодзи и разбивая на предложения
     const sentences = Array.from(paragraphs).flatMap(p => {
         // Убираем эмодзи из содержимого <p>
-        const cleanedContent = removeEmojis(p.innerHTML);
-
-        // Разбиваем содержимое на предложения, сохраняя внутренние теги
-        return cleanedContent.match(/[^.!?]+[.!?]+|[^.!?]+$/g) || [];
+        const cleanedContent = removeEmojis(p.innerHTML.trim());
+        if (cleanedContent !== "") {
+            // Разбиваем содержимое на предложения, сохраняя внутренние теги
+            return cleanedContent.match(/[^.!?]+[.!?]+|[^.!?]+$/g) || [];
+        }
+        return []; // Возвращаем пустой массив для пустых строк
     });
 
-    return sentences;
+    // Исключаем пустые строки из результирующего массива
+    return sentences.filter(sentence => sentence.trim() !== "");
 }
+
+
 
   function htmlToText(html) {
       // Удаляем эмодзи с помощью библиотеки
