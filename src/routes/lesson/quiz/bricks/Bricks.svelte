@@ -106,62 +106,53 @@ let display_audio;
       return match ? match[1] : ''; // Возвращаем название тега или null, если не найдено
   }
   
-  const InitData = async()=>{
+  const InitData = async () => {
+    if (!bricks_data) return;
 
-    if(!bricks_data)
-    return
- 
-    // Объединяем массив предложений в единый текст
     const textToTranslate = bricks_data.text.join(' ').replace(/<[^>]*>/g, '');
 
-    //Переводим единый текст и преобразуем результат обратно в массив предложений
-    setTimeout(async()=>{
-      bricks_data.translate = (await Translate(JSON.stringify(textToTranslate), $llang, $langs))
-      .replace(/^[\"«]|[\"»]$/g, '')
-      .split(/(?<=[.?!])\s+/) // Разбиваем на предложения
-      .map(sentence => sentence.trim()) // Убираем лишние пробелы
-      .filter(sentence => sentence !== ''); 
-      bricks_data.translate  = bricks_data.translate 
-    },100)
+    try {
+        // Перевод текста
+        const translatedText = await Translate(JSON.stringify(textToTranslate), $llang, $langs);
+        bricks_data.translate = translatedText
+            .replace(/^[\"«]|[\"»]$/g, '')
+            .split(/(?<=[.?!])\s+/)
+            .map(sentence => sentence.trim())
+            .filter(sentence => sentence !== '');
 
+        // Текущее предложение
+        const sentence = bricks_data.text[curSentence].trim().replace(/<[^>]*>/g, '');
 
-    sentence = bricks_data.text[curSentence].trim().replace(/<[^>]*>/g, '');
+        // Получение озвучки через TTS
+        const { resp } = await tts.GetGoogleTTS($llang, sentence, data.name);
+        speechData = resp;
 
+        // Разбиваем на слова
+        words = formatWords(sentence);
+        formattedSentence = formatWords(sentence);
 
-    setTimeout(async()=>{
-      speechData = (await tts.GetGoogleTTS($llang, sentence,  data.name)).resp;
-    },1000)
-
-
-    // Разбиваем на слова
-    words =  sentence.trim().split(/[\s,:\.]+/) 
-        .filter(word => word) // Оставляем только существующие слова
-        .map((word) => ({
-            gr: extractTagName(word),
-            placeholder: "\u00a0\u00a0\u00a0\u00a0\u00a0", 
-            value: word.trim()
-        }));
-
-
-    // Создаём массив для предложения с placeholder'ами
-    formattedSentence = sentence.trim().split(/[\s,:\.]+/)  
-        .filter(word => word) // Оставляем только существующие слова
-        .map((word) => ({
-            gr: extractTagName(word),
-            placeholder: "\u00a0\u00a0\u00a0\u00a0\u00a0", 
-            value: word.trim()
-        }));
-
-    // words =  Array.from(new Set(sentence.trim().split(/[\s,:\.]+/).filter(word => word !== "")))
-    // Устанавливаем фокус на первый элемент
-    setTimeout(() => {
+        // Создаём кирпичики
         MakeBricks();
-    }, 0);
-  }
+        } catch (error) {
+            console.error("Error in InitData:", error);
+        }
+    };
+
+    const formatWords = (sentence) =>
+        sentence
+        .trim()
+        .split(/[\s,:\.]+/)
+        .filter(word => word)
+        .map(word => ({
+            gr: extractTagName(word),
+            placeholder: "\u00a0\u00a0\u00a0\u00a0\u00a0",
+            value: word.trim(),
+        }));
 
   onMount(() => {
 
   });
+
 
   function MakeBricks(){
       // Перемешиваем formattedSentence
@@ -182,69 +173,35 @@ let display_audio;
       return array;
   }
 
-  function splitHtmlByParagraphs(html) {
-    let tempDiv = document.createElement('div');
-    tempDiv.innerHTML = html;
-
-    // Находим все <p> элементы
-    const paragraphs = tempDiv.querySelectorAll('p');
-
-    // Создаём массив с содержимым каждого <p>
-    const parts = Array.from(paragraphs).map(p => p.innerHTML || "");
-
-    return parts;
-  }
 
   function splitHtmlIntoSentencesWithInnerTags(html) {
     function removeEmojis(input) {
-          const regex = emojiRegex();
-          return input.replace(regex, '');
-      }
-    // Создаем временный элемент для парсинга HTML
+      const regex = emojiRegex();
+      return input.replace(regex, '');
+    }
+
+    function formatTaggedText(input) {
+      return input.replace(/<(\w+)>(.*?)<\/\1>/g, (match, tag, content) => {
+        const words = content.split(/\s+/);
+        const formattedWords = words.map(word => `<${tag}>${word}</${tag}>`).join(' ');
+        return formattedWords;
+      });
+    }
+
     const parser = new DOMParser();
     const doc = parser.parseFromString(html, 'text/html');
-
-    // Извлекаем все теги <p>
     const paragraphs = doc.querySelectorAll('p');
 
-    // Формируем массив предложений, сохраняя внутренние теги и разбивая по точкам
     const sentences = Array.from(paragraphs).flatMap(p => {
-      const htmlContent = removeEmojis(p.innerHTML.trim());
+      const htmlContent = formatTaggedText(removeEmojis(p.innerHTML.trim()));
 
-      // Разбиваем текст на предложения, включая внутренние теги, учитывая символы окончания предложений
       return htmlContent
-        .split(/(?<=[.!?])\s+(?=<|\w)/g) // Учитываем точки, восклицательные и вопросительные знаки
+        .split(/(?<=[.!?])\s+(?=<|\w|<\/\w+>)/g)  // Разделяем предложения по точке, восклицательному знаку или вопросительному знаку
         .map(sentence => sentence.trim())
-        .filter(sentence => sentence.length > 0); // Убираем пустые строки
+        .filter(sentence => sentence.length > 0);
     });
 
     return sentences;
-  }
-
-  function htmlToText(html) {
-      // Удаляем эмодзи с помощью библиотеки
-      function removeEmojis(input) {
-          const regex = emojiRegex();
-          return input.replace(regex, '');
-      }
-
-      let tempDiv = document.createElement('div');
-      tempDiv.innerHTML = html;
-
-      // Удаляем стили
-      const styles = tempDiv.querySelectorAll('style');
-      styles.forEach(style => style.remove());
-
-      // Извлекаем текст только из <p> элементов
-      const paragraphs = tempDiv.querySelectorAll('p');
-      let text = Array.from(paragraphs)
-          .map(p => p.textContent || p.innerText || "")
-          .join(" ");
-      if(!text)
-          text = html;
-
-      // Убираем эмодзи и лишние переносы строк
-      return removeEmojis(text).replace(/[\n\r]+/g, " ").trim();
   }
 
 
