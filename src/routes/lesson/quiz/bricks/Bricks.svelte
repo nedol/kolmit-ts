@@ -196,35 +196,30 @@ let display_audio;
   }
 
   function splitHtmlIntoSentencesWithInnerTags(html) {
-    // Удаляем эмодзи с помощью регулярного выражения
     function removeEmojis(input) {
-        const regex = emojiRegex();
-        return input.replace(regex, '');
-    }
+          const regex = emojiRegex();
+          return input.replace(regex, '');
+      }
+    // Создаем временный элемент для парсинга HTML
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
 
-    // Создаём временный элемент для парсинга HTML
-    let tempDiv = document.createElement('div');
-    tempDiv.innerHTML = html;
+    // Извлекаем все теги <p>
+    const paragraphs = doc.querySelectorAll('p');
 
-    // Извлекаем все <p> элементы
-    const paragraphs = tempDiv.querySelectorAll('p');
-
-    // Обрабатываем каждый <p>, удаляя эмодзи и разбивая на предложения
+    // Формируем массив предложений, сохраняя внутренние теги и разбивая по точкам
     const sentences = Array.from(paragraphs).flatMap(p => {
-        // Убираем эмодзи из содержимого <p>
-        const cleanedContent = removeEmojis(p.innerHTML.trim());
-        if (cleanedContent !== "" && cleanedContent.length>3)  {
-            // Разбиваем содержимое на предложения, сохраняя внутренние теги
-            return cleanedContent.match(/[^.!?]+[.!?]+|[^.!?]+$/g) || [];
-        }
-        return []; // Возвращаем пустой массив для пустых строк
+      const htmlContent = removeEmojis(p.innerHTML.trim());
+
+      // Разбиваем текст на предложения, включая внутренние теги, учитывая символы окончания предложений
+      return htmlContent
+        .split(/(?<=[.!?])\s+(?=<|\w)/g) // Учитываем точки, восклицательные и вопросительные знаки
+        .map(sentence => sentence.trim())
+        .filter(sentence => sentence.length > 0); // Убираем пустые строки
     });
 
-    // Исключаем пустые строки из результирующего массива
-    return sentences.filter(sentence => sentence.trim() !== "");
-}
-
-
+    return sentences;
+  }
 
   function htmlToText(html) {
       // Удаляем эмодзи с помощью библиотеки
