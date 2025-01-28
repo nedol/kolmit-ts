@@ -72,6 +72,8 @@ let current_word = 0;
 let audio;
 let display_audio;
 
+let keys = [];
+
   export let data;
   const operator = getContext('operator');
   // Исходное предложение
@@ -109,45 +111,49 @@ let display_audio;
   const InitData = async () => {
     if (!bricks_data) return;
 
-    const textToTranslate = bricks_data.text.join(' ').replace(/<[^>]*>/g, '');
+      keys =  Object.keys(bricks_data.text);
+      const text = bricks_data.text[keys[0]];
 
-    try {
-        // Перевод текста
-        const translatedText = await Translate(JSON.stringify(textToTranslate), $llang, $langs);
-        bricks_data.translate = translatedText
-            .replace(/^[\"«]|[\"»]$/g, '')
-            .split(/(?<=[.?!])\s+/)
-            .map(sentence => sentence.trim())
-            .filter(sentence => sentence !== '');
+      const textToTranslate = text.join(' ').replace(/<[^>]*>/g, '');
 
-        // Текущее предложение
-        const sentence = bricks_data.text[curSentence].trim().replace(/<[^>]*>/g, '');
+        try {
+          // Перевод текста
+          const translatedText = await Translate(textToTranslate, $llang, $langs);
+          bricks_data.translate = translatedText
+              .replace(/^[\"«]|[\"»]$/g, '')
+              .split(/(?<=[.?!])\s+/)
+              .map(sentence => sentence.trim())
+              .filter(sentence => sentence !== '');
 
-        // Получение озвучки через TTS
-        const { resp } = await tts.GetGoogleTTS($llang, sentence, data.name);
-        speechData = resp;
+          // Текущее предложение
+          const sentence = text[0].trim();//.replace(/<[^>]*>/g, '');
 
-        // Разбиваем на слова
-        words = formatWords(sentence);
-        formattedSentence = formatWords(sentence);
+          // Получение озвучки через TTS
+          const { resp } = await tts.GetGoogleTTS($llang, sentence.replace(/<[^>]*>/g, ''), data.name);
+          speechData = resp;
 
-        // Создаём кирпичики
-        MakeBricks();
-        } catch (error) {
-            console.error("Error in InitData:", error);
-        }
+          // Разбиваем на слова
+          words = formatWords(sentence);
+          formattedSentence = formatWords(sentence);
+
+          // Создаём кирпичики
+          MakeBricks();
+          } catch (error) {
+              console.error("Error in InitData:", error);
+          }
+      
     };
 
-    const formatWords = (sentence) =>
-        sentence
-        .trim()
-        .split(/[\s,:\.]+/)
-        .filter(word => word)
-        .map(word => ({
-            gr: extractTagName(word),
-            placeholder: "\u00a0\u00a0\u00a0\u00a0\u00a0",
-            value: word.trim(),
-        }));
+  const formatWords = (sentence) =>
+    sentence
+    .trim()
+    .split(/[\s,:\.]+/)
+    .filter(word => word)
+    .map(word => ({
+        gr: extractTagName(word),
+        placeholder: "\u00a0\u00a0\u00a0\u00a0\u00a0",
+        value: word.trim(),
+    }));
 
   onMount(() => {
 
@@ -196,13 +202,30 @@ let display_audio;
       const htmlContent = formatTaggedText(removeEmojis(p.innerHTML.trim()));
 
       return htmlContent
-        .split(/(?<=[.!?])\s+(?=<|\w|<\/\w+>)/g)  // Разделяем предложения по точке, восклицательному знаку или вопросительному знаку
+        .split(/(?<=[.!?])\s+(?=<|\w|<\/\w+>)/g) // Разделяем по окончаниям предложений
         .map(sentence => sentence.trim())
-        .filter(sentence => sentence.length > 0);
+        .filter(sentence => sentence.length > 0); // Убираем пустые строки
     });
 
-    return sentences;
-  }
+    // Формируем объект: { "первые 5 слов ...": [предложение] }
+    const groupedSentences = sentences.reduce((result, sentence) => {
+      const firstFiveWords = sentence
+        .replace(/<\/?[^>]+>/g, '') // Убираем HTML-теги для подсчёта слов
+        .split(/\s+/) // Разделяем на слова
+        .slice(0, 5) // Берём первые 5 слов
+        .join(' ') + ' ...'; // Добавляем троеточие
+
+      // Добавляем предложение в объект, группируя по ключу
+      if (!result[firstFiveWords]) {
+        result[firstFiveWords] = [];
+      }
+      result[firstFiveWords].push(sentence);
+
+      return result;
+  }, {});
+
+  return groupedSentences;
+}
 
 
   // Обработчик клика на слово
@@ -255,11 +278,18 @@ let display_audio;
     // isSTT = false;
     stt_text = ''
 
-    if(curSentence >= bricks_data.text.length){
+    if(curSentence >= keys.length){
       curSentence = 0;
     }
 
-    sentence = bricks_data.text[curSentence].trim();
+    sentence = bricks_data.text[keys[curSentence]][0];
+
+    const translatedText = await Translate(sentence.replace(/<[^>]*>/g, ''), $llang, $langs);
+          bricks_data.translate = translatedText
+              .replace(/^[\"«]|[\"»]$/g, '')
+              .split(/(?<=[.?!])\s+/)
+              .map(sentence => sentence.trim())
+              .filter(sentence => sentence !== '');
 
     const resp = await tts.GetGoogleTTS($llang, sentence.replace(/<[^>]*>/g, ''),  data.name);
       speechData = resp.resp;
@@ -357,11 +387,14 @@ let display_audio;
 
   const onToggleWord = ()=>{
 
-      if(!span_equal){
+    const keys =  Object.keys(bricks_data.text);
+    const text = bricks_data.text[keys[curSentence]][0];
 
-        sentence = bricks_data.text[curSentence].trim();
+    sentence = text.trim();
 
-        formattedSentence = sentence.trim().split(/[\s,:\.]+/)
+      if(!span_equal){    
+
+        formattedSentence = sentence.split(/[\s,:\.]+/)
           .filter(word => word) // Оставляем только существующие слова
           .map((word) => ({
             gr: extractTagName(word),
@@ -374,9 +407,18 @@ let display_audio;
             item.class = "invisible"
         });
 
+                  // Разбиваем на слова
+        words =  sentence.trim().split(/[\s,:\.]+/) 
+        .filter(word => word) // Оставляем только существующие слова
+        .map((word) => ({
+            gr: extractTagName(word),
+            placeholder: "\u00a0\u00a0\u00a0\u00a0\u00a0", 
+            value: word.trim()
+        }));
+
       }else{
-        sentence = bricks_data.text[curSentence].trim().replace(/<[^>]*>/g, '');
-        formattedSentence = sentence.trim().split(/[\s,:\.]+/)
+
+        formattedSentence = sentence.replace(/<[^>]*>/g, '').split(/[\s,:\.]+/)
           .filter(word => word) // Оставляем только существующие слова
           .map((word) => ({
             gr: extractTagName(word),
@@ -386,19 +428,19 @@ let display_audio;
         formattedSentence.forEach((item)=>{
             item.placeholder = "\u00a0\u00a0\u00a0\u00a0\u00a0";
             item.class = ""
-        });
+        });     
         
+                  // Разбиваем на слова
+        words =  sentence.replace(/<[^>]*>/g, '').trim().split(/[\s,:\.]+/) 
+        .filter(word => word) // Оставляем только существующие слова
+        .map((word) => ({
+            gr: extractTagName(word),
+            placeholder: "\u00a0\u00a0\u00a0\u00a0\u00a0", 
+            value: word.trim()
+        }));
 
 
       }
-          // Разбиваем на слова
-      words =  sentence.trim().split(/[\s,:\.]+/) 
-      .filter(word => word) // Оставляем только существующие слова
-      .map((word) => ({
-          gr: extractTagName(word),
-          placeholder: "\u00a0\u00a0\u00a0\u00a0\u00a0", 
-          value: word.trim()
-      }));
 
       words = shuffleArray(words);
 
@@ -633,7 +675,7 @@ let display_audio;
                 position="middle"
                 align="bottom-end - bottom-middle"
                 aria-label="unread count"
-                style="position:relative;top:-30px;right:-5px;scale:.8">{bricks_data?.text.length}</Badge
+                style="position:relative;top:-30px;right:-5px;scale:.8">{keys.length}</Badge
               >
             </span>
           </p>
@@ -702,9 +744,7 @@ let display_audio;
     {#if translate}
       <div class="trans">
             <!-- Исходное предложение -->
-            {#if bricks_data?.translate}
-            <p>{bricks_data.translate[curSentence]}</p>
-            {/if}
+            <p>{bricks_data.translate}</p>
       </div>
     {/if}
     <!-- Предложение с замененными словами -->
