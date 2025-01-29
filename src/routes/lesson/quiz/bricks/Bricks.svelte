@@ -752,8 +752,9 @@ let keys = [];
   <div>
     {#if translate}
       <div class="trans">
-            <!-- Исходное предложение -->
-            <p>{bricks_data.translate}</p>
+        {#await Translate(sentence.replace(/<[^>]*>/g, ''), $llang, $langs) then data}
+        <p>{data}</p>
+        {/await}   
       </div>
     {/if}
     <!-- Предложение с замененными словами -->
