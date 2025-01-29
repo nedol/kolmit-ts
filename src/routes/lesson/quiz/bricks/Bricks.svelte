@@ -626,23 +626,32 @@ let keys = [];
       </Section>
       <Section align="start">
           {#if span_equal}
-          <Icon tag="svg" viewBox="0 0 24 24" width="30px" height="30px"  fill="white"  
-              on:click={()=>{span_equal = !span_equal; onToggleWord()}} >
-              <!-- Верхняя полоска -->
-              <rect x="2" y="4" width="14" height="2" fill="red"/>
-              <rect x="18" y="4" width="4" height="2" />
-              <!-- Вторая полоска (разделенная на две части) -->
-              <rect x="12" y="8" width="10" height="2" fill="lightblue" />
-              <rect x="2" y="8" width="8" height="2" />
-              <!-- Третья полоска -->
-              <rect x="2" y="12" width="20" height="2" />
-              <!-- Четвертая полоска (разделенная на две части) -->
-              <rect x="2" y="16" width="14" height="2" fill="green"/>
-              <rect x="18" y="16" width="4" height="2"  />
-              <!-- Нижняя полоска -->
-              <rect x="12" y="20" width="10" height="2"  fill="blue"/>
-              <rect x="2" y="20" width="8" height="2" />
+          <Icon tag="svg" viewBox="0 0 24 24" width="30px" height="30px" fill="white"  
+          on:click={() => { span_equal = !span_equal; onToggleWord(); }} >
+            <!-- Верхняя полоска -->
+            <rect x="2" y="4" width="8" height="2" fill="red" />
+            <rect x="12" y="4" width="6" height="2" />
+            <rect x="18" y="4" width="4" height="2" />
+          
+            <!-- Вторая полоска (разделенная на две части) -->
+            <rect x="2" y="8" width="8" height="2" />
+            <rect x="12" y="8" width="10" height="2" fill="orange" />
+       
+          
+            <!-- Третья полоска -->
+            <rect x="2" y="12" width="4" height="2" />
+            <rect x="8" y="12" width="10" height="2" fill="black" />
+            <rect x="18" y="12" width="4" height="2" />
+          
+            <!-- Четвертая полоска (разделенная на две части) -->
+            <rect x="2" y="16" width="14" height="2" fill="green" />
+            <rect x="18" y="16" width="4" height="2" />
+          
+            <!-- Нижняя полоска -->
+            <rect x="12" y="20" width="10" height="2" fill="magenta" />
+            <rect x="2" y="20" width="8" height="2" />
           </Icon>
+    
           {:else}
           <Icon tag="svg" viewBox="0 0 24 24" width="30px" height="30px"  fill="white"  
               on:click={()=>{span_equal = !span_equal; onToggleWord()}} >

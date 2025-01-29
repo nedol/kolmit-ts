@@ -1,11 +1,7 @@
-import pkg from 'lodash';
-const { findIndex } = pkg;
+
 
 import ISO6391 from 'iso-google-locales';
 
-
-import Reverso from 'reverso-api'
-const reverso = new Reverso()
 
 // const translate = require('google-translate-api');
 // import pkg from 'google-translate-api';
@@ -14,8 +10,8 @@ const reverso = new Reverso()
 // const {translate} = pkg;
 
 import translate from 'translate';
-// translate.engine = 'deepl'; // 'libre';// 'google'//
-translate.key = '0834516e-29b0-45d1-812e-b903d5962e12:fx'; //'203cca0d-8540-4d75-8c88-d69ac40b6d57:fx';//process.env.DEEPL_API_KEY;
+translate.engine = 'deepl'; // 'libre';// 'google'//
+// translate.key = '0834516e-29b0-45d1-812e-b903d5962e12:fx'; //'203cca0d-8540-4d75-8c88-d69ac40b6d57:fx';//process.env.DEEPL_API_KEY;
 
 import deepl_langs_list from '$lib/dict/deepl_lang_list.json';
 
@@ -52,7 +48,7 @@ export async function Translate(text, from, to) {
     // Проверяем наличие << >> и заменяем на безопасные символы
     const hasQuotes = chunk.includes('<<');
     if (hasQuotes) {
-      chunk = chunk.replace(/<</g, '[').replace(/>>/g, ']');
+      chunk = chunk.replace(/<</g, '').replace(/>>/g, '');
     }
 
     // Попытка перевода через Google Translate API
@@ -65,7 +61,7 @@ export async function Translate(text, from, to) {
 
     // Восстанавливаем << >> после перевода
     if (hasQuotes) {
-      res = res.replace(/\[(.*?)\]/g, '<<$1>>')                                                       
+      res = res.replace(/\<(.*?)\>/g, '<<$1>>')                                                       
     }
 
     translatedText += `${res} `;
@@ -75,16 +71,4 @@ export async function Translate(text, from, to) {
   return translatedText.trim();
 }
 
-async function reversoTranslate(text, lang){
-  let from = ISO6391.getName(lang.from).toLowerCase();
-  const to =  ISO6391.getName(lang.to).toLowerCase();
-  await reverso.getTranslation(
-    text,
-    from,
-    to,
-    (err, response) => {
-        if (err) throw new Error(err.message)
-        return response.translations[0];
-      }
-    )
-}
+
