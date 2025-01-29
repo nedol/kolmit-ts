@@ -126,7 +126,7 @@ let keys = [];
               .filter(sentence => sentence !== '');
 
           // Текущее предложение
-          const sentence = text[0].trim();//.replace(/<[^>]*>/g, '');
+          sentence = bricks_data.text[keys[curSentence]][0];
 
           // Получение озвучки через TTS
           const { resp } = await tts.GetGoogleTTS($llang, sentence.replace(/<[^>]*>/g, ''), data.name);

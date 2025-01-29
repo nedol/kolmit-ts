@@ -8,12 +8,12 @@ export class SignalingChannel {
 
     this.socketUrl = '';
     // this.socketUrl = 'wss://kolmit-server.onrender.com';
-    if(window.location.hostname.includes('onrender'))
+    // if(window.location.hostname.includes('onrender'))
       this.socketUrl = 'wss://kolmit-server.onrender.com';
-    else if(window.location.hostname.includes('192.168.'))
-      this.socketUrl = `wss://192.168.0.6:3000`;
-    else
-      this.socketUrl =  `wss://localhost:3000`;
+    // else if(window.location.hostname.includes('192.168.'))
+    //   this.socketUrl = `wss://192.168.0.6:3000`;
+    // else
+    //   this.socketUrl =  `wss://localhost:3000`;
     this.socket = null;
     this.messageQueue = [];
     this.heartbeatInterval = null; // Таймер для пинга

@@ -10,7 +10,7 @@ import ISO6391 from 'iso-google-locales';
 // const {translate} = pkg;
 
 import translate from 'translate';
-translate.engine = 'deepl'; // 'libre';// 'google'//
+translate.engine = 'google'//'deepl'; // 'libre';// 
 // translate.key = '0834516e-29b0-45d1-812e-b903d5962e12:fx'; //'203cca0d-8540-4d75-8c88-d69ac40b6d57:fx';//process.env.DEEPL_API_KEY;
 
 import deepl_langs_list from '$lib/dict/deepl_lang_list.json';

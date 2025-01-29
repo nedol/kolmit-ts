@@ -32,7 +32,6 @@ declare module '$env/static/private' {
 	export const DEEPL_API_KEY: string;
 	export const ALLUSERSPROFILE: string;
 	export const APPDATA: string;
-	export const APPLICATION_INSIGHTS_NO_DIAGNOSTIC_CHANNEL: string;
 	export const ChocolateyInstall: string;
 	export const ChocolateyLastPathUpdate: string;
 	export const CHROME_CRASHPAD_PIPE_NAME: string;
@@ -44,7 +43,7 @@ declare module '$env/static/private' {
 	export const ComSpec: string;
 	export const DriverData: string;
 	export const EDITOR: string;
-	export const EFC_15504: string;
+	export const EFC_42364: string;
 	export const GIT_ASKPASS: string;
 	export const HOME: string;
 	export const HOMEDRIVE: string;
@@ -156,7 +155,6 @@ declare module '$env/dynamic/private' {
 		DEEPL_API_KEY: string;
 		ALLUSERSPROFILE: string;
 		APPDATA: string;
-		APPLICATION_INSIGHTS_NO_DIAGNOSTIC_CHANNEL: string;
 		ChocolateyInstall: string;
 		ChocolateyLastPathUpdate: string;
 		CHROME_CRASHPAD_PIPE_NAME: string;
@@ -168,7 +166,7 @@ declare module '$env/dynamic/private' {
 		ComSpec: string;
 		DriverData: string;
 		EDITOR: string;
-		EFC_15504: string;
+		EFC_42364: string;
 		GIT_ASKPASS: string;
 		HOME: string;
 		HOMEDRIVE: string;
