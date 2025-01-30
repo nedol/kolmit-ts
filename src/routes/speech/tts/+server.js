@@ -6,10 +6,11 @@ const __dirname = dirname(__filename);
 // import { fileURLToPath } from 'url';
 
 import * as googleTTS from 'google-tts-api';
-// import { speak } from 'google-translate-api-x';
+import { speak } from 'google-translate-api-x';
 // import textToSpeech from '@google-cloud/text-to-speech';
 import speech from "@google-cloud/speech";
 const speechClient = new speech.SpeechClient();
+
 
 import { WriteSpeech, ReadSpeech } from '$lib/server/db.js'; //src\lib\server\server.db.js
 
@@ -93,7 +94,7 @@ async function tts_google(text, lang, abonent, quiz) {
 
     // Проверяем наличие файла
     const resp =  await ReadSpeech({ key: md5(text) });
-    if (resp?.data) {
+    if (false && resp?.data) {
         try {
           console.log(`Файл уже существует`);
           
@@ -104,7 +105,8 @@ async function tts_google(text, lang, abonent, quiz) {
     }else{
       console.log(`Файл  НЕ существует`);
       try{
-        const url_b64 = await googleTTS.getAllAudioBase64(text, {
+        let base64  = '';
+        let url_b64 = await googleTTS.getAllAudioBase64(text, {
           //getAudioUrl(text, {
           lang: lang,
           slow: false,
@@ -112,22 +114,25 @@ async function tts_google(text, lang, abonent, quiz) {
           timeout: 10000,
         });
 
-        let timestamps = []
-
-        let base64 = '';
-
+       
         url_b64.map((e) => {
           base64 += e.base64;
         });
 
-        WriteSpeech({ lang: lang, key: md5(text), text: text, data: base64, quiz:quiz, timestamps:timestamps });
+        // url_b64 = await speak(text, {to: lang}); 
+        // let base64_2 = url_b64 
+
+        let timestamps = []       
+     
+
+        //WriteSpeech({ lang: lang, key: md5(text), text: text, data: '', quiz:quiz, timestamps:timestamps });
 
         // Записываем аудиофайл в директорию
         // await fs.outputFile(filePath, Buffer.from(url, 'base64')); // Запись файла в папку audio
-        console.log(`Файл сохранён`);
+        // console.log(`Файл сохранён`);
 
         // Читаем содержимое только что сохранённого файла и возвращаем его в формате base64
-        return  {audio:'data:audio/mpeg;base64,' + base64, ts:timestamps}
+        return  {audio:'data:audio/mpeg;base64,' + base64 , ts:timestamps}
 
     } catch (error) {
       console.error('Error converting text to speech:', error);

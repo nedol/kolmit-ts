@@ -75,7 +75,7 @@ export async function POST({ url, fetch, cookies, request }) {
   } else if (from_lang == 'nl') {
 
     // const result = await queryHF(buffer);
-    // const result = await stt_nl(arrayBuffer, from_lang);
+    // const result = await stt_whisper_space(blob, from_lang);
 
     // const result = await stt_bluman(blob, from_lang, to_lang);
     const result = await stt_karim_space(blob, from_lang, to_lang);
@@ -87,7 +87,7 @@ export async function POST({ url, fetch, cookies, request }) {
       };
     }
   } else {
-    const result = await stt_whisper(blob, from_lang,from_lang );
+    const result = await stt_whisper(arrayBuffer, from_lang,from_lang );
     // resp = await stt_as(audioUrl);
     if (result) {
       resp = {
@@ -165,16 +165,16 @@ async function stt_whisper_space(blob, from_lang, to_lang) {
     'https://openai-whisper.hf.space/'
   );
 
-  const audioArrayBuffer = await blob.arrayBuffer();
+  // const audioArrayBuffer = await blob.arrayBuffer();
 
-  const response_0 = await fetch("https://github.com/gradio-app/gradio/raw/main/test/test_files/audio_sample.wav");
-const exampleAudio = await response_0.blob();
+  // const response_0 = await fetch("https://github.com/gradio-app/gradio/raw/main/test/test_files/audio_sample.wav");
+  // const exampleAudio = await response_0.blob();
 
-  const result = await app.predict('/predict_1', [
+  const result = await app.predict('/predict', [
     blob, // blob in 'Input speech' Audio component
     "transcribe"
   ]);
-  return result;
+  return result.data;
 }
 
 async function stt_sm4(blob, from_lang, to_lang) {

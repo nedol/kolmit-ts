@@ -1,6 +1,10 @@
 
 
 import ISO6391 from 'iso-google-locales';
+import { Client } from '@gradio/client';
+
+
+import {HttpsProxyAgent} from 'https-proxy-agent';
 
 
 // const translate = require('google-translate-api');
@@ -9,23 +13,18 @@ import ISO6391 from 'iso-google-locales';
 // import pkg from '@iamtraction/google-translate';
 // const {translate} = pkg;
 
-import translate from 'translate';
-translate.engine = 'google'//'deepl'; // 'libre';// 
+import translate from 'google-translate-api-x';
+
+// import translatte from 'translatte';
+
+// import translate from 'translate';
+// translate.engine = 'deepl'; //'google'// 'libre';// 
 // translate.key = '0834516e-29b0-45d1-812e-b903d5962e12:fx'; //'203cca0d-8540-4d75-8c88-d69ac40b6d57:fx';//process.env.DEEPL_API_KEY;
+
+
 
 import deepl_langs_list from '$lib/dict/deepl_lang_list.json';
 
-export async function Translate_(text, from, to) {
-
-  translate(text, {from: from, to: to})
-    .then((res) => {
-      // console.log(res);
-      return res.text;
-    })
-    .catch((err) => {
-      console.error(err);
-    });
-}
 
 export async function Translate(text, from, to) {
   if (!text) return '';
@@ -53,7 +52,12 @@ export async function Translate(text, from, to) {
 
     // Попытка перевода через Google Translate API
     try {
-      res = await translate(chunk, { to, from });// reversoTranslate(chunk, { to, from })//
+      res = await translate(chunk, {  from: from , to: to , autoCorrect: true,forceBatch: false ,
+        requestOptions: {
+          agent: new HttpsProxyAgent('https://164.132.175.159:3128')
+        }
+      });// reversoTranslate(chunk, { to, from })//
+      // res = await azwaw_space(chunk,from,to)
     } catch (error) {
       console.error('Translation error:', error);
       res = chunk; // Если перевод не удался, возвращаем оригинальный текст
@@ -61,14 +65,16 @@ export async function Translate(text, from, to) {
 
     // Восстанавливаем << >> после перевода
     if (hasQuotes) {
-      res = res.replace(/\<(.*?)\>/g, '<<$1>>')                                                       
+      res = res.text.replace(/\<(.*?)\>/g, '<<$1>>')                                                       
     }
 
-    translatedText += `${res} `;
+    translatedText += `${res.text} `;
   }
 
   // Убираем лишние пробелы
   return translatedText.trim();
 }
+
+
 
 
