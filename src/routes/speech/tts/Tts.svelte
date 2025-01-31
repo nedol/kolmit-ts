@@ -9,7 +9,7 @@
   });
 
   export async function GetGoogleTTS(lang, text, quiz){
-
+    console.log()
     if (!audio || (audio && text !== audio.text)) {
       text = text.replace(/<[^>]+>.*?<\/[^>]+>/g, '');
       const par = {
@@ -36,9 +36,10 @@
 
 
   export async  function Speak_server(lang, text, quiz, cb_end) {
-
+    console.log()
     const resp = await GetGoogleTTS(lang, text, quiz);
 
+    if(resp?.resp.audio)
     audio = new Audio(resp.resp.audio);
       audio.type = 'audio/mpeg';
       audio.text = text;
@@ -47,6 +48,7 @@
       audio.addEventListener('ended', function () {
         cb_end();
       });
+      
       audio.play();
   }
 

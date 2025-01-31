@@ -593,7 +593,9 @@
     text = text.replace(/<<|>>/g, '');
     text = text.replace(/_/g, ' ');
     // Speak(text);
-    tts.Speak_server($llang, text, data.name);
+    tts.Speak_server($llang, text, data.name,()=>{
+      nextWord()
+    });
 
     // setFocus();
   }
