@@ -19,8 +19,6 @@ import { Buffer } from 'buffer';
 
 import wav from 'wav';  // Модуль для работы с WAV файлами
 
-// const tts = new textToSpeech.TextToSpeechClient();
-
 import md5 from 'md5'; // Импортируем библиотеку для генерации md5
 import fs from 'fs-extra'; // Импортируем fs-extra для работы с файловой системой
 
@@ -34,9 +32,6 @@ config();
 const HF_TOKEN = process.env.HF_TOKEN_3;
 
 import ISO6391 from 'iso-google-locales';
-
-import https from 'https';
-// const fs = require('fs');
 
 const audioDir = path.join(__dirname, 'audio'); // Директория для сохранения аудиофайлов
 

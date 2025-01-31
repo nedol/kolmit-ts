@@ -23,5 +23,6 @@ export type PageLoadEvent = Parameters<PageLoad>[0];
 export type PageData = Expand<Omit<PageParentData, keyof PageParentData & EnsureDefined<PageServerData>> & OptionalUnion<EnsureDefined<PageParentData & EnsureDefined<PageServerData>>>>;
 export type Action<OutputData extends Record<string, any> | void = Record<string, any> | void> = Kit.Action<RouteParams, OutputData, RouteId>
 export type Actions<OutputData extends Record<string, any> | void = Record<string, any> | void> = Kit.Actions<RouteParams, OutputData, RouteId>
+export type PageProps = { data: PageData; form: ActionData }
 export type RequestHandler = Kit.RequestHandler<RouteParams, RouteId>;
 export type RequestEvent = Kit.RequestEvent<RouteParams, RouteId>;

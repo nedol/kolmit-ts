@@ -41,8 +41,7 @@
     picture = '';
 
   import { llang, langs, dicts } from '$lib/js/stores.js';
-  import translate from 'translate';
-  translate.engine = 'google';
+
 
   let user_lang = 'en';
 
@@ -151,19 +150,7 @@
     card_display = '';
   }
 
-  async function Translate(text: string, from_lang: string, to_lang: string) {
-    try {
-      translate.from = from_lang;
 
-      return (
-        ($dicts[text] && $dicts[text][$langs]) ||
-        (await translate(text.trim(), to_lang))
-      );
-    } catch (error) {
-      console.error('Translation error:', error);
-      return text; // или другое подходящее значение по умолчанию
-    }
-  }
 </script>
 
 <div style="margin-top:50px">

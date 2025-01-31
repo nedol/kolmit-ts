@@ -5,7 +5,7 @@
   import { langs, nlang } from '$lib/js/stores.js';
   import { view } from '$lib/js/stores.js';
 
-  import { Dict } from '../dict/dict';
+  // import { Dict } from '../dict/dict';
   // $view = 'lesson';
 
   import GroupEditor from './group/GroupEditor.svelte';
@@ -17,7 +17,7 @@
 
   $: if (data.dict[0]) {
     $dicts = data.dict[0];
-    setContext('dict', new Dict(data.dict[0]));
+    // setContext('dict', new Dict(data.dict[0]));
   }
 
   let operator = data.operator,

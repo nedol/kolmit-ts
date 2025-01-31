@@ -7,7 +7,7 @@
   import { dicts, langs, view, lesson } from '$lib/js/stores';
   import google_langs_list from '$lib/dict/google_lang_list.json';
   import ISO6391 from 'iso-google-locales';
-  import translate from 'translate';
+  import { Translate } from '../translate/Transloc';
 
   let topAppBar;
   let abonent;
@@ -34,19 +34,7 @@
         console.log(error);
       });
   }
-  async function Translate(text: string, from_lang: string, to_lang: string) {
-    try {
-      translate.from = from_lang;
 
-      return (
-        ($dicts[text] && $dicts[text][$langs]) ||
-        (await translate(text.trim(), to_lang))
-      );
-    } catch (error) {
-      console.error('Translation error:', error);
-      return text; // или другое подходящее значение по умолчанию
-    }
-  }
 </script>
 
 <!-- {#if $dicts && $langs && $dicts['CLASS'][$langs]} -->

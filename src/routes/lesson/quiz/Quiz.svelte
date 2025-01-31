@@ -6,7 +6,6 @@
   import Listen from './listen/Listen.svelte';
   import Numbers from './listen/Numbers.svelte';
   import Time from './listen/Time.svelte';
-  import Text from './text/Text.svelte';
   import Word from './word/Word.svelte';
   import WordGame from './word/WordGame.svelte';
   import { call_but_status } from '$lib/js/stores.js';
