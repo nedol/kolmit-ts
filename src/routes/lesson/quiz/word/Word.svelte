@@ -21,8 +21,6 @@
     mdiTranslateOff
   } from '@mdi/js';
 
-  import md5 from 'md5'
-
   // import words from './80.json';
   import { Translate } from '../../../translate/Transloc';
   // translate.engine = 'google';
@@ -68,7 +66,7 @@
     word,
     example,
     example_lang = $langs;
-  let translate = false;
+  let translate = true;
   let shuffleWords;
   let hints;
   let currentWordIndex = 0;
@@ -89,7 +87,6 @@
   let showSpeakerButton = false;
   let focus_pos = 0;
   let speak_text = '';
-  let speechData = {};
 
   // defineWordsArray();
 
@@ -104,15 +101,9 @@
     `./lesson?words=theme&theme=${data.theme}&name=${data.name}&owner=${abonent}&level=${data.level}`
   )
     .then((response) => response.json())
-    .then(async(data) => {
+    .then((data) => {
       words = data.data.data;
       if (!words[0]) return;
-
-      for (let w of words) {
-        const text =  w.example[$llang].replace(/<<|>>/g, '');
-        const resp = await tts.GetGoogleTTS($llang, text,  names[0]);
-        speechData[md5(text)] = resp.resp.audio;
-      }
 
       currentWord = words[currentWordIndex];
       makeExample();
@@ -200,16 +191,19 @@
 
     return new Promise(async (resolve, reject) => {
 
-     if (currentWord.example[$llang]) {
-        example = await Translate(currentWord.example[$llang], $llang, $langs);
-      }
+      // if (currentWord?.example[example_lang]) {
+      //   example = await currentWord.example[example_lang];
+      // } else if (currentWord.example[$llang]) {
+      //   example = await Translate(currentWord.example[$llang], $llang, $langs);
+      // }
 
-      //currentWord.example[$langs] = example;
+      // currentWord.example[$langs] = example;
+      example = currentWord.example[$llang];
 
       const regex = /(<<\w+>>)\s+(<<\w+>>)/;
       const match = currentWord?.example[$llang]
         ? currentWord?.example[$llang].match(regex)
-        : '';       
+        : '';
       let original = '';
       if (match) {
         original = `${match[0]} ${match[1]}`;
@@ -598,15 +592,8 @@
   function speak(text) {
     text = text.replace(/<<|>>/g, '');
     text = text.replace(/_/g, ' ');
-    const hash = md5(text);
-    if(speechData[hash]){
-        let audio = new Audio(speechData[hash]);
-        audio.playbackRate = 0.9;   
-        // audio.text = text;
-        audio.play();
-    }else{
-      tts.Speak_server($llang, text, data.name);
-    }
+    // Speak(text);
+    tts.Speak_server($llang, text, data.name);
 
     // setFocus();
   }
@@ -697,7 +684,6 @@
     // Очищаем интервал при размонтировании компонента
     $llang = _llang;
     $lesson.data = { quiz: '' };
-    speechData = ''
   });
 </script>
 
@@ -787,11 +773,11 @@
               style="margin:10px 5px 10px 5px; scale:1.2; width:20px"
               on:click={ToggleTranslate}
             >
-              {#if translate}
-                <path fill="white" d={mdiTranslateOff}/>
-              {:else}
-                <path fill="grey" d={mdiTranslate}/>
-              {/if}
+            {#if translate}
+              <path fill="white" d={mdiTranslateOff}/>
+            {:else}
+              <path fill="grey" d={mdiTranslate}/>
+            {/if}
             </Icon>
           </Section>
 
@@ -833,29 +819,14 @@
       {/await}
 
       {#if translate}
-      <div class="word" >
+        <div class="word" >
 
-          {#if example}
-          <!-- {@debug example} -->
-          {#if currentWord?.example[`lbl.${$langs}`] && 
-            currentWord?.example[`lbl.${$langs}`] !== currentWord?.example[$langs]}
-          <Icon tag="svg" on:click={OnClickLBL} viewBox="0 0 24 24" 
-            style="position: absolute;
-                left: 0;
-                margin-top:-40px; 
-                scale:.5; 
-                width:50px">
-          <path fill="lightgrey" d={mdiTranslateVariant} /></Icon>
-          {/if}
-        
-              {@html example} 
-            {:else}
-              {#await Translate(example, $llang, $langs) then data}
+              {#await Translate(currentWord?.example[$llang], $llang, $langs) then data}
                 {@html data}
               {/await}
-            {/if}
-    
-      </div>
+      
+      
+        </div>
       {/if}
     
     <div class="input-container">

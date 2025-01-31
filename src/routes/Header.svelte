@@ -129,10 +129,10 @@
                   <Title
                     on:click={() => {
                       if ($lesson.data?.quiz) {
-                        if (confirm(data)) {
-                          $view = 'group';
-                          $showBottomAppBar = true;
-                        }
+                        // if (confirm(data)) {
+                          // $view = 'group';
+                          // $showBottomAppBar = true;
+                        // }
                       } else {
                         $view = 'group';
                         $showBottomAppBar = true;

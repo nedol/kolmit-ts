@@ -76,7 +76,7 @@ export async function Translate(text, from, to) {
     // Проверяем наличие << >> и заменяем на безопасные символы
     const hasQuotes = chunk.includes('<<');
     if (hasQuotes) {
-      chunk = chunk.replace(/<</g, '').replace(/>>/g, '');
+      chunk = chunk.replace(/<</g, ' ').replace(/>>/g, ' ');
     }
 
     // Попытка перевода через Google Translate API
@@ -100,7 +100,7 @@ export async function Translate(text, from, to) {
 
     // Восстанавливаем << >> после перевода
     if (hasQuotes) {
-      res = res.text.replace(/\<(.*?)\>/g, '<<$1>>')                                                       
+      // res = res.text.replace(/\<(.*?)\>/g, '<<$1>>')                                                       
     }
 
     translatedText += `${res} `;
