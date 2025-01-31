@@ -1,8 +1,7 @@
 
 
 export async function Translate(text: string, from_lang: string, to_lang: string) {
-  try {
-    
+  try {   
 
 
     if (from_lang === to_lang) return text;

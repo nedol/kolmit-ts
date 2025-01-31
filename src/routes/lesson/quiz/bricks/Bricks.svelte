@@ -128,6 +128,7 @@ let keys = [];
       const sentenceBatches = chunkArray(cleanedSentences, 5);
 
       // Фоновый перевод: отправляем группы по 5
+      if(false)
       Promise.allSettled(sentenceBatches.map(batch => Translate(batch.join(' '), $llang, $langs)))
         .then(results => {
           bricks_data.translate = results.flatMap(result =>
@@ -203,34 +204,33 @@ let keys = [];
 
 
   function splitHtmlIntoSentencesWithInnerTags(html) {
-    function removeEmojis(input) {
-      const regex = emojiRegex();
-      return input.replace(regex, '');
-    }
+      function removeEmojis(input) {
+        const regex = emojiRegex();
+        return input.replace(regex, '');
+      }
 
-    function formatTaggedText(input) {
-      return input.replace(/<(\w+)>(.*?)<\/\1>/g, (match, tag, content) => {
-        const words = content.split(/\s+/);
-        return words.map(word => `<${tag}>${word}</${tag}>`).join(' ');
+      function formatTaggedText(input) {
+        return input.replace(/<(\w+)>(.*?)<\/\1>/g, (match, tag, content) => {
+          const words = content.split(/\s+/);
+          return words.map(word => `<${tag}>${word}</${tag}>`).join(' ');
+        });
+      }
+
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(html, 'text/html');
+      const paragraphs = doc.querySelectorAll('p');
+
+      const sentences = Array.from(paragraphs).flatMap(p => {
+      const htmlContent = formatTaggedText(removeEmojis(p.innerHTML.trim()));
+
+        return htmlContent
+          .split(/(?<!\b(?:Dr|Mr|Ms|Mrs|St))(?<=[.!?])\s+(?=<|\w|<\/\w+>)/g) // Улучшенное разделение
+          .map(sentence => sentence.trim())
+          .filter(sentence => sentence.length > 0);
       });
-    }
 
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(html, 'text/html');
-    const paragraphs = doc.querySelectorAll('p');
-
-    const sentences = Array.from(paragraphs).flatMap(p => {
-    const htmlContent = formatTaggedText(removeEmojis(p.innerHTML.trim()));
-
-      return htmlContent
-        .split(/(?<!\b(?:Dr|Mr|Ms|Mrs|St))(?<=[.!?])\s+(?=<|\w|<\/\w+>)/g) // Улучшенное разделение
-        .map(sentence => sentence.trim())
-        .filter(sentence => sentence.length > 0);
-    });
-
-    return sentences;
-}
-
+      return sentences;
+  }
 
   // Обработчик клика на слово
   const handleClick = (word) => {
@@ -750,7 +750,10 @@ let keys = [];
     {#if translate}
     <div class="trans">
       <!-- Исходное предложение -->
-      <p>{bricks_data.translate[curSentence]}</p>
+      <!-- <p>{bricks_data.translate[curSentence]}</p> -->
+      {#await Translate(sentence.replace(/<[^>]*>/g, ''), $llang, $langs) then data}
+        <p>{data}</p>
+      {/await}
     </div>
     {/if}
     <!-- Предложение с замененными словами -->
@@ -937,8 +940,8 @@ let keys = [];
     color: rgb(67, 65, 65);
   }
 
-  .word-list span:not(.ver):not(.subj):not(.tijd):not(.plaats), 
-  .formatted-list span:not(.ver):not(.subj):not(.tijd):not(.plaats) {
+  .word-list span:not(.ver):not(.subj):not(.tijd):not(.plaats):not(.adv), 
+  .formatted-list span:not(.ver):not(.subj):not(.tijd):not(.plaats):not(.adv) {
     padding: 0px 6px;
     border: 1px solid #ddd;
     border-radius: 5px;
@@ -1009,6 +1012,7 @@ let keys = [];
     padding: 0px 6px;
   } 
 
+
   .word-list .tijd,.formatted-list .tijd:not(.invisible){
     color: rgb(119, 201, 119);
   }
@@ -1025,6 +1029,20 @@ let keys = [];
   .word-list .plaats,.formatted-list .plaats:not(.invisible){
     color:  darkmagenta
   }
+
+  .adv{
+    position: relative;
+    border:2px solid; 
+    border-color: darkmagenta;
+    --border-color: darkmagenta;
+    border-radius: 5px;
+    padding: 0px 6px;
+  }
+
+  .word-list .adv,.formatted-list .adv:not(.invisible){
+    color:  darkmagenta
+  }
+
 
   /* Анимация мигания */
   @keyframes color-blink {

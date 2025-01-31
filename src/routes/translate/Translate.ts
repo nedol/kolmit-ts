@@ -13,17 +13,46 @@ import {HttpsProxyAgent} from 'https-proxy-agent';
 // import pkg from '@iamtraction/google-translate';
 // const {translate} = pkg;
 
-import translate from 'google-translate-api-x';
+import translatex from 'google-translate-api-x';
 
 // import translatte from 'translatte';
 
 // import translate from 'translate';
 // translate.engine = 'deepl'; //'google'// 'libre';// 
-// translate.key = '0834516e-29b0-45d1-812e-b903d5962e12:fx'; //'203cca0d-8540-4d75-8c88-d69ac40b6d57:fx';//process.env.DEEPL_API_KEY;
+// translate.key = '203cca0d-8540-4d75-8c88-d69ac40b6d57:fx';//'0834516e-29b0-45d1-812e-b903d5962e12:fx'; //process.env.DEEPL_API_KEY;
 
+import { translate } from 'deeplx'
+ 
+const langs = [
+  "bg",
+  "cs",
+  "da",
+  "de",
+  "el",
+  "en",
+  "es",
+  "et",
+  "fi",
+  "fr",
+  "hu",
+  "id",
+  "it",
+  "ja",
+  "ko",
+  "lt",
+  "lv",
+  "nb",
+  "nl",
+  "pl",
+  "pt",
+  "ro",
+  "ru",
+  "sk",
+  "sl",
+  "sv",
+  "zh"
+]
 
-
-import deepl_langs_list from '$lib/dict/deepl_lang_list.json';
 
 
 export async function Translate(text, from, to) {
@@ -38,7 +67,7 @@ export async function Translate(text, from, to) {
 
   // Формируем группы из трёх предложений
   for (let i = 0; i < sentences.length; i += 5) {
-    const chunkGroup = sentences.slice(i, i + 5).join(' ').trim();
+    const chunkGroup = sentences.slice(i, i + 1).join(' ').trim();
     if (!chunkGroup || chunkGroup=='"') continue;
 
     let chunk = chunkGroup.replaceAll('"','');
@@ -52,14 +81,20 @@ export async function Translate(text, from, to) {
 
     // Попытка перевода через Google Translate API
     try {
-      res = await translate(chunk, {  from: from , to: to , autoCorrect: true,forceBatch: false ,
-        requestOptions: {
-          agent: new HttpsProxyAgent('https://164.132.175.159:3128')
-        }
-      });// reversoTranslate(chunk, { to, from })//
-      // res = await azwaw_space(chunk,from,to)
+      if(langs.includes(to)){
+        res = await translate(chunk,  to.toUpperCase()) 
+      }else{
+        const en = await translate(chunk,  "EN") 
+        res = await translatex(en, { from: "en" , to: to, forceBatch: true ,
+          requestOptions: {
+            agent: new HttpsProxyAgent('https://164.132.175.159:3128')
+          }
+        });  
+        res = res.text;
+      }
+  
+
     } catch (error) {
-      console.error('Translation error:', error);
       res = chunk; // Если перевод не удался, возвращаем оригинальный текст
     }
 
@@ -68,7 +103,7 @@ export async function Translate(text, from, to) {
       res = res.text.replace(/\<(.*?)\>/g, '<<$1>>')                                                       
     }
 
-    translatedText += `${res.text} `;
+    translatedText += `${res} `;
   }
 
   // Убираем лишние пробелы
