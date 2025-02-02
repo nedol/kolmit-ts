@@ -67,7 +67,7 @@ let isCollapsed = true;
 
 let curSentence = 0;
 
-let speechData = '';
+// let speechData = '';
 let current_word = 0;
 let audio;
 let display_audio;
@@ -77,11 +77,9 @@ let keys = [];
   export let data;
   const operator = getContext('operator');
   // Исходное предложение
-  let sentence = "Dit is een voorbeeldzinxx voor het oefenen van Nederlands.";
+  let sentence = "";
 
-  $: if($langs){
-    InitData();
-  }
+
 
   fetch(
     `./lesson?bricks=${data.name}&theme=${data.theme}&owner=${operator.abonent}&level=${data.level}`
@@ -125,23 +123,6 @@ let keys = [];
           i % size === 0 ? [...chunks, arr.slice(i, i + size)] : chunks, []
         );
 
-      const sentenceBatches = chunkArray(cleanedSentences, 5);
-
-      // Фоновый перевод: отправляем группы по 5
-      if(false)
-      Promise.allSettled(sentenceBatches.map(batch => Translate(batch.join(' '), $llang, $langs)))
-        .then(results => {
-          bricks_data.translate = results.flatMap(result =>
-            result.status === "fulfilled"
-              ? result.value
-                .replace(/^[\"«]|[\"»]$/g, '')
-                .split(/(?<=[.?!])\s+/)
-                .map(sentence => sentence.trim())
-                .filter(sentence => sentence !== '')
-              : ["Ошибка перевода"] // если перевод не удался
-          );
-        })
-        .catch(error => console.error("Translation error:", error));
 
       // Проверяем наличие curSentence
       if (typeof curSentence === 'undefined' || !keys[curSentence]) {
@@ -152,8 +133,8 @@ let keys = [];
       const sentence = bricks_data.text[curSentence];
 
       // Получение озвучки через TTS
-      const { resp } = await tts.GetGoogleTTS($llang, sentence.replace(/<[^>]*>/g, ''), data?.name);
-      speechData = resp;
+      // const { resp } = await tts.GetGoogleTTS($llang, sentence.replace(/<[^>]*>/g, ''), data?.name);
+      // speechData = resp;
 
       // Разбиваем на слова
       words = formatWords(sentence);
@@ -211,10 +192,14 @@ let keys = [];
 
       function formatTaggedText(input) {
         return input.replace(/<(\w+)>(.*?)<\/\1>/g, (match, tag, content) => {
-          const words = content.split(/\s+/);
-          return words.map(word => `<${tag}>${word}</${tag}>`).join(' ');
+          const words = content.match(/\S+|\s+/g) || []; // Разделяем на слова + пробелы
+          return words.map(word => {
+            if (word.trim()) return `<${tag}>${word}</${tag}>`;
+            return word; // Оставляем пробелы как есть
+          }).join('');
         });
       }
+
 
       const parser = new DOMParser();
       const doc = parser.parseFromString(html, 'text/html');
@@ -289,9 +274,9 @@ let keys = [];
     sentence = bricks_data.text[curSentence];
 
 
-    const resp = await tts.GetGoogleTTS($llang, sentence.replace(/<[^>]*>/g, ''),  data.name);
-      speechData = resp.resp;
-      console.log('speechData:',speechData)
+    // const resp = await tts.GetGoogleTTS($llang, sentence.replace(/<[^>]*>/g, ''),  data.name);
+    //   speechData = resp.resp;
+    //   console.log('speechData:',speechData)
       // sentence = sentence;
       words = sentence.trim().split(/[\s,:\.]+/)
         .filter(word => word) // Оставляем только существующие слова
@@ -323,15 +308,12 @@ let keys = [];
           },500)          
       }
       if (sentence) {
+        const resp = await tts.GetGoogleTTS($llang, sentence.replace(/<[^>]*>/g, ''),  data.name);
+        const speechData = resp.resp;
         audio = new Audio(speechData.audio);
         let  endTime;
         audio.playbackRate = 0.9;   
-        if(speechData?.ts?.length>0 && focusedIndex < formattedSentence.length-1){
-          audio.currentTime = speechData.ts[focusedIndex].start-.001;
-          if(focusedIndex!=0)
-            audio.playbackRate = 0.8;     
-          // endTime =  speechData.ts[current_word+3].end
-        }
+  
 
         if (focusedIndex >= formattedSentence.length-1){
           audio.playbackRate = 0.9;   
@@ -391,7 +373,7 @@ let keys = [];
 
       if(!span_equal){    
 
-        formattedSentence = sentence.split(/[\s,:\.]+/)
+        formattedSentence = sentence.split(/[\s:\.]+/)
           .filter(word => word) // Оставляем только существующие слова
           .map((word) => ({
             gr: extractTagName(word),
@@ -405,7 +387,7 @@ let keys = [];
         });
 
                   // Разбиваем на слова
-        words =  sentence.trim().split(/[\s,:\.]+/) 
+        words =  sentence.trim().split(/[\s:\.]+/) 
         .filter(word => word) // Оставляем только существующие слова
         .map((word) => ({
             gr: extractTagName(word),
@@ -834,11 +816,13 @@ let keys = [];
 
   {/if}
 
-  <div style="height:200px"></div>
+  <div style="height:100px"></div>
 
 </main>
 
 <style>
+
+
 
   :global(.mdc-top-app-bar__row){
       height:48px
