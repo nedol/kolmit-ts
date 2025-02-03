@@ -450,14 +450,15 @@ let keys = [];
 
   function SttResult(text) {
     stt_text = text[$llang];
+    let sent_compare = sentence.replace(/<[^>]*>/g, '');
 
-    const numbers = sentence.match(/\b\d+\b/g);
+    const numbers = sent_compare.match(/\b\d+\b/g);
     if (numbers)
-      sentence = sentence.replace(/\b\d+\b/g, numberToDutchString(numbers[0]));
+      sent_compare = sent_compare.replace(/\b\d+\b/g, numberToDutchString(numbers[0]));
 
     if (stt_text) {
       const similarity = compareStrings(
-        sentence
+        sent_compare
           .toLowerCase()
           .trim()
           .replace(/[^\w\s]|_/g, ''),
@@ -596,8 +597,8 @@ let keys = [];
       {/if}
       </Section>
       <Section align="start"> 
-          <IconButton on:click={()=>{ isPlayAuto = !isPlayAuto; PlayAutoContent()}}>
-            <Icon tag="svg" viewBox="0 0 24 24" style="position:absolute;margin:0px 10px 5px 10px ;scale:1.1;width:30px">
+          <IconButton on:click={()=>{ isPlayAuto = !isPlayAuto; PlayAutoContent()}} >
+            <Icon tag="svg" viewBox="0 0 24 24" style="visibility:hidden;display:absolute;margin:0px 10px 5px 10px ;scale:1.1;width:30px">
               <path fill={playAutoColor} d={mdiEarHearing} />
             </Icon>
           </IconButton>
@@ -914,12 +915,22 @@ let keys = [];
       background-color:transparent; 
   }
   
-  .word-list, .formatted-list {
+  .word-list {
     display: flex;
     text-align: center;
     margin: 10px 2px 15px 2px;
     gap: 10px;
     font-weight: 500;
+    flex-wrap: wrap;
+    color: rgb(67, 65, 65);
+  }
+
+  .formatted-list {
+    display: flex;
+    text-align: center;
+    margin: 10px 2px 15px 2px;
+    gap: 10px;
+    font-weight: 700;
     flex-wrap: wrap;
     color: rgb(67, 65, 65);
   }
@@ -932,6 +943,7 @@ let keys = [];
     background: #f9f9f9;
     cursor: pointer;
     user-select: none;
+
   }
 
   .formatted-list span:focus {

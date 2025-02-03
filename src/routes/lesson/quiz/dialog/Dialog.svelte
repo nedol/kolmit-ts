@@ -272,13 +272,13 @@
         dialog_data.name = data.name;
         Dialog();
 
-        for(let t in dialog_data.content ){
-          const item = dialog_data.content[t]
-          let resp = await tts.GetGoogleTTS($llang, item.user1[$llang],  dialog_data.name);
-          speechData[md5(item.user1[$llang])] = resp.resp.audio;
-          resp = await tts.GetGoogleTTS($llang, item.user2[$llang], dialog_data.name);
-          speechData[md5(item.user2[$llang])] = resp.resp.audio;
-        }
+        // for(let t in dialog_data.content ){
+        //   const item = dialog_data.content[t]
+        //   let resp = await tts.GetGoogleTTS($llang, item.user1[$llang],  dialog_data.name);
+        //   speechData[md5(item.user1[$llang])] = resp.resp.audio;
+        //   resp = await tts.GetGoogleTTS($llang, item.user2[$llang], dialog_data.name);
+        //   speechData[md5(item.user2[$llang])] = resp.resp.audio;
+        // }
 
       })
       .catch((error) => {
@@ -725,13 +725,13 @@
           <!-- {/if} -->
         </Section>
         <Section align="start">
-          {#if $dc_state === 'close'}
+          <!-- {#if $dc_state === 'close'}
             <IconButton on:click={PlayAutoContent}>
               <Icon tag="svg" viewBox="0 0 24 24">
                 <path fill={playAutoColor} d={mdiEarHearing} />
               </Icon>
             </IconButton>
-          {/if}
+          {/if} -->
         </Section>
         <Section align="start">
           <div class="flip_button">
@@ -877,13 +877,11 @@
         <div class="" style="text-align: center;">
           <div class="user1" style="visibility:{visibility[1]}">
             <span>
-              {#if !q[$langs]}
-                {#await Translate(q[$llang].replace(/"([^"]*)"/g, '$1'), $llang, $langs) then data}
+
+                {#await Translate(q[$llang], $llang, $langs) then data}
                   {@html data}
                 {/await}
-              {:else}
-                {@html q[$langs].replace(/"([^"]*)"/g, '$1')}
-              {/if}
+
             </span>
           </div>     
 

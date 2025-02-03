@@ -65,6 +65,7 @@
     "@huggingface/agents": "^0.0.5",
     "@huggingface/hub": "^0.14.10",
     "@huggingface/inference": "^2.7.0",
+    "@huggingface/transformers": "^3.3.2",
     "@iamtraction/google-translate": "^2.0.1",
     "@material/image-list": "^14.0.0",
     "@mdi/js": "^7.4.47",

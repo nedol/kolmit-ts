@@ -1,5 +1,12 @@
 import path from 'path';
+import { dirname, join } from 'path'; // Импортируем join вместе с dirname
 import { fileURLToPath } from 'url';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+import fs from 'fs';
+
+import { exec } from "child_process";
 
 import ISO6391 from 'iso-google-locales';
 
@@ -11,6 +18,8 @@ import axios from 'axios';
 
 import { config } from 'dotenv';
 config();
+
+
 
 const HF_TOKEN = process.env.HF_TOKEN_2;
 
@@ -79,11 +88,12 @@ export async function POST({ url, fetch, cookies, request }) {
 
     // const result = await stt_bluman(blob, from_lang, to_lang);
     const result = await stt_karim_space(blob, from_lang, to_lang);
+    // const result = await transcribeAudio(arrayBuffer,from_lang);
 
     if (result) {
       resp = {
         [from_lang]: result,
-        [to_lang]: await Translate(result, from_lang, to_lang),
+        // [to_lang]: await Translate(result, from_lang, to_lang),
       };
     }
   } else {
@@ -102,6 +112,52 @@ export async function POST({ url, fetch, cookies, request }) {
   response.headers.append('Access-Control-Allow-Origin', `*`);
   return response;
 }
+
+
+const transcribeAudio = async(arrayBuffer, language) => {
+
+  const audioFilePath = path.resolve(__dirname, 'audio.wav');
+  const tempFilePath = path.resolve(__dirname, 'temp_output.mp3');
+
+  // Удаляем временный файл, если он существует
+  if (fs.existsSync(tempFilePath)) {
+    await fs.promises.unlink(tempFilePath);  // Асинхронное удаление файла
+  }
+
+  try{
+
+    const buffer = Buffer.from(arrayBuffer); // Преобразуем ArrayBuffer в Buffer
+    await fs.promises.writeFile(audioFilePath, buffer);
+
+  }catch(ex){
+    console.log()
+  }
+
+  return new Promise((resolve, reject) => {
+    // Полный путь к whisper_transcribe.py
+  const scriptPath = path.join(__dirname, '', 'whisper_transcribe.py');
+    exec(`python "${scriptPath}" "${audioFilePath}" "${language}"`, (error, stdout, stderr) => {
+      if (error) {
+        return reject(error); 
+      }
+
+      // Парсим результат JSON
+      const result = JSON.parse(stdout.trim());
+
+      // Получаем текст
+      const text = result.text;
+
+      // Получаем временные метки
+      // const segments = result.segments.map(segment => ({
+      //   start: segment.start,  // Начало сегмента
+      //   end: segment.end,      // Конец сегмента
+      //   text: segment.text     // Текст сегмента
+      // }));
+
+      resolve(text);
+    });
+  });
+};
 
 async function stt_sm4_space(blob, from_lang, to_lang) {
 
@@ -216,7 +272,8 @@ async function stt_karim_space(arrayBuffer,  from_lang, to_lang) {
       audio_File: arrayBuffer, 		
       language: "nl-BE", 
   });
-  return result.data[0];
+  if(!result.data[0].includes('Exception:'))
+    return result.data[0];
 }
 
 
