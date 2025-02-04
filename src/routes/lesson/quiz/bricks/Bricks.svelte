@@ -29,27 +29,7 @@
 
   let playAutoColor = 'currentColor';
 
-  $: if (isPlayAuto) {
-      playAutoColor = 'green';
-  } else {
-      playAutoColor = 'currentColor';
-  }
-
-  import {
-      langs,
-      llang,
-  } from '$lib/js/stores.js';
-
-  import {
-      mdiArrowRight,
-      mdiArrowLeft,
-      mdiMicrophoneOutline ,
-      mdiMicrophone,
-      mdiEarHearing,
-      mdiPlay,
-      mdiTranslate,
-      mdiTranslateOff
-  } from '@mdi/js';
+  let article_name = ''
 
   let stt, tts;
   // Разделяем предложение на слова
@@ -78,6 +58,29 @@ let keys = [];
   const operator = getContext('operator');
   // Исходное предложение
   let sentence = "";
+
+  $: if (isPlayAuto) {
+      playAutoColor = 'green';
+  } else {
+      playAutoColor = 'currentColor';
+  }
+
+  import {
+      langs,
+      llang,
+  } from '$lib/js/stores.js';
+
+  import {
+      mdiArrowRight,
+      mdiArrowLeft,
+      mdiMicrophoneOutline ,
+      mdiMicrophone,
+      mdiEarHearing,
+      mdiPlay,
+      mdiTranslate,
+      mdiTranslateOff
+  } from '@mdi/js';
+
 
 
 
@@ -115,7 +118,7 @@ let keys = [];
       const sentences = bricks_data.text;
 
       // Убираем HTML-теги
-      const cleanedSentences = sentences.map(sentence => sentence.replace(/<[^>]*>/g, ''));
+      const cleanedSentences = sentences.map(sent_obj => sent_obj.sentence.replace(/<[^>]*>/g, ''));
 
       // Функция для разделения массива на пакеты по 5 предложений
       const chunkArray = (arr, size) =>
@@ -132,6 +135,8 @@ let keys = [];
       // Текущее предложение
       const sentence = bricks_data.text[curSentence];
 
+      article_name = sentence.article || '\u00a0\u00a0\u00a0\u00a0\u00a0'
+
       // Получение озвучки через TTS
       // const { resp } = await tts.GetGoogleTTS($llang, sentence.replace(/<[^>]*>/g, ''), data?.name);
       // speechData = resp;
@@ -147,9 +152,8 @@ let keys = [];
     }
   };
 
-
-  const formatWords = (sentence) =>
-    sentence
+  const formatWords = (sent_obj) =>
+    sent_obj.sentence
     .trim()
     .split(/[\s,:\.]+/)
     .filter(word => word)
@@ -212,7 +216,8 @@ let keys = [];
 
       const sentences = Array.from(articles).flatMap(article => {
           const htmlContent = formatTaggedText(removeEmojis(article.innerHTML.trim()));
-
+          const articleName = article.getAttribute('name') || ''; // Извлекаем название статьи из атрибута name
+      
           return htmlContent
               .split(/(?<!\b(?:Dr|Mr|Ms|Mrs|St))(?<=[.!?])\s+(?=<|\w|<\/\w+>)/g)
               .map((sentence, index, arr) => {
@@ -221,7 +226,11 @@ let keys = [];
                   }
                   return sentence;
               })
-              .filter(sentence => sentence.length > 0);
+              .filter(sentence => sentence.length > 0)
+              .map(sentence => ({
+                sentence,
+                article: articleName // Добавляем название статьи вместо outerHTML
+            }));;
       });
 
       return sentences;
@@ -281,8 +290,8 @@ let keys = [];
       curSentence = 0;
     }
 
-    sentence = bricks_data.text[curSentence];
-
+    sentence = bricks_data.text[curSentence].sentence;
+    article_name = bricks_data.text[curSentence].article || '\u00a0\u00a0\u00a0\u00a0\u00a0'
 
     // const resp = await tts.GetGoogleTTS($llang, sentence.replace(/<[^>]*>/g, ''),  data.name);
     //   speechData = resp.resp;
@@ -377,9 +386,9 @@ let keys = [];
 
   const onToggleWord = ()=>{
 
-    const text = bricks_data.text[curSentence];
+    const sent_obj = bricks_data.text[curSentence];
 
-    sentence = text.trim();
+    sentence = sent_obj.sentence.trim();
 
       if(!span_equal){    
 
@@ -739,6 +748,7 @@ let keys = [];
 {/if}
 
 <main>
+  <span class='article'>{article_name}</span>
   <div>
     {#if translate}
     <div class="trans">
@@ -862,6 +872,11 @@ let keys = [];
       color:transparent
   }
 
+  .article{
+    color: #2196f3;
+    font-style: italic;
+    font-size: small;
+  }
   .speaker-button {
     display: inline-flex;
     float: right;
