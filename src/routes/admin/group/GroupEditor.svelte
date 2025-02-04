@@ -42,6 +42,8 @@
 
   import { llang, langs, dicts } from '$lib/js/stores.js';
 
+  import {Translate} from '../../../routes/translate/Transloc.ts'
+
 
   let user_lang = 'en';
 

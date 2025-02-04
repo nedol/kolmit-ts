@@ -95,7 +95,7 @@
       dialog_data.name = name;
       //DB
       fetch(
-        `./admin?prompt=dialog.basic&quiz_name=${data.name[$llang]}&prompt_owner=${abonent}&prompt_level=${data.level}&prompt_theme=${data.theme}`
+        `./admin?prompt=dialog.basic&quiz_name=${data.name[$llang]}&prompt_owner=${abonent}&prompt_level=${data.level}&prompt_theme=${data.theme.name[$llang]}`
       )
         .then((response) => response.json())
         .then((resp) => {
@@ -109,14 +109,6 @@
   
           // data.module.themes[1].lessons[0].quizes[1].name
 
-          prompt = prompt.replaceAll('${llang}', $llang);
-          prompt = prompt.replaceAll('${name[$llang]}', `${data.theme.name[$llang]}.${name[$llang]}`);
-          prompt = prompt.replaceAll('${langs}', $langs);
-          prompt = prompt.replaceAll('${dialog_data.html}', dialog_data.html);
-          prompt = prompt.replaceAll('${data.level}', `${data.level}.${data.theme.id}(${data.module.themes.length})`);
-          prompt = prompt.replaceAll('${num}', num);
-
-         
 
           dialog_data.words = JSON.stringify(
             resp.resp.words[0]?.data//resp.words[0].data
@@ -137,9 +129,20 @@
             );
           }
 
-          dialog_data.html = resp.resp.words[0]?.context;
+          if(!dialog_data.html )
+            dialog_data.html = resp.resp?.context[0].html;//from bricks html
 
           if (data.theme.grammar) prompt = prompt.replaceAll('${grammar}', JSON.stringify(data.theme.grammar)) 
+
+          
+          prompt = prompt.replaceAll('${llang}', $llang);
+          prompt = prompt.replaceAll('${name[$llang]}', `${data.theme.name[$llang]}.${name[$llang]}`);
+          prompt = prompt.replaceAll('${langs}', $langs);
+          prompt = prompt.replaceAll('${dialog_data_html}', dialog_data.html);
+          prompt = prompt.replaceAll('${data.level}', `${data.level}.${data.theme.id}(${data.module.themes.length})`);
+          prompt = prompt.replaceAll('${num}', num);
+
+         
 
           prompt = prompt;
         });

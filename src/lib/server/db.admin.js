@@ -194,7 +194,7 @@ export async function UpdateWords(q) {
 }
 
 export async function GetPrompt(prompt = '', quiz_name= '', owner= '', level= '', theme= '') {
-  let prompt_res, words_res, gram_res, gram;
+  let prompt_res, words_res, gram_res, gram, context;
   try {
     if(prompt)
       prompt_res = await sql`SELECT * FROM prompts WHERE name=${prompt}`;
@@ -202,7 +202,10 @@ export async function GetPrompt(prompt = '', quiz_name= '', owner= '', level= ''
       words_res = await sql`SELECT * FROM word WHERE name=${quiz_name}`;
     if(owner && level){
       gram_res = await sql`SELECT * FROM grammar WHERE owner=${owner} AND level=${level}`;
-      gram = find(gram_res[0].data, { theme: theme });
+      if(gram_res[0])
+        gram = find(gram_res[0].data, { theme: theme });
+
+      context = await sql`SELECT html FROM bricks WHERE owner=${owner} AND level=${level} AND name=${quiz_name}`;
     }
   } catch (ex) {
     console.log(JSON.stringify({ res: ex }));
@@ -211,5 +214,6 @@ export async function GetPrompt(prompt = '', quiz_name= '', owner= '', level= ''
     prompt: prompt_res[0],
     words: words_res,
     grammar: gram,
+    context: context 
   };
 }

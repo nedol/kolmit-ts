@@ -185,33 +185,43 @@ let keys = [];
 
 
   function splitHtmlIntoSentencesWithInnerTags(html) {
-      function removeEmojis(input) {
+    function removeEmojis(input) {
         const regex = emojiRegex();
         return input.replace(regex, '');
-      }
+    }
 
-      function formatTaggedText(input) {
+    function formatTaggedText(input) {
         return input.replace(/<(\w+)>(.*?)<\/\1>/g, (match, tag, content) => {
-          const words = content.match(/\S+|\s+/g) || []; // Разделяем на слова + пробелы
-          return words.map(word => {
-            if (word.trim()) return `<${tag}>${word}</${tag}>`;
-            return word; // Оставляем пробелы как есть
-          }).join('');
+            const words = content.match(/\S+|\s+/g) || []; // Разделяем на слова + пробелы
+            return words.map(word => {
+                if (word.trim()) return `<${tag}>${word}</${tag}>`;
+                return word; // Оставляем пробелы как есть
+            }).join('');
         });
-      }
+    }
 
+      function shouldNotSplit(text, index) {
+          // Проверяем, находимся ли внутри любого тега (кроме <article>)
+          const match = text.slice(Math.max(0, index - 10), index + 10);
+          return /<(\w+)>([^<]*[A-Z]\.[A-Z]\.[^<]*)<\/\1>/i.test(match);
+      }
 
       const parser = new DOMParser();
       const doc = parser.parseFromString(html, 'text/html');
-      const paragraphs = doc.querySelectorAll('p');
+      const articles = doc.querySelectorAll('article, aticle');
 
-      const sentences = Array.from(paragraphs).flatMap(p => {
-      const htmlContent = formatTaggedText(removeEmojis(p.innerHTML.trim()));
+      const sentences = Array.from(articles).flatMap(article => {
+          const htmlContent = formatTaggedText(removeEmojis(article.innerHTML.trim()));
 
-        return htmlContent
-          .split(/(?<!\b(?:Dr|Mr|Ms|Mrs|St))(?<=[.!?])\s+(?=<|\w|<\/\w+>)/g) // Улучшенное разделение
-          .map(sentence => sentence.trim())
-          .filter(sentence => sentence.length > 0);
+          return htmlContent
+              .split(/(?<!\b(?:Dr|Mr|Ms|Mrs|St))(?<=[.!?])\s+(?=<|\w|<\/\w+>)/g)
+              .map((sentence, index, arr) => {
+                  if (index > 0 && shouldNotSplit(arr[index - 1], arr[index - 1].length)) {
+                      return arr[index - 1] + ' ' + sentence; // Объединяем части, если не должно быть разделения
+                  }
+                  return sentence;
+              })
+              .filter(sentence => sentence.length > 0);
       });
 
       return sentences;
@@ -220,7 +230,7 @@ let keys = [];
   // Обработчик клика на слово
   const handleClick = (word) => {
       // Присваиваем выбранное слово фокусируемому элементу
-      if(formattedSentence[focusedIndex].value.toLowerCase() === word.value.toLowerCase()){
+      if(formattedSentence[focusedIndex].value.toLowerCase().replace(/<[^>]*>/g, '') === word.value.toLowerCase().replace(/<[^>]*>/g, '')){
 
           formattedSentence[focusedIndex].word =  word.value ;
           formattedSentence[focusedIndex].class = "correct";
@@ -987,15 +997,15 @@ let keys = [];
   .subj{
     position: relative;
     border:2px solid; 
-    border-color: rgb(101, 101, 192); 
-    --border-color: rgb(101, 101, 192); 
+    border-color: rgb(49, 49, 169); 
+    --border-color: rgb(49, 49, 169); 
     border-radius: 7px;
     /* background-color:lightskyblue; */
     padding: 0px 6px;
   } 
 
   .word-list .subj,.formatted-list .subj:not(.invisible){
-    color: rgb(101, 101, 192); 
+    color: rgb(49, 49, 169); 
   }
 
   .tijd{
