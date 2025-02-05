@@ -116,7 +116,8 @@ export async function POST({ url, fetch, cookies, request }) {
 
 const transcribeAudio = async(arrayBuffer, language) => {
 
-  const audioFilePath = path.resolve(__dirname, 'audio.wav');
+  const audioFilePath =// path.resolve(__dirname, 'audio.wav');
+    '/opt/render/project/src/src/routes/speech/stt/audio.wav'
   const tempFilePath = path.resolve(__dirname, 'temp_output.mp3');
 
   // Удаляем временный файл, если он существует
