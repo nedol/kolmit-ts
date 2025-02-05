@@ -4,6 +4,9 @@ import whisper
 import sys
 import json
 
+import logging
+logging.basicConfig(level=logging.DEBUG)
+
 # Загружаем более мощную модель
 model = whisper.load_model("small")# large-v3 medium
 
