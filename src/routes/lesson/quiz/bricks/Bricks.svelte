@@ -245,7 +245,9 @@ let keys = [];
           formattedSentence[focusedIndex].class = "correct";
 
           // После того как слово присвоено, ищем следующий элемент для фокуса
-          focusedIndex = Math.min(focusedIndex + 1, formattedSentence.length - 1);
+          if(formattedSentence.length-1 > focusedIndex){
+            focusedIndex = Math.min(focusedIndex + 1, formattedSentence.length - 1);
+          }
 
           // Устанавливаем фокус на следующий элемент
           requestAnimationFrame(() => {
@@ -256,7 +258,10 @@ let keys = [];
           });
 
            // Проверяем, все ли слова правильно заполнены
-          checkCompletion();
+          setTimeout(()=>{
+            checkCompletion();
+          },100) 
+        
 
       }else{
           formattedSentence[focusedIndex].word =  word.value ;
@@ -283,6 +288,7 @@ let keys = [];
     }
 
     current_word = 0;
+    focusedIndex = 0;
     // isSTT = false;
     stt_text = ''
 
@@ -318,7 +324,13 @@ let keys = [];
       MakeBricks();
   }
 
+  function getCorrectSpanString(){
+    const elements = document.querySelectorAll(".correct");
+    return Array.from(elements).map(el => el.textContent.trim()).join(" ");
+  }
+
   const SpeakText = async (isEndSpeak) => {
+
       const endSpeak = ()=> {
           if(isEndSpeak===true)
           setTimeout(()=>{
@@ -326,8 +338,11 @@ let keys = [];
               navSentence(++curSentence)
           },500)          
       }
-      if (sentence) {
-        const resp = await tts.GetGoogleTTS($llang, sentence.replace(/<[^>]*>/g, ''),  data.name);
+
+      const textToSpeak = getCorrectSpanString();
+
+      if (textToSpeak) {
+        const resp = await tts.GetGoogleTTS($llang, textToSpeak,  data.name);
         const speechData = resp.resp;
         audio = new Audio(speechData.audio);
         let  endTime;
@@ -364,24 +379,34 @@ let keys = [];
 
   // Обработчик для фокуса на placeholder
   const handleFocus = (index) => {
-    focusedIndex = index;
+    // focusedIndex = index;
   };
 
-  const handleFormatted = (item)=>{
-      formattedSentence[focusedIndex].word =  item.word ;
-      formattedSentence[focusedIndex].class = "correct";
+  const handleFormatted = (item, index)=>{
+
+    if(formattedSentence[index].class === "correct"){
+      formattedSentence[index].class= 'incorrect';
+      formattedSentence[index].word =  "\u00a0\u00a0\u00a0\u00a0\u00a0";
+      return;
+    }
+
+    if(formattedSentence[index].value ===  item.word){
+      formattedSentence[index].word = item.word;
+      formattedSentence[index].class = "correct";
+          // После того как слово присвоено, ищем следующий элемент для фокуса
+      focusedIndex = Math.min(index + 1, formattedSentence.length - 1);
+    }
+    setTimeout(()=>{
       checkCompletion();
+    },100)
 
-      // После того как слово присвоено, ищем следующий элемент для фокуса
-      focusedIndex = Math.min(focusedIndex + 1, formattedSentence.length - 1);
-
-      // Устанавливаем фокус на следующий элемент
-      requestAnimationFrame(() => {
-          const nextElement = document.querySelectorAll('.formatted-list span')[focusedIndex];
-          if (nextElement) {
-            nextElement.focus();
-          }
-      });        
+    // // Устанавливаем фокус на следующий элемент
+    requestAnimationFrame(() => {
+        const nextElement = document.querySelectorAll('.formatted-list span')[focusedIndex];
+        if (nextElement) {
+          nextElement.focus();
+        }
+    });        
   }
 
   const onToggleWord = ()=>{
@@ -405,7 +430,7 @@ let keys = [];
             item.class = "invisible"
         });
 
-                  // Разбиваем на слова
+       // Разбиваем на слова
         words =  sentence.trim().split(/[\s:\.]+/) 
         .filter(word => word) // Оставляем только существующие слова
         .map((word) => ({
@@ -469,7 +494,8 @@ let keys = [];
 
   function SttResult(text) {
     stt_text = text[$llang];
-    let sent_compare = sentence.replace(/<[^>]*>/g, '');
+    const correct_str = getCorrectSpanString();
+    let sent_compare = correct_str;
 
     const numbers = sent_compare.match(/\b\d+\b/g);
     if (numbers)
@@ -494,6 +520,8 @@ let keys = [];
       }
     }
   }
+
+
 
   function compareStrings(str1, str2) {
     // Используем алгоритм Левенштейна для вычисления расстояния между строками
@@ -579,6 +607,30 @@ let keys = [];
 
   }
 
+  const toNextArticle = ()=>{
+
+      const arr=bricks_data.text;
+      if (curSentence < 0 || curSentence >= arr.length) return null;
+      
+      let currentArticle = arr[curSentence].article;
+      
+      for (let i = curSentence + 1; i < arr.length; i++) {
+          if (arr[i].article !== currentArticle) {
+            curSentence=i;
+            MakeBricks()
+            article_name = arr[i].article;
+            return;
+          }
+      }
+      // Если нет следующего объекта с другим article
+      curSentence = 0;
+      MakeBricks()
+      article_name = arr[0].article;
+      return; 
+  }
+
+  
+
 </script>
 
 <Tts bind:this={tts}></Tts>
@@ -616,11 +668,22 @@ let keys = [];
       {/if}
       </Section>
       <Section align="start"> 
-          <IconButton on:click={()=>{ isPlayAuto = !isPlayAuto; PlayAutoContent()}} >
-            <Icon tag="svg" viewBox="0 0 24 24" style="visibility:hidden;display:absolute;margin:0px 10px 5px 10px ;scale:1.1;width:30px">
-              <path fill={playAutoColor} d={mdiEarHearing} />
-            </Icon>
-          </IconButton>
+
+          <div>
+            <IconButton
+              class="material-icons"
+              aria-label="Back"
+              on:click={onSTT}
+            >
+              <Icon tag="svg" viewBox="0 0 24 24" style="position:absolute; margin:10px 5px 10px 5px; scale:1.1;width:30px">
+                {#if isSTT}
+                  <path fill="grey" d={mdiMicrophone} />
+                {:else}
+                  <path fill="white" d={mdiMicrophoneOutline} />
+                {/if}
+              </Icon>
+            </IconButton>
+          </div>
 
       </Section>
       <Section align="start">
@@ -691,20 +754,12 @@ let keys = [];
       </Section>
       <Section align="end">
         <div>
-          <IconButton
-            class="material-icons"
-            aria-label="Back"
-            on:click={onSTT}
-          >
-            <Icon tag="svg" viewBox="0 0 24 24" style="position:absolute; margin:10px 5px 10px 5px; scale:1.1;width:30px">
-              {#if isSTT}
-                <path fill="grey" d={mdiMicrophone} />
-              {:else}
-                <path fill="white" d={mdiMicrophoneOutline} />
-              {/if}
-            </Icon>
-          </IconButton>
-        </div>
+        <IconButton on:click={()=>{ isPlayAuto = !isPlayAuto; PlayAutoContent()}} >
+          <Icon tag="svg" viewBox="0 0 24 24" style="visibility:hidden;display:absolute;margin:0px 10px 5px 10px ;scale:1.1;width:30px">
+            <path fill={playAutoColor} d={mdiEarHearing} />
+          </Icon>
+        </IconButton>
+      </div>
       </Section>
       <Section align="end">
         <Icon
@@ -736,8 +791,8 @@ let keys = [];
 </div>
 
 {#if bricks_data?.html}
-  <span on:click={() => (isCollapsed = !isCollapsed)}
-  style="display:block-inline;position:relative;width:80%;color: black;font-style: italic;font-size:smaller;font-family: serif;"
+  <span class="bricks_name" on:click={() => (isCollapsed = !isCollapsed)}
+  
   >{bricks_data?.name}</span
   >
   {#if !isCollapsed}
@@ -748,7 +803,7 @@ let keys = [];
 {/if}
 
 <main>
-  <span class='article'>{article_name}</span>
+  <span class='article' on:click={toNextArticle}>{article_name}</span>
   <div>
     {#if translate}
     <div class="trans">
@@ -770,7 +825,7 @@ let keys = [];
       {#each formattedSentence as item, index}
         <span class={`${item.class} ${item.gr}`}
           tabindex="0" 
-          on:click={() => {item.word=item.value; handleFormatted(item)}}
+          on:click={() => {item.word=item.value; handleFormatted(item, index)}}
           on:focus={() => handleFocus(index)}>
           {@html item.word || item.placeholder}
         </span>
@@ -868,11 +923,25 @@ let keys = [];
       padding: 8px 10px;
   }
 
+  .bricks_name{
+    position:relative;
+    margin: 10px;
+    width:80%;
+    color: black;
+    font-style: italic;
+    font-size: small;
+    font-family: serif;
+  }
+
   .invisible{
       color:transparent
   }
 
   .article{
+    display: flex;;
+    justify-content: center;
+    align-items: center;
+    height: 3vh;
     color: #2196f3;
     font-style: italic;
     font-size: small;
@@ -933,10 +1002,10 @@ let keys = [];
       width: fit-content;
       margin: 5px auto; /* Центрирование второго элемента */
       margin-top: 5px;
-      color: coral;
+      color: #9eb2cc;
       line-height: normal;
       text-align: center;
-      font-size: 0.8em;
+      font-size: 0.9em;
       background-color:transparent; 
   }
   
