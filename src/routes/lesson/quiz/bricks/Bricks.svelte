@@ -339,7 +339,7 @@ let keys = [];
           },500)          
       }
 
-      const textToSpeak = getCorrectSpanString();
+      const textToSpeak = isSTT?getCorrectSpanString():sentence.replace(/<[^>]*>/g, '');
 
       if (textToSpeak) {
         const resp = await tts.GetGoogleTTS($llang, textToSpeak,  data.name);
