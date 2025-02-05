@@ -85,9 +85,13 @@ export async function POST({ url, fetch, cookies, request }) {
 
     // const result = await queryHF(buffer);
     // const result = await stt_whisper_space(blob, from_lang);
-
+    // const result = await stt_whisper(blob, from_lang);
     // const result = await stt_bluman(blob, from_lang, to_lang);
-    const result = await stt_karim_space(blob, from_lang, to_lang);
+    // const result = await stt_karim_space(blob, from_lang, to_lang);
+
+    const result = await stt_mms(blob, from_lang, to_lang)
+
+
     // const result = await transcribeAudio(arrayBuffer,from_lang);
 
     if (result) {
@@ -204,8 +208,8 @@ async function stt_bluman(blob, from_lang, to_lang) {
 
 async function stt_whisper(blob, from_lang, to_lang) {
   const response = await fetch(
-    // "https://api-inference.huggingface.co/models/openai/whisper-large-v3",
-    "https://api-inference.huggingface.co/models/openai/whisper-small",
+    "https://api-inference.huggingface.co/models/openai/whisper-large-v3",
+    // "https://api-inference.huggingface.co/models/openai/whisper-small",
     {
       headers: {
         Authorization: "Bearer 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",
@@ -257,27 +261,31 @@ async function stt_sm4(blob, from_lang, to_lang) {
 }
 
 
-async function stt_mms(arrayBuffer,  from_lang, to_lang) {
-  const app = await Client.connect('mms-meta/MMS');
-    const from = ISO6391.getName(from_lang);
-    const to = ISO6391.getName(to_lang);
-  const result = await app.predict('/predict', 
-    {
-      audio_data: arrayBuffer,//convertBlobToBase64(arrayBuffer),
-      lang: 'rus (Russian)'
-    }
-  );
-  return result.data[0];
+async function stt_mms(arrayBuffer, from_lang, to_lang) {
+  try {
+    const app = await Client.connect('Nymbo/MMS');
+    const result = await app.predict('/predict', {
+      audio_data: arrayBuffer,
+      lang: 'nld (Dutch)'
+    });
+    return result.data[0];
+  } catch (error) {
+    console.error('Error in stt_mms:', error);
+    throw error; // Пробрасываем ошибку дальше, если нужно
+  }
 }
 
+
 async function stt_karim_space(arrayBuffer,  from_lang, to_lang) {
-  const client = await Client.connect("karim23657/Persian_Automatic_Speech_Recognition-asr");
+  // const client = await Client.connect("karim23657/Persian_Automatic_Speech_Recognition-asr");
+  const client = await Client.connect("MelikaNLP/Persian_Automatic_Speech_Recognition-asr");
+
   const result = await client.predict("/g_rec", { 
       audio_File: arrayBuffer, 		
       language: "nl-BE", 
   });
   if(!result.data[0].includes('Exception:'))
-    return result.data[0];
+    return result.data[0].replace("Text:", '').trim();
 }
 
 

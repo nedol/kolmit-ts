@@ -118,7 +118,6 @@ declare module '$env/static/private' {
 	export const VSCODE_INSPECTOR_OPTIONS: string;
 	export const windir: string;
 	export const ZES_ENABLE_SYSMAN: string;
-	export const _OLD_VIRTUAL_PATH: string;
 }
 
 /**
@@ -242,7 +241,6 @@ declare module '$env/dynamic/private' {
 		VSCODE_INSPECTOR_OPTIONS: string;
 		windir: string;
 		ZES_ENABLE_SYSMAN: string;
-		_OLD_VIRTUAL_PATH: string;
 		[key: `PUBLIC_${string}`]: undefined;
 		[key: `${string}`]: string | undefined;
 	}
