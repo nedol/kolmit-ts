@@ -13,4 +13,4 @@ vite.config.ts.timestamp-*
 # tsconfig.json
 /src/routes/speech/tts/audio
 /sql
-
+/whisper_env

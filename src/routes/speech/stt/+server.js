@@ -135,7 +135,10 @@ const transcribeAudio = async(arrayBuffer, language) => {
 
   return new Promise((resolve, reject) => {
     // Полный путь к whisper_transcribe.py
-  const scriptPath = path.join(__dirname, '', 'whisper_transcribe.py');
+    // const scriptPath = path.join(__dirname, '', 'whisper_transcribe.py');
+    // Полный путь к whisper_transcribe.py
+    const scriptPath = '/opt/render/project/src/src/routes/speech/stt/whisper_transcribe.py';  // Указываем правильный путь
+
     exec(`python "${scriptPath}" "${audioFilePath}" "${language}"`, (error, stdout, stderr) => {
       if (error) {
         return reject(error); 
