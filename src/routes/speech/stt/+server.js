@@ -87,8 +87,8 @@ export async function POST({ url, fetch, cookies, request }) {
     // const result = await stt_whisper_space(blob, from_lang);
 
     // const result = await stt_bluman(blob, from_lang, to_lang);
-    const result = await stt_karim_space(blob, from_lang, to_lang);
-    // const result = await transcribeAudio(arrayBuffer,from_lang);
+    // const result = await stt_karim_space(blob, from_lang, to_lang);
+    const result = await transcribeAudio(arrayBuffer,from_lang);
 
     if (result) {
       resp = {

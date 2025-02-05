@@ -1,31 +1,31 @@
 # -*- coding: utf-8 -*-
 
-# import whisper
-
-# model = whisper.load_model("base")
-# print("Model loaded successfully!")
-
-
 import whisper
 import sys
 import json
 
-# Загрузить модель Whisper
-model = whisper.load_model("base")
+# Загружаем более мощную модель
+model = whisper.load_model("small")# large-v3 medium
 
 # Получить путь к аудиофайлу
 audio_file = sys.argv[1]
+language = sys.argv[2] if len(sys.argv) > 2 else "en"
 
-language = sys.argv[2] if len(sys.argv) > 2 else "en"  # По умолчанию английский
+# Выполнить транскрипцию с улучшенными параметрами
+result = model.transcribe(
+    audio_file, 
+    language=language, 
+    temperature=[0.0], 
+    word_timestamps=True, 
+    beam_size=5, 
+    fp16=False
+)
 
-# Выполнить транскрипцию с получением временных меток
-result = model.transcribe(audio_file,  language=language, word_timestamps=False)
-
-# Вывести результат в формате JSON (с временными метками)
+# Вывести результат в формате JSON
 output = {
     "text": result["text"],
     "segments": result["segments"]  # Список сегментов с временными метками
 }
 
-# Печатаем результат в формате JSON
-print(json.dumps(output))
+print(json.dumps(output, ensure_ascii=False, indent=2))
+
