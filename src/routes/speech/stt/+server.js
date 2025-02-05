@@ -83,13 +83,11 @@ export async function POST({ url, fetch, cookies, request }) {
     }
   } else if (from_lang == 'nl') {
 
-    // const result = await queryHF(buffer);
-    // const result = await stt_whisper_space(blob, from_lang);
-    // const result = await stt_whisper(blob, from_lang);
-    // const result = await stt_bluman(blob, from_lang, to_lang);
-    // const result = await stt_karim_space(blob, from_lang, to_lang);
+    // const result = await queryHF(buffer);?
 
-    const result = await stt_mms(blob, from_lang, to_lang)
+    // const result = await stt_karim_space(blob, from_lang, to_lang);!
+
+    const result = await stt_mms(blob, from_lang, to_lang);//!
 
 
     // const result = await transcribeAudio(arrayBuffer,from_lang);
