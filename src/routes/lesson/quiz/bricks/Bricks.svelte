@@ -476,6 +476,7 @@ let keys = [];
 
   function onClickMicrophone() {
     if (isListening) {
+      stt_text = ''
       stt.MediaRecorderStop();
       isListening = false;
       return;

@@ -85,9 +85,9 @@ export async function POST({ url, fetch, cookies, request }) {
 
     // const result = await queryHF(buffer);?
 
-    // const result = await stt_karim_space(blob, from_lang, to_lang);!
+    const result = await stt_karim_space(blob, from_lang, to_lang);//!
 
-    const result = await stt_mms(blob, from_lang, to_lang);//!
+    // const result = await stt_mms(blob, from_lang, to_lang);//!
 
 
     // const result = await transcribeAudio(arrayBuffer,from_lang);
