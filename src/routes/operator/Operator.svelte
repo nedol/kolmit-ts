@@ -53,8 +53,6 @@
   import pkg from 'lodash';
   const { find } = pkg;
 
-  import md5 from 'md5';
-  
 
   import { msg } from '$lib/js/stores.js';
   $: if ($msg) {
@@ -90,10 +88,6 @@
   let commandsList;
   let rtcSupportText = '';
   let debug_div: any;
-
-  let cc_display: string,
-    lesson_display: string,
-    chat_display = 'block';
 
   $call_but_status = 'inactive';
 
@@ -182,6 +176,9 @@
       if (detectDevice())
         document.addEventListener('visibilitychange', handleVisibilityChange);
 
+      if(group_data.length<=1)
+        $view = 'lesson'
+      
 
     // setTimeout(()=>{
     //   OnClickCallButton();//активировать

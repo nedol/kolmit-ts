@@ -181,7 +181,7 @@
 
     return text.replace(
       /<<([^>]*)>>/g,
-      `<span  value="$1" class="sentence_span" style="position: relative;width:20px;  left: 0px;" onclick=OnClickInput></span>`
+      `<span  value="$1" class="sentence_span" style="position: relative;width:20px;  left: 0px;" ></span>`
     );
   }
 
@@ -225,14 +225,14 @@
         example = example?.replace(
           /<<([^<>]+)>>/gu,
           !data.level.includes('C1')
-            ? '<span style="color:green" onclick=OnClickInput><b>$1</b></span>'
+            ? '<span style="color:green" ><b>$1</b></span>'
             : '$1'
         );
       } else if (example.includes('"')) {
         example = example?.replace(
           /"([^"]+)"/gu,
           !data.level.includes('C1')
-            ? '<span style="color:green" onclick=OnClickInput><b>$1</b></span>'
+            ? '<span style="color:green" ><b>$1</b></span>'
             : '$1'
         );
       }
@@ -619,11 +619,11 @@
     return count;
   }
 
-  function OnClickInput(el) {
-    // div_input[0].innerHTML = "    "
-    div_input[0].focus();
-    // setFocus()
-  }
+  // function OnClickInput(el) {
+  //   // div_input[0].innerHTML = "    "
+  //   div_input[0].focus();
+  //   // setFocus()
+  // }
 
   function setLang(ev) {
     let lang = ev.currentTarget.outerText;
@@ -725,9 +725,7 @@
             {/if}
           </Section>
           <Section align="start">
-            <button class="hint-button" on:click={showHint}>
-              <span class="material-symbols-outlined">?</span>
-            </button>
+
           </Section>
           <Section>
             {#if !$dc}
@@ -830,7 +828,7 @@
       
         </div>
       {/if}
-    
+
     <div class="input-container">
       {#if resultElement}
         {@html resultElement}
@@ -839,8 +837,7 @@
       <div
         class="input"
         contenteditable="true"
-        on:click={OnClickInput}
-        on:input={onChangeUserContent}
+        on:click={showHint}
         bind:this={div_input[0]}
         bind:innerHTML={userContent[0]}
         style="display:none;width: {resultElementWidth[0]}px"
@@ -850,7 +847,7 @@
       <div
         class="input"
         contenteditable="true"
-        on:input={onChangeUserContent}
+        on:click={showHint}
         bind:this={div_input[1]}
         bind:innerHTML={userContent[1]}
         style="display:none;width: {resultElementWidth[1]}px"
@@ -927,7 +924,7 @@
   }
   .title {
     font-size: medium;
-    color: coral;
+    color: lightgrey;
     position: relative;
     text-align: center;
     margin-top: 10px;

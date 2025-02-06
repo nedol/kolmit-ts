@@ -72,6 +72,8 @@
 
   let isPlayAuto = false;
 
+  let isSTT = false;
+
   let isCollapsed = true;
 
   let playAutoColor = 'currentColor';
@@ -469,8 +471,8 @@
     visibility_cnt = 1;
   }
 
-  function onClickQ() {
-    visibility[visibility_cnt++] = 'visible';
+  function onClickQ(cnt) {
+    visibility[cnt] = 'visible';
     showSpeakerButton = true;
   }
 
@@ -677,6 +679,10 @@
     tts.Speak_server($langs, active, onEndSpeak);
   }
 
+  function onSTT(){
+    isSTT = !isSTT
+  }
+
   onDestroy(async () => {
     // voice.Cancel();
     $lesson.data = { quiz: '' };
@@ -725,6 +731,22 @@
           <!-- {/if} -->
         </Section>
         <Section align="start">
+          <div>
+            <IconButton
+              class="material-icons"
+              aria-label="Back"
+              on:click={onSTT}
+            >
+              <Icon tag="svg" viewBox="0 0 24 24" style="position:absolute; margin:10px 5px 10px 5px; scale:1.1;width:30px">
+                {#if isSTT}
+                  <path fill="grey" d={mdiMicrophone} />
+                {:else}
+                  <path fill="white" d={mdiMicrophoneOutline} />
+                {/if}
+              </Icon>
+            </IconButton>
+          </div>
+
           <!-- {#if $dc_state === 'close'}
             <IconButton on:click={PlayAutoContent}>
               <Icon tag="svg" viewBox="0 0 24 24">
@@ -774,9 +796,7 @@
           </div>
         </Section>
         <Section align="end">
-          <button class="hint-button" on:click={onClickQ}>
-            <span class="material-symbols-outlined">?</span>
-          </button>
+
         </Section>
         <Section align="end">
           <!-- {#if !isFlipped} -->
@@ -822,8 +842,8 @@
    
     {#if q || a}
       {#if !isFlipped}
-      <div class="border">
-        <div class="container">
+      <div class="container">
+
           {#if $call_but_status == 'talk'}
             <div class="repeat_but">
               <IconButton on:click={(ev) => SendCommand('repeat', ev)}>
@@ -839,6 +859,11 @@
             <div class="title">{data}:</div>
           {/await}
 
+
+          <button class="hint-button" on:click={()=>onClickQ(1)}>
+            <span class="material-symbols-outlined">?</span>
+          </button>
+       
           {#if $call_but_status == 'talk'}
             <div class="thumb_but">
               <IconButton on:click={(ev) => SendCommand('thumb', ev)}>
@@ -846,9 +871,23 @@
                   <path fill="currentColor" d={mdiThumbUpOutline} />
                 </Icon>
               </IconButton>
+
             </div>
           {/if}
-        </div>
+
+        <div class="" style="text-align: center;">
+          {#if visibility[1]==='visible'}
+          <div class="user1" style="visibility:{visibility[1]}">
+            <span>
+                {#await Translate(q[$llang], $llang, $langs) then data}
+                  {@html data}
+                {/await}
+            </span>
+          </div>   
+          {/if}
+
+
+        
 
         <div
           class="tip mdc-typography--headline6 {tip_hidden_text}"
@@ -863,27 +902,21 @@
           <div style="display: inline-flex; float: right; margin-right: 10px;}">
             <br />
             <!-- {#if showSpeakerButton} -->
-            <div class="speaker-button" on:click={speak(q[$llang])}>
-              <IconButton>
-                <Icon tag="svg" viewBox="0 0 24 24">
-                  <path fill="currentColor" d={mdiPlay} />
-                </Icon>
-              </IconButton>
-            </div>
+
             <!-- {/if} -->
           </div>
         </div>
-      
-        <div class="" style="text-align: center;">
-          <div class="user1" style="visibility:{visibility[1]}">
-            <span>
 
-                {#await Translate(q[$llang], $llang, $langs) then data}
-                  {@html data}
-                {/await}
+        
 
-            </span>
-          </div>     
+
+        <div class="speaker-button" on:click={speak(q[$llang])}>
+          <IconButton>
+            <Icon tag="svg" viewBox="0 0 24 24">
+              <path fill="currentColor" d={mdiPlay} />
+            </Icon>
+          </IconButton>
+        </div>
 
         {#if isThumb}
           <div class="thumb_alert" style="margin-top: 10px;">
@@ -904,7 +937,7 @@
       </div>
   
 
-      <div class="border">
+        <div class="container">
 
         {#await Translate('Переведи и ответь', 'ru', $langs) then data_1}
         <div class="title">{data_1}:</div>
@@ -913,19 +946,22 @@
           <div class="title title2">{data_2}:</div>
         {/await}
 
+        <button class="hint-button" on:click={()=>onClickQ(2)}>
+          <span class="material-symbols-outlined">?</span>
+        </button>
+
         <div class="user2_tr">
           {#if a && visibility[0] === 'visible'}
-            {#if !a[$langs]}
               {#await Translate(a[$llang].replace(/"([^"]*)"/g, '$1'), $llang, $langs) then data}
                 {data}
-              {/await}
-            {:else}
-              {@html a[$langs].replace(/"([^"]*)"/g, '$1')}
-            {/if}
+              {/await}    
           {/if}  
 
+
         <div class="user2">
-          {#if a && visibility[2] === 'hidden'}
+  
+          {#if a && visibility[2] === 'hidden'}   
+   
             {@html a[$llang].replace(
               /(?<!")\b\p{L}+(?<!\s)(?!")/gu,
               (match) => {
@@ -955,7 +991,8 @@
           </div>       
         </div>
 
-          {#if !share_mode}
+
+          {#if !share_mode && isSTT}
             <div
               class="margins"
               style="text-align: center; display: flex; align-items: center; justify-content: space-between;"
@@ -997,7 +1034,7 @@
         </div>
       </div>
       {:else}
-      <div class="border"> 
+
         {#if isThumb}
           <div class="thumb_alert" style="    margin-top: -2px;">
             <Icon tag="svg" color="green" viewBox="0 0 24 24">
@@ -1062,7 +1099,7 @@
               </IconButton>
             </div>
 
-            {#if !share_mode}
+            {#if !share_mode && isSTT}
               <div
                 class="margins"
                 style="text-align: center; display: flex; align-items: center; justify-content: space-between;"
@@ -1097,8 +1134,8 @@
               {@html stt_text}
             </span>
           </div>
-        </div>
-        <div class="border">
+
+ 
         <div class="container">
           {#if $call_but_status == 'talk'}
             <div class="repeat_but">
@@ -1126,16 +1163,18 @@
         </div>
 
         <div class="tip mdc-typography--headline6">
-          {@html q[$llang]}        
+          {@html q[$llang]}     
 
-          <div class="speaker-button" on:click={speak(q[$llang])}>
-            <IconButton>
-              <Icon tag="svg" viewBox="0 0 24 24">
-                <path fill="currentColor" d={mdiPlay} />
-              </Icon>
-            </IconButton>
-          </div>   
+
         </div>
+
+        <div class="speaker-button" on:click={speak(q[$llang])}>
+          <IconButton>
+            <Icon tag="svg" viewBox="0 0 24 24">
+              <path fill="currentColor" d={mdiPlay} />
+            </Icon>
+          </IconButton>
+        </div>   
 
         <div style="text-align: center;">
           <div class="user1" style="visibility:{visibility[2]}">
@@ -1157,9 +1196,8 @@
             <!-- {/if} -->         
           
           </div>
-
         </div>
-      </div>
+
       {/if}
 
       <br />
@@ -1210,12 +1248,14 @@
   }
 
   .container {
-    display: flex;
-    top: 5px;
+    /* display: flex; */
+    top: 15px;
     margin-bottom: 15px;
     position: relative;
     justify-content: space-between;
     align-items: center;
+    border: 1px solid lightgrey;
+    border-radius: 5px;
   }
 
 
@@ -1283,13 +1323,12 @@
   }
 
   .speaker-button {
-    display: inline-flex;
-    float: right;
+    position: relative;
+    color: #2196f3;
     font-size: large;
     border-radius: 25px;
-    margin-right: 0px;
-    margin-left: 10px;
-    z-index: 2;
+    margin-left: 90vw;
+    z-index: 0;
   }
 
   .html_data {
@@ -1342,7 +1381,7 @@
     width: fit-content;
     margin: 5px auto; /* Центрирование второго элемента */
     margin-top: 5px;
-    color: coral;
+    color:lightgrey;
     line-height: normal;
     text-align: center;
     font-size: 0.8em;
@@ -1353,13 +1392,7 @@
     font-size: 0.7em;
   }
 
-  .border{
-    border:1px solid #80808038; 
-    background-color:#c8c8c815; 
-    border-radius: 5px;
-    padding: 5px;
-    margin-top: 5px;
-  }
+
 
   .user1 {
     /* width: 100vw;*/
@@ -1396,7 +1429,7 @@
     text-align: center;
     line-height: normal;
     font-size: 1em;
-    margin-bottom: 0px;
+    margin-top: 10px;
     color: #2196f3;
   }
 
@@ -1422,11 +1455,16 @@
   }
 
   .hint-button {
-    border: 0px;
-    color: white;
-    background-color: #2196f3;
+    position: absolute;
+    right:0;
+    top:0;
+    border: 1px solid;
+    color: #2196f3;
     border-radius: 3px;
-    padding: 2px 10px;
+    padding: 1px 7px;
+    /* z-index: 1; */
+    scale: 0.8;
+
   }
 
   .card {
