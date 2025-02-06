@@ -17,11 +17,13 @@ import translatex from 'google-translate-api-x';
 
 // import translatte from 'translatte';
 
-// import translate from 'translate';
-// translate.engine = 'deepl'; //'google'// 'libre';// 
+
+
+import translate from 'papago-translate';
+// translate.engine = 'yandex';//'deepl'; //'google'//  
 // translate.key = '203cca0d-8540-4d75-8c88-d69ac40b6d57:fx';//'0834516e-29b0-45d1-812e-b903d5962e12:fx'; //process.env.DEEPL_API_KEY;
 
-import { translate } from 'deeplx'
+// import { translate } from 'deeplx'
  
 const langs = [
   "bg",
@@ -81,17 +83,18 @@ export async function Translate(text, from, to) {
 
     // Попытка перевода через Google Translate API
     try {
-      if(langs.includes(to)){
-        res = await translate(chunk,  to.toUpperCase()) 
-      }else{
-        const en = await translate(chunk,  "EN") 
-        res = await translatex(en, { from: "en" , to: to, forceBatch: true ,
+      // if(langs.includes(to)){
+      //   // res = await translate(chunk, from,  'en-US')
+      //   res = await translate(chunk, { from: from, to: to } )
+      // }else{
+        const en = await translatex(chunk,  { from: from, to: 'en' }) ;
+        res = await translatex(en.text, { from: "en" , to: to, forceBatch: false ,
           requestOptions: {
             agent: new HttpsProxyAgent('https://164.132.175.159:3128')
           }
         });  
         res = res.text;
-      }
+      // }
   
 
     } catch (error) {

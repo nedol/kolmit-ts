@@ -9,11 +9,9 @@ node_modules
 !.env.example
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
-.env*
 # tsconfig.json
 /src/routes/speech/tts/audio
 /sql
 /whisper_env
 requirements.txt
-
-
+/.venv

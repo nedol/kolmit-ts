@@ -473,7 +473,7 @@
 
   function onClickQ(cnt) {
     visibility[cnt] = 'visible';
-    showSpeakerButton = true;
+
   }
 
   function shuffle(array) {
@@ -854,15 +854,18 @@
             </div>
           {/if}
 
-          <!-- <div class="cnt">{cur_qa + 1}</div> -->
+
           {#await Translate('Послушай вопрос', 'ru', $langs) then data}
             <div class="title">{data}:</div>
           {/await}
 
-
+          {#if visibility[1]==='hidden' }
           <button class="hint-button" on:click={()=>onClickQ(1)}>
             <span class="material-symbols-outlined">?</span>
           </button>
+          {/if}
+
+        
        
           {#if $call_but_status == 'talk'}
             <div class="thumb_but">
@@ -883,11 +886,10 @@
                   {@html data}
                 {/await}
             </span>
+
           </div>   
           {/if}
 
-
-        
 
         <div
           class="tip mdc-typography--headline6 {tip_hidden_text}"
@@ -909,7 +911,6 @@
 
         
 
-
         <div class="speaker-button" on:click={speak(q[$llang])}>
           <IconButton>
             <Icon tag="svg" viewBox="0 0 24 24">
@@ -917,6 +918,8 @@
             </Icon>
           </IconButton>
         </div>
+      
+
 
         {#if isThumb}
           <div class="thumb_alert" style="margin-top: 10px;">
@@ -937,7 +940,9 @@
       </div>
   
 
-        <div class="container">
+      <div class="container">
+
+
 
         {#await Translate('Переведи и ответь', 'ru', $langs) then data_1}
         <div class="title">{data_1}:</div>
@@ -946,13 +951,15 @@
           <div class="title title2">{data_2}:</div>
         {/await}
 
+        {#if visibility[2]==='hidden' }
         <button class="hint-button" on:click={()=>onClickQ(2)}>
           <span class="material-symbols-outlined">?</span>
         </button>
+        {/if}
 
         <div class="user2_tr">
           {#if a && visibility[0] === 'visible'}
-              {#await Translate(a[$llang].replace(/"([^"]*)"/g, '$1'), $llang, $langs) then data}
+              {#await Translate(a[$llang], $llang, $langs) then data}
                 {data}
               {/await}    
           {/if}  
@@ -982,14 +989,16 @@
               }
             )}
           {/if}
-          <div class="speaker-button" on:click={speak(a[$llang])}>
-            <IconButton>
-              <Icon tag="svg" viewBox="0 0 24 24">
-                <path fill="currentColor" d={mdiPlay} />
-              </Icon>
-            </IconButton>
-          </div>       
+      
         </div>
+
+        <div class="speaker-button" on:click={speak(a[$llang])}>
+          <IconButton>
+            <Icon tag="svg" viewBox="0 0 24 24">
+              <path fill="currentColor" d={mdiPlay} />
+            </Icon>
+          </IconButton>
+        </div>  
 
 
           {#if !share_mode && isSTT}
@@ -1327,7 +1336,9 @@
     color: #2196f3;
     font-size: large;
     border-radius: 25px;
-    margin-left: 90vw;
+    left: 50%; 
+    margin-left: -30px; /* Компенсирует ширину элемента */
+
     z-index: 0;
   }
 
