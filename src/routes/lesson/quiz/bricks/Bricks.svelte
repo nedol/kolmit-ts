@@ -290,7 +290,7 @@ let keys = [];
     current_word = 0;
     focusedIndex = 0;
     // isSTT = false;
-    stt_text = ''
+
 
     if(curSentence >= bricks_data.text.length){
       curSentence = 0;
@@ -481,6 +481,8 @@ let keys = [];
       isListening = false;
       return;
     }
+
+    stt_text = ''
 
     stt.startAudioMonitoring($llang, $langs);
 
