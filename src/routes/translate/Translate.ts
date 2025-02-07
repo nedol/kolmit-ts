@@ -1,22 +1,10 @@
 
-
-import ISO6391 from 'iso-google-locales';
-import { Client } from '@gradio/client';
-
-// import puppeteer from 'puppeteer';
 import { WriteSpeech, ReadSpeech } from '$lib/server/db.js'; //src\lib\server\server.db.js
 import md5 from 'md5'; // Импортируем библиотеку для генерации md5
 
 import {HttpsProxyAgent} from 'https-proxy-agent';
 
-// import { v2 as Translate_gc } from '@google-cloud/translate';
-
-// const translate_gc = new Translate_gc.Translate({projectId: "firebase-infodesk"})
-
 import translatex from 'google-translate-api-x';
-
-// import translatte from 'translatte';
-
 
 // import translate from '@mgcodeur/super-translator';
 
@@ -55,44 +43,6 @@ const langs = [
   "sv",
   "zh"
 ]
-
-
-async function translateWithPuppeteer(text, targetLang) {
-  const browser = await puppeteer.launch({
-    args: [
-      '--no-sandbox',
-      '--disable-setuid-sandbox',
-      '--disable-dev-shm-usage',
-      '--disable-gpu',
-      '--single-process'
-    ],
-    headless: 'new', // Новый headless-режим, более стабильный
-  });
-
-  try {
-    const page = await browser.newPage();
-    const url = `https://translate.google.com/?sl=auto&tl=${targetLang}&text=${encodeURIComponent(text)}&op=translate`;
-    
-    await page.goto(url, { waitUntil: 'networkidle2' });
-
-    // Подождать 2 секунды после загрузки, чтобы избежать проблем с iframe
-    await page.waitForTimeout(2000);
-
-    await page.waitForFunction(() => document.querySelector('span[jsname="W297wb"]') !== null, { timeout: 10000 });
-
-    const translation = await page.$eval('span[jsname="W297wb"]', el => el.innerText);
-
-    console.log(`Translated: ${translation}`);
-    await browser.close();
-    
-    return translation;
-  } catch (error) {
-    console.error('Translation error:', error.message);
-    return null;
-  } finally {
-    await browser.close(); // Гарантированное закрытие браузера
-  }
-}
 
 
 export async function Translate(text, from, to) {
