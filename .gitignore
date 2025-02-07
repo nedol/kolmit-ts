@@ -13,5 +13,5 @@ vite.config.ts.timestamp-*
 /src/routes/speech/tts/audio
 /sql
 /whisper_env
-requirements.txt
-/.venv
+whisper.requirements.txt
+
