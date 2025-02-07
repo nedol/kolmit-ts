@@ -11,7 +11,6 @@
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
     "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
     "smui-theme": "smui-theme compile ./src/routes/smui.css -i src/theme"
-
   },
   "devDependencies": {
     "@flydotio/dockerfile": "^0.5.8",
