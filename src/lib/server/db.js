@@ -661,11 +661,12 @@ export async function GetDict(q) {
 export async function WriteSpeech(q) {
   try {
     await sql.begin(async (sql) => {
-      await sql`INSERT INTO speech (lang, key, text, data, quiz, timestamps)
-                VALUES (${q.lang}, ${q.key}, ${q.text}, ${q.data}, ${q.quiz}, ${q.timestamps})
-                ON CONFLICT (key) 
+      await sql`INSERT INTO speech (lang, key, text, translate)
+                VALUES (${q.lang}, ${q.key}, ${q.text}, ${q.translate})
+                ON CONFLICT (key, lang) 
                 DO UPDATE SET 
-                    data = EXCLUDED.data`;
+                  lang=EXCLUDED.lang,
+                  translate = EXCLUDED.translate`;
     });
     return { success: true, message: "Data written successfully." };
   } catch (ex) {
@@ -677,8 +678,8 @@ export async function WriteSpeech(q) {
 
 export async function ReadSpeech(q) {
   try {
-    let res = await sql`SELECT data, timestamps FROM speech
-                        WHERE key = ${q.key} AND quiz IS NOT NULL`;
+    let res = await sql`SELECT translate FROM speech
+                        WHERE key = ${q.key} AND lang = ${q.lang}`;
     if (res[0]) {
       return res[0];
     } else {

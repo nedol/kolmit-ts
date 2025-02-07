@@ -3,28 +3,29 @@
 import ISO6391 from 'iso-google-locales';
 import { Client } from '@gradio/client';
 
+// import puppeteer from 'puppeteer';
+import { WriteSpeech, ReadSpeech } from '$lib/server/db.js'; //src\lib\server\server.db.js
+import md5 from 'md5'; // Импортируем библиотеку для генерации md5
 
 import {HttpsProxyAgent} from 'https-proxy-agent';
 
+// import { v2 as Translate_gc } from '@google-cloud/translate';
 
-// const translate = require('google-translate-api');
-// import pkg from 'google-translate-api';
-// const translate = require('google-translate-free')
-// import pkg from '@iamtraction/google-translate';
-// const {translate} = pkg;
+// const translate_gc = new Translate_gc.Translate({projectId: "firebase-infodesk"})
 
 import translatex from 'google-translate-api-x';
 
 // import translatte from 'translatte';
 
 
+// import translate from '@mgcodeur/super-translator';
 
-import translate from 'papago-translate';
-// translate.engine = 'yandex';//'deepl'; //'google'//  
+// import translate from 'translate';
+// translate.engine = 'deepl';//'yandex';//'deepl'; //'google'//  
 // translate.key = '203cca0d-8540-4d75-8c88-d69ac40b6d57:fx';//'0834516e-29b0-45d1-812e-b903d5962e12:fx'; //process.env.DEEPL_API_KEY;
 
-// import { translate } from 'deeplx'
- 
+import { translate } from 'deeplx'
+
 const langs = [
   "bg",
   "cs",
@@ -56,6 +57,43 @@ const langs = [
 ]
 
 
+async function translateWithPuppeteer(text, targetLang) {
+  const browser = await puppeteer.launch({
+    args: [
+      '--no-sandbox',
+      '--disable-setuid-sandbox',
+      '--disable-dev-shm-usage',
+      '--disable-gpu',
+      '--single-process'
+    ],
+    headless: 'new', // Новый headless-режим, более стабильный
+  });
+
+  try {
+    const page = await browser.newPage();
+    const url = `https://translate.google.com/?sl=auto&tl=${targetLang}&text=${encodeURIComponent(text)}&op=translate`;
+    
+    await page.goto(url, { waitUntil: 'networkidle2' });
+
+    // Подождать 2 секунды после загрузки, чтобы избежать проблем с iframe
+    await page.waitForTimeout(2000);
+
+    await page.waitForFunction(() => document.querySelector('span[jsname="W297wb"]') !== null, { timeout: 10000 });
+
+    const translation = await page.$eval('span[jsname="W297wb"]', el => el.innerText);
+
+    console.log(`Translated: ${translation}`);
+    await browser.close();
+    
+    return translation;
+  } catch (error) {
+    console.error('Translation error:', error.message);
+    return null;
+  } finally {
+    await browser.close(); // Гарантированное закрытие браузера
+  }
+}
+
 
 export async function Translate(text, from, to) {
   if (!text) return '';
@@ -81,29 +119,45 @@ export async function Translate(text, from, to) {
       chunk = chunk.replace(/<</g, ' ').replace(/>>/g, ' ');
     }
 
-    // Попытка перевода через Google Translate API
-    try {
-      // if(langs.includes(to)){
-      //   // res = await translate(chunk, from,  'en-US')
-      //   res = await translate(chunk, { from: from, to: to } )
-      // }else{
-        const en = await translatex(chunk,  { from: from, to: 'en' }) ;
-        res = await translatex(en.text, { from: "en" , to: to, forceBatch: false ,
-          requestOptions: {
-            agent: new HttpsProxyAgent('https://164.132.175.159:3128')
+
+    // Проверяем наличие файла
+    const resp =  await ReadSpeech({ lang: to, key: md5(chunk) });
+    if (resp?.translate) {
+        try {
+          console.log(`Файл уже существует`);
+          
+          return resp.translate;
+        } catch (error) {
+          console.error('Error converting text to speech:', error);
+        }
+    }else{
+      console.log(`Файл  НЕ существует`);
+      // Попытка перевода через Google Translate API
+      try {
+     
+          if(langs.includes(to)){
+            res = await translate(chunk,  to.toUpperCase()) 
+          }else{
+            const en = await translate(chunk,  "EN") 
+            res = await translatex(en, { from: "en" , to: to, forceBatch: true ,
+              requestOptions: {
+                agent: new HttpsProxyAgent('https://164.132.175.159:3128')
+              }
+            });  
+            res = res.text;
           }
-        });  
-        res = res.text;
-      // }
-  
+    
 
-    } catch (error) {
-      res = chunk; // Если перевод не удался, возвращаем оригинальный текст
-    }
+          WriteSpeech({ lang: to, key: md5(text), text: text, translate: res});  
 
-    // Восстанавливаем << >> после перевода
-    if (hasQuotes) {
-      // res = res.text.replace(/\<(.*?)\>/g, '<<$1>>')                                                       
+      } catch (error) {
+        res = chunk; // Если перевод не удался, возвращаем оригинальный текст
+      }
+
+      // Восстанавливаем << >> после перевода
+      if (hasQuotes) {
+        // res = res.text.replace(/\<(.*?)\>/g, '<<$1>>')                                                       
+      }
     }
 
     translatedText += `${res} `;
