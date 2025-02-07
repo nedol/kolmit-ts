@@ -87,19 +87,7 @@ async function tts_google(text, lang, abonent, quiz) {
     const fileName = md5(text) + '.mp3';
     const filePath = join(audioDir, fileName); // Полный путь к файлу
 
-    // Проверяем наличие файла
-    const resp =  await ReadSpeech({ key: md5(text) });
-    if (false && resp?.data) {
-        try {
-          console.log(`Файл уже существует`);
-          
-          return {audio:'data:audio/mpeg;base64,' + resp.data, ts:resp.timestamps};
-        } catch (error) {
-          console.error('Error converting text to speech:', error);
-        }
-    }else{
-      console.log(`Файл  НЕ существует`);
-      try{
+    try{
         let base64  = '';
         let url_b64 = await googleTTS.getAllAudioBase64(text, {
           //getAudioUrl(text, {
@@ -119,22 +107,11 @@ async function tts_google(text, lang, abonent, quiz) {
 
         let timestamps = []       
      
-
-        //WriteSpeech({ lang: lang, key: md5(text), text: text, data: '', quiz:quiz, timestamps:timestamps });
-
-        // Записываем аудиофайл в директорию
-        // await fs.outputFile(filePath, Buffer.from(url, 'base64')); // Запись файла в папку audio
-        // console.log(`Файл сохранён`);
-
-        // Читаем содержимое только что сохранённого файла и возвращаем его в формате base64
         return  {audio:'data:audio/mpeg;base64,' + base64 , ts:timestamps}
 
     } catch (error) {
       console.error('Error converting text to speech:', error);
     }
-  }
-    
-
 }
 
 
