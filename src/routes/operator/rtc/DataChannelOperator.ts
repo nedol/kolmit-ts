@@ -31,7 +31,12 @@ export class DataChannelOperator {
 		//     console.log('OnOpenDataChannel');
 		// }
 
-		this.dc = pc.con.createDataChannel(pc.pc_key + ' data channel', { reliable: true });
+		pc.con.onconnectionstatechange = function (e) {
+			console.log('onconnectionstatechange');
+
+		};
+
+		this.dc = pc.con.createDataChannel(pc.pc_key + ' data channel', { reliable: true, ordered:true });
 
 		this.dc.onopen = () => {
 			//this.dc.onopen = null;
@@ -131,11 +136,6 @@ export class DataChannelOperator {
 			}
 		};
 	}
-
-	CreateDC(){
-        this.dc = pc.con.createDataChannel(pc.pc_key+" data channel");
-    }
-
 	
 
 	SendData(data, cb) {
