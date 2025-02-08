@@ -325,9 +325,12 @@ let keys = [];
   }
 
   function getCorrectSpanString(){
-    const elements = document.querySelectorAll(".correct");
-    return Array.from(elements).map(el => el.textContent.trim()).join(" ");
+    const elements = document.querySelectorAll(isSTT?".formatted-list > .correct":".formatted-list > span:not(.correct)");
+    return Array.from(elements)
+    .map(el => el.getAttribute('value')?.trim() || "")
+    .join(" ");;
   }
+
 
   const SpeakText = async (isEndSpeak) => {
 
@@ -339,7 +342,7 @@ let keys = [];
           },500)          
       }
 
-      const textToSpeak = isSTT?getCorrectSpanString():sentence.replace(/<[^>]*>/g, '');
+      const textToSpeak = isSTT?getCorrectSpanString():getCorrectSpanString();
 
       if (textToSpeak) {
         const resp = await tts.GetGoogleTTS($llang, textToSpeak,  data.name);
@@ -461,8 +464,6 @@ let keys = [];
             placeholder: "\u00a0\u00a0\u00a0\u00a0\u00a0", 
             value: word.trim()
         }));
-
-
       }
 
       words = shuffleArray(words);
@@ -828,6 +829,7 @@ let keys = [];
       {#each formattedSentence as item, index}
         <span class={`${item.class} ${item.gr}`}
           tabindex="0" 
+          value={item.value.replace(/<[^>]*>/g, '')}
           on:click={() => {item.word=item.value; handleFormatted(item, index)}}
           on:focus={() => handleFocus(index)}>
           {@html item.word || item.placeholder}
@@ -1047,8 +1049,8 @@ let keys = [];
     outline: 2px solid transparent
   }
 
-  .correct{
-      /* color:green */
+  .word-list span{
+      border-color: lightgray;
   }
 
   .incorrect{
@@ -1152,11 +1154,11 @@ let keys = [];
   @keyframes border-blink {
     0%, 100% {
 
-      box-shadow: 0 0 0px 0 var(--border-color, blue); /* Без тени */
+      box-shadow: 0 0 0px 0 var(--border-color, rgb(124, 124, 139)); /* Без тени */
   }
   50% {
 
-      box-shadow: 0 0 10px 4px var(--border-color, blue); /* Тень цвета рамки */
+      box-shadow: 0 0 10px 4px var(--border-color, rgb(124, 124, 139)); /* Тень цвета рамки */
   }
 }
 

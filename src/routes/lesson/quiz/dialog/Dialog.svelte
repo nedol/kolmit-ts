@@ -1336,9 +1336,9 @@
     color: #2196f3;
     font-size: large;
     border-radius: 25px;
-    left: 50%; 
-    margin-left: -30px; /* Компенсирует ширину элемента */
-
+    left: 100%;
+    margin-left: -30px;
+    width: fit-content;
     z-index: 0;
   }
 
