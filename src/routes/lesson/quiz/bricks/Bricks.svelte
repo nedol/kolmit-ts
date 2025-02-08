@@ -324,8 +324,8 @@ let keys = [];
       MakeBricks();
   }
 
-  function getCorrectSpanString(){
-    const elements = document.querySelectorAll(isSTT?".formatted-list > .correct":".formatted-list > span:not(.correct)");
+  function getCorrectSpanString(isCorrect){
+    const elements = document.querySelectorAll(isCorrect?".formatted-list > .correct":".formatted-list > span:not(.correct)");
     return Array.from(elements)
     .map(el => el.getAttribute('value')?.trim() || "")
     .join(" ");;
@@ -342,7 +342,7 @@ let keys = [];
           },500)          
       }
 
-      const textToSpeak = isSTT?getCorrectSpanString():getCorrectSpanString();
+      const textToSpeak = getCorrectSpanString(isSTT || formattedSentence.every(item => item.class === "correct"));
 
       if (textToSpeak) {
         const resp = await tts.GetGoogleTTS($llang, textToSpeak,  data.name);
