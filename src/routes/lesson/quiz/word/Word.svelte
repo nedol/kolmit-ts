@@ -82,7 +82,6 @@
   let hintIndex = 0;
   let errorIndex = 0;
   let showCheckMark = false;
-  let showNextButton = false;
   let resultElementWidth = [];
   let showSpeakerButton = false;
   let focus_pos = 0;
@@ -133,7 +132,7 @@
       result.push(match[1]);
     }
 
-    return result;
+    return result
   }
 
   function similarity(s1, s2) {
@@ -200,13 +199,17 @@
       // currentWord.example[$langs] = example;
       example = currentWord.example[$llang];
 
-      const regex = /(<<\w+>>)\s+(<<\w+>>)/;
-      const match = currentWord?.example[$llang]
-        ? currentWord?.example[$llang].match(regex)
-        : '';
+      const regex = /(<<\w+>>)\s/;
+      const match = currentWord?.example[$llang].match(regex);
       let original = '';
       if (match) {
         original = `${match[0]} ${match[1]}`;
+      }else{
+
+        words.splice(currentWordIndex, 1);
+        currentWord = words[currentWordIndex];
+        example = currentWord.example[$llang];
+
       }
       // else original = `${currentWord.original}`;
 
@@ -228,14 +231,7 @@
             ? '<span style="color:green" ><b>$1</b></span>'
             : '$1'
         );
-      } else if (example.includes('"')) {
-        example = example?.replace(
-          /"([^"]+)"/gu,
-          !data.level.includes('C1')
-            ? '<span style="color:green" ><b>$1</b></span>'
-            : '$1'
-        );
-      }
+      } 
 
       setTimeout(() => {
         const wAr = extractWords(currentWord?.example[$llang]);
@@ -468,7 +464,6 @@
 
     if (thisErrorIndex < 1) {
       showCheckMark = true; // Показываем галочку
-      showNextButton = true;
       speak(speak_text);
       currentWordIndex = currentWordIndex + 1;
       hintIndex = 0;
@@ -550,6 +545,7 @@
 
   async function nextWord() {
     if (currentWordIndex >= words.length) currentWordIndex = 0;
+    currentWordIndex++;
     example_lang = $langs;
     currentWord = words[currentWordIndex];
     await makeExample();
@@ -561,7 +557,6 @@
     hintIndex = 0;
     result = '&nbsp;';
     showCheckMark = false;
-    showNextButton = false;
     showSpeakerButton = false;
   }
 
@@ -575,26 +570,27 @@
     hintIndex = 0;
     result = '';
     showCheckMark = false;
-    showNextButton = false;
     showSpeakerButton = false;
   }
 
-  function onSpeach() {
+  function onSpeach(noNext) {
     speak(
-      !showNextButton
+      noNext
         ? extractWords(currentWord.example[$llang]).join()
-        : currentWord.example[$llang]
+        : currentWord.example[$llang],
+      noNext
     );
 
-    if (!showNextButton) hintIndex++;
+    hintIndex++;
   }
 
-  function speak(text) {
+  function speak(text,noNext) {
     text = text.replace(/<<|>>/g, '');
     text = text.replace(/_/g, ' ');
     // Speak(text);
     tts.Speak_server($llang, text, data.name,()=>{
-      nextWord()
+      if(!noNext)
+        nextWord()
     });
 
     // setFocus();
@@ -728,20 +724,20 @@
 
           </Section>
           <Section>
-            {#if !$dc}
+            <!-- {#if !$dc}
               <IconButton on:click={PlayAutoContent}>
                 <Icon tag="svg" viewBox="0 0 24 24">
                   <path fill={playAutoColor} d={mdiEarHearing} />
                 </Icon>
               </IconButton>
-            {/if}
+            {/if} -->
           </Section>
 
           <Section align="end">
             <div class="counter">
               <p>
                 <span class="mdc-typography--overline" style="position:relative"
-                  >{currentWordIndex}
+                  >{currentWordIndex+1}
                   <Badge
                     position="middle"
                     align="bottom-end - bottom-middle"
@@ -782,25 +778,16 @@
           </Section>
 
           <Section align="end">
-            {#if showNextButton}
+        
               <Icon
                 tag="svg"
                 on:click={nextWord}
                 viewBox="0 0 24 24"
                 style="margin:10px 5px 10px 5px; scale:.5; width:50px"
               >
-                <path fill="green" d={mdiArrowRight} />
+                <path fill="white" d={mdiArrowRight} />
               </Icon>
-            {:else}
-              <Icon
-                tag="svg"
-                on:click={checkInput}
-                viewBox="0 0 24 24"
-                style="visibility:hidden;margin-top:0px; scale:.5; width:50px"
-              >
-                <path fill="white" d={mdiTextBoxCheckOutline} />
-              </Icon>
-            {/if}
+
           </Section>
         </Row>
       </TopAppBar>
@@ -854,7 +841,7 @@
       >
         {@html result}
       </div>
-      <div class="speaker-button" on:click={onSpeach}>
+      <div class="speaker-button" on:click={()=>onSpeach(true)}>
         <IconButton>
           <Icon tag="svg" viewBox="0 0 24 24">
             <path fill="currentColor" d={mdiPlay} />
@@ -870,6 +857,7 @@
       {#if hints?.length > 0}
         <Content style="line-height: 2.0; overflow-y:auto;">
           {#each hints as hint, i}
+          {#if extractWords(hint?.example[$llang]).length>0}
             {#if hint?.example[$llang]}
               <span
                 class="hint_button"
@@ -892,6 +880,7 @@
                   {@html extractWords(data).join(' ') + '&nbsp;' + '&nbsp;'}
                 </span>
               {/await}
+            {/if}
             {/if}
           {/each}
           <div style="height:80px"></div>

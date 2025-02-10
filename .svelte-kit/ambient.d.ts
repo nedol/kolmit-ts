@@ -30,6 +30,8 @@ declare module '$env/static/private' {
 	export const GROQ_API_KEY: string;
 	export const NEWS_API_KEY: string;
 	export const DEEPL_API_KEY: string;
+	export const TWILIO_RECOVERY_CODE: string;
+	export const GOOGLE_API_KEY: string;
 	export const ALLUSERSPROFILE: string;
 	export const APPDATA: string;
 	export const ChocolateyInstall: string;
@@ -154,6 +156,8 @@ declare module '$env/dynamic/private' {
 		GROQ_API_KEY: string;
 		NEWS_API_KEY: string;
 		DEEPL_API_KEY: string;
+		TWILIO_RECOVERY_CODE: string;
+		GOOGLE_API_KEY: string;
 		ALLUSERSPROFILE: string;
 		APPDATA: string;
 		ChocolateyInstall: string;
