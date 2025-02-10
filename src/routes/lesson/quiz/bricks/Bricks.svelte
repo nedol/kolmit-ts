@@ -498,7 +498,7 @@ let keys = [];
 
   function SttResult(text) {
     stt_text = text[$llang];
-    const correct_str = getCorrectSpanString();
+    const correct_str = getCorrectSpanString(true);
     let sent_compare = correct_str;
 
     const numbers = sent_compare.match(/\b\d+\b/g);

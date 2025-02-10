@@ -243,7 +243,7 @@
           // spanElement.style.width = "50px";
           resultElementWidth[i] = getTextWidth(wAr[i], '20px Arial');
         });
-      }, 0);
+      }, 100);
 
       function getSubArray(arr, index) {
         const totalElements = 10;
