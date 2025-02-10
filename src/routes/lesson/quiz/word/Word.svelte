@@ -732,6 +732,18 @@
                 </Icon>
               </IconButton>
             {/if} -->
+            {#if true || words.length <= 20}
+            <Icon
+              tag="svg"
+              on:click={onShuffleWords}
+              viewBox="0 0 24 24"
+              style="margin-top:0px; scale:.5; width:50px"
+            >
+              <path fill="white" d={mdiShuffle} />
+            </Icon>
+          {:else}
+            <div on:click={jumpNext10}>+10</div>
+          {/if}
           </Section>
 
           <Section align="end">
@@ -750,18 +762,7 @@
             </div>
           </Section>
           <Section align="end">
-            {#if true || words.length <= 20}
-              <Icon
-                tag="svg"
-                on:click={onShuffleWords}
-                viewBox="0 0 24 24"
-                style="margin-top:0px; scale:.5; width:50px"
-              >
-                <path fill="white" d={mdiShuffle} />
-              </Icon>
-            {:else}
-              <div on:click={jumpNext10}>+10</div>
-            {/if}
+  
           </Section>
           <Section align="end">
             <Icon
