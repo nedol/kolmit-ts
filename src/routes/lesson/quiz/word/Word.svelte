@@ -208,7 +208,8 @@
 
         words.splice(currentWordIndex, 1);
         currentWord = words[currentWordIndex];
-        example = currentWord.example[$llang];
+        makeExample();
+        return;
 
       }
       // else original = `${currentWord.original}`;
