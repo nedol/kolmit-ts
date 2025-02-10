@@ -289,7 +289,7 @@ let keys = [];
 
     current_word = 0;
     focusedIndex = 0;
-    // isSTT = false;
+    stt_text = ''
 
 
     if(curSentence >= bricks_data.text.length){
@@ -836,13 +836,15 @@ let keys = [];
           {@html item.word || item.placeholder}
         </span>
       {/each}
-      <div class="speaker-button" on:click={SpeakText}>
-        <IconButton>
-          <Icon tag="svg" viewBox="0 0 24 24">
-            <path fill="currentColor" d={mdiPlay} />
-          </Icon>
-        </IconButton>
-      </div> 
+      {#if !isSTT || (isSTT && formattedSentence.some(item => item.class === "correct"))}
+        <div class="speaker-button" on:click={SpeakText}>
+          <IconButton>
+            <Icon tag="svg" viewBox="0 0 24 24">
+              <path fill="currentColor" d={mdiPlay} />
+            </Icon>
+          </IconButton>
+        </div> 
+      {/if}
     </div>
   </div>
 </div>
