@@ -818,6 +818,7 @@ let keys = [];
       {/await}
     </div>
     {/if}
+    <div class="container">
     <!-- Предложение с замененными словами -->
     {#await Translate('Составить предложение', 'ru', $langs) then data}
       <div class="title">{data}:</div>
@@ -844,7 +845,8 @@ let keys = [];
       </div> 
     </div>
   </div>
-
+</div>
+<div class="container">
   <div>
     <!-- Горизонтальный список слов -->
     {#await Translate('используя набор слов', 'ru', $langs) then data}
@@ -858,7 +860,7 @@ let keys = [];
     </div>
   </div>
 
-
+</div>
 
   {#if isSTT}
   {#await Translate('Check a pronanciation', 'en', $langs) then data}
@@ -919,6 +921,17 @@ let keys = [];
     height: 45px;
   /* transform: scale(1.2) translate(-4%,0%);
   transform-origin: center ;  */
+  }
+
+  .container {
+    /* display: flex; */
+    top: 15px;
+    margin-bottom: 15px;
+    position: relative;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid lightgrey;
+    border-radius: 5px;
   }
   .hint-button {
       border: 0px;
@@ -1016,7 +1029,7 @@ let keys = [];
   
   .word-list {
     display: flex;
-    text-align: center;
+    justify-content: center;
     margin: 10px 2px 15px 2px;
     gap: 10px;
     font-weight: 500;
@@ -1026,7 +1039,7 @@ let keys = [];
 
   .formatted-list {
     display: flex;
-    text-align: center;
+    justify-content: center;
     margin: 10px 2px 15px 2px;
     gap: 10px;
     font-weight: 700;
