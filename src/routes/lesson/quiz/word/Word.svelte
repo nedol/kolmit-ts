@@ -196,7 +196,7 @@
     // input_val = `<span class="sentence_span" style="display:inline;position: relative;width:20px; left: 1px;"></span>`
     text = text.replace(
       /<<([^>]*)>>/g,
-      `<span class="sentence_span" style="display:inline;position: relative;width:20px; left: 1px;"></span>`      
+      `<span class="sentence_span" value="$1" style="display:inline;position: relative;width:20px; left: 1px;"></span>`      
     );    
 
     return text
