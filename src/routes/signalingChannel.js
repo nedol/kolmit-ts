@@ -22,6 +22,8 @@ export class SignalingChannel {
   }
 
   initializeWebSocket(reconnectAttempt = 1) {
+    // return;
+
     this.socket = new WebSocket(this.socketUrl);
     this.status = "inactive";
 
