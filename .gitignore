@@ -14,5 +14,6 @@ vite.config.ts.timestamp-*
 /sql
 /whisper_env
 whisper.requirements.txt
-oracle.ssh.txt
+ssh.txt
 
+.vercel

@@ -1,63 +1,35 @@
 import { sveltekit } from "@sveltejs/kit/vite";
 import { defineConfig } from "vite";
 import path from "path";
-import { createProxyMiddleware } from "http-proxy-middleware";
-// import { terser } from 'vite-plugin-terser';
-
 import commonjs from "vite-plugin-commonjs";
-// import nodeGlobals from 'rollup-plugin-node-globals';
 
 export default defineConfig({
-  plugins: [sveltekit(), commonjs()
-    // ,terser({
-    //   format: {
-    //     comments: false
-    //   }
-    // })
-  ],
+  plugins: [sveltekit(), commonjs()],
   assetsInclude: ["**/*.html"],
 
   resolve: {
     alias: {
-      // создание алиаса
       $src: path.resolve("./src"),
       $assets: path.resolve("./src/routes/assets"),
     },
   },
 
-    define: {
-    // By default, Vite doesn't include shims for NodeJS/
-    // necessary for segment analytics lib to work
-      global: 'globalThis',
+  define: {
+    global: 'globalThis',
   },
 
   build: {
-    // Устанавливаем dev: true только для целей разработки
-    dev: true,
-    sourcemap: true
+    sourcemap: true, // Оставляем только нужные настройки для сборки
   },
 
   server: {
-    //port: 3478, // Измените этот порт по вашему усмотрению
-
     host: '0.0.0.0',
-    port: 5173,  // Проверьте, что этот порт соответствует порту, на котором работает ваше приложение
-  
+    port: 5173,
     https: {
       key: path.resolve("./key.pem"),
       cert: path.resolve("./cert.pem"),
     },
-    // middleware: [
-    // 	createProxyMiddleware('/turn', {
-    // 		target: 'http://0.0.0.0:3478',
-    // 		pathRewrite: {
-    // 			'^/turn': '' // Удалить префикс /turn из URL перед отправкой на сервер TURN
-    // 		},
-    // 		changeOrigin: true // Включить изменение происхождения запросов
-    // 	})
-    // ]
   },
-
 
   css: {
     preprocessorOptions: {
@@ -67,5 +39,3 @@ export default defineConfig({
     },
   },
 });
-
-//# sourceMappingURL=vite.config.js.map

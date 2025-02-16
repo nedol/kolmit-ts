@@ -1,7 +1,7 @@
 <script lang="ts">
   import { getContext, onMount } from 'svelte';
 
-  import { SortableList } from '@jhubbardsf/svelte-sortablejs';
+  import { SortableList } from '@rodrigodagostino/svelte-sortable-list';
 
   import { Translate } from '../../../translate/Transloc';
 

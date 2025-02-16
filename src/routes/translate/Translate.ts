@@ -45,6 +45,8 @@ const langs = [
 ]
 
 
+const pendingTranslations = new Map(); // Очередь выполняемых переводов
+
 export async function Translate(text, from, to) {
   if (!text) return '';
 
@@ -55,13 +57,10 @@ export async function Translate(text, from, to) {
   const sentences = text.split(/(?<=[.!?])\s+/);
   let translatedText = '';
 
-  // Формируем группы из трёх предложений
+  // Формируем группы из 5 предложений
   for (let i = 0; i < sentences.length; i += 5) {
-    const chunkGroup = sentences.slice(i, i + 5).join(' ').trim();
-    if (!chunkGroup || chunkGroup=='"') continue;
-
-    let chunk = chunkGroup.replaceAll('"','');
-    let res = '';
+    let chunk = sentences.slice(i, i + 5).join(' ').trim();
+    if (!chunk || chunk === '"') continue;
 
     // Проверяем наличие << >> и заменяем на безопасные символы
     const hasQuotes = chunk.includes('<<');
@@ -69,51 +68,67 @@ export async function Translate(text, from, to) {
       chunk = chunk.replace(/<</g, ' ').replace(/>>/g, ' ');
     }
 
+    const cacheKey = md5(chunk);
 
-    // Проверяем наличие файла
-    const resp =  await ReadSpeech({ lang: to, key: md5(chunk) });
+    // Если перевод уже выполняется — ждем его завершения
+    if (pendingTranslations.has(cacheKey)) {
+      console.log(`Ожидание перевода: ${chunk}`);
+      translatedText += await pendingTranslations.get(cacheKey);
+      continue;
+    }
+
+    // Проверяем, есть ли перевод в базе
+    const resp = await ReadSpeech({ lang: to, key: cacheKey });
     if (resp?.translate) {
-        try {
-          console.log(`Файл уже существует`);
-          
-          return resp.translate;
-        } catch (error) {
-          console.error('Error converting text to speech:', error);
-        }
-    }else{
-      console.log(`Файл  НЕ существует`);
-      // Попытка перевода через Google Translate API
-      try {
-     
-          if(langs.includes(to)){
-            res = await translate(chunk,  to.toUpperCase()) 
-          }else{
-            const en = await translate(chunk,  "EN") 
-            res = await translatex(en, { from: "en" , to: to, forceBatch: true ,
-              requestOptions: {
-                agent: new HttpsProxyAgent('https://164.132.175.159:3128')
-              }
-            });  
-            res = res.text;
-          }
-    
+      console.log(`Файл уже существует`);
+      translatedText += `${resp.translate} `;
+      continue;
+    }
 
-          WriteSpeech({ lang: to, key: md5(text), text: text, translate: res});  
+    console.log(`Файл НЕ существует`);
+    let translationPromise = (async () => {
+      let res = '';
+
+      try {
+        if (langs.includes(to)) {
+          res = await translate(chunk, to.toUpperCase());
+        } else {
+          const en = await translate(chunk, "EN");
+          res = await translatex(en, {
+            from: "en",
+            to: to,
+            forceBatch: true,
+            requestOptions: {
+              agent: new HttpsProxyAgent('https://164.132.175.159:3128'),
+            },
+          });
+          res = res.text;
+        }
+
+        // Восстанавливаем << >> после перевода
+        if (hasQuotes) {
+          // res = res.text.replace(/\<(.*?)\>/g, '<<$1>>');                                                       
+        }
+
+        // Записываем в базу только если перевода не было
+        await WriteSpeech({ lang: to, key: cacheKey, text: chunk, translate: res });
 
       } catch (error) {
+        console.error('Ошибка перевода:', error);
         res = chunk; // Если перевод не удался, возвращаем оригинальный текст
       }
 
-      // Восстанавливаем << >> после перевода
-      if (hasQuotes) {
-        // res = res.text.replace(/\<(.*?)\>/g, '<<$1>>')                                                       
-      }
-    }
+      // Убираем `chunk` из очереди
+      pendingTranslations.delete(cacheKey);
 
-    translatedText += `${res} `;
+      return res;
+    })();
+
+    // Добавляем в очередь
+    pendingTranslations.set(cacheKey, translationPromise);
+    translatedText += await translationPromise;
   }
 
-  // Убираем лишние пробелы
   return translatedText.trim();
 }
 

@@ -200,29 +200,21 @@
     }
   }
 
-  $: if ($msg?.msg || $msg?.msg) {
-    (async () => {
-      alert(await Translate($msg?.msg || $msg?.msg, 'ru', $langs));
-      // $msg?.msg = ''; $msg?.msg =  '';
-      // $msg ? ($msg.msg = '') : ($msg.msg = '');
-    })();
-  }
-
   $: if (data.html) {
     share_mode = true;
   }
 
-  $: if (q && !q[$langs]) {
-    (async () => {
-      q[$langs] = await Translate(q[$llang], $llang, $langs);
-    })();
-  }
+  // $: if (q && !q[$langs]) {
+  //   (async () => {
+  //     q[$langs] = await Translate(q[$llang], $llang, $langs);
+  //   })();
+  // }
 
-  $: if (a && !a[$langs]) {
-    (async () => {
-      a[$langs] = await Translate(a[$llang], $llang, $langs);
-    })();
-  }
+  // $: if (a && !a[$langs]) {
+  //   (async () => {
+  //     a[$langs] = await Translate(a[$llang], $llang, $langs);
+  //   })();
+  // }
 
   $: if ($langs) {
     example_lang = $langs;
@@ -315,7 +307,7 @@
 
       q = isFlipped ? qa.user2 : qa.user1;
 
-      if (!q[$langs]) q[$langs] = await Translate(q[$llang], $llang, $langs);
+      // if (!q[$langs]) q[$langs] = await Translate(q[$llang], $llang, $langs);
 
       q[$llang] = q[$llang]?.replace(
         '${user1_name}',
@@ -342,7 +334,7 @@
       // q_shfl = shuffle(ar).toString().replaceAll(',', ' ');
       a = isFlipped ? qa.user1 : qa.user2;
 
-      if (!a[$langs]) a[$langs] = await Translate(a[$llang], $llang, $langs);
+      // if (!a[$langs]) a[$langs] = await Translate(a[$llang], $llang, $langs);
 
       a[$llang] = a[$llang]?.replace('${user2_name}', '...');
       a[$langs] = a[$langs]?.replace('${user2_name}', '...');

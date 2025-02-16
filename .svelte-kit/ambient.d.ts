@@ -45,8 +45,7 @@ declare module '$env/static/private' {
 	export const ComSpec: string;
 	export const DriverData: string;
 	export const EDITOR: string;
-	export const FPS_BROWSER_APP_PROFILE_STRING: string;
-	export const FPS_BROWSER_USER_PROFILE_STRING: string;
+	export const EFC_3716: string;
 	export const GIT_ASKPASS: string;
 	export const HOME: string;
 	export const HOMEDRIVE: string;
@@ -121,6 +120,7 @@ declare module '$env/static/private' {
 	export const VSCODE_INSPECTOR_OPTIONS: string;
 	export const windir: string;
 	export const ZES_ENABLE_SYSMAN: string;
+	export const _OLD_VIRTUAL_PROMPT: string;
 }
 
 /**
@@ -171,8 +171,7 @@ declare module '$env/dynamic/private' {
 		ComSpec: string;
 		DriverData: string;
 		EDITOR: string;
-		FPS_BROWSER_APP_PROFILE_STRING: string;
-		FPS_BROWSER_USER_PROFILE_STRING: string;
+		EFC_3716: string;
 		GIT_ASKPASS: string;
 		HOME: string;
 		HOMEDRIVE: string;
@@ -247,6 +246,7 @@ declare module '$env/dynamic/private' {
 		VSCODE_INSPECTOR_OPTIONS: string;
 		windir: string;
 		ZES_ENABLE_SYSMAN: string;
+		_OLD_VIRTUAL_PROMPT: string;
 		[key: `PUBLIC_${string}`]: undefined;
 		[key: `${string}`]: string | undefined;
 	}

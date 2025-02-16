@@ -8,6 +8,8 @@
 
   export let SttResult, StopListening, display_audio;
 
+  // let MediaRecorder;
+
   let mediaRecorder: IMediaRecorder,
     mediaStream: any,
     audioAnalyser: any,
@@ -25,6 +27,11 @@
   let to_lang = 'en';
 
   onMount(async () => {
+    // if (typeof window !== 'undefined') {
+    //   const module = await import('extendable-media-recorder');
+    //   MediaRecorder = module.default;
+      
+    // }
 
     try {
       mediaStream = await navigator.mediaDevices.getUserMedia({

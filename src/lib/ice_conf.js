@@ -7,20 +7,15 @@ export let ice_conf = {
   ],
   turn: [
     {
-      urls: 'turn:relay1.expressturn.com:3478?transport=tcp',
-      username: 'ef0ZUU5G66E1O9IV3Z',
-      credential: 'jE9btE3On6i5nLz0',
+      urls: "turn:18.195.84.86:3478?transport=tcp",
+      username: 'kolmit',
+      credential: 'nissan@720',
     },
     {
-      urls: 'turn:kolmit-server.onrender.com:3000?transport=udp',
-      username: 'username',
-      credential: 'password',
-    },
-    {
-      urls: 'turn:kolmit-server.onrender.com:3000?transport=tcp',
-      username: 'username',
-      credential: 'password',
-    },
+      urls: "turn:18.195.84.86:3478?transport=udp",
+      username: 'kolmit',
+      credential: 'nissan@720',
+    }
   ],
   lifetimeDuration: '86400s',
 };

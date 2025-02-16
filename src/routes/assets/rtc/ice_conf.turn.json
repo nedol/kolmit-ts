@@ -9,11 +9,11 @@
   },
   "turn": {
     "urls": [
-      "turn:kolmit.onrender.com:3478?transport=udp",
-      "turn:kolmit.onrender.com:3478?transport=tcp"
+      "turn:92.113.144.41:3478?transport=tcp",
+      "turn:92.113.144.41:3478?transport=udp"
     ],
-    "username": "username",
-    "credential": "password"
+    "username": "kolmit",
+    "credential": "nissan720"
   },
   "lifetimeDuration": "86400s"
 }

@@ -9,7 +9,7 @@
 
 
   import Checkbox from '@smui/checkbox';
-  import { SortableList } from '@jhubbardsf/svelte-sortablejs';
+  import { SortableList } from '@rodrigodagostino/svelte-sortable-list';
 
   import List, { Item, Separator, Text } from '@smui/list';
   import Button, { Label } from '@smui/button';
