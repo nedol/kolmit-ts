@@ -114,6 +114,7 @@
     "postgres": "^3.4.4",
     "puppeteer": "^23.11.1",
     "scss": "^0.2.4",
+    "tone": "^15.0.4",
     "uuid": "^10.0.0",
     "vite-plugin-commonjs": "^0.10.1",
     "wav": "^1.0.2",

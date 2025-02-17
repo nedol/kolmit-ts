@@ -93,24 +93,17 @@
       // currentWord.example[$langs] = example;
       example = currentWord.example[$llang];
 
-      const regex = /(<<\w+>>)\s/;
-      const match = currentWord?.example[$llang].match(regex);
+      const regex = /(<<\w+>>)\s+(<<\w+>>)/;
+      const match = currentWord?.example[$llang]
+        ? currentWord?.example[$llang].match(regex)
+        : '';
       let original = '';
       if (match) {
         original = `${match[0]} ${match[1]}`;
-      }else{
-
-        words.splice(currentWordIndex, 1);
-        currentWord = words[currentWordIndex];
-        makeExample();
-        return;
-
       }
       // else original = `${currentWord.original}`;
 
-      console.log()
-
-      resultElement =  replaceWordWithInput(
+      resultElement = replaceWordWithInput(
         (speak_text = currentWord?.example[$llang]
           ? currentWord?.example[$llang]
           : (currentWord.example[$llang] = await Translate(
@@ -128,7 +121,14 @@
             ? '<span style="color:green" ><b>$1</b></span>'
             : '$1'
         );
-      } 
+      } else if (example.includes('"')) {
+        example = example?.replace(
+          /"([^"]+)"/gu,
+          !data.level.includes('C1')
+            ? '<span style="color:green" ><b>$1</b></span>'
+            : '$1'
+        );
+      }
 
       setTimeout(() => {
         const wAr = extractWords(currentWord?.example[$llang]);
@@ -139,7 +139,7 @@
           // spanElement.style.width = "50px";
           resultElementWidth[i] = getTextWidth(wAr[i], '20px Arial');
         });
-      }, 100);
+      }, 0);
 
       function getSubArray(arr, index) {
         const totalElements = 10;
@@ -175,7 +175,6 @@
       // setFocus();
     });
   }
-
   
   function getTextWidth(text, font) {
     // Создаем элемент canvas
@@ -243,12 +242,15 @@
   }
 
   function nextWord() {
-    if (currentWordIndex < words.length - 1) {
+    if (currentWordIndex < words.length - 1) 
       currentWordIndex++;
-      currentWord = words[currentWordIndex];
-      userContent = userContent.map(() => '&nbsp;');
-      makeExample()
-    }
+    else
+      currentWordIndex=0;
+
+    currentWord = words[currentWordIndex];
+    userContent = userContent.map(() => '&nbsp;');
+   
+    makeExample()
   }
 
   function shuffle(array) {
