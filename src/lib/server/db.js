@@ -519,14 +519,20 @@ export async function GetBricks(q) {
 
 export async function GetDialog(q) {
   try {
-    let res = await sql`SELECT dialog, html, subscribe FROM dialogs
+    let dialog = await sql`SELECT dialog, html, subscribe, type FROM dialogs
 		WHERE name=${q.name} AND owner=${q.owner} AND level=${q.level}`;
 
-    return {
-      dialog: res[0].dialog,
-      html: res[0].html || '',
-      subscribe: res[0].subscribe
-    };
+    let bricks = await sql`SELECT html FROM bricks
+		WHERE name=${q.name} AND owner=${q.owner} AND level=${q.level}`;
+
+    let context = await sql`SELECT data,type FROM context
+		WHERE name=${q.name}`;
+
+    dialog[0].brick = bricks[0]?bricks[0].html:'';
+    dialog[0].context = context[0]?context[0].data:'';
+    dialog[0].type = context[0]?context[0].type:'';
+
+    return  dialog[0];
   } catch (ex) {
     return JSON.stringify({ func: q.func, res: ex });
   }
@@ -578,19 +584,57 @@ export async function GetLesson(q) {
         await sql`SELECT data, level, lang FROM lessons WHERE owner=${q.owner} AND level=${q.level}  ORDER BY level desc`;
     } else {      
       res =
-        await sql`SELECT data, level, lang FROM lessons WHERE owner=${q.owner}  ORDER BY level desc`;
-      
+        await sql`SELECT data, level, lang FROM lessons WHERE owner=${q.owner}  ORDER BY level desc`;      
     }
+    
     //debugger;
     const levels = await getLevels(q.owner);
 
-    const les = find(res, {level:q.level})
+    const les = find(res, {level:q.level});
+
+    const lang = res[0].lang; // предполагаем, что это значение приходит как 'nl', 'en' и т.п.
+
+    const news = await sql`
+      SELECT 
+        json_build_object(${lang}::text, "name") AS "name",  
+        MAX((EXTRACT(EPOCH FROM "timestamp") * 1000)::BIGINT) AS "published", 
+        "type"
+      FROM (
+        SELECT "name", "timestamp", 'dialog' AS "type" 
+        FROM public.dialogs 
+        WHERE "type" = 'news' AND "timestamp" >= DATE_TRUNC('month', CURRENT_DATE)
+
+        UNION
+
+        SELECT "name", "timestamp", 'bricks' AS "type" 
+        FROM public.bricks 
+        WHERE "type" = 'news' AND "timestamp" >= DATE_TRUNC('month', CURRENT_DATE)
+      ) AS combined
+      GROUP BY "name", "type"
+      ORDER BY "published" ASC;
+    `;
+
+    
+    const context_news = await sql`
+      SELECT 
+        json_build_object(quote_literal(${lang}), "name") AS "name", 
+        "data", 
+        MAX((EXTRACT(EPOCH FROM "timestamp") * 1000)::BIGINT) AS "published", 
+        "type"
+      FROM public.context 
+      WHERE "type" = 'news' 
+        AND "timestamp" >= DATE_TRUNC('month', CURRENT_DATE)
+      GROUP BY "name", "data", "type"
+      ORDER BY "published" ASC;
+    `;
 
     return {
       data: les?les.data:res[0].data,
       lang: les?.lang?les.lang:res[0].lang,
       level: les?.level?les.level:res[0].level,
       levels: levels,
+      news: news,
+      context_news:context_news
     };
   } catch (ex) {
     return JSON.stringify({ func: q.func, res: ex });
@@ -660,8 +704,8 @@ export async function GetDict(q) {
 
 export async function WriteSpeech(q) {
   try {
-    await sql.begin(async (sql) => {
-      await sql`INSERT INTO speech (lang, key, text, translate)
+    await sql.begin(async (tx) => {
+      await tx`INSERT INTO speech (lang, key, text, translate)
                 VALUES (${q.lang}, ${q.key}, ${q.text}, ${q.translate})
                 ON CONFLICT (key, lang) 
                 DO UPDATE SET 

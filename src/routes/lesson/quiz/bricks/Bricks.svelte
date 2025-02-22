@@ -525,8 +525,6 @@ let keys = [];
     }
   }
 
-
-
   function compareStrings(str1, str2) {
     // Используем алгоритм Левенштейна для вычисления расстояния между строками
 
@@ -794,19 +792,38 @@ let keys = [];
   </TopAppBar>
 </div>
 
+<div class="card">
+
 {#if bricks_data?.html}
-  <span class="bricks_name" on:click={() => (isCollapsed = !isCollapsed)}
-  
-  >{bricks_data?.name}</span
-  >
+  <div class="bricks-header">
+    <Icon tag="svg" viewBox="0 0 24 24" width="30px" height="30px" fill="grey"> 
+      <svg aria-hidden="true" viewBox="0 0 24 24" width="20px" height="20px">
+        <rect x="3" y="3" width="8" height="3"></rect>
+        <rect x="13" y="3" width="8" height="3"></rect>
+        <rect x="3" y="8" width="4" height="3"></rect>
+        <rect x="9" y="8" width="6" height="3"></rect>
+        <rect x="17" y="8" width="4" height="3"></rect>
+        <rect x="3" y="13" width="8" height="3"></rect>
+        <rect x="13" y="13" width="8" height="3"></rect>
+        <rect x="3" y="18" width="4" height="3"></rect>
+        <rect x="9" y="18" width="6" height="3"></rect>
+        <rect x="17" y="18" width="4" height="3"></rect>
+      </svg>
+    </Icon>
+    <span class="bricks_name" on:click={() => (isCollapsed = !isCollapsed)}>
+      {bricks_data?.name}
+    </span>
+  </div>
+
   {#if !isCollapsed}
-      <div class="collapsible" in:slide={{ duration: 300 }}>
-          <ConText data={bricks_data} {tts} />
-      </div>
+    <div class="collapsible" in:slide={{ duration: 300 }}>
+      <ConText data={bricks_data} {tts} {onToggleWord} />
+    </div>
   {/if} 
 {/if}
 
-<main>
+
+
   <span class='article' on:click={toNextArticle}>{article_name}</span>
   <div>
     {#if translate}
@@ -861,7 +878,6 @@ let keys = [];
       {/each}
     </div>
   </div>
-
 </div>
 
   {#if isSTT}
@@ -903,11 +919,9 @@ let keys = [];
 
   <div style="height:100px"></div>
 
-</main>
+</div>
 
 <style>
-
-
 
   :global(.mdc-top-app-bar__row){
       height:48px
@@ -923,6 +937,20 @@ let keys = [];
     height: 45px;
   /* transform: scale(1.2) translate(-4%,0%);
   transform-origin: center ;  */
+  }
+
+  .card {
+    transition: transform 0.3s ease-in-out;
+    transform-style: preserve-3d;
+    transition: transform 0.5s;
+    top: 10px;
+    overflow-y: auto;
+    border-radius: 5px;
+    margin: 0 auto;
+    position: relative;
+    height: calc(100vh - 80px);
+    margin-left: 10px;
+    margin-right: 10px;
   }
 
   .container {
@@ -942,6 +970,13 @@ let keys = [];
       border-radius: 3px;
       padding: 8px 10px;
   }
+
+  .bricks-header {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Отступ между элементами */
+  }
+
 
   .bricks_name{
     position:relative;

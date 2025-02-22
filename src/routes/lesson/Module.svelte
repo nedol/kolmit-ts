@@ -93,7 +93,7 @@
 
   export let data;
 
-  let news = [],archive_news= [];
+  let news = [],archive_news= [], news_=[];
   
   const icons = {
     dialog: mdiAccountMultiple,
@@ -157,25 +157,29 @@
     module = lesson_data.module;
     $llang = lesson_data.lang;
     $showBottomAppBar = true;
+    news = lessonData.news;
     const oneWeekAgo = Date.now() - 7 * 24 * 60 * 60 * 1000; // Получаем временную метку, соответствующую одной неделе назад
 
-    module?.themes?.forEach((theme) => {
-      theme.lessons?.forEach((les) => {
-        les.quizes?.forEach((quiz) => {
-          const isBricks = quiz.type === 'bricks';
-          const isNieuws = quiz.name[$llang].includes('Nieuws');
-          const isOlderThanOneWeek = quiz.published < oneWeekAgo;
+    
+    // module?.themes?.forEach((theme) => {
+    //   if(theme.name[$llang]==='Nieuws'){
+    //     theme.lessons?.forEach((les) => {
+    //       les.quizes?.forEach((quiz) => {
+    //         const isBricks = quiz.type === 'bricks';
+    //         const isNieuws = quiz.name[$llang].includes('Nieuws');
+    //         const isOlderThanOneWeek = quiz.published < oneWeekAgo;
 
-          if (isNieuws) {
-            if(isOlderThanOneWeek){
-              archive_news.push(quiz);
-            } else {
-              news.push(quiz);
-            }
-          }
-        });
-      });
-    });
+    //         if (isNieuws) {
+    //           if(isOlderThanOneWeek){
+    //             archive_news.push(quiz);
+    //           } else {
+    //             news.push(quiz);
+    //           }
+    //         }
+    //       });
+    //     });
+    //   }  
+    // });
   })
 
   function onClickQuiz(type, level, theme, name) {
@@ -394,7 +398,7 @@
                               <Content>
                             {#each archive_news as quiz}
          
-                              {#if quiz.name[$llang] && quiz.published}
+                              {#if quiz.name && quiz.published}
                                 <div
                                   class="quiz-container mdc-typography--caption"
                                   type={quiz.type}
@@ -528,7 +532,7 @@
                             </Panel>
                           </Accordion>
                         {#each news as quiz}
-                        {#if quiz.name[$llang] && quiz.published}
+                        {#if quiz.name && quiz.published}
                         <div
                           class="quiz-container mdc-typography--caption"
                           type={quiz.type}

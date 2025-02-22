@@ -62,7 +62,7 @@ export async function GET({ url, fetch, cookies }) {
 	const quiz_theme = url.searchParams.get('prompt_theme');
 	
   if (prompt) {
-   resp = await GetPrompt(prompt, quiz_name,quiz_owner, quiz_level,quiz_theme);
+   resp = await GetPrompt(prompt, quiz_name,quiz_owner, quiz_level);
   }
 
 	let response = new Response(JSON.stringify({ resp } ));

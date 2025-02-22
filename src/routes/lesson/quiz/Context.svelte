@@ -10,7 +10,7 @@
 
   import { mdiEarHearing } from '@mdi/js';
 
-  export let data, quiz, tts;
+  export let data, quiz, tts, onToggleWord;
 
   let trans = '';
 
@@ -23,6 +23,49 @@
     playAutoColor = 'currentColor';
   }
   let isPlayAuto = false;
+
+  const style_color = `
+article {
+  display: block;
+  background: #f9f9f9;
+  padding: 20px;
+  margin: 20px auto;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  max-width: 800px;
+  font-family: Arial, sans-serif;
+  line-height: 1.6;
+}
+article p {
+  margin-bottom: 15px;
+  color: #333;
+}
+  article p:last-child {
+  margin-bottom: 0;
+}
+article subj {
+  font-weight: bold;
+  color: #2c3e50;
+}
+article ver {
+  color: #e74c3c;
+  font-style: italic;
+}
+article dirobj {
+  color: #3498db;
+  font-weight: bold;
+}
+article tijd, article plaats, article extra, article adv {
+  color: #27ae60;
+  font-style: italic;
+}
+article:hover {
+  background: #ffffff;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s ease-in-out;
+}`;
+let iframe;
+    
 
   function onTouchStart(event) {
     // Запомните время начала касания
@@ -121,6 +164,24 @@
       }
     }
   }
+
+  function OnLoad(){
+    const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+
+    if (iframeDoc) {
+            // Проверяем, есть ли <head>
+        if (!iframeDoc.head) {
+            iframeDoc.documentElement.insertAdjacentHTML("afterbegin", "<head></head>");
+        }
+        const styleTag = iframeDoc.createElement("style");
+        styleTag.textContent  = style_color;
+        iframeDoc.head.appendChild(styleTag); // Вставляем стили в <head>
+        console.log("🎨 Стили успешно добавлены!");
+
+    } else {
+        console.error("Не удалось получить contentDocument у iframe.");
+    }
+  }
 </script>
 
 <div>
@@ -136,7 +197,7 @@
         </Icon>
       </IconButton>
     </div>
-    <iframe class="context" srcdoc={data.html}></iframe>
+    <iframe bind:this={iframe} class="context" srcdoc={data.html} on:load={OnLoad}></iframe>
   {/if}
 </div>
 
@@ -172,4 +233,5 @@
   .context::-webkit-scrollbar {
     display: none; /* Для Chrome, Safari и Opera */
   }
+
 </style>

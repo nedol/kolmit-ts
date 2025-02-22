@@ -22,9 +22,9 @@
 
   let content = '',
     new_content = false,
-    num = 10;
+    num = 5;
 
-  let dialog_data = { lang: '', content: [], words: [], html: [''], name: '' };
+  let bricks_data = { lang: '', content: [], words: [], html: [''], name: '', type:'' , original:'' };
   const name = data.name;
   let dialog_task: HTMLDivElement, dialog_words, dialog_tmplt;
 
@@ -54,21 +54,21 @@
   }
 
   // {@dialogue: ${dlg_content} {There is dlg_content:${dlg_content}}
-  $: if (dialog_data && $llang) {
+  $: if (bricks_data && $llang) {
     try {
-      const dlg_content = dialog_data.content.map((line) => {
+      const dlg_content = bricks_data.content.map((line) => {
         return JSON.stringify(line);
       });
-      let dialog_data_words = dialog_data.words || '';
+      let bricks_data_words = bricks_data.words || '';
     } catch (ex) {}
   }
 
-  $: if (dialog_data && $langs) {
+  $: if (bricks_data && $langs) {
     TranslateContentToCurrentLang();
   }
 
-  $: if (dialog_data.content.length > 0 && prompt) {
-    let content = JSON.parse(JSON.stringify(dialog_data.content));
+  $: if (bricks_data.content.length > 0 && prompt) {
+    let content = JSON.parse(JSON.stringify(bricks_data.content));
     try {
       content?.forEach((item) => {
         item['user1'] = item['user1'][$llang]
@@ -87,28 +87,29 @@
   )
     .then((response) => response.json())
     .then(async (resp) => {
-      dialog_data = resp.data.dialog;
-      if (!dialog_data) dialog_data = { content: [] };
-      if (resp.data.html) {
-        dialog_data.html = splitHtmlContent(resp.data.html);
+
+      if (resp?.data) {
+        bricks_data.html = resp.data.html//splitHtmlContent(resp.data.html);
+      
+        bricks_data.name = resp.data.name;
+        bricks_data.type = resp.data.type;
+        bricks_data.original =  resp.data.original;
       }
-      dialog_data.name = name;
+      content  = bricks_data?.html;
       //DB
       fetch(
-        `./admin?prompt=dialog.basic&quiz_name=${data.name[$llang]}&prompt_owner=${abonent}&prompt_level=${data.level}&prompt_theme=${data.theme}`
+        `./admin?prompt=bricks.${resp.data.type}.${$llang}&quiz_name=${data.name[$llang]}&prompt_owner=${abonent}&prompt_level=${data.level}&prompt_theme=${data.theme}`
       )
         .then((response) => response.json())
         .then((resp) => {
           prompt = resp.resp.prompt.system + resp.resp.prompt.user;
 
-          prompt = prompt.replaceAll('${llang}', $llang);
-          prompt = prompt.replaceAll('${name[$llang]}', `${data.theme.name[$llang]}.${name[$llang]}`);
-          prompt = prompt.replaceAll('${langs}', $langs);
-          prompt = prompt.replaceAll('${dialog_data.html}', dialog_data.html);
-          prompt = prompt.replaceAll('${data.level}', `${data.level}.${data.theme.id}(${data.module.themes.length})`);
-          prompt = prompt.replaceAll('${num}', num);
+          prompt = prompt.replaceAll('${lang}', $llang);
+          prompt = prompt.replaceAll('${text}', '```text\n'+bricks_data.original+'\n```');
+          prompt = prompt.replaceAll('${level}', `${data.level}`);
+          prompt = prompt.replaceAll('${qnty}', num);
 
-          dialog_data.words = JSON.stringify(
+          bricks_data.words = JSON.stringify(
             resp.resp.words[0]?.data//resp.words[0].data
               .map((item) => extractWords(item.example[$llang]))
               .join(',')
@@ -122,12 +123,12 @@
           if (resp.resp.words[0]?.data){            
 
             prompt = prompt.replaceAll(
-              '[${dialog_data_words}]',
+              '[${bricks_data_words}]',
               resp.resp.words[0].data.map(item => extractContent(item.example[$llang]))
             );
           }
 
-          dialog_data.html = resp.resp.words[0]?.context;
+          bricks_data.html = resp.resp.words[0]?.context;
 
           if (data.theme.grammar) prompt = prompt.replaceAll('${grammar}', JSON.stringify(data.theme.grammar)) 
 
@@ -136,7 +137,7 @@
     })
     .catch((error) => {
       console.log(error);
-      // dialog_data.content = [];
+      // bricks_data.content = [];
     });
 
   onMount(async () => {});
@@ -154,17 +155,17 @@
       .then((data) => {
         prompt = data.resp.prompt.system + data.resp.prompt.user;
         prompt = prompt.replaceAll('${llang}', $llang);
-        prompt = prompt.replaceAll('${name[$llang]}', dialog_data.name[$llang]);
+        prompt = prompt.replaceAll('${name[$llang]}', bricks_data.name[$llang]);
         prompt = prompt.replaceAll('${langs}', $langs);
-        prompt = prompt.replaceAll('${dialog_data.html}', dialog_data.html);
+        prompt = prompt.replaceAll('${bricks_data.html}', bricks_data.html);
         prompt = prompt.replaceAll('${data.level}', data.level);
-        prompt = prompt.replaceAll('${num}', num);
+        prompt = prompt.replaceAll('${qnty}', num);
         prompt = prompt.replaceAll('${grammar}', data.resp.grammar.grammar.map((el)=>{return el}));
         prompt = prompt;
       })
       .catch((error) => {
         console.log(error);
-        // dialog_data.content = [];
+        // bricks_data.content = [];
       });
   }
 
@@ -186,14 +187,14 @@
   async function TranslateContentToCurrentLang() {
     try {
       await Promise.all(
-        dialog_data.content.map(async (item: any) => {
+        bricks_data.content.map(async (item: any) => {
           await Promise.all(
             Object.keys(item).map(async (key: string) => {
               // console.log(key, item);
               if (item[key][$llang] && !item[key][$langs]) {
                 let tr = await Translate(item[key][$llang], $llang, $langs);
                 item[key][$langs] = tr;
-                dialog_data = dialog_data;
+                bricks_data = bricks_data;
               }
             })
           );
@@ -217,19 +218,19 @@
 
   function addEmptyRecord() {
     let emptyRecord = {
-      num: (dialog_data.content.length + 1).toString(), // Пример создания уникального номера записи
+      num: (bricks_data.content.length + 1).toString(), // Пример создания уникального номера записи
       user1: { nl: '', ru: '', uk: '', fr: '', en: '', de: '' },
       user2: { nl: '', ru: '', uk: '', fr: '', en: '', de: '' },
       language: $llang, // Пример начального выбранного языка
     };
-    dialog_data.content.push(emptyRecord);
-    dialog_data = dialog_data;
+    bricks_data.content.push(emptyRecord);
+    bricks_data = bricks_data;
   }
 
   function remRecord(ev) {
     const index = ev.currentTarget.attributes.index.nodeValue;
-    dialog_data.content.splice(index, 1);
-    dialog_data = dialog_data;
+    bricks_data.content.splice(index, 1);
+    bricks_data = bricks_data;
   }
 
   // Функция для сохранения текущего состояния в localStorage
@@ -244,12 +245,12 @@
     const response = await fetch(`/admin/module`, {
       method: 'POST',
       body: JSON.stringify({
-        func: 'upd_dlg',
+        func: 'upd_brks',
         owner: abonent,
         level: data.level,
         name: name[$llang],
         new_name: data.name[$llang],
-        data: dialog_data,
+        html: content,
         lang: $llang,
       }),
       headers: { 'Content-Type': 'application/json' },
@@ -266,50 +267,50 @@
       method: 'POST',
       body: JSON.stringify({
         topic: name,
-        dialog: JSON.stringify(dialog_data.content),
+        dialog: JSON.stringify(bricks_data.content),
       }),
       headers: { 'Content-Type': 'application/json' },
     })
       .then((response) => response.json())
       .then((data) => {
         if (data.data.content[0]) {
-          dialog_data.content = dialog_data.content.concat(data.data.content);
+          bricks_data.content = bricks_data.content.concat(data.data.content);
           if (data.data.html) {
-            dialog_data.html = splitHtmlContent(data.data.html);
+            bricks_data.html = splitHtmlContent(data.data.html);
           }
-          dialog_data.name = name;
+          bricks_data.name = name;
           new_content = true;
         }
       })
       .catch((error) => {
         console.log(error);
-        // dialog_data = { content: [] };
+        // bricks_data = { content: [] };
       });
 
     // content = data.replace(/\\\"/g, '"');
     // content = JSON.stringify(JSON.parse(data)[0]);
     // if (content) {
-    //   dialog_data.content.push(JSON.parse(data)[0]);
-    //   dialog_data = dialog_data;
+    //   bricks_data.content.push(JSON.parse(data)[0]);
+    //   bricks_data = bricks_data;
     // }
   }
 
   function OnContextChange() {
-    prompt = prompt.replace('${dialog_data_html}', dialog_data.html);
+    prompt = prompt.replace('${text}', bricks_data.original);
   }
 
   function OnWordsChange() {
-    prompt = prompt.replaceAll('${dialog_data_words}', dialog_data.words);
+    prompt = prompt.replaceAll('${bricks_data_words}', bricks_data.words);
   }
 
   function OnChangeContent(ev: Event) {
     // console.log(ev.currentTarget.value)
     try {
       if (ev.currentTarget.value) {
-        dialog_data.content = dialog_data.content.concat(
+        bricks_data.content = bricks_data.content.concat(
           JSON.parse(ev.currentTarget.value)
         );
-        console.log(dialog_data.content);
+        console.log(bricks_data.content);
       } else content = '';
     } catch (ex) {
       console.log(ex);
@@ -343,16 +344,17 @@
       .readText()
       .then((text) => {
         content = text;
-        const parsed = JSON.parse(text);
-        const parsed_html = JSON.parse(text).html;
-        if (dialog_data && dialog_data.content)
-          dialog_data.content = dialog_data.content.concat(parsed.content);
-        else {
-          dialog_data.content = parsed;
-        }
-        if (dialog_data && parsed_html) {
-          dialog_data.html = parsed_html;
-        }
+        // const parsed = JSON.parse(text);
+        // const parsed_html = JSON.parse(text).html;
+        // content = parsed;
+        // if (bricks_data && bricks_data.content)
+        //   bricks_data.content = bricks_data.content.concat(parsed.content);
+        // else {
+        //   bricks_data.content = parsed;
+        // }
+        // if (bricks_data && parsed_html) {
+        //   bricks_data.html = parsed_html;
+        // }
       })
       .catch((err) => {
         console.error('Failed to read clipboard contents: ', err);
@@ -360,7 +362,7 @@
   }
 
   function OnCopyContent() {
-    const stringToCopy = JSON.stringify(dialog_data.content);
+    const stringToCopy = JSON.stringify(bricks_data.content);
     navigator.permissions.query({ name: 'clipboard-write' }).then((result) => {
       if (result.state == 'granted' || result.state == 'prompt') {
         navigator.clipboard
@@ -455,9 +457,9 @@
             {#if active === context_title}
               {#if viewHTML}
                 <!-- <div style="height: 350px; overflow-y:auto">
-                  {@html dialog_data.html}
+                  {@html bricks_data.html}
                 </div> -->
-                <iframe srcdoc={dialog_data.html} width="100%" height="350px"
+                <iframe srcdoc={bricks_data.original} width="100%" height="350px"
                 ></iframe>
               {:else}
                 <Paper variant="unelevated">
@@ -465,7 +467,7 @@
                     <textarea
                       rows="20"
                       name="dialog_context"
-                      bind:value={dialog_data.html}
+                      bind:value={bricks_data.original}
                       on:change={OnContextChange}
                     ></textarea>
                   </Content>
@@ -495,7 +497,7 @@
                     on:change={() => OnWordsChange()}
                     rows="20"
                     name="dialog_words"
-                    bind:value={dialog_data.words}
+                    bind:value={bricks_data.words}
                   ></textarea>
                 </Content>
               </Paper>
@@ -557,20 +559,28 @@
               <Paper variant="unelevated">
                 <Content>
                   {#await Translate('Use chatGPT to run the copied prompt and paste result here', 'en', $langs) then data}
-                    <textarea
+                    <!-- <textarea
                       id="dialog_content"
                       rows="20"
                       name="dialog_content"
                       placeholder={data}
                       on:input={OnChangeContent}
                       bind:value={content}
-                    ></textarea>
+                    ></textarea> -->
+                    <iframe srcdoc={content}  width="100%" height="350px"
+                    ></iframe>
+                    <!-- <div 
+                      contenteditable="true"
+                      placeholder={data}
+                      bind:innerHTML={content}
+                      style="min-height: 300px; max-height: 400px; overflow-y: auto; border: 1px solid #ccc; padding: 10px; font-family: Arial, sans-serif; font-size: 14px;"
+                    ></div> -->
                   {/await}
                   <button class="paste_content" on:click={PasteContent}>
                     {#await Translate('Paste Content', 'en', $langs) then data}
                       {data}
                     {/await}
-                  </button>
+                  </button> 
                 </Content>
               </Paper>
             {/if}
@@ -599,8 +609,8 @@
       </tr>
     </thead>
     <tbody>
-      {#if dialog_data}
-        {#each dialog_data.content as item, index}
+      {#if bricks_data}
+        {#each bricks_data.content as item, index}
           <tr>
             <td>
               {#if item.user1}

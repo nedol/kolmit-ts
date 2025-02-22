@@ -12,6 +12,7 @@
   export let ChangeQuizName;
 
   setContext('quiz_data', data);
+
 </script>
 
 <!-- {@debug quiz} -->

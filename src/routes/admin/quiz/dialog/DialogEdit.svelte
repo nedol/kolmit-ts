@@ -67,7 +67,7 @@
     TranslateContentToCurrentLang();
   }
 
-  $: if (dialog_data.content.length > 0 && prompt) {
+  $: if (dialog_data.content?.length > 0 && prompt) {
     let content = JSON.parse(JSON.stringify(dialog_data.content));
     try {
       content?.forEach((item) => {
@@ -90,25 +90,22 @@
       dialog_data = resp.data.dialog;
       if (!dialog_data) dialog_data = { content: [] };
       if (resp.data.html) {
-        dialog_data.html = splitHtmlContent(resp.data.html);
+        // dialog_data.html = splitHtmlContent(resp.data.html);
+        dialog_data.context = resp.data.html;
+      }else if(resp.data.brick){//old format, need to remove
+        dialog_data.context = resp.data.brick;
       }
-      dialog_data.name = name;
+      if(resp.data.context){
+        dialog_data.context = resp.data.context;//new format
+      }
       //DB
       fetch(
-        `./admin?prompt=dialog.basic&quiz_name=${data.name[$llang]}&prompt_owner=${abonent}&prompt_level=${data.level}&prompt_theme=${data.theme.name[$llang]}`
+        `./admin?prompt=dialog.${resp.data.type}&quiz_name=${data.name[$llang]}&prompt_owner=${abonent}&prompt_level=${data.level}&prompt_theme=${data.theme.name[$llang]}`
       )
         .then((response) => response.json())
         .then((resp) => {
+          
           prompt = resp.resp.prompt.system + resp.resp.prompt.user;
-
-          // fetch('./src/routes/admin/quiz/prompts/dialog.ru.txt')
-          //   .then((response) => response.text())
-          //   .then((resp) => {
-          // prompt = resp;
-
-  
-          // data.module.themes[1].lessons[0].quizes[1].name
-
 
           dialog_data.words = JSON.stringify(
             resp.resp.words[0]?.data//resp.words[0].data
@@ -129,22 +126,20 @@
             );
           }
 
-          if(!dialog_data.html )
-            dialog_data.html = resp.resp?.context[0].html;//from bricks html
+          // if(!dialog_data.html )
+          //   dialog_data.html = resp.resp?.context[0].html;//from bricks html
 
           if (data.theme.grammar) prompt = prompt.replaceAll('${grammar}', JSON.stringify(data.theme.grammar)) 
-
           
           prompt = prompt.replaceAll('${llang}', $llang);
           prompt = prompt.replaceAll('${name[$llang]}', `${data.theme.name[$llang]}.${name[$llang]}`);
           prompt = prompt.replaceAll('${langs}', $langs);
-          prompt = prompt.replaceAll('${dialog_data_html}', dialog_data.html);
-          prompt = prompt.replaceAll('${data.level}', `${data.level}.${data.theme.id}(${data.module.themes.length})`);
-          prompt = prompt.replaceAll('${num}', num);
-
-         
+          prompt = prompt.replaceAll('${dialog_data_html}', dialog_data.context);
+          prompt = prompt.replaceAll('${level}', `${data.level}(${data.module.themes.length})`);
+          prompt = prompt.replaceAll('${num}', num);         
 
           prompt = prompt;
+
         });
     })
     .catch((error) => {
@@ -169,7 +164,7 @@
         prompt = prompt.replaceAll('${llang}', $llang);
         prompt = prompt.replaceAll('${name[$llang]}', dialog_data.name[$llang]);
         prompt = prompt.replaceAll('${langs}', $langs);
-        prompt = prompt.replaceAll('${dialog_data.html}', dialog_data.html);
+        prompt = prompt.replaceAll('${dialog_data_html}', dialog_data.context);
         prompt = prompt.replaceAll('${data.level}', data.level);
         prompt = prompt.replaceAll('${num}', num);
         prompt = prompt.replaceAll('${grammar}', data.resp.grammar.grammar.map((el)=>{return el}));
@@ -470,7 +465,7 @@
                 <!-- <div style="height: 350px; overflow-y:auto">
                   {@html dialog_data.html}
                 </div> -->
-                <iframe srcdoc={dialog_data.html} width="100%" height="350px"
+                <iframe srcdoc={dialog_data.context} width="100%" height="350px"
                 ></iframe>
               {:else}
                 <Paper variant="unelevated">
@@ -478,7 +473,7 @@
                     <textarea
                       rows="20"
                       name="dialog_context"
-                      bind:value={dialog_data.html}
+                      bind:value={dialog_data.context}
                       on:change={OnContextChange}
                     ></textarea>
                   </Content>
@@ -612,7 +607,7 @@
       </tr>
     </thead>
     <tbody>
-      {#if dialog_data}
+      {#if dialog_data?.content}
         {#each dialog_data.content as item, index}
           <tr>
             <td>

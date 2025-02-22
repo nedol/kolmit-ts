@@ -6,7 +6,13 @@ import { SendEmail } from './db';
 import pkg_l from 'lodash';
 const { find, remove, findIndex, difference } = pkg_l;
 
+import {sql_st} from '$lib/js/stores.js'
+
 let sql;
+
+sql_st.subscribe((data)=>{
+  sql = data;
+})
 
 let conStr = {
   connectionStringSupabase:
@@ -14,7 +20,7 @@ let conStr = {
 };
 
 export async function CreatePool_(resolve) {
-  sql = postgres(conStr.connectionStringSupabase, {
+  sql_st(postgres(conStr.connectionStringSupabase, {
     host: 'aws-0-eu-central-1.pooler.supabase.com', // Postgres ip address[s] or domain name[s]
     port: 5432, // Postgres server port[s]
     database: 'postgres', // Name of database to connect to
@@ -22,7 +28,7 @@ export async function CreatePool_(resolve) {
     password: 'NissanPathfinder@386', // Password of database user
     idle_timeout: 20,
     max_lifetime: 60 * 30,
-  });
+  }))
   resolve(sql);
 }
 
@@ -32,13 +38,13 @@ let conStrNeon = {
 };
 
 export async function CreatePool_neon() {
-  sql = postgres(conStrNeon.connectionString, {
+  sql_st.set(postgres(conStrNeon.connectionString, {
     host: 'ep-polished-bush-a2n4g5y9-pooler.eu-central-1.aws.neon.tech', // Postgres ip address[s] or domain name[s]
     port: 5432, // Postgres server port[s]
     database: 'neondb', // Name of database to connect to
     username: 'nedooleg', // Username of database user
     password: 'nHLhfQB0WS5Y', // Password of database user
-  });
+  }))
 }
 
 export async function CreateAdmin(par) {
@@ -161,6 +167,22 @@ export async function UpdateDialog(q) {
   }
 }
 
+export async function UpdateBricks(q) {
+  try {
+    let res = await sql`INSERT INTO bricks
+			(name , owner, html, level,timestamp)
+			VALUES(${q.new_name},${q.owner},${q.html || ''}, ${q.level}, NOW() )
+			ON CONFLICT (name, owner, level)
+			DO UPDATE SET
+			name = EXCLUDED.name,
+      html = EXCLUDED.html,
+      timestamp = NOW()`;
+    return { res };
+  } catch (ex) {
+    return JSON.stringify({ func: q.func, res: ex });
+  }
+}
+
 export async function UpdateListen(q) {
   try {
     let res = await sql`INSERT INTO listen
@@ -217,3 +239,4 @@ export async function GetPrompt(prompt = '', quiz_name= '', owner= '', level= ''
     context: context 
   };
 }
+

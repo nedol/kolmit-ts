@@ -3,9 +3,9 @@ import fs from 'fs';
 
 import {
   UpdateDialog,
-  UpdateLesson,
   UpdateListen,
   UpdateWords,
+  UpdateBricks
 
 } from '$lib/server/db.admin.js';
 
@@ -14,7 +14,7 @@ import {
 export async function POST({ request, url, fetch }) {
 	let resp;
 
-	const { func, owner, level, name, new_name, data, lang, context } = await request.json();
+	const { func, owner, level, name, new_name, data, lang, context,html } = await request.json();
 
 	switch (func) {
     case 'upd_dlg':
@@ -26,6 +26,9 @@ export async function POST({ request, url, fetch }) {
     case 'upd_words':
       UpdateWords({ owner, level, name, new_name, data, lang, context });
       break;
+    case 'upd_brks':
+      UpdateBricks({ owner, level, name, new_name, data, lang, html });
+      break;  
   }
 
 	let response = new Response(JSON.stringify({ resp }));

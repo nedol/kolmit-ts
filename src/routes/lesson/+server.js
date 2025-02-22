@@ -94,19 +94,21 @@ export async function GET({ url, fetch, cookies }) {
     let response = new Response(JSON.stringify({ data }));
     response.headers.append('Access-Control-Allow-Origin', `*`);
     return response;
+
   } else if (lesson) {
     let owner = url.searchParams.get('owner');
     let operator = lesson;
 
-    let { data, lang, level, levels } = await GetLesson({
+    const obj = await GetLesson({
       owner: owner,
       operator: operator,
       level: lvl
     });
     // console.log(data)
-    let response = new Response(JSON.stringify({ data, lang, level, levels }));
+    let response = new Response(JSON.stringify(obj));
     response.headers.append('Access-Control-Allow-Origin', `*`);
     return response;
+
   } else if (listen) {
     let name = url.searchParams.get('listen');
     let owner = url.searchParams.get('owner');

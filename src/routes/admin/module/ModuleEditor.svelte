@@ -65,6 +65,8 @@
   let levels: any = [];
   let module_input: any;
 
+  let news;
+
   const quizes = ['выбери quiz...',  'dialog', 'word', 'bricks'];
 
   let containerWidth = '100%'; // Исходная ширина - 100% ширины родительского окна
@@ -90,6 +92,7 @@
         throw new Error('Failed to fetch data');
       }
       const resp = await response.json();
+      news = resp.news;
       $llang = resp.lang;
       return resp;
     } catch (error) {
@@ -113,6 +116,7 @@
 
     // const modules = JSON.parse(localStorage.getItem('kolmit'))['modules'];
     lesson_data = await fetchLesson(abonent, '');
+
   });
 
   $: if (lesson_data.data) {
@@ -158,8 +162,10 @@
     }
   }
 
+
+  
   function onClickQuiz(quiz: any, level: string, theme: string) {
-    $view = 'quiz';
+  
 
     lesson_data.data.llang = lesson_data.data.lang;
     // lesson_data.data.level = level;
@@ -170,7 +176,10 @@
     // })['words'];
     lesson_data.data.quiz = quiz.type;
 
-    // setContext('quiz_data', lesson_data.data);
+    lesson_data.data.level = lesson_data.level;
+
+ 
+    $view = 'quiz';
   }
 
   function disablePanel(node) {
@@ -505,7 +514,7 @@
                                   touch
                                 ></Checkbox>
 
-                                <div
+                                <div 
                                   on:click={() => {
                                     onClickQuiz(
                                       quiz,
@@ -513,6 +522,7 @@
                                       theme
                                     );
                                   }}
+                                  class="icon"
                                   type={quiz.type}
                                   name={quiz.name[$llang]}
                                   level={lesson_data.data.module.level}
@@ -638,7 +648,7 @@
                           </SortableList>
                         {/if}
                       {/each}
-                      <div class="add_quiz" style="left:10px">
+                      <div class="add_quiz" style="left:10px;top:20px">
                         {#await Translate('Add quiz', 'en', $langs) then data}
                           <IconButton
                             class="material-icons"
@@ -719,8 +729,14 @@
   .quiz-container {
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    padding: 0px; /* Установите желаемый отступ вокруг элемента */
+    align-items: baseline;
+    padding: 0px;
+    margin-top: 5px;
+  }
+
+  .icon{
+    position: relative;
+    top: 10px;
   }
 
   .add_quiz,
