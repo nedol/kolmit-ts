@@ -315,11 +315,4 @@ export async function GetLesson(q) {
   }
 }
 
-export async function getLevels(owner) {
-  const levels = await sql`SELECT level FROM lessons WHERE owner=${owner}`;
-
-  return levels.map((item) => {
-    return item.level;
-  });
-}
 
