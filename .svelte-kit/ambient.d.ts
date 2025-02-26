@@ -26,12 +26,6 @@
  * ```
  */
 declare module '$env/static/private' {
-	export const HF_TOKEN: string;
-	export const GROQ_API_KEY: string;
-	export const NEWS_API_KEY: string;
-	export const DEEPL_API_KEY: string;
-	export const TWILIO_RECOVERY_CODE: string;
-	export const GOOGLE_API_KEY: string;
 	export const ALLUSERSPROFILE: string;
 	export const APPDATA: string;
 	export const ChocolateyInstall: string;
@@ -45,7 +39,7 @@ declare module '$env/static/private' {
 	export const ComSpec: string;
 	export const DriverData: string;
 	export const EDITOR: string;
-	export const EFC_3716: string;
+	export const EFC_8084: string;
 	export const GIT_ASKPASS: string;
 	export const HOME: string;
 	export const HOMEDRIVE: string;
@@ -110,8 +104,6 @@ declare module '$env/static/private' {
 	export const USERDOMAIN_ROAMINGPROFILE: string;
 	export const USERNAME: string;
 	export const USERPROFILE: string;
-	export const VIRTUAL_ENV: string;
-	export const VIRTUAL_ENV_PROMPT: string;
 	export const VSCODE_GIT_ASKPASS_EXTRA_ARGS: string;
 	export const VSCODE_GIT_ASKPASS_MAIN: string;
 	export const VSCODE_GIT_ASKPASS_NODE: string;
@@ -120,7 +112,6 @@ declare module '$env/static/private' {
 	export const VSCODE_INSPECTOR_OPTIONS: string;
 	export const windir: string;
 	export const ZES_ENABLE_SYSMAN: string;
-	export const _OLD_VIRTUAL_PROMPT: string;
 }
 
 /**
@@ -152,12 +143,6 @@ declare module '$env/static/public' {
  */
 declare module '$env/dynamic/private' {
 	export const env: {
-		HF_TOKEN: string;
-		GROQ_API_KEY: string;
-		NEWS_API_KEY: string;
-		DEEPL_API_KEY: string;
-		TWILIO_RECOVERY_CODE: string;
-		GOOGLE_API_KEY: string;
 		ALLUSERSPROFILE: string;
 		APPDATA: string;
 		ChocolateyInstall: string;
@@ -171,7 +156,7 @@ declare module '$env/dynamic/private' {
 		ComSpec: string;
 		DriverData: string;
 		EDITOR: string;
-		EFC_3716: string;
+		EFC_8084: string;
 		GIT_ASKPASS: string;
 		HOME: string;
 		HOMEDRIVE: string;
@@ -236,8 +221,6 @@ declare module '$env/dynamic/private' {
 		USERDOMAIN_ROAMINGPROFILE: string;
 		USERNAME: string;
 		USERPROFILE: string;
-		VIRTUAL_ENV: string;
-		VIRTUAL_ENV_PROMPT: string;
 		VSCODE_GIT_ASKPASS_EXTRA_ARGS: string;
 		VSCODE_GIT_ASKPASS_MAIN: string;
 		VSCODE_GIT_ASKPASS_NODE: string;
@@ -246,7 +229,6 @@ declare module '$env/dynamic/private' {
 		VSCODE_INSPECTOR_OPTIONS: string;
 		windir: string;
 		ZES_ENABLE_SYSMAN: string;
-		_OLD_VIRTUAL_PROMPT: string;
 		[key: `PUBLIC_${string}`]: undefined;
 		[key: `${string}`]: string | undefined;
 	}

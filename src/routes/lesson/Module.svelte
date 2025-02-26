@@ -154,33 +154,24 @@
   onMount(async () => {
     const lessonData = await fetchLesson(operator.abonent, operator.operator);
     lesson_data = lessonData.data;
-    module = lesson_data.module;
+    module = lesson_data. module;
     $llang = lesson_data.lang;
     $showBottomAppBar = true;
     news = lessonData.news;
-    const oneWeekAgo = Date.now() - 7 * 24 * 60 * 60 * 1000; // Получаем временную метку, соответствующую одной неделе назад
+    const oneWeekAgo = Date.now() - 7 * 24 * 60 * 60 * 1000; // Получаем временную метку, соответствующую одной неделе наз    
+    const tmp = [];
+    news?.forEach((quiz) => {
+      const isOlderThanOneWeek = quiz.published < oneWeekAgo;
 
-    
-    // module?.themes?.forEach((theme) => {
-    //   if(theme.name[$llang]==='Nieuws'){
-    //     theme.lessons?.forEach((les) => {
-    //       les.quizes?.forEach((quiz) => {
-    //         const isBricks = quiz.type === 'bricks';
-    //         const isNieuws = quiz.name[$llang].includes('Nieuws');
-    //         const isOlderThanOneWeek = quiz.published < oneWeekAgo;
-
-    //         if (isNieuws) {
-    //           if(isOlderThanOneWeek){
-    //             archive_news.push(quiz);
-    //           } else {
-    //             news.push(quiz);
-    //           }
-    //         }
-    //       });
-    //     });
-    //   }  
-    // });
+        if(isOlderThanOneWeek){
+          archive_news.push(quiz);
+        } else {
+          tmp.push(quiz);
+        }      
+    })
+    news = tmp;
   })
+  
 
   function onClickQuiz(type, level, theme, name) {
     try {

@@ -25,6 +25,9 @@
   let isPlayAuto = false;
 
   const style_color = `
+body{
+  height:110vh;
+}
 article {
   display: block;
   background: #f9f9f9;

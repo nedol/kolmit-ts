@@ -499,7 +499,7 @@ export async function GetListen(q) {
 
 export async function GetWords(q) {
   try {
-    let res = await sql`SELECT data, context, subscribe  FROM word
+    let res = await sql`SELECT data, subscribe  FROM word
 		WHERE name=${q.name} AND owner=${q.owner} AND level=${q.level}`;
     return res[0];
   } catch (ex) {
@@ -507,11 +507,34 @@ export async function GetWords(q) {
   }
 }
 
-export async function GetBricks(q) {
+export async function GetBricks(q) { 
   try {
-    let res = await sql`SELECT * FROM bricks
-		WHERE name=${q.name} AND owner=${q.owner} AND level=${q.level}`;
-    return res[0];
+    let contextResult = await sql`
+      SELECT c.name, c.data
+      FROM context c
+      ${q.name ? sql`WHERE c.name = ${q.name}` : sql``}
+    `;
+
+    let bricksResult = await sql`
+      SELECT b.*
+      FROM bricks b
+      WHERE b.owner = ${q.owner} 
+        AND b.level = ${q.level} 
+        AND b.theme = ${q.theme}
+        ${q.name ? sql`AND b.name = ${q.name}` : sql``}
+    `;
+
+    // Если bricksResult пустой, инициализируем его как пустой массив
+    if (!bricksResult) {
+      bricksResult = [];
+    }
+
+    // Если есть contextResult и bricksResult, добавляем контекст в первый элемент
+    if (contextResult[0] && bricksResult[0]) {
+      bricksResult[0].context = contextResult[0].data;
+    }
+
+    return q.name ? bricksResult[0] : bricksResult;
   } catch (ex) {
     return JSON.stringify({ func: q.func, res: ex });
   }
@@ -519,18 +542,17 @@ export async function GetBricks(q) {
 
 export async function GetDialog(q) {
   try {
-    let dialog = await sql`SELECT dialog, html, subscribe, type FROM dialogs
+    let dialog = await sql`SELECT * FROM dialogs
 		WHERE name=${q.name} AND owner=${q.owner} AND level=${q.level}`;
 
     let bricks = await sql`SELECT html FROM bricks
 		WHERE name=${q.name} AND owner=${q.owner} AND level=${q.level}`;
 
-    let context = await sql`SELECT data,type FROM context
+    let context = await sql`SELECT data, prompt_type FROM context
 		WHERE name=${q.name}`;
 
     dialog[0].brick = bricks[0]?bricks[0].html:'';
     dialog[0].context = context[0]?context[0].data:'';
-    dialog[0].type = context[0]?context[0].type:'';
 
     return  dialog[0];
   } catch (ex) {
@@ -609,6 +631,7 @@ export async function GetLesson(q) {
         SELECT "name", "timestamp", 'bricks' AS "type" 
         FROM public.bricks 
         WHERE "type" = 'news' AND "timestamp" >= DATE_TRUNC('month', CURRENT_DATE)
+        AND "html" <>''
       ) AS combined
       GROUP BY "name", "type"
       ORDER BY "published" ASC;
@@ -633,6 +656,54 @@ export async function GetLesson(q) {
       lang: les?.lang?les.lang:res[0].lang,
       level: les?.level?les.level:res[0].level,
       levels: levels,
+      news: news,
+      context_news:context_news
+    };
+  } catch (ex) {
+    return JSON.stringify({ func: q.func, res: ex });
+  }
+}
+
+
+export async function GetNews(q) {
+  try {
+    let res = '';
+
+    const news = await sql`
+      SELECT 
+        json_build_object(${lang}::text, "name") AS "name",  
+        MAX((EXTRACT(EPOCH FROM "timestamp") * 1000)::BIGINT) AS "published", 
+        "type"
+      FROM (
+        SELECT "name", "timestamp", 'dialog' AS "type" 
+        FROM public.dialogs 
+        WHERE "type" = 'news' AND "timestamp" >= DATE_TRUNC('month', CURRENT_DATE)
+
+        UNION
+
+        SELECT "name", "timestamp", 'bricks' AS "type" 
+        FROM public.bricks 
+        WHERE "type" = 'news' AND "timestamp" >= DATE_TRUNC('month', CURRENT_DATE)
+      ) AS combined
+      GROUP BY "name", "type"
+      ORDER BY "published" ASC;
+    `;
+
+    
+    const context_news = await sql`
+      SELECT 
+        json_build_object(quote_literal(${lang}), "name") AS "name", 
+        "data", 
+        MAX((EXTRACT(EPOCH FROM "timestamp") * 1000)::BIGINT) AS "published", 
+        "type"
+      FROM public.context 
+      WHERE "type" = 'news' 
+        AND "timestamp" >= DATE_TRUNC('month', CURRENT_DATE)
+      GROUP BY "name", "data", "type"
+      ORDER BY "published" ASC;
+    `;
+
+    return {
       news: news,
       context_news:context_news
     };

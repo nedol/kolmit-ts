@@ -34,7 +34,7 @@
   let viewHTML = false;
 
   let prompt = ``,
-    grammar = '',
+    grammAr = '',
     grammar_title = 'Grammar',
     context_title = 'Context',
     prompt_title = 'Prompt',
@@ -83,29 +83,29 @@
   }
 
   fetch(
-    `./lesson?bricks=${data.name[$llang]}&owner=${abonent}&level=${data.level}`
+    `./lesson?bricks=${data.name}&owner=${abonent}&level=${data.level}&theme=${data.theme}`
   )
     .then((response) => response.json())
     .then(async (resp) => {
 
       if (resp?.data) {
-        bricks_data.html = resp.data.html//splitHtmlContent(resp.data.html);
-      
-        bricks_data.name = resp.data.name;
-        bricks_data.type = resp.data.type;
-        bricks_data.original =  resp.data.original;
+        bricks_data.html = resp.data.html;      
+        bricks_data.name = data.name;
+        bricks_data.type = data.type?data.type:data.name.includes('Nieuws')?'news':'';
+        bricks_data.prompt_type = resp.data.prompt_type;
+        bricks_data.context = resp.data.context;
       }
       content  = bricks_data?.html;
       //DB
       fetch(
-        `./admin?prompt=bricks.${resp.data.type}.${$llang}&quiz_name=${data.name[$llang]}&prompt_owner=${abonent}&prompt_level=${data.level}&prompt_theme=${data.theme}`
+        `./admin?prompt=bricks.${bricks_data.prompt_type}.${$langs}&quiz_name=${data.name}&prompt_owner=${abonent}&prompt_level=${data.level}&prompt_theme=${data.theme}`
       )
         .then((response) => response.json())
         .then((resp) => {
           prompt = resp.resp.prompt.system + resp.resp.prompt.user;
 
           prompt = prompt.replaceAll('${lang}', $llang);
-          prompt = prompt.replaceAll('${text}', '```text\n'+bricks_data.original+'\n```');
+          prompt = prompt.replaceAll('${text}', '```text\n'+bricks_data.context+'\n```');
           prompt = prompt.replaceAll('${level}', `${data.level}`);
           prompt = prompt.replaceAll('${qnty}', num);
 
@@ -149,18 +149,17 @@
       active = `Grammar`;
     }
     fetch(
-      `/admin?prompt=dialog.${name}&quiz_name=${data.name[$llang]}&prompt_owner=${abonent}&prompt_level=${data.level}&prompt_theme=${data.theme}`
+      `/admin?prompt=bricks.${name}.${$langs}&quiz_name=${data.name[$llang]}&prompt_owner=${abonent}&prompt_level=${data.level}&prompt_theme=${data.theme}`
     )
       .then((response) => response.json())
-      .then((data) => {
-        prompt = data.resp.prompt.system + data.resp.prompt.user;
-        prompt = prompt.replaceAll('${llang}', $llang);
-        prompt = prompt.replaceAll('${name[$llang]}', bricks_data.name[$llang]);
-        prompt = prompt.replaceAll('${langs}', $langs);
-        prompt = prompt.replaceAll('${bricks_data.html}', bricks_data.html);
-        prompt = prompt.replaceAll('${data.level}', data.level);
-        prompt = prompt.replaceAll('${qnty}', num);
-        prompt = prompt.replaceAll('${grammar}', data.resp.grammar.grammar.map((el)=>{return el}));
+      .then((resp) => {
+        prompt = resp.resp.prompt.system + (resp.resp.prompt.user?resp.resp.prompt.user:'');
+        prompt = prompt.replaceAll('${lang}', $llang);
+        prompt = prompt.replaceAll('${name}', bricks_data.name[$llang]);
+        prompt = prompt.replaceAll('${text}', bricks_data.context);
+        prompt = prompt.replaceAll('${level}', data.level);
+        prompt = prompt.replace('${qnty}', num);
+        prompt = prompt.replaceAll('${grammar}', '${grammar}:[' + grammAr+']');
         prompt = prompt;
       })
       .catch((error) => {
@@ -296,11 +295,11 @@
   }
 
   function OnContextChange() {
-    prompt = prompt.replace('${text}', bricks_data.original);
+    prompt = prompt.replace('${text}', bricks_data.context);
   }
 
   function OnWordsChange() {
-    prompt = prompt.replaceAll('${bricks_data_words}', bricks_data.words);
+    prompt = prompt.replaceAll('${words}', bricks_data.words);
   }
 
   function OnChangeContent(ev: Event) {
@@ -382,7 +381,8 @@
   }
 
   function OnGrammarChange() {
-    if (grammar) prompt = prompt.replace('${grammar}', grammar);
+    if (grammAr) prompt = prompt.replace('${grammar}', '${grammar}:['+grammAr+']');
+    prompt=prompt;
   }
 </script>
 
@@ -397,7 +397,7 @@
         type="text"
         class="dialog_name"
         name="dialog_name"
-        bind:value={data.name[$llang]}
+        bind:value={data.name}
       />
     </div>
     {#if data.level}
@@ -459,7 +459,7 @@
                 <!-- <div style="height: 350px; overflow-y:auto">
                   {@html bricks_data.html}
                 </div> -->
-                <iframe srcdoc={bricks_data.original} width="100%" height="350px"
+                <iframe srcdoc={bricks_data.context} width="100%" height="350px"
                 ></iframe>
               {:else}
                 <Paper variant="unelevated">
@@ -467,7 +467,7 @@
                     <textarea
                       rows="20"
                       name="dialog_context"
-                      bind:value={bricks_data.original}
+                      bind:value={bricks_data.context}
                       on:change={OnContextChange}
                     ></textarea>
                   </Content>
@@ -485,7 +485,7 @@
                   <textarea
                     rows="20"
                     name="dialog_grammar"
-                    bind:value={grammar}
+                    bind:value={grammAr}
                     on:change={OnGrammarChange}
                   ></textarea>
                 </Content>
@@ -539,6 +539,9 @@
                         </Item>
                         <Item on:click={() => LoadPrompt('grammar', data)}>
                           <Text>grammar</Text>
+                        </Item>
+                        <Item on:click={() => LoadPrompt('news', data)}>
+                          <Text>news</Text>
                         </Item>
                       </List>
                     </Menu>

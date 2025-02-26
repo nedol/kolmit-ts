@@ -82,8 +82,6 @@ let keys = [];
   } from '@mdi/js';
 
 
-
-
   fetch(
     `./lesson?bricks=${data.name}&theme=${data.theme}&owner=${operator.abonent}&level=${data.level}`
   )
@@ -146,7 +144,11 @@ let keys = [];
       formattedSentence = formatWords(sentence);
 
       // Создаём кирпичики
-      MakeBricks();
+      setTimeout(()=>{
+        MakeBricks();
+      },100);
+
+
     } catch (error) {
       console.error("Error in InitData:", error);
     }
@@ -821,8 +823,6 @@ let keys = [];
     </div>
   {/if} 
 {/if}
-
-
 
   <span class='article' on:click={toNextArticle}>{article_name}</span>
   <div>

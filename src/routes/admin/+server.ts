@@ -59,7 +59,6 @@ export async function GET({ url, fetch, cookies }) {
     const quiz_name = url.searchParams.get('quiz_name');
 	const quiz_level = url.searchParams.get('prompt_level');
 	const quiz_owner = url.searchParams.get('prompt_owner');
-	const quiz_theme = url.searchParams.get('prompt_theme');
 	
   if (prompt) {
    resp = await GetPrompt(prompt, quiz_name,quiz_owner, quiz_level);

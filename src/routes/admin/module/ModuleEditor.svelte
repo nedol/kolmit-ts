@@ -72,22 +72,19 @@
   let containerWidth = '100%'; // Исходная ширина - 100% ширины родительского окна
   let containerHeight = '100vh';
 
-  // $: if ($langs && lesson_data.data.module && llang) {
-
-  //   lesson_data.data.module.themes.map(async (theme) => {
-  //     if (!theme.name[$langs]) {
-  //       theme.name[$langs] = await Translate(theme.name[llang], $langs);
-  //     }
-  //   });
-
-  // }
 
   export async function fetchLesson(owner: string, level: string) {
     try {
-      let lev_str = level ? '&level=' + level : '';
-      const response = await fetch(
-        `./lesson?lesson=${abonent}&owner=${abonent}` + lev_str
-      );
+      const response = await fetch(`/admin/module`, {
+        method: 'POST',
+          body: JSON.stringify({
+            func: 'get_les',
+            operator: abonent,
+            level: level,
+            owner: abonent,
+          }),
+          headers: { 'Content-Type': 'application/json' },
+        });
       if (!response.ok) {
         throw new Error('Failed to fetch data');
       }
@@ -162,24 +159,31 @@
     }
   }
 
-
+  let quiz_data_export;
   
-  function onClickQuiz(quiz: any, level: string, theme: string) {
-  
+  function onClickQuiz(quiz: any, level: string, theme: string) {  
 
-    lesson_data.data.llang = lesson_data.data.lang;
-    // lesson_data.data.level = level;
-    lesson_data.data.name = quiz.name;
-    lesson_data.data.theme = theme;
-    // lesson_data.data.words = find(lesson_data.module.themes, {
-    // 	name: ev.currentTarget.attributes['name'].value
-    // })['words'];
-    lesson_data.data.quiz = quiz.type;
+    quiz_data_export = {quiz:quiz.type,name:quiz.name[$llang],lang:lesson_data.lang,level:lesson_data.level,theme:theme.name[$llang]}
 
-    lesson_data.data.level = lesson_data.level;
+    // lesson_data.data.llang = lesson_data.data.lang;
+    // // lesson_data.data.level = level;
+    // lesson_data.data.name = quiz.name;
+    // lesson_data.data.theme = theme;
+    // // lesson_data.data.words = find(lesson_data.module.themes, {
+    // // 	name: ev.currentTarget.attributes['name'].value
+    // // })['words'];
+    // lesson_data.data.quiz = quiz.type;
+
+    // // lesson_data.data.level = lesson_data.level;
+
+    // level = lesson_data.level;
 
  
     $view = 'quiz';
+  }
+
+  function OnClickQuizName(ev) {
+    // ev.target.select()
   }
 
   function disablePanel(node) {
@@ -298,7 +302,6 @@
     lesson_data = lesson_data;
   }
 
-  function OnChangeQuizName(ev) {}
 
   async function ChangeLevel(ev: any) {
     lesson_data.data.module.level = ev.target.attributes['level'].nodeValue;
@@ -325,9 +328,7 @@
     });
   }
 
-  function OnClickQuizName(ev) {
-    // ev.target.select()
-  }
+
 
   function OnAddModule(ev) {
     menu.getElement().attributes.style.nodeValue = 'display:none';
@@ -363,7 +364,9 @@
   }
 
   function OnPublish(quiz, state) {
+
     quiz.published = state?'': Date.now()
+
   }
 
   // async function OnThemeNameInput(t) {
@@ -390,7 +393,7 @@
 
 <main>
   {#if $view === 'quiz'}
-    <Quiz data={lesson_data.data} {ChangeQuizName} />
+    <Quiz data={quiz_data_export} {ChangeQuizName} />
   {:else if lesson_data.data && lesson_data.data.module}
     <!-- svelte-ignore a11y-missing-content -->
 
@@ -518,7 +521,7 @@
                                   on:click={() => {
                                     onClickQuiz(
                                       quiz,
-                                      lesson_data.data.module.level,
+                                      level,
                                       theme
                                     );
                                   }}
@@ -623,7 +626,7 @@
                                       {t}
                                       placeholder={data}
                                       name={quiz.name[$llang]}
-                                      level={lesson_data.data.level}
+                                      level={level}
                                       theme={theme.num}
                                       theme_name={theme.name[$llang]}
                                       bind:value={quiz.name[$llang]}

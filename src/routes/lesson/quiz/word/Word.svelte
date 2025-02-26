@@ -600,11 +600,10 @@
       </TopAppBar>
     </div>
 
-    <div class="div_word">
+    <div class="container">
     <span
       style="display:block;position:relative;top: 0px;left:5px;color: lightgray;font-style: italic;font-size:smaller;font-family: serif;"
-      >{data.name}</span
-    >
+      >{data.name}</span>
 
     <div style="border:1px solid lightgrey;border-radius:5px;padding:-10px">
 
@@ -633,7 +632,7 @@
         bind:innerHTML={userContent[0]}
         style="display:none;width: {resultElementWidth[0]}px"
       >
-        {@html result}
+      {@html result}
       </div>
       <div
         class="input"
@@ -696,24 +695,15 @@
 {/if}
 
 <style>
-  .top-app-bar-container{
+.top-app-bar-container{
     position: relative;
     top:0px; 
     height: 60px;
-  /* transform: scale(1.2) translate(-4%,0%);
-  transform-origin: center ;  */
   }
-.div_word {
+.container {
   position: relative;
   display: inline-grid;
-  /* background-color: #fff; */
-  transition: transform 0.3s ease-in-out;
-  /* width: 98%; */
-  margin: 0 auto;
-  /* transform-style: preserve-3d; */
-  transition: transform 0.5s;
-  /* height: 80vh; */
-  /* top: 10px; */
+  padding:10px;
 }
 .title {
   font-size: medium;
@@ -796,7 +786,7 @@ p {
   position: relative;
   text-align: center;
   overflow-y: hidden;
-  height: 70vh;
+  height: 40vh;
 }
 
 .input {

@@ -809,18 +809,13 @@
     {#if !dialog_data?.html}
       <span
         style="display:block-inline;position:relative;width:80%;color: lightgray;font-style: italic;font-size:smaller;font-family: serif;"
-        >{dialog_data?.name}</span
-      >
+        >{dialog_data?.name}</span>
 
     {:else if dialog_data?.html}
       <span on:click={() => (isCollapsed = !isCollapsed)}
         style="display:block-inline;position:relative;width:80%;color: black;font-style: italic;font-size:smaller;font-family: serif;"
-        >{dialog_data?.name}</span
-      >
-    <!-- // <span  on:click={() => (isCollapsed = !isCollapsed)}
-    //   class="not_collapsed"
-    //     style="position:absolute; right:20px;color:gray;font-style: italic;font-size:smaller;font-family: serif;"     
-    // >context</span> -->
+        >{dialog_data?.name}</span>
+
 
         {#if !isCollapsed}
             <div class="collapsible" in:slide={{ duration: 300 }}>
@@ -1429,6 +1424,7 @@
     color: #2196f3;
     margin-left: 10px;
     margin-right: 10px;
+    font-weight: 800;
   }
 
   .user2_tr {

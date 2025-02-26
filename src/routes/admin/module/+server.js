@@ -5,7 +5,8 @@ import {
   UpdateDialog,
   UpdateListen,
   UpdateWords,
-  UpdateBricks
+  UpdateBricks,
+  GetLesson
 
 } from '$lib/server/db.admin.js';
 
@@ -14,9 +15,15 @@ import {
 export async function POST({ request, url, fetch }) {
 	let resp;
 
-	const { func, owner, level, name, new_name, data, lang, context,html } = await request.json();
+	const { func,owner, operator,level, name, new_name, data, lang, context,html } = await request.json();
 
 	switch (func) {
+    case 'get_les':
+      const obj = await GetLesson({ operator:operator, owner:owner, level:level});
+      let response = new Response(JSON.stringify(obj));
+      response.headers.append('Access-Control-Allow-Origin', `*`);
+      return response;
+      break;
     case 'upd_dlg':
       UpdateDialog({ owner, level, name, new_name, data, lang });
       break;

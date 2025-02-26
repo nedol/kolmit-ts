@@ -130,7 +130,8 @@ export async function UpdateLesson(q) {
       if (q.levels.indexOf(item) === -1) removeModule(item);
     });
 
-    let res = await sql`INSERT INTO lessons
+    let res = await sql`
+    INSERT INTO lessons
 			(level , owner, data, lang, timestamp )
 			VALUES(${q.level},${q.owner},${JSON.parse(q.data)}, ${q.lang}, NOW())
 			ON CONFLICT (level, owner, lang)
@@ -215,7 +216,7 @@ export async function UpdateWords(q) {
   }
 }
 
-export async function GetPrompt(prompt = '', quiz_name= '', owner= '', level= '', theme= '') {
+export async function GetPrompt(prompt = '', quiz_name= '', owner= '', level= '') {
   let prompt_res, words_res, gram_res, gram, context;
   try {
     if(prompt)
@@ -238,5 +239,87 @@ export async function GetPrompt(prompt = '', quiz_name= '', owner= '', level= ''
     grammar: gram,
     context: context 
   };
+}
+
+export async function GetLesson(q) {
+  try {
+    let res = '';
+    if (q.operator !== q.owner) {
+      res = await sql`
+      SELECT lessons.data, lessons.level, lessons.lang 
+        FROM lessons
+        JOIN operators ON (operators.operator = ${q.operator} and operators.abonent=${q.owner})
+        JOIN groups ON (groups.name = operators.group and groups.level=lessons.level)
+        WHERE  groups.owner=${q.owner} AND lessons.owner=${q.owner}
+        ORDER BY level desc`;
+      
+     } else if (q.level) {
+      res =
+        await sql`SELECT data, level, lang FROM lessons WHERE owner=${q.owner} AND level=${q.level}  ORDER BY level desc`;
+    } else {      
+      res =
+        await sql`SELECT data, level, lang FROM lessons WHERE owner=${q.owner}  ORDER BY level desc`;      
+    }
+    
+    //debugger;
+    const levels = await getLevels(q.owner);
+
+    const les = find(res, {level:q.level});
+
+    const lang = res[0].lang; // предполагаем, что это значение приходит как 'nl', 'en' и т.п.
+
+    const news = await sql`
+      SELECT 
+        json_build_object(${lang}::text, "name") AS "name",  
+        MAX((EXTRACT(EPOCH FROM "timestamp") * 1000)::BIGINT) AS "published", 
+        "type"
+      FROM (
+        SELECT "name", "timestamp", 'dialog' AS "type" 
+        FROM public.dialogs 
+        WHERE "type" = 'news' AND "timestamp" >= DATE_TRUNC('month', CURRENT_DATE)
+
+        UNION
+
+        SELECT "name", "timestamp", 'bricks' AS "type" 
+        FROM public.bricks 
+        WHERE "type" = 'news' AND "timestamp" >= DATE_TRUNC('month', CURRENT_DATE)
+      ) AS combined
+      GROUP BY "name", "type"
+      ORDER BY "published" ASC;
+    `;
+
+    
+    const context_news = await sql`
+      SELECT 
+        json_build_object(quote_literal(${lang}), "name") AS "name", 
+        "data", 
+        MAX((EXTRACT(EPOCH FROM "timestamp") * 1000)::BIGINT) AS "published", 
+        "type"
+      FROM public.context 
+      WHERE "type" = 'news' 
+        AND "timestamp" >= DATE_TRUNC('month', CURRENT_DATE)
+      GROUP BY "name", "data", "type"
+      ORDER BY "published" ASC;
+    `;
+
+    return {
+      data: les?les.data:res[0].data,
+      lang: les?.lang?les.lang:res[0].lang,
+      level: les?.level?les.level:res[0].level,
+      levels: levels,
+      news: news,
+      context_news:context_news
+    };
+  } catch (ex) {
+    return JSON.stringify({ func: q.func, res: ex });
+  }
+}
+
+export async function getLevels(owner) {
+  const levels = await sql`SELECT level FROM lessons WHERE owner=${owner}`;
+
+  return levels.map((item) => {
+    return item.level;
+  });
 }
 

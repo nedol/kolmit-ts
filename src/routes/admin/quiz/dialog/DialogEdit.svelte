@@ -64,7 +64,7 @@
   }
 
   $: if (dialog_data && $langs) {
-    TranslateContentToCurrentLang();
+    // TranslateContentToCurrentLang();
   }
 
   $: if (dialog_data.content?.length > 0 && prompt) {
@@ -83,7 +83,7 @@
   }
 
   fetch(
-    `./lesson?dialog=${data.name[$llang]}&owner=${abonent}&level=${data.level}`
+    `./lesson?dialog=${data.name}&owner=${abonent}&level=${data.level}`
   )
     .then((response) => response.json())
     .then(async (resp) => {
@@ -91,21 +91,22 @@
       if (!dialog_data) dialog_data = { content: [] };
       if (resp.data.html) {
         // dialog_data.html = splitHtmlContent(resp.data.html);
-        dialog_data.context = resp.data.html;
       }else if(resp.data.brick){//old format, need to remove
         dialog_data.context = resp.data.brick;
       }
       if(resp.data.context){
         dialog_data.context = resp.data.context;//new format
       }
+
+      dialog_data.prompt_type= resp.data.prompt_type;
       //DB
       fetch(
-        `./admin?prompt=dialog.${resp.data.type}&quiz_name=${data.name[$llang]}&prompt_owner=${abonent}&prompt_level=${data.level}&prompt_theme=${data.theme.name[$llang]}`
+        `./admin?prompt=dialog.${dialog_data.prompt_type}.${$langs}&quiz_name=${data.name}&prompt_owner=${abonent}&prompt_level=${data.level}`
       )
         .then((response) => response.json())
         .then((resp) => {
           
-          prompt = resp.resp.prompt.system + resp.resp.prompt.user;
+          prompt = resp.resp.prompt.system + (resp.resp.prompt.user?resp.resp.prompt.user:'');
 
           dialog_data.words = JSON.stringify(
             resp.resp.words[0]?.data//resp.words[0].data
@@ -131,12 +132,11 @@
 
           if (data.theme.grammar) prompt = prompt.replaceAll('${grammar}', JSON.stringify(data.theme.grammar)) 
           
-          prompt = prompt.replaceAll('${llang}', $llang);
-          prompt = prompt.replaceAll('${name[$llang]}', `${data.theme.name[$llang]}.${name[$llang]}`);
-          prompt = prompt.replaceAll('${langs}', $langs);
-          prompt = prompt.replaceAll('${dialog_data_html}', dialog_data.context);
-          prompt = prompt.replaceAll('${level}', `${data.level}(${data.module.themes.length})`);
-          prompt = prompt.replaceAll('${num}', num);         
+          prompt = prompt.replaceAll('${lang}', $llang);
+          prompt = prompt.replaceAll('${name}', `${data.name}`);
+          prompt = prompt.replaceAll('${text}', dialog_data.context);
+          prompt = prompt.replaceAll('${level}', `${data.level}`);
+          prompt = prompt.replaceAll('${qnty}', num);         
 
           prompt = prompt;
 
@@ -161,12 +161,11 @@
       .then((response) => response.json())
       .then((data) => {
         prompt = data.resp.prompt.system + data.resp.prompt.user;
-        prompt = prompt.replaceAll('${llang}', $llang);
-        prompt = prompt.replaceAll('${name[$llang]}', dialog_data.name[$llang]);
-        prompt = prompt.replaceAll('${langs}', $langs);
-        prompt = prompt.replaceAll('${dialog_data_html}', dialog_data.context);
-        prompt = prompt.replaceAll('${data.level}', data.level);
-        prompt = prompt.replaceAll('${num}', num);
+        prompt = prompt.replaceAll('${lang}', $llang);
+        prompt = prompt.replaceAll('${name}', dialog_data.name);
+        prompt = prompt.replaceAll('${text}', dialog_data.context);
+        prompt = prompt.replaceAll('${level}', data.level);
+        prompt = prompt.replaceAll('${qnty}', num);
         prompt = prompt.replaceAll('${grammar}', data.resp.grammar.grammar.map((el)=>{return el}));
         prompt = prompt;
       })
@@ -255,9 +254,9 @@
         func: 'upd_dlg',
         owner: abonent,
         level: data.level,
-        name: name[$llang],
-        new_name: data.name[$llang],
-        data: dialog_data,
+        name: name,
+        new_name: data.name,
+        data: {"content":dialog_data.content},
         lang: $llang,
       }),
       headers: { 'Content-Type': 'application/json' },
@@ -353,10 +352,10 @@
         content = text;
         const parsed = JSON.parse(text);
         const parsed_html = JSON.parse(text).html;
-        if (dialog_data && dialog_data.content)
+        if (dialog_data?.content)
           dialog_data.content = dialog_data.content.concat(parsed.content);
         else {
-          dialog_data.content = parsed;
+          dialog_data.content = parsed.content;
         }
         if (dialog_data && parsed_html) {
           dialog_data.html = parsed_html;
@@ -403,7 +402,7 @@
         type="text"
         class="dialog_name"
         name="dialog_name"
-        bind:value={data.name[$llang]}
+        bind:value={data.name}
       />
     </div>
     {#if data.level}
@@ -615,7 +614,7 @@
                 <textarea
                   rows="3"
                   type="text"
-                  bind:value={item.user1[$langs]}
+                  bind:value={item.user1[$llang]}
                 />
               {:else}
                 <textarea rows="3" type="text" />
@@ -626,7 +625,7 @@
                 <textarea
                   rows="3"
                   type="text"
-                  bind:value={item.user2[$langs]}
+                  bind:value={item.user2[$llang]}
                 />
               {:else}
                 <textarea rows="3" type="text" />
