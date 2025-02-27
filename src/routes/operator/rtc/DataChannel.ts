@@ -1,14 +1,34 @@
-// Базовый класс для оператора и пользователя
-
 import { writable } from 'svelte/store';
-import { operatorst, dc, dc_state, posterst, msg } from '$lib/js/stores.js';
+import { operatorst, dc, dc_state, posterst, msg } from '$lib/stores.ts';
+
+interface FileData {
+  file: string;
+  length: number;
+  from: string;
+}
+
+interface MessageData {
+  slice?: string;
+  from: string;
+  type?: string;
+}
 
 export class DataChannel {
-  constructor(rtc, pc) {
+  private rtc: any;
+  private pc: any;
+  private call_num: number;
+  private type: string;
+  private forward: any;
+  private data: string;
+  private receiveBuffer: Blob[];
+  private receivedSize: number;
+  private dc: RTCDataChannel;
+  
+  constructor(rtc: any, pc: any) {
     this.rtc = rtc;
     this.pc = pc;
     this.call_num = 3;
-    this.type = type;
+    this.type = 'user'; // Убедитесь, что type имеет значение
     this.forward = null;
     this.data = '';
     this.receiveBuffer = [];
@@ -23,30 +43,29 @@ export class DataChannel {
     this.dc.onerror = () => this.onError();
 
     pc.StartEvents();
-    pc.con.ondatachannel = (event) => {
+    pc.con.ondatachannel = (event: { channel: RTCDataChannel }) => {
       console.log('Receive Channel Callback');
       this.dc = event.channel;
       this.dc.onopen = () => this.onOpen();
     };
   }
 
-  onOpen() {
+  private onOpen(): void {
     if (this.type === 'user') {
       dc.set(this);
       dc_state.set('open');
-    //   this.SendDCCall();
     }
     console.log(`${this.pc.pc_key} datachannel open`);
   }
 
-  onMessage(event) {
+  private onMessage(event: MessageEvent): void {
     try {
-      let parsed = JSON.parse(event.data);
+      let parsed: MessageData = JSON.parse(event.data);
       if (parsed.type === 'eom' && parsed.from !== this.type) {
         this.handleEndOfMessage();
         return;
       }
-      this.data += parsed.slice;
+      this.data += parsed.slice || '';
       if (parsed.type === 'eof' && parsed.from !== this.type) {
         this.handleFileReceived(parsed);
         return;
@@ -57,8 +76,7 @@ export class DataChannel {
     }
   }
 
-  handleEndOfMessage() {
-
+  private handleEndOfMessage(): void {
     msg.set(JSON.parse(this.data));
     setTimeout(() => {
       msg.set('');
@@ -66,29 +84,29 @@ export class DataChannel {
     }, 100);
   }
 
-  handleFileReceived(parsed) {
+  private handleFileReceived(parsed: MessageData): void {
     const received = new Blob(this.receiveBuffer);
     this.receiveBuffer = [];
     this.receivedSize = 0;
     if (confirm(`Получен файл: ${parsed.file}. Размер: ${parsed.length}. Сохранить?`)) {
-      let download_href = document.getElementById('download_href');
+      let download_href = document.getElementById('download_href') as HTMLAnchorElement;
       download_href.textContent = `Получен файл: ${parsed.file}. Размер: ${parsed.length}. Сохранить?`;
       download_href.href = URL.createObjectURL(received);
-      download_href.download = parsed.file;
+      download_href.download = parsed.file || 'file';
       download_href.click();
     }
   }
 
-  onClose() {
+  private onClose(): void {
     dc_state.set('close');
     this.rtc.SendStatus('close');
   }
 
-  onError() {
+  private onError(): void {
     this.onClose();
   }
 
-  SendData(data, cb) {
+  public SendData(data: any, cb?: () => void): void {
     try {
       if (this.dc.readyState === 'open') {
         const serializedData = JSON.stringify(data);
@@ -105,17 +123,17 @@ export class DataChannel {
     }
   }
 
-  SendFile(data, name, resolve) {
+  public SendFile(data: Blob, name: string, resolve: () => void): void {
     try {
       if (this.dc.readyState === 'open') {
         const size = 16384;
-        const numChunks = Math.ceil(data.byteLength / size);
-        this.dc.send(JSON.stringify({ file: name, length: data.byteLength, from: this.type }));
+        const numChunks = Math.ceil(data.size / size);
+        this.dc.send(JSON.stringify({ file: name, length: data.size, from: this.type }));
         for (let i = 0, o = 0; i < numChunks; i++, o += size) {
           const slice = data.slice(o, o + size);
           this.dc.send(slice);
         }
-        this.dc.send(JSON.stringify({ type: 'eof', file: name, length: data.byteLength, from: this.type }));
+        this.dc.send(JSON.stringify({ type: 'eof', file: name, length: data.size, from: this.type }));
         resolve();
       }
     } catch (ex) {
@@ -123,7 +141,7 @@ export class DataChannel {
     }
   }
 
-  SendDCCall() {
+  private SendDCCall(): void {
     let par = {
       proj: 'kolmit',
       uid: this.rtc.uid,

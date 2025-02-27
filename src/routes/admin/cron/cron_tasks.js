@@ -17,7 +17,7 @@ let browser = ''
 
 import {
 	GetPrompt
-} from '$lib/server/db.admin.js';
+} from '$lib/server/db.admin.ts';
 
 const formatDate = (date) => {
     const year = date.getFullYear();

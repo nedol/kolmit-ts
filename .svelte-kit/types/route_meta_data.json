@@ -4,7 +4,7 @@
 		"src/routes/+page.server.ts",
 		"src/routes/+layout.server.js",
 		"src/routes/+layout.server.js",
-		"src/routes/+server.js"
+		"src/routes/+server.ts"
 	],
 	"/admin": [
 		"src/routes/admin/+page.js",

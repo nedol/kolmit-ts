@@ -2,7 +2,7 @@ import md5 from 'md5';
 import dict from '$lib/dict/dict.json';
 import os from 'os';
 
-import {  CreatePool_neon,GetGroups } from '$lib/server/db.admin.js'; 
+import {  CreatePool_neon,GetGroups } from '$lib/server/db.admin.ts'; 
 
 
 await CreatePool_neon();

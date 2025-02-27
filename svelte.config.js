@@ -7,14 +7,19 @@ import { sveltekit } from "@sveltejs/kit/vite";
 // import { vitePreprocess } from "@sveltejs/kit/vite";
 
 import path from "path";
-import preprocess from "svelte-preprocess";
+import {sveltePreprocess} from "svelte-preprocess";
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
   // Consult https://kit.svelte.dev/docs/integrations#preprocessors
   // for more information about preprocessors
   // preprocess: vitePreprocess(),
-  preprocess: [preprocess(), vitePreprocess({})],
+  preprocess: [sveltePreprocess(
+    {
+      typescript: true,
+      scss: true
+    }),
+    vitePreprocess({})],
   
 
   css: (css) => {

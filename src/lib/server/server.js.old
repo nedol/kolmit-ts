@@ -5,8 +5,6 @@ import cron from 'node-cron';
 
 import Translate from '../server/Translate.js';
 
-import { json } from '@sveltejs/kit';
-
 import Email from './email.js';
 
 import pkg_l from 'lodash';
@@ -23,7 +21,7 @@ import {
   GetLessonsByDate,
   GetUsersEmail,
   SendEmailTodayPublished,
-} from './db.js'; //src\lib\server\server.db.js
+} from './db.ts'; //src\lib\server\server.db.ts
 
 if (!global.turn_server) {
   global.turn_server = new Turn({

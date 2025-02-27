@@ -8,13 +8,13 @@
   } from '@smui/card';
 
   import CallButtonUser from './CallButtonUser.svelte';
-  import { view } from '$lib/js/stores.js';
+  import { view } from '$lib/stores.ts';
 
   export let abonent, operator, name;
 
   import poster from '$lib/images/tutor.png';
 
-  import { users, call_but_status, click_call_func} from '$lib/js/stores.js';
+  import { users, call_but_status, click_call_func} from '$lib/stores.ts';
 
   $click_call_func = null;
 

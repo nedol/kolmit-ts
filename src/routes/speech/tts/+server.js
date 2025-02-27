@@ -12,7 +12,7 @@ import speech from "@google-cloud/speech";
 const speechClient = new speech.SpeechClient();
 
 
-import { WriteSpeech, ReadSpeech } from '$lib/server/db.js'; //src\lib\server\server.db.js
+import { WriteSpeech, ReadSpeech } from '$lib/server/db.ts'; //src\lib\server\server.db.ts
 
 
 import { Buffer } from 'buffer';

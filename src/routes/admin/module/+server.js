@@ -8,7 +8,7 @@ import {
   UpdateBricks,
   GetLesson
 
-} from '$lib/server/db.admin.js';
+} from '$lib/server/db.admin.ts';
 
 
 /** @type {import('./$types').RequestHandler} */

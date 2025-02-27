@@ -22,14 +22,14 @@
     import Tarif from './Tarif.svelte'
 
     export let rtc;
-    import {langs} from '$lib/js/stores.js'
+    import {langs} from '$lib/stores.ts'
     let lang = 'en';
     const unsubscr_lang = langs.subscribe((data) => {
         if(data)
             lang = data;
     });
 
-    import {dicts} from '$lib/js/stores.js';
+    import {dicts} from '$lib/stores.ts';
     let txt = 'Download Call Center';
     let dnld = '';
     let Dict;

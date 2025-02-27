@@ -6,7 +6,7 @@
   import BricksEdit from './bricks/BricksEdit.svelte';
   import WordEdit from './word/WordEdit.svelte';
   import WordGameEdit from './word/WordGameEdit.svelte';
-  import { dc_state , call_but_status } from '$lib/js/stores.js';
+  import { dc_state , call_but_status } from '$lib/stores.ts';
 
   export let data;
   export let ChangeQuizName;

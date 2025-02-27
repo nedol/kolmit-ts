@@ -3,7 +3,7 @@
 	import IconButton, { Icon } from '@smui/icon-button';
 	import { mdiPagePreviousOutline } from '@mdi/js';
 
-	import { lesson } from '$lib/js/stores.js';
+	import { lesson } from '$lib/stores.ts';
 
 	// Функция для обработки клика на кнопку "Back"
 	function handleBackClick() {

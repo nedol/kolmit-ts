@@ -23,7 +23,7 @@
 
   //  import { Speak } from '/src/routes/speech/tts/VoiceRSS';
 
-  import { lesson, dc, dc_state , langs, llang , dicts } from '$lib/js/stores.js';
+  import { lesson, dc, dc_state , langs, llang , dicts } from '$lib/stores.ts';
 
   const operator = getContext('operator');
 

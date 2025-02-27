@@ -1,5 +1,5 @@
 // import {log} from './utils'n
-  import { msg, signal} from '$lib/js/stores';
+  import { msg, signal} from '$lib/stores';
 
 export class Peer {
 	constructor(rtc, pc_config, pc_key) {

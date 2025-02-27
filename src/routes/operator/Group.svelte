@@ -29,7 +29,7 @@
     dc,
     msg,
     call_but_status,
-  } from '$lib/js/stores.js';
+  } from '$lib/stores.ts';
 
   import User from '../user/User.svelte';
 
@@ -39,7 +39,7 @@
 
   let lang = $langs;
 
-  export let group = [];
+  export let group: pkg.List<any> | null | undefined = [];
 
   let no_users_display = 'block';
 
@@ -50,6 +50,13 @@
 
   $: if ($msg) {
     onMessage($msg);
+  }
+
+  $:{
+    if(group.length===0)
+      $users = []
+    // console.log('group', group);
+    // console.log('users', $users);
   }
 
   $: if ($call_but_status === 'active') {
@@ -79,9 +86,6 @@
   function OnClickUpload() {}
 
   $: if (group.length > 0) {
-    mapValues($users, function (o) {
-      // if (o.status !== 'inactive' && o.status !== 'busy')  no_users_display = 'none';
-    });
 
     no_users_display = 'none';
 
@@ -92,7 +96,7 @@
   
 
   function onMessage(data) {
-    console.log();
+
     if (data.operators) {
       Object.keys(data.operators).map((el) => {
         if (
@@ -145,7 +149,7 @@
       font-family: monospace;">{data}</span
     >
   {/await}
-  <div class="flexy-dad">
+  <div class="flexy-dad"> 
     {#each group as user, i}
       {#if user && user.operator !== operator.operator}
         <br />

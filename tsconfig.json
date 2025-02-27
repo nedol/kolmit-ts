@@ -8,7 +8,7 @@
 	  "skipLibCheck": true,
 	  "lib": ["dom", "esnext"]	  
 	},
-	"include": ["src/**/*", "svelte.config.js"],
+	"include": ["src/**/*", "svelte.config.js","src/svelte.d.ts"],
 	"exclude": ["node_modules", "public"]
   }
   

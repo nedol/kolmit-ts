@@ -1,4 +1,4 @@
-import { CreateOperator, CheckOperator, GetUsers } from '$lib/server/db.js';
+import { CreateOperator, CheckOperator, GetUsers } from '$lib/server/db.ts';
 
 import pkg_l from 'lodash';
 const { find, findKey } = pkg_l;

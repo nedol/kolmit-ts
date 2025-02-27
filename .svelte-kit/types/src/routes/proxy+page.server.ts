@@ -2,24 +2,10 @@
 import md5 from 'md5';
 import dict from '$lib/dict/dict.json';
 import { ice_conf } from '$lib/ice_conf';
-import os from 'os';
 
-
-// import cc from '$lib/json/cc.json';
-
-// global.rtcPull = { user: {}, operator: {} };
-
-// global.rtcPool;
-// import { rtcPool_st } from '$lib/js/stores.js';
-// rtcPool_st.subscribe((data) => {
-//   global.rtcPool = data;
-// });
-
-import { CreatePool_render, CreatePool_neon, GetUsers, GetGroup } from '$lib/server/db.js'; //src\lib\server\server.db.js
+import { CreatePool_render, CreatePool_neon, GetUsers, GetGroup } from '$lib/server/db.ts'; //src\lib\server\server.db.ts
 
 let kolmit:any;
-
-
 
 /** @param {Parameters<import('./$types').PageServerLoad>[0]} event */
 export async function load({ fetch, cookies, route, url }) {

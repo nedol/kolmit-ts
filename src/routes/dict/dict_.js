@@ -1,7 +1,7 @@
 import translate from 'translate';
 translate.engine ="google"
 translate.from = 'ru';
-import { llang, langs } from '$lib/js/stores.js';
+import { llang, langs } from '$lib/stores.ts';
 
 export class Dict {
   constructor(dict) {

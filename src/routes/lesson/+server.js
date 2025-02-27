@@ -4,12 +4,11 @@ import fs from 'fs';
 import {
   GetLesson,
   GetDialog,
-  GetListen,
   GetDict,
   GetWords,
   GetBricks,
   UpdateQuizUsers,
-} from '$lib/server/db.js';
+} from '$lib/server/db.ts';
 // import { getContext } from 'svelte';
 
 export const config = {
@@ -109,16 +108,8 @@ export async function GET({ url, fetch, cookies }) {
     response.headers.append('Access-Control-Allow-Origin', `*`);
     return response;
 
-  } else if (listen) {
-    let name = url.searchParams.get('listen');
-    let owner = url.searchParams.get('owner');
-    let lang = url.searchParams.get('lang');
-    data = await GetListen({ name: name, owner: owner, lang: lang });
+  } 
 
-    let response = new Response(JSON.stringify({ data }));
-    response.headers.append('Access-Control-Allow-Origin', `*`);
-    return response;
-  }
   let response = new Response(JSON.stringify({ data }));
   response.headers.append('Access-Control-Allow-Origin', `*`);
   return response;

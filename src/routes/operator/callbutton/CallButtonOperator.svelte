@@ -1,7 +1,7 @@
 <script lang="ts">
   // let status = 'talk';
   // import 'long-press-event';
-  import { call_but_status } from '$lib/js/stores.js';
+  import { call_but_status } from '$lib/stores.ts';
 
   let status: string;
   // export let OnLongPress;

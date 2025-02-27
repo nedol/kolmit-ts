@@ -3,7 +3,7 @@ import { DataChannelOperator } from './DataChannelOperator';
 import md5 from 'md5';
 import { ice_conf } from '$lib/ice_conf';
 
-import { call_but_status } from '$lib/js/stores.js';
+import { call_but_status } from '$lib/stores.ts';
 
 export class RTCBase {
 	constructor(operator, name, signal) {

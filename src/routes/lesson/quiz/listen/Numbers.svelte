@@ -22,7 +22,7 @@
   import TTS from '../../../speech/tts/Tts.svelte';
   let tts;
 
-  import { dicts, lesson, dc_state, dc, langs, llang } from '$lib/js/stores.js';
+  import { dicts, lesson, dc_state, dc, langs, llang } from '$lib/stores.ts';
 
   let dict = $dicts;
 

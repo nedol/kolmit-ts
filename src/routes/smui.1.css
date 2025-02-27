@@ -1,7 +1,7 @@
 
 
 
-.smui-bottom-app-bar {
+/* .smui-bottom-app-bar {
   position: fixed;
   bottom: 0;
   display: flex;
@@ -10,7 +10,7 @@
   --smui-bottom-app-bar--fab-offset: 0px;
   background-color: #605f80;
   background-color: var(--mdc-theme-primary, #605f80);
-}
+} */
 
 .smui-paper.smui-paper--color-primary.smui-paper--unelevated {
   background-color: whitesmoke;
@@ -20,19 +20,7 @@
   font-size: small;
 }
 
-.smui-accordion
-  .smui-accordion__panel
-  > .smui-accordion__header.smui-accordion__header__title {
-  height: 65px;
-  padding: 0x 5px;
-}
 
-.smui-accordion
-  .smui-accordion__panel.smui-accordion__panel--open
-  > .smui-paper__content {
-  height: auto;
-  padding: 8px 5px;
-}
 body {
   overflow-y: auto;
 }
@@ -42,9 +30,7 @@ body {
   background-color: var(--mdc-theme-primary, #9eb2cc);
   width: 100%;
 }
-.form-field-container {
-  width: 0;
-}
+
 
 .mdc-text-field__input {
   text-align: center;
@@ -53,17 +39,9 @@ body {
 .quiz_select > .mdc-select {
   width: 95px;
 }
-.mdc-icon-button {
-  padding: 1px;
-  margin: 0px;
-  width: 25px;
-  height: 25px;
-}
+
 
 .mdc-image-list__supporting {
   display: block;
 }
 
-.mdc-checkbox {
-  /* height:8px */
-}

@@ -32,7 +32,7 @@
     msg,
     posterst
   
-  } from '$lib/js/stores.js';
+  } from '$lib/stores.ts';
 
   let poster = user_.picture ? user_.picture : '/assets/operator.svg';
 

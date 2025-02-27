@@ -1,4 +1,4 @@
-<script>
+<script  lang="ts">
   import { onMount, onDestroy, getContext } from 'svelte';
   import TopAppBar, { Row, Title, Section } from '@smui/top-app-bar';
   import Badge from '@smui-extra/badge';
@@ -27,7 +27,7 @@
     lesson,
     showBottomAppBar,
     dc,
-  } from '$lib/js/stores.js';
+  } from '$lib/stores.ts';
 
   import langs_list from '$lib/dict/learn_langs_list.json';
 
@@ -67,7 +67,7 @@
         `./lesson?words=theme&theme=${data.theme}&name=${data.name}&owner=${abonent}&level=${data.level}`
       );
       const result = await response.json();
-      words = result.data.data.map(item => ({ example: { nl: item.example.nl } }));
+      words = result?.data.data.map(item => ({ example: { nl: item.example.nl } }));
       currentWordIndex = 0;
       currentWord = words[currentWordIndex];
       

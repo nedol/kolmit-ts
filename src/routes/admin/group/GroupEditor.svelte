@@ -40,7 +40,7 @@
     email = '',
     picture = '';
 
-  import { llang, langs, dicts } from '$lib/js/stores.js';
+  import { llang, langs, dicts } from '$lib/stores.ts';
 
   import {Translate} from '../../../routes/translate/Transloc.ts'
 

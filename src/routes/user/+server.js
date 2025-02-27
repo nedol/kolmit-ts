@@ -2,7 +2,7 @@ import { json } from '@sveltejs/kit';
 
 
 global.rtcPool;
-import { rtcPool_st } from '$lib/js/stores.js';
+import { rtcPool_st } from '$lib/stores.ts';
 import { opendir } from 'fs';
 rtcPool_st.subscribe((data) => {
 	global.rtcPool = data;

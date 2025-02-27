@@ -1,4 +1,4 @@
-<script>
+<script  lang="ts">
   // @ts-nocheck
 
   import { onMount, onDestroy, getContext } from 'svelte';
@@ -11,7 +11,7 @@
   // translate.engine = 'google';
   // translate.from = $llang;
 
-  import { langs } from '$lib/js/stores.js';
+  import { langs } from '$lib/stores.ts';
 
   import langs_list from '$lib/dict/learn_langs_list.json';
 
@@ -45,7 +45,7 @@
     call_but_status,
     showBottomAppBar,
     OnCheckQU,
-  } from '$lib/js/stores.js';
+  } from '$lib/stores.ts';
 
   let dict = $dicts;
 

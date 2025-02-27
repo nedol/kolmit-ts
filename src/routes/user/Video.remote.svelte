@@ -6,7 +6,7 @@
     Media,
     MediaContent,
   } from '@smui/card';
-  import { muted } from '$lib/js/stores.js';
+  import { muted } from '$lib/stores.ts';
   export let srcObject;
   export let poster;
   export let status;

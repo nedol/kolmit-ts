@@ -1,13 +1,13 @@
 <script>
-	import { users } from '$lib/js/stores.js';
+	import { users } from '$lib/stores.ts';
 
 	import { onMount, getContext } from 'svelte';
 	import BottomAppBar, { Section, AutoAdjust } from '@smui-extra/bottom-app-bar';
 	import IconButton, { Icon } from '@smui/icon-button';
 	import { mdiPagePreviousOutline } from '@mdi/js';
 
-	import { lesson } from '$lib/js/stores.js';
-	import { dc } from '$lib/js/stores.js';
+	import { lesson } from '$lib/stores.ts';
+	import { dc } from '$lib/stores.ts';
 	$: if ($dc && $dc.dc) {
 		$dc.dc.onmessage = (event) => {
 			console.log(event.data);

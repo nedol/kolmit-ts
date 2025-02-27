@@ -1,8 +1,8 @@
 import { writable } from 'svelte/store';
 import { DataChannelOperator } from './DataChannelOperator';
 import { RTCBase } from './RTCBase';
-import { langs } from '$lib/js/stores.js';
-import { msg } from '$lib/js/stores.js';
+import { langs } from '$lib/stores.ts';
+import { msg } from '$lib/stores.ts';
 
 export class RTCOperator extends RTCBase {
   constructor(operator, name, signal) {

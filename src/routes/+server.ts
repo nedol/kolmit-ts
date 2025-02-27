@@ -1,19 +1,16 @@
-import { json } from '@sveltejs/kit';
-import WebSocket from 'ws';  
-import { CreateOperator, CheckOperator, GetUsers } from '$lib/server/db.js'; //src\lib\server\server.db.js
+import { CreateOperator, CheckOperator, GetUsers, GetDict } from '$lib/server/db.ts'; //src\lib\server\server.db.ts
 
 import pkg from 'nodemailer';
 const { Email } = pkg;
 
 import md5 from 'md5';
 
-import pkg_l from 'lodash';
-const { find, findKey } = pkg_l;
-
+import lodash from 'lodash';
+const { find, findKey } = lodash;
 
 
 global.rtcPool;
-import { rtcPool_st } from '$lib/js/stores.js';
+import { rtcPool_st } from '$lib/stores.ts';
 rtcPool_st.subscribe((data) => {
   global.rtcPool = data;
 });

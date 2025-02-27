@@ -9,7 +9,7 @@
     llang,
     dc,
     msg,
-  } from '$lib/js/stores.js';
+  } from '$lib/stores.ts';
 
   $llang = 'nl';
 

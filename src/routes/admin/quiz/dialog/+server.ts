@@ -5,7 +5,7 @@ import { CreateContent } from '$lib/server/ai.js';
 
 import {
 	GetPrompt
-} from '$lib/server/db.admin.js';
+} from '$lib/server/db.admin.ts';
 
 
 export async function GET({ url, fetch, cookies }) {

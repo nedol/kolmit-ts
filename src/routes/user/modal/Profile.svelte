@@ -20,7 +20,7 @@
 		console.log(files);
 	}
 
-	import { langs,dicts } from '$lib/js/stores.js';
+	import { langs,dicts } from '$lib/stores.ts';
 	let lang = 'en';
 	lang = $langs;
 

@@ -4,7 +4,7 @@
     setContext,
   } from 'svelte';
   import TopAppBar, { Row, Title, Section } from '@smui/top-app-bar';
-  import { dicts, langs, view, lesson } from '$lib/js/stores';
+  import { dicts, langs, view, lesson } from '$lib/stores.ts';
   import google_langs_list from '$lib/dict/google_lang_list.json';
   import ISO6391 from 'iso-google-locales';
   import { Translate } from '../translate/Transloc';

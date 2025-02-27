@@ -24,7 +24,7 @@
     dicts,
     langs,
     showBottomAppBar,
-  } from '$lib/js/stores.js';
+  } from '$lib/stores.ts';
 
   import CircularProgress from '@smui/circular-progress';
 
@@ -54,7 +54,7 @@
   const { find } = pkg;
 
 
-  import { msg } from '$lib/js/stores.js';
+  import { msg } from '$lib/stores.ts';
   $: if ($msg) {
     OnMessage($msg, null);
     // $msg = ''
@@ -91,7 +91,7 @@
 
   $call_but_status = 'inactive';
 
-  import { editable } from '$lib/js/stores.js';
+  import { editable } from '$lib/stores.ts';
   import { Translate } from '../translate/Transloc';
   $: if ($editable) {
     edited_display = $editable;

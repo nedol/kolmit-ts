@@ -29,13 +29,13 @@
 
   import Accordion, { Panel, Header, Content } from '@smui-extra/accordion';
 
-  import { langs, llang, dicts } from '$lib/js/stores.js';
+  import { langs, llang, dicts } from '$lib/stores.ts';
 
   import Quiz from '../quiz/Quiz.svelte';
 
   let value = 'dialog';
 
-  import { view } from '$lib/js/stores.js';
+  import { view } from '$lib/stores.ts';
 
   let menu: Menu;
 
@@ -689,7 +689,29 @@
 </main>
 
 <style>
-  main {
+
+:global(.mdc-icon-button) {
+    padding: 1px;
+    margin: 1px;
+    width: 25px;
+    height: 25px;
+  }
+
+:global(.smui-accordion
+  .smui-accordion__panel
+  > .smui-accordion__header.smui-accordion__header__title) {
+  height: 65px;
+  padding: 0x 5px;
+} 
+
+:global(.smui-accordion
+  .smui-accordion__panel.smui-accordion__panel--open
+  > .smui-paper__content) {
+  height: auto;
+  padding: 8px 5px;
+}
+
+main {
     margin-top: 40px;
   }
   .module_level {

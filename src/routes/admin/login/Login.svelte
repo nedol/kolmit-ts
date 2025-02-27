@@ -4,8 +4,7 @@
   import Button from '@smui/button';
   import Textfield from '@smui/textfield';
 
-  import { dicts } from '../../../lib/js/stores.js';
-  import { langs } from '$lib/js/stores.js';
+  import { langs , dicts } from '$lib/stores.ts';
 
   // let operator_svg =
   // 	'https://kolmit-service.onrender.com/_app/immutable/assets/operator.7238a518.svg';

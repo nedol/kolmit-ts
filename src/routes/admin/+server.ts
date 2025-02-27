@@ -1,55 +1,10 @@
-import { json } from '@sveltejs/kit';
-import fs from 'fs';
-
-import generate_news from './cron/cron_tasks.js'
-
-import cron from 'node-cron';
-
 
 import {
-	UpdateDialog,
 	UpdateLesson,
-	UpdateListen,
-	UpdateWords,
 	GetGroups,
 	GetPrompt
   
-  } from '$lib/server/db.admin.js';
-
-
-
-// Пример cron-задачи, которая запускается каждый день в полночь
-cron.schedule('26 21 * * 7', () => {
-	/* 
-	0 — минуты (0-я минута часа)
-	0 — час (полночь)
-	* — день месяца (каждый день)
-	* — месяц (каждый месяц)
-	* — день недели (каждый день недели)
-	* 
-	* Каждые 5 минут: *\/5 * * * *
-	  Каждую субботу в полдень: 0 12 * * 6
-	  Каждый час: 0 * * * *
-  */
-	const now = new Date();
-	const formattedDateTime =
-	  now.getFullYear() +
-	  '-' +
-	  String(now.getMonth() + 1).padStart(2, '0') +
-	  '-' +
-	  String(now.getDate()).padStart(2, '0') +
-	  ' ' +
-	  String(now.getHours()).padStart(2, '0') +
-	  ':' +
-	  String(now.getMinutes()).padStart(2, '0');
-  
-	console.log('Задача выполняется в 21 часа 30 минут.', formattedDateTime);
-	// Здесь можно вызвать нужные функции или выполнить операции
-
-  });
-
-  
-	// generate_news()
+  } from '$lib/server/db.admin.ts';
 
 
 

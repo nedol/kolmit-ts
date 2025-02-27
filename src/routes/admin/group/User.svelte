@@ -14,16 +14,16 @@
     poster = '/assets/operator.svg',
     name;
 
-  import { click_call_func } from '$lib/js/stores.js';
+  import { click_call_func } from '$lib/stores.ts';
 
-  import { users_status } from '$lib/js/stores.js';
+  import { users_status } from '$lib/stores.ts';
 
   $click_call_func = null;
 
   import pkg from 'lodash';
   const { groupBy, find } = pkg;
 
-  import { msg } from '$lib/js/stores.js';
+  import { msg } from '$lib/stores.ts';
   $: if ($msg) {
     // if ($msg.operator) {
     // 	if ($msg.operator === operator) OnMessage($msg);
@@ -32,7 +32,7 @@
     OnMessage($msg_user);
   }
 
-  // import { dc_msg } from '$lib/js/stores.js';
+  // import { dc_msg } from '$lib/stores.ts';
   // $: if ($dc_msg) {
   // 	OnMessage($dc_msg);
   // }

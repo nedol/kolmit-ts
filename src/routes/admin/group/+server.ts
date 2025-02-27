@@ -1,7 +1,7 @@
 import { json } from '@sveltejs/kit';
 import fs from 'fs';
 
-import { DeleteUser, AddUser } from '$lib/server/db.admin.js';
+import { DeleteUser, AddUser } from '$lib/server/db.admin.ts';
 
 /** @type {import('./$types').RequestHandler} */
 export async function POST({ request, url, fetch }) {

@@ -68,7 +68,7 @@ let keys = [];
   import {
       langs,
       llang,
-  } from '$lib/js/stores.js';
+  } from '$lib/stores.ts';
 
   import {
       mdiArrowRight,
@@ -928,9 +928,12 @@ let keys = [];
   }
 
   :global(.mdc-icon-button){
-    top:5px
+    top:5px;
+    padding: 1px;
+    margin: 0px;
+    width: 25px;
+    height: 25px;
   }
-
   .top-app-bar-container{
     position: relative;
     top:0px; 

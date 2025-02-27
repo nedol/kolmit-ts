@@ -1,13 +1,13 @@
 <script lang="ts">
   import { onMount, setContext } from 'svelte';
   import Login from './Login.svelte';
-  import { langs } from '$lib/js/stores.js';
-  import { view } from '$lib/js/stores.js';
+  import { langs } from '$lib/stores.ts';
+  import { view } from '$lib/stores.ts';
 
   // import { Dict } from '../dict/dict';
 
  
-  import { dicts } from '$lib/js/stores.js';
+  import { dicts } from '$lib/stores.ts';
 
   export let data;
 

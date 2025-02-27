@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
     import CircularProgress from '@smui/circular-progress';
 
   import Dialog from './dialog/Dialog.svelte';
@@ -8,7 +8,7 @@
   import Time from './listen/Time.svelte';
   import Word from './word/Word.svelte';
   import WordGame from './word/WordGame.svelte';
-  import { call_but_status } from '$lib/js/stores.js';
+  import { call_but_status } from '$lib/stores.ts';
 
   export let data;
   let quiz = data.quiz;

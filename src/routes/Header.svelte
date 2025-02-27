@@ -33,21 +33,20 @@
     users,
     editable,
     showBottomAppBar,
-  } from '$lib/js/stores.js';
+  } from '$lib/stores.ts';
 
   $: if ($editable) {
     edited_display = $editable;
   }
 
-  $:if($users){
-    console.log($users)
-  }
+  $: console.log('users:',$users)
 
 
   let menu = 'menu';
 
   let topAppBar;
   let abonent = '';
+
 
   let lvl  = new URL(window.location.href).searchParams.get('lvl')||''
   if(!lvl)
@@ -115,101 +114,96 @@
 {#if $dicts && $langs && $dicts['CLASS'][$langs]}
   <header>
     <div class="top-app-bar-container flexor">
-      <TopAppBar bind:this={topAppBar} variant="fixed">
-      
-        <Row>
-  
-            {#if $view !== 'login'}
-              <Section align="start">
-                <span class="level">{lvl}</span>
-              </Section>
-              <Section align="start">
-  
-                <div class={$view !== 'lesson' ? 'active' : ''}>               
-                  <Title
-                    on:click={() => {
-                      if ($lesson.data?.quiz) {
-                        // if (confirm(data)) {
-                          // $view = 'group';
-                          // $showBottomAppBar = true;
-                        // }
-                      } else {
-                        $view = 'group';
-                        $showBottomAppBar = true;
-                      }
-                    }}
-                  >
-               
-                  {#await Translate('КЛАСС', 'ru', $langs) then data}
-                    <span>{data.toUpperCase()}</span>
-                  {/await}
-                    
-                    <span >{Object.keys($users).length>0?`(${Object.keys($users).length})`:''}</span>
+      <TopAppBar bind:this={topAppBar} variant="fixed">      
+        <Row>  
+          {#if $view !== 'login'}
+            <Section align="start">
+              <span class="level">{lvl}</span>
+            </Section>
+            <Section align="start">
 
-                  </Title>
-                </div>
-     
-              </Section>
-              <Section>
-                
-                <div class={$view === 'lesson' ? 'active' : ''}>
-                  {#await Translate('Quit the exercise?', 'en', $langs) then data}
-                  <Title
-                    on:click={async () => {
-                      if ($lesson.data?.quiz) {
-                       
-                        if (confirm(data)) {
-                          $lesson.data = { quiz: '' };
-                          $view = 'lesson';
-                          $showBottomAppBar = true;
-                        }
-                       
-                      } else {
+              <div class={$view !== 'lesson' ? 'active' : ''}>               
+                <Title
+                  on:click={() => {
+                    if ($lesson.data?.quiz) {
+                      // if (confirm(data)) {
+                        // $view = 'group';
+                        // $showBottomAppBar = true;
+                      // }
+                    } else {
+                      $view = 'group';
+                      $showBottomAppBar = true;
+                    }
+                  }}
+                >
+              
+                {#await Translate('КЛАСС', 'ru', $langs) then data}
+                  <span>{data.toUpperCase()}</span>
+                {/await}
+                  
+                  <span >{Object.keys($users).length>0?`(${Object.keys($users).length})`:''}</span>
+
+                </Title>
+              </div>
+    
+            </Section>
+            <Section>
+              
+              <div class={$view === 'lesson' ? 'active' : ''}>
+                {#await Translate('Quit the exercise?', 'en', $langs) then data}
+                <Title
+                  on:click={async () => {
+                    if ($lesson.data?.quiz) {
+                      
+                      if (confirm(data)) {
                         $lesson.data = { quiz: '' };
                         $view = 'lesson';
                         $showBottomAppBar = true;
                       }
-                    }}
-                  >
-                    {#await Translate('УРОК', 'ru', $langs) then data}
-                       <span>{data.toUpperCase()}</span>
-                    {/await}
-                  </Title>
+                      
+                    } else {
+                      $lesson.data = { quiz: '' };
+                      $view = 'lesson';
+                      $showBottomAppBar = true;
+                    }
+                  }}
+                >
+                  {#await Translate('УРОК', 'ru', $langs) then data}
+                      <span>{data.toUpperCase()}</span>
                   {/await}
-                </div>
-                
-      
-                <!-- <IconButton class="material-icons" aria-label="Bookmark this page">bookmark</IconButton> -->
-              </Section>
-              <Section align="end">
-                <span
-                class="lang_span"
-                on:click={() => {
-                  lang_menu = !lang_menu;
-                }}
-                >{(() => {
-                  return $langs;
-                })()}</span
-              >
-              {#if lang_menu}
-                <div class="lang_list">
-                  {#each langs_list as lang}
-                    <div
-                      style="color:black;width:min-content; margin:10px;font-size:smaller"
-                      on:click={setLang}
-                    >
-                      {lang}
-                    </div>
-                  {/each}
-                </div>
-              {/if}
-              </Section>
+                </Title>
+                {/await}
+              </div>
+              
+    
+              <!-- <IconButton class="material-icons" aria-label="Bookmark this page">bookmark</IconButton> -->
+            </Section>
+            <Section align="end">
+              <span
+              class="lang_span"
+              on:click={() => {
+                lang_menu = !lang_menu;
+              }}
+              >{(() => {
+                return $langs;
+              })()}</span
+            >
+            {#if lang_menu}
+              <div class="lang_list">
+                {#each langs_list as lang}
+                  <div
+                    style="color:black;width:min-content; margin:10px;font-size:smaller"
+                    on:click={setLang}
+                  >
+                    {lang}
+                  </div>
+                {/each}
+              </div>
             {/if}
-      
+            </Section>
+          {/if}
 
-
-
-    </Row>
+        </Row>
       </TopAppBar>
       <div class="flexor-content"></div>
     </div>

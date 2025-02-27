@@ -1,338 +1,292 @@
 import { writable } from 'svelte/store';
-
 import { DataChannel } from './DataChannel';
-import { msg, dc, dc_state, posterst ,operatorst } from '$lib/js/stores.js';
+import { msg, dc, dc_state, posterst, operatorst } from '$lib/stores';
 import md5 from 'md5';
 
+// Define types for RTC and PC (you can refine these based on your RTC and PC structures)
+interface RTC {
+  uid: string;
+  call_num: number;
+  type: string;
+  email: { from: string };
+  operator: string;
+  name: string;
+  poster: string;
+  abonent: string;
+  OnMessage: (data: any, operator: DataChannelOperator) => void;
+  SendStatus: (status: string) => void;
+  PlayCallCnt: () => void;
+  ClosePull: () => void;
+}
 
-let oper;
+interface PC {
+  pc_key: string;
+  con: RTCPeerConnection;
+  params: { loc_desc: any; loc_cand: any[] };
+  StartEvents: () => void;
+}
+
+let oper: any;
 operatorst.subscribe((data) => {
   oper = data;
 });
 
-
-let poster;
+let poster: any;
 posterst.subscribe((data) => {
   poster = data;
 });
 
-
 export class DataChannelOperator {
+  rtc: RTC;
+  pc: PC;
+  call_num: number;
+  forward?: string;
+  cnt_call: number = 0;
+  dc: RTCDataChannel;
 
-	constructor(rtc,pc){
-        this.rtc = rtc;
-        this.pc = pc;
-        this.call_num = 3;
-        this.forward;
+  constructor(rtc: RTC, pc: PC) {
+    this.rtc = rtc;
+    this.pc = pc;
+    this.call_num = 3;
+    this.dc = pc.con.createDataChannel(pc.pc_key + ' data channel', {
+      reliable: true,
+      ordered: true,
+    });
 
-		let that = this;
-		that.cnt_call = 0;
-		// this.dc.onopen = () => {
-		//     console.log('OnOpenDataChannel');
-		// }
+    this.dc.onopen = () => {
+      dc.set(this);
+      if (this.dc.readyState === 'open') {
+        console.log(this.pc.pc_key + ' datachannel open');
+        dc_state.set(this.dc.readyState);
 
-		pc.con.onconnectionstatechange = function (e) {
-			console.log('onconnectionstatechange');
+        this.dc.onclose = () => {
+          dc_state.set('close');
+          rtc.SendStatus('close');
+        };
 
-		};
-
-		this.dc = pc.con.createDataChannel(pc.pc_key + ' data channel', { reliable: true, ordered:true });
-
-		this.dc.onopen = () => {
-			//this.dc.onopen = null;
-			dc.set(this);
-			if (that.dc.readyState === 'open') {
-				console.log(that.pc.pc_key + ' datachannel open');
-				dc_state.set(that.dc.readyState);
-
-				this.dc.onclose = () => {
-					// msg.set({ func: 'mute' });
-					dc_state.set("close");					
-					rtc.SendStatus('close');
-				};
-
-				this.dc.onerror = () => {
-					// msg.set({ func: 'mute' });
-					dc_state.set("close");
-					rtc.SendStatus('close');
-				};
-			}
-		};
-
-		pc.StartEvents();
-
-		pc.con.ondatachannel = (event) => {
-			console.log('Receive Channel Callback');
-
-			this.dc = event.channel; //change dc
-		};
-
-		let data = '';
-		let receiveBuffer = [];
-		let receivedSize = 0;
-		// this.dc.removeEventListener("message",this.dc.onmessage);
-		this.dc.onmessage = async (event) => {
-			try {
-				// debugger;
-				let parsed = JSON.parse(event.data);
-		
-				if (parsed.type === 'eom') {
-					if (parsed.received) {
-						console.log(parsed.received);
-					}
-					if (parsed.hash) {						
-						setTimeout(() => {
-							this.dc.send(JSON.stringify({ type: 'eom', received: parsed.hash }));
-						}, 0);	
-					}
-					if (data) {
-						//that.rtc.OnMessage(JSON.parse(data), that);			
-				
-						setTimeout(() => {
-							try {
-								if(data)
-								msg.set(JSON.parse(data));
-								// msg.set('');
-							} catch (error) {
-								console.error('Msg ошибка:', error);
-							}
-							data = '';
-						
-						}, 0);
-					}
-					
-					return;
-						
-				}
-				data += parsed.slice;
-				if (parsed.file) {
-					// document.getElementById('dataProgress').attributes.max = parsed.length;
-				}
-				if (parsed.type === 'eof') {
-					const received = new Blob(receiveBuffer);
-					receiveBuffer = [];
-
-					receivedSize = 0;
-					if (
-						confirm('Получен файл: ' + parsed.file + '. Размер: ' + parsed.length + ' Сохранить?')
-					) {
-						let download_href = document.getElementById('download_href');
-						download_href.text(
-							'Получен файл: ' + parsed.file + '. Размер: ' + parsed.length + ' Сохранить?'
-						);
-						download_href.attributes.href = 'URL.createObjectURL(received)';
-						download_href.attributes.download = parsed.file;
-						download_href.click();
-					}
-					// setTimeout(function () {
-					// 	document.getElementById('dataProgress').style.display = 'none';
-					// }, 2000);
-
-					return;
-				}
-			} catch (ex) {
-				data = '';
-				if (!event.data.byteLength) return;
-			}
-		};
-	}
-	
-
-	SendData(data, cb) {
-		// if(this.forward){
-		//     data.email = this.forward;
-		//     this.forward = '';
-		//     data.func = 'answer';
-		// }
-		try {
-			if (this.dc.readyState === 'open') {
-				data = JSON.stringify(data);
-				let size = 16384;
-				const numChunks = Math.ceil(data.length / size);
-
-				for (let i = 0, o = 0; i < numChunks; ++i, o += size) {
-					this.dc.send(JSON.stringify({ slice: data.substr(o, size),from:'oper' }));
-				}
-				this.dc.send(JSON.stringify({ type: 'eom', hash: md5(data)  }));
-				
-			}
-
-			if (cb) cb();
-		} catch (ex) {
-			console.log(ex);
-		}
-	}
-
-	// SendDCCnt(){
-	//     let that = this;
-	//     let par = {};
-	//     par.proj = 'kolmit';
-	//     par.uid = that.rtc.uid;
-	//     par.func = 'cnt';
-	//     par.call = that.rtc.call_num;
-	//     par.type = that.rtc.type;
-	//     par.email = that.rtc.email.from;
-	//     par.profile = localStorage.getItem("kolmi_abonent");
-
-	//     if(that.dc.readyState==='open') {
-	//         that.SendData(par);
-
-	//         //that.rtc.pcPull[that.rtc.main_pc].params['loc_cand'] = [];
-	//     }
-
-	//     that.rtc.PlayCallCnt();
-	// }
-
-	SendFile(data, name) {
-		// if(this.forward){
-		//     data.email = this.forward;
-		//     this.forward = '';
-		//     data.func = 'answer';
-		// }
-		try {
-			if (this.dc.readyState === 'open') {
-				let size = 16384;
-				const numChunks = Math.ceil(data.byteLength / size);
-
-				this.dc.send(JSON.stringify({ file: name, length: data.byteLength }), function (data) {
-					console.log(data);
-				});
-				for (let i = 0, o = 0; i < numChunks; ++i, o += size) {
-					const slice = data.slice(o, o + size);
-					// document.getElementById('dataProgress').attributes.value = o + size;
-					this.dc.send(slice, function (data) {
-						console.log(data);
-					});
-				}
-				// setTimeout(function () {
-				// 	document.getElementById('dataProgress').style.display = 'none';
-				// }, 2000);
-
-				this.dc.send(
-					JSON.stringify({ type: 'eof', file: name, length: data.byteLength, from: 'oper' }),
-					function (data) {
-						console.log(data);
-					}
-				);
-			}
-		} catch (ex) {
-			console.log(ex);
-		}
-	}
-
-
-  SendDCCall() {
-    let that = this;
-    let par = {};
-    par.func = 'call';
-	par.call = that.rtc.call_num;	  
-
-    par.profile = {
-      email: this.rtc.operator,
-      name: this.rtc.name,
-      img: this.rtc.poster
+        this.dc.onerror = () => {
+          dc_state.set('close');
+          rtc.SendStatus('close');
+        };
+      }
     };
 
-    if (that.dc.readyState === 'open') {
-      that.SendData(par);
+    pc.StartEvents();
 
-      //that.rtc.pcPull[that.rtc.main_pc].params['loc_cand'] = [];
-    }
+    pc.con.ondatachannel = (event) => {
+      console.log('Receive Channel Callback');
+      this.dc = event.channel; // change dc
+    };
 
-    // that.rtc.OnOpenDataChannel();
+    let data = '';
+    let receiveBuffer: BlobPart[] = [];
+    let receivedSize = 0;
+
+    this.dc.onmessage = async (event) => {
+      try {
+        let parsed = JSON.parse(event.data);
+
+        if (parsed.type === 'eom') {
+          if (parsed.received) {
+            console.log(parsed.received);
+          }
+          if (parsed.hash) {
+            setTimeout(() => {
+              // Send acknowledgement if needed
+            }, 10);
+          }
+          if (data) {
+            setTimeout(() => {
+              try {
+                if (data && typeof data === 'string') {
+                    const parsedData = JSON.parse(data);
+                    msg.set(parsedData);
+                } else {
+                    console.error('Data is not a valid JSON string');
+                }
+              } catch (error) {
+                  console.error('Msg ошибка:', error);
+              } finally {
+                  data = ''; // Очистка данных
+              }
+            }, 10);
+          }
+          return;
+        }
+
+        data += parsed.slice;
+        if (parsed.file) {
+          // Handle file metadata if needed
+        }
+        if (parsed.type === 'eof') {
+          const received = new Blob(receiveBuffer);
+          receiveBuffer = [];
+          receivedSize = 0;
+          if (
+            confirm(`Получен файл: ${parsed.file}. Размер: ${parsed.length}. Сохранить?`)
+          ) {
+            let download_href = document.getElementById('download_href') as HTMLAnchorElement;
+            download_href.textContent = `Получен файл: ${parsed.file}. Размер: ${parsed.length}. Сохранить?`;
+            download_href.href = URL.createObjectURL(received);
+            download_href.download = parsed.file;
+            download_href.click();
+          }
+          return;
+        }
+      } catch (ex) {
+        data = '';
+        if (!event.data.byteLength) return;
+      }
+    };
   }
 
-    CloseDC(){
-		setTimeout(()=>{
-			this.dc.close();
-			this.rtc.ClosePull()
-		},100)		
-	}
+  SendData(data: any, cb?: () => void): void {
+    try {
+      if (this.dc.readyState === 'open') {
+        data = JSON.stringify(data);
+        let size = 16384;
+        const numChunks = Math.ceil(data.length / size);
 
-	SendDCHangup(cb) {
-		let par = {};
-		par.proj = 'kolmit';
-		par.func = 'mute';
-		par.type = this.rtc.type;
+        for (let i = 0, o = 0; i < numChunks; ++i, o += size) {
+          this.dc.send(JSON.stringify({ slice: data.substr(o, size), from: 'oper' }));
+        }
+        this.dc.send(JSON.stringify({ type: 'eom', hash: md5(data) }));
+      }
 
-		this.SendData(par, cb);
-	}
+      if (cb) cb();
+    } catch (ex) {
+      console.log(ex);
+    }
+  }
 
-	SendDCClose(cb) {		
-		let par = {};
-		par.proj = 'kolmit';
-		par.func = 'close';
-		par.type = this.rtc.type;
+  SendFile(data: Blob, name: string): void {
+    try {
+      if (this.dc.readyState === 'open') {
+        let size = 16384;
+        const numChunks = Math.ceil(data.size / size);
 
-		this.SendData(par, cb);
-	}
+        this.dc.send(JSON.stringify({ file: name, length: data.size }));
+        for (let i = 0, o = 0; i < numChunks; ++i, o += size) {
+          const slice = data.slice(o, o + size);
+          this.dc.send(slice);
+        }
 
-	SendDCTalk(cb) {
-		let par = {};
-		par.proj = 'kolmit';
-		par.func = 'talk';
-		par.type = this.rtc.type;
+        this.dc.send(
+          JSON.stringify({ type: 'eof', file: name, length: data.size, from: 'oper' })
+        );
+      }
+    } catch (ex) {
+      console.log(ex);
+    }
+  }
 
-		this.SendData(par, cb);
-	}
+  SendDCCall(): void {
+    let par = {
+      func: 'call',
+      call: this.rtc.call_num,
+      profile: {
+        email: this.rtc.operator,
+        name: this.rtc.name,
+        img: this.rtc.poster,
+      },
+    };
 
-	SendDCCand(cand, key, msg) {
-		let par = {};
-		par.proj = 'kolmit';
-		par.func = 'offer';
-		par.cand = cand;
-		par.trans = key;
-		par.abonent = this.rtc.abonent;
-		par.msg = msg;
+    if (this.dc.readyState === 'open') {
+      this.SendData(par);
+    }
+  }
 
-		this.SendData(par);
-	}
+  CloseDC(): void {
+    setTimeout(() => {
+      this.dc.close();
+      this.rtc.ClosePull();
+    }, 100);
+  }
 
-	SendDCDesc(desc, key, msg) {
-		let par = {};
-		par.proj = 'kolmit';
-		par.func = 'offer';
-		par.desc = desc;
-		par.trans = key;
-		par.abonent = this.rtc.abonent;
-		par.msg = msg;
+  SendDCHangup(cb?: () => void): void {
+    let par = {
+      proj: 'kolmit',
+      func: 'mute',
+      type: this.rtc.type,
+    };
+    this.SendData(par, cb);
+  }
 
-		this.SendData(par);
-	}
+  SendDCClose(cb?: () => void): void {
+    let par = {
+      proj: 'kolmit',
+      func: 'close',
+      type: this.rtc.type,
+    };
+    this.SendData(par, cb);
+  }
 
-	SendDCOffer(key, msg) {
-		let par = {};
-		par.proj = 'kolmit';
-		par.func = 'offer';
-		par.desc = this.pc.params['loc_desc'];
-		par.cand = this.pc.params['loc_cand'];
-		par.trans = key;
-		par.abonent = this.rtc.abonent;
-		par.msg = msg;
+  SendDCTalk(cb?: () => void): void {
+    let par = {
+      proj: 'kolmit',
+      func: 'talk',
+      type: this.rtc.type,
+    };
+    this.SendData(par, cb);
+  }
 
-		this.SendData(par);
-	}
+  SendDCCand(cand: any, key: string, msg: string): void {
+    let par = {
+      proj: 'kolmit',
+      func: 'offer',
+      cand,
+      trans: key,
+      abonent: this.rtc.abonent,
+      msg,
+    };
+    this.SendData(par);
+  }
 
-	SendDCVideoOK(cb) {
-		let par = {};
-		par.proj = 'kolmit';
-		par.func = 'video';
-		par.type = this.rtc.type;
+  SendDCDesc(desc: any, key: string, msg: string): void {
+    let par = {
+      proj: 'kolmit',
+      func: 'offer',
+      desc,
+      trans: key,
+      abonent: this.rtc.abonent,
+      msg,
+    };
+    this.SendData(par);
+  }
 
-		this.SendData(par, cb);
-	}
+  SendDCOffer(key: string, msg: string): void {
+    let par = {
+      proj: 'kolmit',
+      func: 'offer',
+      desc: this.pc.params.loc_desc,
+      cand: this.pc.params.loc_cand,
+      trans: key,
+      abonent: this.rtc.abonent,
+      msg,
+    };
+    this.SendData(par);
+  }
 
-	SendRedirect(abonent, resolve) {
-		let par = {};
-		par.proj = 'kolmit';
-		par.func = 'redirect';
-		par.abonent = abonent;
+  SendDCVideoOK(cb?: () => void): void {
+    let par = {
+      proj: 'kolmit',
+      func: 'video',
+      type: this.rtc.type,
+    };
+    this.SendData(par, cb);
+  }
 
-		if (this.dc.readyState === 'open') {
-			this.SendData(par);
-			// this.rtc.OnMessage({func: 'mute'});
-			let date_str = new Date().toLocaleString('es-CL');
-			resolve(date_str);
-		}
-	}
+  SendRedirect(abonent: string, resolve: (date_str: string) => void): void {
+    let par = {
+      proj: 'kolmit',
+      func: 'redirect',
+      abonent,
+    };
+
+    if (this.dc.readyState === 'open') {
+      this.SendData(par);
+      let date_str = new Date().toLocaleString('es-CL');
+      resolve(date_str);
+    }
+  }
 }

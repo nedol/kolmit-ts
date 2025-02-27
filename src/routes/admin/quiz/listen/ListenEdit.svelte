@@ -3,7 +3,7 @@
 
   import { Translate } from '../../../translate/Transloc';
 
-  import { langs, llang } from '$lib/js/stores.js';
+  import { langs, llang } from '$lib/stores.ts';
 
   import Tab, { Label } from '@smui/tab';
   import TabBar from '@smui/tab-bar';

@@ -6,7 +6,7 @@
   import Paper, { Title, Subtitle } from '@smui/paper';
   import Accordion, { Panel, Header, Content } from '@smui-extra/accordion';
 
-  import { langs, llang, dicts, dc_state } from '$lib/js/stores.js';
+  import { langs, llang, dicts, dc_state } from '$lib/stores.ts';
 
   import { mdiEarHearing } from '@mdi/js';
 

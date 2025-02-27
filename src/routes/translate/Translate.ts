@@ -1,68 +1,34 @@
-
-import { WriteSpeech, ReadSpeech } from '$lib/server/db.js'; //src\lib\server\server.db.js
+import { WriteSpeech, ReadSpeech } from '$lib/server/db.ts'; //src\lib\server\server.db.ts
 import md5 from 'md5'; // Импортируем библиотеку для генерации md5
-
-import {HttpsProxyAgent} from 'https-proxy-agent';
-
+import { HttpsProxyAgent } from 'https-proxy-agent';
 import translatex from 'google-translate-api-x';
+import { translate } from 'deeplx';
 
-// import translate from '@mgcodeur/super-translator';
-
-// import translate from 'translate';
-// translate.engine = 'deepl';//'yandex';//'deepl'; //'google'//  
-// translate.key = '203cca0d-8540-4d75-8c88-d69ac40b6d57:fx';//'0834516e-29b0-45d1-812e-b903d5962e12:fx'; //process.env.DEEPL_API_KEY;
-
-import { translate } from 'deeplx'
-
+// Define supported languages
 const langs = [
-  "bg",
-  "cs",
-  "da",
-  "de",
-  "el",
-  "en",
-  "es",
-  "et",
-  "fi",
-  "fr",
-  "hu",
-  "id",
-  "it",
-  "ja",
-  "ko",
-  "lt",
-  "lv",
-  "nb",
-  "nl",
-  "pl",
-  "pt",
-  "ro",
-  "ru",
-  "sk",
-  "sl",
-  "sv",
-  "zh"
-]
+  "bg", "cs", "da", "de", "el", "en", "es", "et", "fi", "fr", "hu", "id", "it", "ja", "ko", "lt", "lv", "nb", "nl", "pl", "pt", "ro", "ru", "sk", "sl", "sv", "zh"
+];
 
+// Map to track pending translations (caching)
+const pendingTranslations = new Map<string, Promise<string>>(); 
 
-const pendingTranslations = new Map(); // Очередь выполняемых переводов
-
-export async function Translate(text, from, to) {
+// Translation function
+export async function Translate(text: string, from: string, to: string): Promise<string> {
   if (!text) return '';
 
-  // Удаляем лишние символы новой строки
+  // Clean the input text
   text = text.replace(/\r\n/g, ' ');
 
-  // Разбиваем текст на предложения
+  // Split the text into sentences
   const sentences = text.split(/(?<=[.!?])\s+/);
   let translatedText = '';
 
-  // Формируем группы из 5 предложений
+  // Process sentences in chunks of 5
   for (let i = 0; i < sentences.length; i += 5) {
     let chunk = sentences.slice(i, i + 5).join(' ').trim();
     if (!chunk || chunk === '"') continue;
 
-    // Проверяем наличие << >> и заменяем на безопасные символы
+    // Handle special characters like <<
     const hasQuotes = chunk.includes('<<');
     if (hasQuotes) {
       chunk = chunk.replace(/<</g, ' ').replace(/>>/g, ' ');
@@ -70,14 +36,14 @@ export async function Translate(text, from, to) {
 
     const cacheKey = md5(chunk);
 
-    // Если перевод уже выполняется — ждем его завершения
+    // Wait for existing translation if one is in progress
     if (pendingTranslations.has(cacheKey)) {
       console.log(`Ожидание перевода: ${chunk}`);
       translatedText += await pendingTranslations.get(cacheKey);
       continue;
     }
 
-    // Проверяем, есть ли перевод в базе
+    // Check if the translation is already cached in the database
     const resp = await ReadSpeech({ lang: to, key: cacheKey });
     if (resp?.translate) {
       console.log(`Файл уже существует`);
@@ -91,8 +57,10 @@ export async function Translate(text, from, to) {
 
       try {
         if (langs.includes(to)) {
+          // Use DeepL for supported languages
           res = await translate(chunk, to.toUpperCase());
         } else {
+          // Use Google Translate API for unsupported languages
           const en = await translate(chunk, "EN");
           res = await translatex(en, {
             from: "en",
@@ -105,33 +73,29 @@ export async function Translate(text, from, to) {
           res = res.text;
         }
 
-        // Восстанавливаем << >> после перевода
+        // Restore special characters (<< >>)
         if (hasQuotes) {
           // res = res.text.replace(/\<(.*?)\>/g, '<<$1>>');                                                       
         }
 
-        // Записываем в базу только если перевода не было
+        // Cache the translation in the database
         await WriteSpeech({ lang: to, key: cacheKey, text: chunk, translate: res });
 
       } catch (error) {
         console.error('Ошибка перевода:', error);
-        res = chunk; // Если перевод не удался, возвращаем оригинальный текст
+        res = chunk; // Return original text if translation fails
       }
 
-      // Убираем `chunk` из очереди
+      // Remove the item from the queue after translation
       pendingTranslations.delete(cacheKey);
 
       return res;
     })();
 
-    // Добавляем в очередь
+    // Add the translation task to the queue
     pendingTranslations.set(cacheKey, translationPromise);
     translatedText += await translationPromise;
   }
 
   return translatedText.trim();
 }
-
-
-
-

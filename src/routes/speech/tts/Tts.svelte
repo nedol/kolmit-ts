@@ -1,6 +1,6 @@
 <script>
   import { onMount, onDestroy, getContext } from 'svelte';
-  import { langs } from '$lib/js/stores.js';
+  import { langs } from '$lib/stores.ts';
 
   let audio;
 

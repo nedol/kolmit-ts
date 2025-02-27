@@ -2,15 +2,15 @@
   import { onMount, setContext } from 'svelte';
   import Header from './Header.svelte';
   import Login from './login/Login.svelte';
-  import { langs, nlang } from '$lib/js/stores.js';
-  import { view } from '$lib/js/stores.js';
+  import { langs, nlang } from '$lib/stores.ts';
+  import { view } from '$lib/stores.ts';
 
   // import { Dict } from '../dict/dict';
   // $view = 'lesson';
 
   import GroupEditor from './group/GroupEditor.svelte';
 
-  import { dicts } from '$lib/js/stores.js';
+  import { dicts } from '$lib/stores.ts';
   import ModuleEditor from './module/ModuleEditor.svelte';
 
   export let data;

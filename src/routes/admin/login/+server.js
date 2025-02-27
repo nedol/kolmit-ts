@@ -1,4 +1,4 @@
-import { CreateAdmin } from '$lib/server/db.admin.js';
+import { CreateAdmin } from '$lib/server/db.admin.ts';
 
 /** @type {import('./$types').RequestHandler} */
 export async function POST({ request, url, fetch, cookies }) {
