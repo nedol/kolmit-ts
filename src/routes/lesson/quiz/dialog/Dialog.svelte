@@ -3,9 +3,6 @@
 
   import ConText from '../Context.svelte';
 
-
-  import BottomAppBar from '@smui-extra/bottom-app-bar';
-
   //import '$lib/css/_Colored.scss';
 
   import TopAppBar, { Row, Title, Section } from '@smui/top-app-bar';
