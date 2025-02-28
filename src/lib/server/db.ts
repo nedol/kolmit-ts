@@ -729,7 +729,7 @@ export async function GetDialog(q: GetDialogQuery): Promise<Dialog | string> {
 
     // Fetch brick data (HTML content)
     const bricks = await sql<{ html: string }[]>`
-      SELECT html 
+      SELECT html, prompt_type 
       FROM bricks
       WHERE name = ${q.name} 
         AND owner = ${q.owner} 
@@ -744,10 +744,13 @@ export async function GetDialog(q: GetDialogQuery): Promise<Dialog | string> {
     `;
 
     // Check if dialog exists and add brick and context data
-    if (dialog[0]) {
-      dialog[0].brick = bricks[0]?.html || ''; // Add brick HTML if available
-      dialog[0].context = context[0]?.data || ''; // Add context data if available
+    if (!dialog[0]) {
+      dialog[0] = {}
     }
+
+    dialog[0].brick = bricks[0]?.html || ''; // Add brick HTML if available
+    dialog[0].context = context[0]?.data || ''; // Add context data if available
+  
 
     return dialog[0] || 'Dialog not found'; // Return the first dialog or a message if not found
   } catch (ex) {

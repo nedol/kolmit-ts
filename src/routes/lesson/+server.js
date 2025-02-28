@@ -27,7 +27,6 @@ export async function GET({ url, fetch, cookies }) {
   const dialog = url.searchParams.get('dialog');
   const bricks = url.searchParams.get('bricks');
   const lesson = url.searchParams.get('lesson');
-  const listen = url.searchParams.get('listen');
   const lvl = url.searchParams.get('level');
   let data;
   // debugger;

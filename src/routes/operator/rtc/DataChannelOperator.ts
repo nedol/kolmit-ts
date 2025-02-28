@@ -61,7 +61,7 @@ export class DataChannelOperator {
 
         this.dc.onclose = () => {
           dc_state.set('close');
-          rtc.SendStatus('close');
+          // rtc.SendStatus('close');
         };
 
         this.dc.onerror = () => {

@@ -3,13 +3,14 @@
 
   import { Translate } from '../../translate/Transloc';
 
-  import pkg, { indexOf } from 'lodash';
-  const { find, isObject, mapValues } = pkg;
+  import pkg from 'lodash'; 
+  const { find, isObject, mapValues, indexOf } = pkg;
 
 
 
   import Checkbox from '@smui/checkbox';
-  import { SortableList } from '@rodrigodagostino/svelte-sortable-list';
+  // import { SortableList } from '@sonderbase/svelte-sortablejs';
+  import { SortableList } from '@jhubbardsf/svelte-sortablejs';
 
   import List, { Item, Separator, Text } from '@smui/list';
   import Button, { Label } from '@smui/button';
@@ -36,6 +37,7 @@
   let value = 'dialog';
 
   import { view } from '$lib/stores.ts';
+    import { prompt_data } from '../../operator/chat/prompt/prompt_data';
 
   let menu: Menu;
 
@@ -163,7 +165,13 @@
   
   function onClickQuiz(quiz: any, level: string, theme: string) {  
 
-    quiz_data_export = {quiz:quiz.type,name:quiz.name[$llang],lang:lesson_data.lang,level:lesson_data.level,theme:theme.name[$llang]}
+    quiz_data_export = {
+      quiz:quiz.type,
+      name:quiz.name[$llang],
+      lang:lesson_data.lang,
+      level:lesson_data.level,
+      theme:theme.name[$llang]
+    }
 
     // lesson_data.data.llang = lesson_data.data.lang;
     // // lesson_data.data.level = level;
@@ -369,6 +377,7 @@
 
   }
 
+
   // async function OnThemeNameInput(t) {
   //   // console.log(theme)
   //   // return;
@@ -459,12 +468,7 @@
       </div>
 
       <div class="lesson-container" style="">
-        <SortableList
-          onSort={(ev) => {
-            handleSort(ev, lesson_data.data.module.themes);
-          }}
-          bind:this={theme_sort_list}
-        >
+
           {#each lesson_data.data.module.themes as theme, t}
             <div class="accordion-container">
               <Accordion multiple>
@@ -499,154 +503,157 @@
                       {#each theme.lessons as lesson}
                         <!-- <div>{lesson.num}.{lesson.title}</div> -->
                         {#if lesson.quizes}
-                          <SortableList
-                            onSort={(ev) => {
-                              handleSort(ev, lesson.quizes);
-                            }}
-                            bind:this={quiz_sort_list}
-                          >
+                            <!-- <SortableList  class="list-group col mr-6" group="shared2" animation={150}>  -->
+                            <SortableList
+                              onSort={(ev) => {
+                                handleSort(ev, lesson.quizes);
+                              }}
+                              bind:this={quiz_sort_list}
+                            >
                             {#each lesson.quizes as quiz, q}
                               <!-- {@debug quiz} -->
+                            
+                             
+                                <div class="quiz-container">
+                                  <Checkbox
+                          
+                                    on:click={()=>OnPublish(lesson_data.data.module.themes[t].lessons[0].quizes[q], quiz.published)}
+      
+                                    checked={quiz.published ? 'true' : ''}
+                                    touch
+                                  ></Checkbox>
 
-                              <div class="quiz-container">
-                                <Checkbox
-                         
-                                  on:click={()=>OnPublish(lesson_data.data.module.themes[t].lessons[0].quizes[q], quiz.published)}
-    
-                                  checked={quiz.published ? 'true' : ''}
-                                  touch
-                                ></Checkbox>
-
-                                <div 
-                                  on:click={() => {
-                                    onClickQuiz(
-                                      quiz,
-                                      level,
-                                      theme
-                                    );
-                                  }}
-                                  class="icon"
-                                  type={quiz.type}
-                                  name={quiz.name[$llang]}
-                                  level={lesson_data.data.module.level}
-                                  highlight={quiz.highlight || ''}
-                                >
-                                  {#if quiz.type === 'dialog'}
-                                    <Icon
-                                      tag="svg"
-                                      viewBox="0 0 24 24"
-                                      width="30px"
-                                      height="30px"
-                                    >
-                                      <path
-                                        fill="grey"
-                                        d={mdiAccountMultiple}
+                                  <div 
+                                    on:click={() => {
+                                      onClickQuiz(
+                                        quiz,
+                                        level,
+                                        theme
+                                      );
+                                    }}
+                                    class="icon"
+                                    type={quiz.type}
+                                    name={quiz.name[$llang]}
+                                    level={lesson_data.data.module.level}
+                                    highlight={quiz.highlight || ''}
+                                  >
+                                    {#if quiz.type === 'dialog'}
+                                      <Icon
+                                        tag="svg"
+                                        viewBox="0 0 24 24"
+                                        width="30px"
+                                        height="30px"
+                                      >
+                                        <path
+                                          fill="grey"
+                                          d={mdiAccountMultiple}
+                                        />
+                                      </Icon>
+                                    {:else if quiz.type === 'text'}
+                                      <Icon
+                                        tag="svg"
+                                        viewBox="0 0 24 24"
+                                        width="30px"
+                                        height="30px"
+                                      >
+                                        <path fill="grey" d={mdiTextBoxOutline} />
+                                      </Icon>
+                                    {:else if quiz.type === 'word'}
+                                      <Icon
+                                        tag="svg"
+                                        viewBox="0 0 24 24"
+                                        width="30px"
+                                        height="30px"
+                                      >
+                                        <path
+                                          fill="grey"
+                                          d={mdiFileWordBoxOutline}
+                                        />
+                                      </Icon>
+                                    {:else if quiz.type === 'bricks'}
+                                      <Icon
+                                        tag="svg"
+                                        viewBox="0 0 24 24"
+                                        width="30px"
+                                        height="30px"
+                                      >                          
+                                        <rect x="3" y="3" width="8" height="3" />
+                                        <rect x="13" y="3" width="8" height="3" />
+                                        <rect x="3" y="8" width="4" height="3" />
+                                        <rect x="9" y="8" width="6" height="3" />
+                                        <rect x="17" y="8" width="4" height="3" />
+                                        <rect x="3" y="13" width="8" height="3" />
+                                        <rect x="13" y="13" width="8" height="3" />
+                                        <rect x="3" y="18" width="4" height="3" />
+                                        <rect x="9" y="18" width="6" height="3" />
+                                        <rect x="17" y="18" width="4" height="3" />
+                                      </Icon>
+                    
+                                    {:else if quiz.type === 'quiz'}
+                                      <select
+                                        on:click|preventDefault|once|stopPropagation={() => {}}
+                                        on:change={(event) =>
+                                          OnSelectQuiztype(
+                                            event.target.value,
+                                            t,
+                                            quiz.name[$llang]
+                                          )}
+                                        name={quiz.name[$llang]}
+                                      >
+                                        {#each quizes as quizOption}
+                                          <option value={quizOption}
+                                            >{quizOption}</option
+                                          >
+                                        {/each}
+                                      </select>
+                                    {/if}
+                                  </div>
+                                  <!-- svelte-ignore a11y-invalid-attribute -->
+                                  {#if quiz.type === 'quiz'}
+                                    {#await Translate('Quiz Name', $llang, $langs) then data}
+                                      <input
+                                        class="quiz_name"
+                                        on:click={OnClickQuizName}
+                                        autofocus
+                                        contenteditable
+                                        {t}
+                                        placeholder={data}
+                                        name={quiz.name[$langs]}
+                                        theme={theme.num}
+                                        theme_name={theme.name[$llang]}
+                                        bind:value={quiz.name[$langs]}
                                       />
-                                    </Icon>
-                                  {:else if quiz.type === 'text'}
-                                    <Icon
-                                      tag="svg"
-                                      viewBox="0 0 24 24"
-                                      width="30px"
-                                      height="30px"
-                                    >
-                                      <path fill="grey" d={mdiTextBoxOutline} />
-                                    </Icon>
-                                  {:else if quiz.type === 'word'}
-                                    <Icon
-                                      tag="svg"
-                                      viewBox="0 0 24 24"
-                                      width="30px"
-                                      height="30px"
-                                    >
-                                      <path
-                                        fill="grey"
-                                        d={mdiFileWordBoxOutline}
+                                    {/await}
+                                  {:else}
+                                    {#await Translate('Quiz Name', $llang, $langs) then data}
+                                      <input
+                                        on:click={OnClickQuizName}
+                                        style="width:80%"
+                                        {t}
+                                        placeholder={data}
+                                        name={quiz.name[$llang]}
+                                        level={level}
+                                        theme={theme.num}
+                                        theme_name={theme.name[$llang]}
+                                        bind:value={quiz.name[$llang]}
                                       />
-                                    </Icon>
-                                  {:else if quiz.type === 'bricks'}
-                                    <Icon
-                                      tag="svg"
-                                      viewBox="0 0 24 24"
-                                      width="30px"
-                                      height="30px"
-                                    >                          
-                                      <rect x="3" y="3" width="8" height="3" />
-                                      <rect x="13" y="3" width="8" height="3" />
-                                      <rect x="3" y="8" width="4" height="3" />
-                                      <rect x="9" y="8" width="6" height="3" />
-                                      <rect x="17" y="8" width="4" height="3" />
-                                      <rect x="3" y="13" width="8" height="3" />
-                                      <rect x="13" y="13" width="8" height="3" />
-                                      <rect x="3" y="18" width="4" height="3" />
-                                      <rect x="9" y="18" width="6" height="3" />
-                                      <rect x="17" y="18" width="4" height="3" />
-                                    </Icon>
-                  
-                                  {:else if quiz.type === 'quiz'}
-                                    <select
-                                      on:click|preventDefault|once|stopPropagation={() => {}}
-                                      on:change={(event) =>
-                                        OnSelectQuiztype(
-                                          event.target.value,
-                                          t,
-                                          quiz.name[$llang]
-                                        )}
-                                      name={quiz.name[$llang]}
-                                    >
-                                      {#each quizes as quizOption}
-                                        <option value={quizOption}
-                                          >{quizOption}</option
-                                        >
-                                      {/each}
-                                    </select>
+                                    {/await}
                                   {/if}
-                                </div>
-                                <!-- svelte-ignore a11y-invalid-attribute -->
-                                {#if quiz.type === 'quiz'}
-                                  {#await Translate('Quiz Name', $llang, $langs) then data}
-                                    <input
-                                      class="quiz_name"
-                                      on:click={OnClickQuizName}
-                                      autofocus
-                                      contenteditable
-                                      {t}
-                                      placeholder={data}
-                                      name={quiz.name[$langs]}
-                                      theme={theme.num}
-                                      theme_name={theme.name[$llang]}
-                                      bind:value={quiz.name[$langs]}
-                                    />
-                                  {/await}
-                                {:else}
-                                  {#await Translate('Quiz Name', $llang, $langs) then data}
-                                    <input
-                                      on:click={OnClickQuizName}
-                                      style="width:80%"
-                                      {t}
-                                      placeholder={data}
-                                      name={quiz.name[$llang]}
-                                      level={level}
-                                      theme={theme.num}
-                                      theme_name={theme.name[$llang]}
-                                      bind:value={quiz.name[$llang]}
-                                    />
-                                  {/await}
-                                {/if}
 
-                                <div class="rem_quiz">
-                                  {#await Translate('Remove quiz', 'en', $langs) then data}
-                                    <IconButton
-                                      class="material-icons"
-                                      title={data}
-                                      name={quiz.name[$llang]}
-                                      on:click={() => {
-                                        OnRemoveItem(quiz.name[$llang], t);
-                                      }}>remove</IconButton
-                                    >
-                                  {/await}
+                                  <div class="rem_quiz">
+                                    {#await Translate('Remove quiz', 'en', $langs) then data}
+                                      <IconButton
+                                        class="material-icons"
+                                        title={data}
+                                        name={quiz.name[$llang]}
+                                        on:click={() => {
+                                          OnRemoveItem(quiz.name[$llang], t);
+                                        }}>remove</IconButton
+                                      >
+                                    {/await}
+                                  </div>
                                 </div>
-                              </div>
+                           
                             {/each}
                           </SortableList>
                         {/if}
@@ -669,7 +676,7 @@
               </Accordion>
             </div>
           {/each}
-        </SortableList>
+ 
         {#if lesson_data.level && $llang !== ' '}
           <div class="add_theme">
             {#await Translate('Add theme', 'en', $langs) then data}
@@ -683,7 +690,7 @@
         {/if}
       </div>
 
-      <div style="height:100px"></div>
+      <div style="height:70px"></div>
     </div>
   {/if}
 </main>

@@ -97,13 +97,20 @@
   };
 
 
- $: if ($lesson.data) {
-    if ($lesson.data.quiz == '' && data.quiz) {
-      
-      SendDataDC({ msg: (async()=>{await Translate('Собеседник вышел из упражнения', 'ru', $langs) })()},'');
-      data = $lesson.data;
+  $: if ($lesson.data) {
+    if ($lesson.data.quiz === '' && data.quiz) {
+      // Define an async function inside the reactive block
+      const updateMessage = async () => {
+        const msg = await Translate('Собеседник вышел из упражнения', 'ru', $langs);
+        SendDataDC({ msg: msg });
+        data = $lesson.data;  // Ensure data is updated with new lesson data
+      };
+
+      // Call the async function
+      updateMessage();
+    } else {
+      data = $lesson.data;  // Update data if no condition is met
     }
-    data = $lesson.data;
   }
 
   let module, main;

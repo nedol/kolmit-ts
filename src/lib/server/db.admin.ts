@@ -381,4 +381,63 @@ export async function GetLesson(q: Query) {
   }
 }
 
+interface GetDialogQuery {
+  name: string;
+  owner: string;
+  level: string;
+  func: string;  // Name of the function (used in error reporting)
+}
+
+interface Dialog {
+  id: string;
+  name: string;
+  owner: string;
+  level: string;
+  brick?: string; // Optional, to store the HTML brick
+  context?: string; // Optional, to store the context data
+}
+
+export async function GetDialog(q: GetDialogQuery): Promise<Dialog | string> {
+  try {
+    // Fetch dialog data
+    const dialog = await sql<Dialog[]>`
+      SELECT * 
+      FROM dialogs
+      WHERE name = ${q.name} 
+        AND owner = ${q.owner} 
+        AND level = ${q.level}
+    `;
+
+    // Fetch brick data (HTML content)
+    const bricks = await sql<{ html: string }[]>`
+      SELECT html, prompt_type 
+      FROM bricks
+      WHERE name = ${q.name} 
+        AND owner = ${q.owner} 
+        AND level = ${q.level}
+    `;
+
+    // Fetch context data (context and prompt_type)
+    const context = await sql<Context[]>`
+      SELECT data, prompt_type 
+      FROM context
+      WHERE name = ${q.name}
+    `;
+
+    // Check if dialog exists and add brick and context data
+    if (!dialog[0]) {
+      dialog[0] = {}
+    }
+
+    dialog[0].brick = bricks[0]?.html || ''; // Add brick HTML if available
+    dialog[0].context = context[0] || ''; // Add context data if available
+  
+
+    return dialog[0] || 'Dialog not found'; // Return the first dialog or a message if not found
+  } catch (ex) {
+    console.error('Error in GetDialog:', ex); // Log the error for debugging
+    return JSON.stringify({ func: q.func, res: ex }); // Return structured error response
+  }
+}
+
 

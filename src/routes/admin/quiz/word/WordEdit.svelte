@@ -1,7 +1,7 @@
 <script lang="ts">
   import { getContext, onMount } from 'svelte';
 
-  import { SortableList } from '@rodrigodagostino/svelte-sortable-list';
+  // import { SortableList } from '@rodrigodagostino/svelte-sortable-list';
 
   import { Translate } from '../../../translate/Transloc';
 
@@ -519,11 +519,7 @@
   </table>
 
   {#if words_data && words_data[0]}
-    <SortableList
-      onSort={(ev) => {
-        handleSort(ev, words_data);
-      }}
-    >
+
       {#each words_data as item, index (index)}
         <!-- {@debug item} -->
         <div class="row">
@@ -537,7 +533,7 @@
           <br />
         </div>
       {/each}
-    </SortableList>
+
   {/if}
 
   <div class="container">

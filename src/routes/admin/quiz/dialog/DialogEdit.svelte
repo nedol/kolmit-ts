@@ -83,7 +83,7 @@
   }
 
   fetch(
-    `./lesson?dialog=${data.name}&owner=${abonent}&level=${data.level}`
+    `./admin/module?dialog=${data.name}&owner=${abonent}&level=${data.level}`
   )
     .then((response) => response.json())
     .then(async (resp) => {
@@ -95,10 +95,10 @@
         dialog_data.context = resp.data.brick;
       }
       if(resp.data.context){
-        dialog_data.context = resp.data.context;//new format
+        dialog_data.context = resp.data.context.data;//new format
       }
 
-      dialog_data.prompt_type= resp.data.prompt_type;
+      dialog_data.prompt_type= resp.data.prompt_type || resp.data.context.prompt_type;
       //DB
       fetch(
         `./admin?prompt=dialog.${dialog_data.prompt_type}.${$langs}&quiz_name=${data.name}&prompt_owner=${abonent}&prompt_level=${data.level}`

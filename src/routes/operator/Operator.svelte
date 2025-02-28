@@ -431,6 +431,11 @@
         $call_but_status = 'call';//дубль
         local.audio.paused = false;
         break;
+      case 'close':
+        $call_but_status = 'inactive';
+        remote.video.display = 'none'
+        local.audio.paused = true;
+        break;
     }
 
   function OnMessage(data: any, resolve: any) {

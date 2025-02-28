@@ -130,7 +130,9 @@
 
   let variant = 'outlined';
 
-  let speechData:any = {}
+  let speechData:any = {};
+
+  const isActiveTitle = [false, false, false];
 
   $: if ($msg) {
     if ($msg.lesson?.quiz === 'dialog') {
@@ -156,6 +158,8 @@
           onNextQA();
         }
       }, 2000);
+      isActiveTitle[1] = true;
+      isActiveTitle[0] = false;
     } else if ($msg.command === 'quit') {
       $msg.command = '';
       setTimeout(() => {
@@ -168,18 +172,6 @@
     share_mode = true;
   }
 
-  // $: if (q && !q[$langs]) {
-  //   (async () => {
-  //     q[$langs] = await Translate(q[$llang], $llang, $langs);
-  //   })();
-  // }
-
-  // $: if (a && !a[$langs]) {
-  //   (async () => {
-  //     a[$langs] = await Translate(a[$llang], $llang, $langs);
-  //   })();
-  // }
-
   $: if ($langs) {
     example_lang = $langs;
     // Dialog();
@@ -190,10 +182,11 @@
   }
 
   onMount(async () => {
+
     window.scrollTo({ top: 0, behavior: 'smooth' });
     setTimeout(() => {
       if (!share_mode) {
-        // $showBottomAppBar = false; //test
+        $showBottomAppBar = false; //test
       }
     }, 3000);
   });
@@ -230,14 +223,6 @@
         dialog_data.name = data.name;
         Dialog();
 
-        // for(let t in dialog_data.content ){
-        //   const item = dialog_data.content[t]
-        //   let resp = await tts.GetGoogleTTS($llang, item.user1[$llang],  dialog_data.name);
-        //   speechData[md5(item.user1[$llang])] = resp.resp.audio;
-        //   resp = await tts.GetGoogleTTS($llang, item.user2[$llang], dialog_data.name);
-        //   speechData[md5(item.user2[$llang])] = resp.resp.audio;
-        // }
-
       })
       .catch((error) => {
         console.log(error);
@@ -269,9 +254,10 @@
         return;
       }
 
-      q = isFlipped ? qa.user2 : qa.user1;
+      isActiveTitle[0] = true;
+      isActiveTitle[1] = false;
 
-      // if (!q[$langs]) q[$langs] = await Translate(q[$llang], $llang, $langs);
+      q = isFlipped ? qa.user2 : qa.user1;
 
       q[$llang] = q[$llang]?.replace(
         '${user1_name}',
@@ -295,21 +281,11 @@
         .replaceAll('?', '')
         .replaceAll(',', ' ')
         .split(' ');
-      // q_shfl = shuffle(ar).toString().replaceAll(',', ' ');
-      a = isFlipped ? qa.user1 : qa.user2;
 
-      // if (!a[$langs]) a[$langs] = await Translate(a[$llang], $llang, $langs);
+      a = isFlipped ? qa.user1 : qa.user2;
 
       a[$llang] = a[$llang]?.replace('${user2_name}', '...');
       a[$langs] = a[$langs]?.replace('${user2_name}', '...');
-      // a[$llang] = a[$llang]?.replace(
-      //   '${user1_name}',
-      //   $dc ? 'user_name' : 'Kolmit'
-      // );
-      // a[$langs] = a[$langs]?.replace(
-      //   '${user1_name}',
-      //   $dc ? 'user_name' : 'Kolmit'
-      // );
 
       hints = a.hints;
       dialog_data.hints = a.hints;
@@ -320,7 +296,6 @@
         .replaceAll('?', '')
         .replaceAll(',', ' ')
         .split(' ');
-      // a_shfl = shuffle(ar).toString().replaceAll(',', ' ');
 
       total_cnt = dialog_data.content.length;
 
@@ -351,8 +326,6 @@
     showSpeakerButton = false;
 
     return Dialog();
-
-    // speak(q[$llang])
   }
 
   function onBackQA() {
@@ -442,7 +415,14 @@
   }
 
   async function speak(text, cb_end) {
-    function endSpeak() {}
+    function endSpeak() {
+      if(isActiveTitle[1]){
+        isActiveTitle[1] = false;
+      }else{
+        isActiveTitle[1] = true;
+        isActiveTitle[0] = false;
+      }
+    }
     if (!text)
       return;
     const hash = md5(text);
@@ -495,11 +475,6 @@
           .replace(/[^\w\s]|_/g, '') //replace(/[0-9!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~]/g, '')
       );
       similarity = `${similarity.toFixed(0)}%`;
-      // if (similarity > 75) {
-      //   setTimeout(() => {
-      //     // onNextQA();
-      //   }, 3000);
-      // }
     }
   }
 
@@ -797,7 +772,7 @@
       <div class="container">
 
           {#await Translate('Послушай вопрос', 'ru', $langs) then data}
-            <div class="title">{data}:</div>
+            <div class="title" class:active_title={isActiveTitle[0]}>{data}:</div>
           {/await}
 
           {#if visibility[1]==='hidden' }
@@ -835,8 +810,8 @@
           </div>
         </div>
 
-        <div style="display:block;position:relative;height: 72px !important;">       
-          <Row>
+        <div style="display:block;position:relative">       
+          <Row style="height:64px;top:-14px">
             <Section  align="start">
               {#if $call_but_status == 'talk'}
                 <div class="repeat_but">
@@ -886,6 +861,7 @@
                 <Label>{data}</Label>
               {/await}              
             </Button>
+
           </div>
         {/if}
       </div>
@@ -894,7 +870,7 @@
       <div class="container">
 
         {#await Translate('Переведи и ответь', 'ru', $langs) then data_1}
-          <div class="title">{data_1}:</div>
+          <div class="title"  class:active_title={isActiveTitle[1]}>{data_1}:</div>
         {/await}
         <!-- {#await Translate('(используй подсказки слов в случае необходимости)', 'ru', $langs) then data_2}
           <div class="title title2">{data_2}:</div>
@@ -939,60 +915,59 @@
               )}
             {/if}
         
-          </div>    </div>
+          </div>    
+        </div>
        
-          <div style="height:72px;">
-            <Row>
-              <Section align="start">
-                {#if !share_mode && isSTT}
-                <div
-                  class="margins"
-                  style="text-align: center; display: flex; align-items: center; justify-content: space-between;"
-                >
-                  <div>
-                    <IconButton
-                      class="material-icons"
-                      aria-label="Back"
-                      on:click={onClickMicrophone}
-                    >
-                      <Icon tag="svg" viewBox="0 0 24 24">
-                        {#if isListening}
-                          <path fill="currentColor" d={mdiMicrophone} />
-                        {:else}
-                          <path fill="currentColor" d={mdiMicrophoneOutline} />
-                        {/if}
-                      </Icon>
-                    </IconButton>
-                    {#if isListening}
-                      {#await Translate('говори', 'ru', $llang) then data}
-                        <span>{data}</span>
-                      {/await}
-                    {/if}
-                  </div>
-                  <Stt
-                    bind:this={stt}
-                    {SttResult}
-                    {StopListening}
-                    bind:display_audio
-                  ></Stt>
-                </div>
-                {/if}
-          
-              </Section>
- 
-              <Section align="end">
-                <div class="speaker-button" on:click={speak(a[$llang])}>
-                  <IconButton>
+        <div>
+          <Row style="height:64px;top:-14px">
+            <Section align="start">
+              {#if !share_mode && isSTT}
+              <div
+                class="margins"
+                style="text-align: center; display: flex; align-items: center; justify-content: space-between;">
+
+                <div>
+                  <IconButton
+                    class="material-icons"
+                    aria-label="Back"
+                    on:click={onClickMicrophone}
+                  >
                     <Icon tag="svg" viewBox="0 0 24 24">
-                      <path fill="currentColor" d={mdiPlay} />
+                      {#if isListening}
+                        <path fill="currentColor" d={mdiMicrophone} />
+                      {:else}
+                        <path fill="currentColor" d={mdiMicrophoneOutline} />
+                      {/if}
                     </Icon>
                   </IconButton>
-                </div>  
-              </Section>
-            </Row>
-          </div>
+                  {#if isListening}
+                    {#await Translate('говори', 'ru', $llang) then data}
+                      <span>{data}</span>
+                    {/await}
+                  {/if}
+                </div>
+                <Stt
+                  bind:this={stt}
+                  {SttResult}
+                  {StopListening}
+                  bind:display_audio
+                ></Stt>
+              </div>
+              {/if}
+        
+            </Section>
 
-   
+            <Section align="end">
+              <div class="speaker-button" on:click={speak(a[$llang])}>
+                <IconButton>
+                  <Icon tag="svg" viewBox="0 0 24 24">
+                    <path fill="currentColor" d={mdiPlay} />
+                  </Icon>
+                </IconButton>
+              </div>  
+            </Section>
+          </Row>
+        </div>   
 
         <div style="text-align: center;  margin-top: 20px;">
           <span style="color: darkgreen;">
@@ -1028,7 +1003,7 @@
           {/if}
 
           {#await Translate('Переведи и спроси', 'ru', $langs) then data}
-            <div class="title">{data}:</div>
+            <div class="title" class:active_title={isActiveTitle[0]}>{data}:</div>
           {/await}
           <!-- {#await Translate('(используй подсказки слов в случае необходимости)', 'ru', $langs) then data_2}
             <div class="title title2">{data_2}:</div>
@@ -1076,7 +1051,7 @@
             {/if}
           </div>
 
-          <Row>
+          <Row style="top:-14px">
             <Section align="end">
               <div class="speaker-button" on:click={speak(a[$llang])}>
                 <IconButton>
@@ -1088,40 +1063,40 @@
             </Section>
           </Row>
 
-              {#if !share_mode && isSTT}
-                <div
-                  class="margins"
-                  style="text-align: center; display: flex; align-items: center; justify-content: space-between;"
+          {#if !share_mode && isSTT}
+            <div
+              class="margins"
+              style="text-align: center; display: flex; align-items: center; justify-content: space-between;"
+            >
+              <div>
+                <IconButton
+                  class="material-icons"
+                  aria-label="Back"
+                  on:click={onClickMicrophone}
                 >
-                  <div>
-                    <IconButton
-                      class="material-icons"
-                      aria-label="Back"
-                      on:click={onClickMicrophone}
-                    >
-                      <Icon tag="svg" viewBox="0 0 24 24">
-                        {#if isListening}
-                          <path fill="currentColor" d={mdiMicrophone} />
-                        {:else}
-                          <path fill="currentColor" d={mdiMicrophoneOutline} />
-                        {/if}
-                      </Icon>
-                    </IconButton>
-                  </div>
-                  <Stt
-                    bind:this={stt}
-                    {SttResult}
-                    {StopListening}
-                    bind:display_audio
-                  ></Stt>
-                </div>
-              {/if}
-              
-              <div  style="text-align: center;  margin-top: 20px;">
-                <span style="color: darkgreen;">
-                  {@html stt_text}
+                  <Icon tag="svg" viewBox="0 0 24 24">
+                    {#if isListening}
+                      <path fill="currentColor" d={mdiMicrophone} />
+                    {:else}
+                      <path fill="currentColor" d={mdiMicrophoneOutline} />
+                    {/if}
+                  </Icon>
+                </IconButton>
+              </div>
+              <Stt
+                bind:this={stt}
+                {SttResult}
+                {StopListening}
+                bind:display_audio
+              ></Stt>
+            </div>
+          {/if}
+          
+          <div  style="text-align: center;  margin-top: 20px;">
+            <span style="color: darkgreen;">
+              {@html stt_text}
 
-                </span> 
+            </span> 
             </div>    
             {#if similarity}
               <div class="similarity">
@@ -1143,7 +1118,7 @@
           {/if}
 
             {#await Translate('Послушай ответ', 'ru', $langs) then data}
-              <div class="title">{data}:</div>
+              <div class="title" class:active_title={isActiveTitle[1]}>{data}:</div>
             {/await}
 
            <div style="text-align: center;">
@@ -1168,9 +1143,9 @@
             {@html q[$llang]}
           </div>
 
-          <div style="height:72px;">
+          <div>
           
-          <Row>
+          <Row style="height:64px;top:-14px">
             <Section align="start">
             {#if $call_but_status == 'talk'}
               <div class="repeat_but">
@@ -1264,7 +1239,6 @@
 
   .thumb_alert {
     position: absolute;
-
     width: 30px;
     z-index: 2;
     scale: 0.7;
@@ -1272,7 +1246,18 @@
   }
 
   .active_title{
+    animation: color-blink 1s infinite; /* Запускает мигание */
+  }
 
+  @keyframes color-blink {
+    0%, 100% {
+      color:grey;
+
+    }
+    50% {
+      color:white;
+
+    }
   }
 
   .container {
@@ -1325,7 +1310,7 @@
     position: relative;
     margin-left: auto;
     color: grey;
-    margin:25px 25px auto 25px;
+    margin: 25px 5px auto 25px;
     font-size: x-small;
     z-index: 2;
     scale: .8;
