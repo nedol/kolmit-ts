@@ -12,6 +12,8 @@ export class RTCOperator extends RTCBase {
 
     this.checking_tmr;
 
+    this.isReconnecting = false;
+
     msg.subscribe((data) => {
       try {
         if (data) {
@@ -22,6 +24,68 @@ export class RTCOperator extends RTCBase {
       }
     });
   }
+
+
+
+  async onIceStateChange(pc, event) {
+		if (pc && pc.con !== null) {
+			if (pc.con.iceConnectionState === 'new') {
+				console.log(pc.pc_key + ' ICE state change event: new', this);
+			}
+
+			if (pc.con.iceConnectionState === 'checking') {
+				console.log(pc.pc_key + ' ICE state change event: checking', this);
+			}
+
+			if (pc.con.iceConnectionState === 'disconnected') {
+				console.log(pc.pc_key + ' ICE state change event: disconnected', this);
+        if (!this.isReconnecting) {
+          this.isReconnecting = true; // Блокируем повторные попытки
+          
+          console.log('Соединение потеряно, перезапуск...');
+          pc.con.restartIce();
+          try {
+            // Перезапуск ICE без создания нового оффера
+              await this.pcPull[this.abonent].setRemoteDesc(this.pcPull[this.abonent].params['rem_desc']);
+              const data = this.pcPull[this.abonent].params['rem_cand'] 
+              if (Array.isArray(data )) {
+                for (let c in data ) {
+                  if (data[c])
+                    this.pcPull[this.abonent].con.addIceCandidate(data[c]);
+                }
+              }
+            } catch (error) {
+              console.error('Ошибка при перезапуске ICE:', error);
+            }finally {
+            // Сброс флага после завершения
+            this.isReconnecting = false;
+          }
+        }
+      }
+
+			if (pc.con.iceConnectionState === 'connected') {
+				//this.signch.eventSource.close();
+				clearTimeout(this.checking_tmr);
+				console.log(pc.pc_key + ' ICE state change event: connected', this);
+				this.main_pc = pc.pc_key;
+				// call_but_status.set('active');
+				// this.DC = new DataChannelOperator(this, pc);
+			}
+
+			if (pc.con.iceConnectionState === 'failed') {
+				/* possibly reconfigure the connection in some way here */
+				console.log(pc.pc_key + ' ICE state change event: failed', this);
+				/* then request ICE restart */
+				pc.con.restartIce();
+			}
+
+			if (pc.con.iceConnectionState === 'completed') {
+				console.log(pc.pc_key + ' ICE state change event: completed', this);
+			}
+			console.log(pc.pc_key + ' ICE state change event: ' + event.type, this);
+		}
+	}
+
 
   Init(cb) {
     let that = this;
@@ -120,8 +184,7 @@ export class RTCOperator extends RTCBase {
         par.user = user;
         par.name = 'user';
         this.signal.SendMessage(par, () => {
-          this.status = 'call';
- 
+          this.status = 'call'; 
         });
       });
     });

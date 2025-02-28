@@ -48,44 +48,6 @@ export class RTCBase {
 			);
 	}
 
-	onIceStateChange(pc, event) {
-		if (pc && pc.con !== null) {
-			if (pc.con.iceConnectionState === 'new') {
-				console.log(pc.pc_key + ' ICE state change event: new', this);
-			}
-
-			if (pc.con.iceConnectionState === 'checking') {
-				console.log(pc.pc_key + ' ICE state change event: checking', this);
-			}
-
-			if (pc.con.iceConnectionState === 'disconnected') {
-				console.log(pc.pc_key + ' ICE state change event: disconnected', this);
-				pc.con.restartIce();
-				pc.SendOffer();
-			}
-
-			if (pc.con.iceConnectionState === 'connected') {
-				//this.signch.eventSource.close();
-				clearTimeout(this.checking_tmr);
-				console.log(pc.pc_key + ' ICE state change event: connected', this);
-				this.main_pc = pc.pc_key;
-				// call_but_status.set('active');
-				// this.DC = new DataChannelOperator(this, pc);
-			}
-
-			if (pc.con.iceConnectionState === 'failed') {
-				/* possibly reconfigure the connection in some way here */
-				console.log(pc.pc_key + ' ICE state change event: failed', this);
-				/* then request ICE restart */
-				pc.con.restartIce();
-			}
-
-			if (pc.con.iceConnectionState === 'completed') {
-				console.log(pc.pc_key + ' ICE state change event: completed', this);
-			}
-			console.log(pc.pc_key + ' ICE state change event: ' + event.type, this);
-		}
-	}
 
 	TransFile() {
 		async function handleFileInputChange() {
@@ -144,7 +106,8 @@ export class RTCBase {
 			lifetimeDuration: this.conf.lifetimeDuration,
 			rtcpMuxPolicy: 'require',
 			bundlePolicy: 'balanced',
-			iceServers: this.conf.stun.concat(this.conf.turn)
+			iceServers: this.conf.stun.concat(this.conf.turn),
+			iceCandidatePoolSize: 10 // Ограничиваем до 10 кандидатов
 		};
 
 		console.log('iceServers:', this.conf.stun.concat(this.conf.turn));
