@@ -442,14 +442,13 @@
     if (data.func === 'close') {
       $call_but_status = 'inactive';
       rtc.DC.CloseDC();
-      remote.video.display = 'none'
       local.audio.paused = true;
     }
 
     if (data.call || data.func === 'call') {
    
       $showBottomAppBar = true;
-      $call_but_status = 'call';//дубль
+      // $call_but_status = 'call';//дубль
       remote.text.display = 'block';
       video_button_display = false;
       local.audio.paused = false;

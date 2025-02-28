@@ -46,7 +46,7 @@ export async function Translate(text: string, from: string, to: string): Promise
     // Check if the translation is already cached in the database
     const resp = await ReadSpeech({ lang: to, key: cacheKey });
     if (resp?.translate) {
-      console.log(`Файл уже существует`);
+      // console.log(`Файл уже существует`);
       translatedText += `${resp.translate} `;
       continue;
     }

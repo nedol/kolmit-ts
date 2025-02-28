@@ -271,7 +271,7 @@
     $signal.SendMessage(par, (data) => {
       if (data && data.resp) {
         const key = Object.keys(data.resp)[0];
-        data.resp[key].subscribers.map((user) => {
+        data.resp[key].subscribers?.map((user) => {
           const quiz = data.resp.word?.quiz || data.resp.dialog?.quiz;
           const key = Object.keys(data.resp)[0];
           BuildQuizUsers(quiz, user, key);

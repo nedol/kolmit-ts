@@ -65,8 +65,8 @@ export class DataChannelOperator {
         };
 
         this.dc.onerror = () => {
-          dc_state.set('close');
-          rtc.SendStatus('close');
+          // dc_state.set('close');
+          // rtc.SendStatus('close');
         };
       }
     };

@@ -354,7 +354,7 @@
   async function SendData() {
     const dc = $dc?.dc.readyState === 'open' ? $dc : '';
 
-    if (share_mode && dc) {
+    if (dialog_data.content[cur_qa] && share_mode && dc) {
       dialog_data.content[cur_qa].user2['a_shfl'] = a_shfl;
 
       $msg = $msg = null; //предотвр.повтор isFlipped
