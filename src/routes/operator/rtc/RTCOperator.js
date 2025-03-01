@@ -36,32 +36,74 @@ export class RTCOperator extends RTCBase {
 			if (pc.con.iceConnectionState === 'checking') {
 				console.log(pc.pc_key + ' ICE state change event: checking', this);
 			}
-
-			if (pc.con.iceConnectionState === 'disconnected') {
-				console.log(pc.pc_key + ' ICE state change event: disconnected', this);
+      
+      if (pc.con && pc.con.iceConnectionState === 'disconnected') {
+        console.log(pc.pc_key + ' ICE state change event: disconnected', this);
+        
         if (!this.isReconnecting) {
           this.isReconnecting = true; // Блокируем повторные попытки
-          
           console.log('Соединение потеряно, перезапуск...');
-          pc.con.restartIce();
+      
           try {
-            // Перезапуск ICE без создания нового оффера
+            // Если поддерживается, запустить ICE Restart
+            if (pc.con && typeof pc.con.restartIce === 'function') {
+              console.log('Перезапуск ICE через restartIce()...');
+              pc.con.restartIce();
+      
+              // Ожидаем, пока состояние не изменится (ждём до 3 секунд)
+              await new Promise((resolve) => {
+                const checkState = () => {
+                  if (!pc.con) {
+                    console.warn('PeerConnection уже не существует, выходим.');
+                    Init(()=>{
+
+                    });
+                    resolve();
+                    return;
+                  }
+                  if (pc.con.iceConnectionState === 'connected' || pc.con.iceConnectionState === 'completed') {
+                    console.log('Соединение восстановлено после restartIce()');
+                    resolve();
+                  } else {
+                    setTimeout(checkState, 500);
+                  }
+                };
+                setTimeout(checkState, 500);
+              });
+         
+      
+            } else {
+              console.log('restartIce() не поддерживается, выполняем ручное восстановление...');
+            }
+      
+            // Проверяем signalingState перед установкой remoteDescription
+            if (pc.con && pc.con.signalingState !== 'stable') {
+              console.warn('signalingState нестабилен, пропускаем setRemoteDesc()');
+            } else if (pc.con) {
               await this.pcPull[this.abonent].setRemoteDesc(this.pcPull[this.abonent].params['rem_desc']);
-              const data = this.pcPull[this.abonent].params['rem_cand'] 
-              if (Array.isArray(data )) {
-                for (let c in data ) {
-                  if (data[c])
-                    this.pcPull[this.abonent].con.addIceCandidate(data[c]);
+            }
+      
+            // Повторно добавляем ICE-кандидатов
+            const candidates = this.pcPull[this.abonent].params['rem_cand'];
+            if (Array.isArray(candidates)) {
+              for (const candidate of candidates) {
+                if (candidate && pc.con) {
+                  await this.pcPull[this.abonent].con.addIceCandidate(candidate);
                 }
               }
-            } catch (error) {
-              console.error('Ошибка при перезапуске ICE:', error);
-            }finally {
+            }
+      
+          } catch (error) {
+            console.error('Ошибка при перезапуске ICE:', error);
+          } finally {
             // Сброс флага после завершения
             this.isReconnecting = false;
           }
         }
       }
+      
+      
+      
 
 			if (pc.con.iceConnectionState === 'connected') {
 				//this.signch.eventSource.close();

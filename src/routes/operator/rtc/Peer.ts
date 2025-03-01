@@ -90,51 +90,29 @@ export class Peer {
 			}
 		};
 
-		let maxCandidates = 50;  // Максимальное количество кандидатов
-		let candidateCount = 0;  // Счётчик кандидатов
-		let timr = null;
+		let timr;
 
 		this.con.onicecandidate = (e) => {
 			let that = this;
 			if (e.candidate) {
-				// Фильтрация по типу кандидатов (например, пропускаем локальные host кандидаты)
-				if (e.candidate.type === 'host') {
-				  console.log('Пропущен локальный (host) кандидат.');
-				  return; // Пропускаем локальные кандидаты
+				if (e.candidate.type == 'relay') {
+					console.log('The TURN server is reachable !');
 				}
-				
-				// Увеличиваем счётчик кандидатов
-				candidateCount++;
-			
-				// Ограничиваем количество кандидатов
-				if (candidateCount > maxCandidates) {
-				  console.log(`Достигнут лимит кандидатов (${maxCandidates}), пропуск.`);
-				  return; // Пропускаем кандидаты после лимита
-				}
-			
-				// Проверяем, если это TURN кандидат
-				if (e.candidate.type === 'relay') {
-				  console.log('The TURN server is reachable!');
-				}
-			
-				// Сохраняем кандидата
 				if (!this.params['loc_cand']) this.params['loc_cand'] = [];
 				this.params['loc_cand'].push(e.candidate);
-			
-				// Если таймер не установлен, создаём новый
+
 				if (!timr) {
-				  timr = setTimeout(() => {
-					if (this.answer) {
-					  this.rtc.SendAnswer();
-					  this.answer = false;
-					} else {
-					  this.SendOffer();
-					}
-					clearTimeout(timr);
-					timr = null;  // Обнуляем таймер после выполнения
-				  }, 1000); // Задержка перед отправкой
+					timr = setTimeout(() => {
+						if (this.answer){
+							this.rtc.SendAnswer();
+							this.answer = false;
+						} else{
+							this.SendOffer();							
+						}
+						clearTimeout(timr);
+					}, 1000);
 				}
-			  }
+			}
 		};
 
 		this.con.oniceconnectionstatechange = function (e) {

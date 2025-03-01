@@ -311,6 +311,7 @@
   async function onNextQA() {
     // voice.Cancel();
     cur_qa++;
+    similarity = ''
     visibility[1] = 'hidden';
     visibility[2] = 'hidden';
     visibility_cnt = 1;
@@ -562,8 +563,6 @@
     const selection = window.getSelection();
     const selectedText = selection.toString();
 
-    console.log(selectedText);
-
     if (selectedText) {
       const sentenceRegex = /[^.!?]*[.!?]/g;
       const sentences = text.match(sentenceRegex);
@@ -810,8 +809,8 @@
           </div>
         </div>
 
-        <div style="display:block;position:relative">       
-          <Row style="height:64px;top:-14px">
+        <div style="display:block;position:relative;height:64px;top:-14px">       
+          <Row>
             <Section  align="start">
               {#if $call_but_status == 'talk'}
                 <div class="repeat_but">
@@ -919,7 +918,7 @@
         </div>
        
         <div>
-          <Row style="height:64px;top:-14px">
+          <Row style="height:64px;">
             <Section align="start">
               {#if !share_mode && isSTT}
               <div
@@ -953,8 +952,9 @@
                   bind:display_audio
                 ></Stt>
               </div>
+              
               {/if}
-        
+
             </Section>
 
             <Section align="end">
@@ -968,21 +968,21 @@
             </Section>
           </Row>
         </div>   
+              <div style="text-align: center;  margin-top: 20px;">
+                <span style="color: darkgreen;">
+                  {@html stt_text}
+                </span>
+              </div>
+              {#if similarity}
+              <div class="similarity">
+                <p>
+                  <span class="mdc-typography--overline" style="position:relative"
+                    >{similarity}
+                  </span>
+                </p>
+              </div>
+              {/if}
 
-        <div style="text-align: center;  margin-top: 20px;">
-          <span style="color: darkgreen;">
-            {@html stt_text}
-          </span>
-        </div>
-        {#if similarity}
-        <div class="similarity">
-          <p>
-            <span class="mdc-typography--overline" style="position:relative"
-              >{similarity}
-            </span>
-          </p>
-        </div>
-        {/if}
       </div>
       {:else if isFlipped}
         <div class="container">
@@ -1051,7 +1051,41 @@
             {/if}
           </div>
 
-          <Row style="top:-14px">
+          <Row>
+            <Section align="start">
+
+              {#if !share_mode && isSTT}
+              <div
+                class="margins"
+                style="text-align: center; display: flex; align-items: center; justify-content: space-between;"
+              >
+                <div>
+                  <IconButton
+                    class="material-icons"
+                    aria-label="Back"
+                    on:click={onClickMicrophone}
+                  >
+                    <Icon tag="svg" viewBox="0 0 24 24">
+                      {#if isListening}
+                        <path fill="currentColor" d={mdiMicrophone} />
+                      {:else}
+                        <path fill="currentColor" d={mdiMicrophoneOutline} />
+                      {/if}
+                    </Icon>
+                  </IconButton>
+                </div>
+                <Stt
+                  bind:this={stt}
+                  {SttResult}
+                  {StopListening}
+                  bind:display_audio
+                ></Stt>
+              </div>
+            {/if}
+            
+
+
+            </Section>
             <Section align="end">
               <div class="speaker-button" on:click={speak(a[$llang])}>
                 <IconButton>
@@ -1061,37 +1095,9 @@
                 </IconButton>
               </div>
             </Section>
+            
           </Row>
 
-          {#if !share_mode && isSTT}
-            <div
-              class="margins"
-              style="text-align: center; display: flex; align-items: center; justify-content: space-between;"
-            >
-              <div>
-                <IconButton
-                  class="material-icons"
-                  aria-label="Back"
-                  on:click={onClickMicrophone}
-                >
-                  <Icon tag="svg" viewBox="0 0 24 24">
-                    {#if isListening}
-                      <path fill="currentColor" d={mdiMicrophone} />
-                    {:else}
-                      <path fill="currentColor" d={mdiMicrophoneOutline} />
-                    {/if}
-                  </Icon>
-                </IconButton>
-              </div>
-              <Stt
-                bind:this={stt}
-                {SttResult}
-                {StopListening}
-                bind:display_audio
-              ></Stt>
-            </div>
-          {/if}
-          
           <div  style="text-align: center;  margin-top: 20px;">
             <span style="color: darkgreen;">
               {@html stt_text}
@@ -1107,7 +1113,8 @@
                 </p>
               </div>
             {/if}
-        </div> 
+
+          </div> 
   
         <div class="container">
 
@@ -1143,9 +1150,9 @@
             {@html q[$llang]}
           </div>
 
-          <div>
+          <div style="top:-14px;height:64px">
           
-          <Row style="height:64px;top:-14px">
+          <Row>
             <Section align="start">
             {#if $call_but_status == 'talk'}
               <div class="repeat_but">
@@ -1179,7 +1186,7 @@
             </Section>
           </Row>
         </div>
-        </div>
+      </div>
 
       {/if}
 
@@ -1212,13 +1219,14 @@
     height: 25px;
   }
 
-  /* :global(.mdc-top-app-bar__row){
-    display: flex;
+  :global(.mdc-top-app-bar__row){
+    /* display: flex;
     position: relative;
     box-sizing: border-box;
-    width: 100%;
-    height: 72px !important;
-  } */
+    width: 100%; */
+    /* height: 72px !important; */
+    top:0px;
+  }
   main_dlg {
     /* overflow-y: auto; */
     transition: transform 0.3s ease-in-out;
@@ -1232,7 +1240,7 @@
 
   .repeat_alert {
     position: absolute;
-    left: 30px;
+    left: 10px;
     scale: 0.7;
     z-index: 2;
   }
@@ -1246,17 +1254,19 @@
   }
 
   .active_title{
-    animation: color-blink 1s infinite; /* Запускает мигание */
+    animation: color-blink 2s infinite; /* Запускает мигание */
+    animation-timing-function:  ease-in-out; /* Чтобы мигание происходило точно через 1 секунду */
   }
 
   @keyframes color-blink {
-    0%, 100% {
+    0% {
       color:grey;
-
     }
     50% {
       color:white;
-
+    }
+    100% {
+      color:grey;
     }
   }
 
@@ -1285,7 +1295,6 @@
       var(--mdc-theme-text-hint-on-background, rgba(0, 0, 0, 0.1));
     margin: 0 18px 18px 0;
     background-color: var(--mdc-theme-background, #fff);
-
     overflow: auto;
     display: inline-block;
   }
@@ -1369,7 +1378,6 @@
     bottom:5px;
   }
 
-
   .html_data {
     display: grid;
     width: 100vw;
@@ -1411,16 +1419,19 @@
     font-size: 15px;
     color: #333;
   }
-
   .similarity {
+    /* display: flex
+; */
+    /* justify-content: center; */
     position: relative;
+    margin: 0 auto;
     background-color: #f0f0f0;
     padding: 0px;
     border-radius: 20px;
     width: 50px;
     height: 30px;
-    float: right;
-    bottom: 10px;
+    /* float: right; */
+    /* bottom: 10px; */
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     text-align: center;
   }
@@ -1429,6 +1440,7 @@
     font-weight: 700;
     font-size: 15px;
     color: #2ca838; /* цвет счетчика */
+    text-align: center;
   }
   .cnt {
     position: absolute;
@@ -1455,9 +1467,6 @@
   .title2{
     font-size: 0.7em;
   }
-
-
-
   .user1 {
     /* width: 100vw;*/
     position: relative;

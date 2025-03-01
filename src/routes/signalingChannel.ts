@@ -8,12 +8,16 @@ export class SignalingChannel {
 
     this.socketUrl = '';
     // this.socketUrl = 'wss://kolmit.net:3000';
-    if(window.location.hostname.includes('onrender'))
-      this.socketUrl = 'wss://kolmit-server.onrender.com';//!! работает на render
-    // if(window.location.hostname.includes('192.168.'))
-    //   this.socketUrl = `wss://192.168.0.6:3000`;
-    else if(window.location.hostname.includes('localhost'))
+    if(window.location.hostname.includes('localhost'))
       this.socketUrl =  `ws://localhost:3000`;
+
+    if(window.location.hostname.includes('192.168.'))
+      this.socketUrl = `wss://192.168.0.6:3000`;
+    
+    // if(window.location.hostname.includes('onrender'))
+      this.socketUrl = 'wss://kolmit-server.onrender.com';//!! работает на render
+
+
     // else
     //   this.socketUrl =  `wss://3.125.91.221:3000`;
       

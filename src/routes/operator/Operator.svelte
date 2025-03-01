@@ -551,18 +551,20 @@
 
     </Section>
     <Section align="end">
-      <CallButton on:click={OnClickCallButton}>
-        <b
-          class="call_cnt"
-          style="display:none;position: relative;left:22px;top:10px;color:#0e0cff;font-size: 12px;"
-          >100</b
-        >
-        <span
-          class="badge badge-primary badge-pill call-queue"
-          style="display:none;position: relative;right:0px;bottom:0px;color:#0e0cff;font-size: 12px;opacity:1"
-          >0</span
-        >
-      </CallButton>
+      <div style="position: relative; top:-17px;right: 10px;z-index: 1; scale:1">
+        <CallButton on:click={OnClickCallButton}>
+          <b
+            class="call_cnt"
+            style="display:none;position: relative;left:25px;top:10px;color:#0e0cff;font-size: 12px;"
+            >100</b
+          >
+          <span
+            class="badge badge-primary badge-pill call-queue"
+            style="display:none;position: relative;right:0px;bottom:0px;color:#0e0cff;font-size: 12px;opacity:1"
+            >0</span
+          >
+        </CallButton>
+      </div>
       <div
         class="video"
         on:click={OnClickVideoButton}
@@ -657,8 +659,8 @@
   }
   .speaker-button {
     position: absolute;
-    left: 83px;
-    bottom: 20px;
+    left: 70px;
+    bottom: 30px;
     color: black;
   }
 

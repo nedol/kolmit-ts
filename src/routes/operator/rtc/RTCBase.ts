@@ -106,8 +106,7 @@ export class RTCBase {
 			lifetimeDuration: this.conf.lifetimeDuration,
 			rtcpMuxPolicy: 'require',
 			bundlePolicy: 'balanced',
-			iceServers: this.conf.stun.concat(this.conf.turn),
-			iceCandidatePoolSize: 10 // Ограничиваем до 10 кандидатов
+			iceServers: this.conf.stun.concat(this.conf.turn)
 		};
 
 		console.log('iceServers:', this.conf.stun.concat(this.conf.turn));

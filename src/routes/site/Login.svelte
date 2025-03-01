@@ -103,7 +103,10 @@
 		required
 	  />
 	  {#if !passwordMatch}
-		<p style="color: red;">{dicts['Пароли не совпадают'][lang]}</p>
+	  	{#await Translate('Пароли не совпадают','ru',$langs)  then data }
+		  <p style="color: red;">{data}</p>
+		{/await}
+
 	  {/if}
 	  <div>
 		<input type="file" id="pic" on:change={uploadImage} accept="image/png, image/jpeg" hidden />
