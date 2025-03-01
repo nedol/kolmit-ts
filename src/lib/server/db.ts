@@ -909,38 +909,39 @@ export async function GetLesson(q: { operator: string; owner: string; level?: st
     const lang = res[0]?.lang || 'en'; // Defaulting to 'en' if lang is missing
 
     // Fetch news based on language and recent timestamp
-    const news = await sql<News[]>`
-      SELECT 
-        json_build_object(${lang}::text, "name") AS "name",  
-        MAX((EXTRACT(EPOCH FROM "timestamp") * 1000)::BIGINT) AS "published", 
-        "type"
-      FROM (
-        SELECT "name", "timestamp", 'dialog' AS "type" 
-        FROM public.dialogs 
-        WHERE "type" = 'news' AND "timestamp" >= DATE_TRUNC('month', CURRENT_DATE)
-        UNION
-        SELECT "name", "timestamp", 'bricks' AS "type" 
-        FROM public.bricks 
-        WHERE "type" = 'news' AND "timestamp" >= DATE_TRUNC('month', CURRENT_DATE)
-        AND "html" <> ''
-      ) AS combined
-      GROUP BY "name", "type"
-      ORDER BY "published" ASC;
-    `;
-
-    // Fetch context-related news based on language and recent timestamp
-    const context_news = await sql<ContextNews[]>`
-      SELECT 
-        json_build_object(quote_literal(${lang}), "name") AS "name", 
-        "data", 
-        MAX((EXTRACT(EPOCH FROM "timestamp") * 1000)::BIGINT) AS "published", 
-        "type"
-      FROM public.context 
+    const news = await sql<NewsItem[]>`
+    SELECT 
+      json_build_object(${lang}::text, "name") AS "name",  
+      MAX((EXTRACT(EPOCH FROM "timestamp") * 1000)::BIGINT) AS "published", 
+      "type"
+    FROM (
+      SELECT "name", "timestamp", 'dialog' AS "type" 
+      FROM public.dialogs 
       WHERE "type" = 'news' 
-        AND "timestamp" >= DATE_TRUNC('month', CURRENT_DATE)
-      GROUP BY "name", "data", "type"
-      ORDER BY "published" ASC;
-    `;
+
+      UNION
+
+      SELECT "name", "timestamp" AS "published", 'bricks' AS "type" 
+      FROM public.bricks 
+      WHERE "type" = 'news'
+    ) AS combined
+    GROUP BY "name", "type"
+    ORDER BY "published" DESC
+    LIMIT 20;
+  `;
+
+  // Query for context-related news
+  const context_news = await sql<NewsItem[]>`
+    SELECT 
+      json_build_object(quote_literal(${lang}), "name") AS "name", 
+      "data", 
+      MAX((EXTRACT(EPOCH FROM "timestamp") * 1000)::BIGINT) AS "published", 
+      "type"
+    FROM public.context 
+    WHERE "type" = 'news' 
+    GROUP BY "name", "data", "type"
+    ORDER BY "published" DESC;
+  `;
 
     // Return structured response
     return {
@@ -982,16 +983,17 @@ export async function GetNews(q: { lang: string; func?: string }): Promise<GetNe
       FROM (
         SELECT "name", "timestamp", 'dialog' AS "type" 
         FROM public.dialogs 
-        WHERE "type" = 'news' AND "timestamp" >= DATE_TRUNC('month', CURRENT_DATE)
+        WHERE "type" = 'news' 
 
         UNION
 
-        SELECT "name", "timestamp", 'bricks' AS "type" 
+        SELECT "name", "timestamp" AS "published", 'bricks' AS "type" 
         FROM public.bricks 
-        WHERE "type" = 'news' AND "timestamp" >= DATE_TRUNC('month', CURRENT_DATE)
+        WHERE "type" = 'news'
       ) AS combined
       GROUP BY "name", "type"
-      ORDER BY "published" ASC;
+      ORDER BY "published" DESC
+      LIMIT 20;
     `;
 
     // Query for context-related news
@@ -1003,9 +1005,8 @@ export async function GetNews(q: { lang: string; func?: string }): Promise<GetNe
         "type"
       FROM public.context 
       WHERE "type" = 'news' 
-        AND "timestamp" >= DATE_TRUNC('month', CURRENT_DATE)
       GROUP BY "name", "data", "type"
-      ORDER BY "published" ASC;
+      ORDER BY "published" DESC;
     `;
 
     // Return structured response
