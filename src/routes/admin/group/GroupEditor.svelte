@@ -169,7 +169,7 @@
                   <div style="display:inline-flex">
                     <div style="display:block;">
                       <Content>
-                        {#await Translate('Language', 'en', $langs) then data}
+                        {#await Translate('Language', 'en', $langs, 'group') then data}
                           <Textfield
                             class="shaped-filled"
                             variant="filled"
@@ -179,7 +179,7 @@
                         {/await}
                       </Content>
                       <Content>
-                        {#await Translate('Name', 'en', $langs) then data}
+                        {#await Translate('Name', 'en', $langs, 'group') then data}
                           <Textfield
                             class="shaped-filled"
                             variant="filled"
@@ -227,7 +227,7 @@
               </div>
             {:else}
               <Button variant="outlined" class="save" on:click={saveClassData}>
-                {#await Translate('Save', 'en', $langs) then data}
+                {#await Translate('Save', 'en', $langs, 'group') then data}
                   <Label>{data}</Label>
                 {/await}
               </Button>
@@ -274,7 +274,7 @@
                     }}
                     variant="outlined"
                   >
-                    {#await Translate('добавить пользователя', 'ru', $langs) then data}
+                    {#await Translate('добавить пользователя', 'ru', $langs, 'group') then data}
                       <Label>{data}</Label>
                     {/await}
                   </Button>

@@ -237,7 +237,7 @@
 
   $: if ($msg?.msg) {
     (async () => {
-      alert(await Translate($msg?.msg, 'ru', $langs));
+      alert(await Translate($msg?.msg, 'ru', $langs,data.name));
       if ($msg) $msg.msg = '';
     })();
   }
@@ -351,7 +351,7 @@
     if (currentWord.example[$langs]) {
       example = currentWord['example'][$langs];
     } else if (currentWord.example[$llang]) {
-      example = await Translate(currentWord['example'][$llang], $llang, $langs);
+      example = await Translate(currentWord['example'][$llang], $llang, $langs,data.name);
     }
 
     const regex = /(<<\w+>>)\s+(<<\w+>>)/;
@@ -365,7 +365,7 @@
     resultElement = replaceWordWithInput(
       currentWord?.example[$llang]
         ? currentWord?.example[$llang]
-        : await Translate(currentWord.example['ru'], 'ru', $llang),
+        : await Translate(currentWord.example['ru'], 'ru', $llang,data.name),
       `${original}`
     );
 

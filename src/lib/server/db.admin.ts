@@ -217,18 +217,49 @@ export async function UpdateDialog(q: Query) {
   }
 }
 
+export async function GetBricks(q: GetBricksQuery): Promise<Brick | Brick[] | string> {
+  try {
+    // Fetch context data if name is provided
+    const contextResult = await sql<Context[]>`
+      SELECT c.name, c.data
+      FROM context c
+      ${q.name ? sql`WHERE c.name = ${q.name}` : sql``}
+    `;
+
+    // Fetch brick data based on provided filters
+    let bricksResult = await sql<Brick[]>`
+      SELECT b.*
+      FROM bricks b
+      WHERE b.owner = ${q.owner} 
+        AND b.level = ${q.level} 
+        AND b.theme = ${q.theme}
+        ${q.name ? sql`AND b.name = ${q.name}` : sql``}
+    `;
+
+    // Return either a single brick or an array of bricks
+    return {context:contextResult[0],bricks:bricksResult[0]} ;
+  } catch (ex) {
+    console.error('Error in GetBricks:', ex); // Log error for debugging
+    return JSON.stringify({ func: q.func, res: ex }); // Return structured error response
+  }
+}
+
+
 export async function UpdateBricks(q: Query) {
   try {
     const res = await sql`
       INSERT INTO bricks
-        (name, owner, html, level, timestamp)
+        (name, owner, html, level, timestamp, type, theme, prompt_type)
       VALUES
-        (${q.new_name}, ${q.owner}, ${q.html || ''}, ${q.level}, NOW())
+        (${q.new_name}, ${q.owner}, ${q.html || ''}, ${q.level}, NOW(),${q.prompt_type},${q.theme},${q.prompt_type})
       ON CONFLICT (name, owner, level)
       DO UPDATE SET
         name = EXCLUDED.name,
         html = EXCLUDED.html,
-        timestamp = NOW()`;
+        timestamp = NOW(),
+        type = EXCLUDED.prompt_type,
+        theme = EXCLUDED.theme,
+        prompt_type = EXCLUDED.prompt_type`;
     return { res };
   } catch (ex) {
     return JSON.stringify({ func: q.func, res: ex });

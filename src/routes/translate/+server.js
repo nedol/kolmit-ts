@@ -9,7 +9,8 @@ export async function POST({ url, fetch, cookies, request }) {
   let resp = await Translate(
     question.text,
     question.from_lang,
-    question.to_lang
+    question.to_lang,
+    question.quiz
   );
   // console.log(question.text,resp);
 

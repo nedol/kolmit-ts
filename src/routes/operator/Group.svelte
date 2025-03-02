@@ -143,7 +143,7 @@
 
 <!-- {@debug operator} -->
 <div class="deps_div">
-  {#await Translate('Нет пользователей онлайн', 'ru', $langs) then data}
+  {#await Translate('Нет пользователей онлайн', 'ru', $langs,'group') then data}
     <span
       style="display:{no_users_display};position: relative;top:0px;text-align: center; font-size: smaller;
       font-family: monospace;">{data}</span

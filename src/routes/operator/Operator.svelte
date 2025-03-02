@@ -538,7 +538,7 @@
     <Section>
       {#if remote.text.display && remote.text.name}
         <div class="remote_text_display" style="display:{remote.text.display};">
-          {#await Translate('Тебя вызывает - ', 'ru', $langs) then data}
+          {#await Translate('Тебя вызывает - ', 'ru', $langs,remote.text.name) then data}
             <p class="remote_msg">
               {data}
               {remote.text.name}
@@ -598,7 +598,7 @@
     </Section>
   </BottomAppBar>
 
-  {#await Translate(rtcSupportText, 'ru', $langs) then data}
+  {#await Translate(rtcSupportText, 'ru', $langs,'operator') then data}
     <span style="position:fixed;bottom:0;font-size:smaller;color:red"
       >{data}</span
     >

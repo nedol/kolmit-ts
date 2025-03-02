@@ -156,7 +156,7 @@
       active = `Grammar`;
     }
     fetch(
-      `/admin?prompt=dialog.${name}&quiz_name=${data.name[$llang]}&prompt_owner=${abonent}&prompt_level=${data.level}&prompt_theme=${data.theme}`
+      `/admin?prompt=dialog.${name}&quiz_name=${data.name}&prompt_owner=${abonent}&prompt_level=${data.level}&prompt_theme=${data.theme}`
     )
       .then((response) => response.json())
       .then((data) => {
@@ -198,7 +198,7 @@
             Object.keys(item).map(async (key: string) => {
               // console.log(key, item);
               if (item[key][$llang] && !item[key][$langs]) {
-                let tr = await Translate(item[key][$llang], $llang, $langs);
+                let tr = await Translate(item[key][$llang], $llang, $langs,data.name);
                 item[key][$langs] = tr;
                 dialog_data = dialog_data;
               }
@@ -257,6 +257,7 @@
         name: name,
         new_name: data.name,
         data: {"content":dialog_data.content},
+        theme: data.theme,
         lang: $llang,
       }),
       headers: { 'Content-Type': 'application/json' },
@@ -394,7 +395,7 @@
 <main>
   <div class="container">
     <div class="dialog-field">
-      {#await Translate('Title', 'en', $langs) then data}
+      {#await Translate('Title', 'en', $langs,data.name) then data}
         <label for="dialog_name">{data}</label>
       {/await}
 
@@ -407,7 +408,7 @@
     </div>
     {#if data.level}
       <div class="dialog-field">
-        {#await Translate('Level', 'en', $langs) then data}
+        {#await Translate('Level', 'en', $langs,data.name) then data}
           <label for="dialog_level">{data}</label>
         {/await}
 
@@ -417,7 +418,7 @@
 
     {#if $llang}
       <div class="dialog-field">
-        {#await Translate('Language', 'en', $langs) then data}
+        {#await Translate('Language', 'en', $langs,data.name) then data}
           <label for="dialog_lang">{data}</label>
         {/await}
 
@@ -554,7 +555,7 @@
                 {@html prompt}
               </div> -->
                   <button class="copy_prompt" on:click={CopyPrompt}>
-                    {#await Translate('Copy', 'en', $langs) then data}
+                    {#await Translate('Copy', 'en', $langs,'dialog.edit') then data}
                       {data}
                     {/await}
                   </button>
@@ -563,7 +564,7 @@
             {:else if active === content_title}
               <Paper variant="unelevated">
                 <Content>
-                  {#await Translate('Use chatGPT to run the copied prompt and paste result here', 'en', $langs) then data}
+                  {#await Translate('Use chatGPT to run the copied prompt and paste result here', 'en', $langs, 'dialog.edit') then data}
                     <textarea
                       id="dialog_content"
                       rows="20"
@@ -574,7 +575,7 @@
                     ></textarea>
                   {/await}
                   <button class="paste_content" on:click={PasteContent}>
-                    {#await Translate('Paste Content', 'en', $langs) then data}
+                    {#await Translate('Paste Content', 'en', $langs, 'dialog.edit') then data}
                       {data}
                     {/await}
                   </button>
@@ -585,7 +586,7 @@
 
           <div class="container">
             <button class="save" disabled on:click={CreateContent}>
-              {#await Translate('Create content', 'en', $langs) then data}
+              {#await Translate('Create content', 'en', $langs, 'dialog.edit') then data}
                 {data}
               {/await}
             </button>
@@ -598,10 +599,10 @@
   <table>
     <thead>
       <tr>
-        {#await Translate('User 1', 'en', $langs) then data}
+        {#await Translate('User 1', 'en', $langs,'dialog.edit') then data}
           <th>{data}</th>{/await}
 
-        {#await Translate('User 2', 'en', $langs) then data}
+        {#await Translate('User 2', 'en', $langs,'dialog.edit') then data}
           <th>{data}</th>{/await}
       </tr>
     </thead>
@@ -645,10 +646,10 @@
       >add</IconButton
     >
     <div class="container">
-      {#await Translate('Copy data', 'en', $langs) then data}
+      {#await Translate('Copy data', 'en', $langs,'dialog.edit') then data}
         <button class="copy_content" on:click={() => OnCopyContent()}>{data}</button>
       {/await}
-      {#await Translate('Save', 'en', $langs) then data}
+      {#await Translate('Save', 'en', $langs,'dialog.edit') then data}
         <button class="save_content" on:click={() => OnSave()}>{data}</button>
       {/await}
     </div>

@@ -138,7 +138,8 @@ let iframe;
       let translatedSentence = await Translate(
         originalSentence,
         $llang,
-        $langs
+        $langs,
+        'context'
       ); // Вызов функции перевода
 
       // Озвучить перевод
@@ -222,7 +223,7 @@ let iframe;
 
   iframe.context{
     position:absolute; 
-    z-index: 1;
+    z-index: 2;
     width: 100vw;
     height: calc(100vh - 56px - 45px - 50px); 
     border:0;

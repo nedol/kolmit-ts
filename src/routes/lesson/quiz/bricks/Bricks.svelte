@@ -1,5 +1,5 @@
 <script>
-  import { onMount , getContext} from 'svelte';
+  import { onMount , getContext, onDestroy} from 'svelte';
   import { slide } from 'svelte/transition';
   import ConText from '../Context.svelte';
   import { Translate } from '../../../translate/Transloc';
@@ -68,6 +68,7 @@ let keys = [];
   import {
       langs,
       llang,
+      showBottomAppBar
   } from '$lib/stores.ts';
 
   import {
@@ -166,7 +167,11 @@ let keys = [];
     }));
 
   onMount(() => {
+    setTimeout(() => {
 
+        $showBottomAppBar = false; //test
+
+    }, 3000);
   });
 
 
@@ -634,7 +639,9 @@ let keys = [];
   }
 
   
-
+  onDestroy(async()=>{
+    $showBottomAppBar = true;
+  })
 </script>
 
 <Tts bind:this={tts}></Tts>
@@ -830,14 +837,14 @@ let keys = [];
     <div class="trans">
       <!-- Исходное предложение -->
       <!-- <p>{bricks_data.translate[curSentence]}</p> -->
-      {#await Translate(sentence.replace(/<[^>]*>/g, ''), $llang, $langs) then data}
+      {#await Translate(sentence.replace(/<[^>]*>/g, ''), $llang, $langs,data.name) then data}
         <p>{data}</p>
       {/await}
     </div>
     {/if}
     <div class="container">
     <!-- Предложение с замененными словами -->
-    {#await Translate('Составить предложение', 'ru', $langs) then data}
+    {#await Translate('Составить предложение', 'ru', $langs,data.name) then data}
       <div class="title">{data}:</div>
     {/await}
       <!-- {#await Translate('(используй подсказки слов в случае необходимости)', 'ru', $langs) then data_2}
@@ -868,7 +875,7 @@ let keys = [];
 <div class="container">
   <div>
     <!-- Горизонтальный список слов -->
-    {#await Translate('используя набор слов', 'ru', $langs) then data}
+    {#await Translate('используя набор слов', 'ru', $langs,data.name) then data}
         <div class="title">{data}:</div>
     {/await}
 

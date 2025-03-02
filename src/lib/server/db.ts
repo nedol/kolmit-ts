@@ -659,6 +659,8 @@ interface Context {
 
 export async function GetBricks(q: GetBricksQuery): Promise<Brick | Brick[] | string> {
   try {
+
+    let res;
     // Fetch context data if name is provided
     const contextResult = await sql<Context[]>`
       SELECT c.name, c.data
@@ -676,23 +678,24 @@ export async function GetBricks(q: GetBricksQuery): Promise<Brick | Brick[] | st
         ${q.name ? sql`AND b.name = ${q.name}` : sql``}
     `;
 
-    // Ensure bricksResult is an array (default to empty array if null/undefined)
-    if (!bricksResult) {
-      bricksResult = [];
-    }
+    res = bricksResult[0]||{}
 
     // If contextResult and bricksResult exist, add context to the first brick
-    if (contextResult[0] && bricksResult[0]) {
-      bricksResult[0].context = contextResult[0].data;
+    if (contextResult[0]) {
+      res.context = contextResult[0].data;
     }
 
     // Return either a single brick or an array of bricks
-    return q.name ? bricksResult[0] : bricksResult;
+    return res;
   } catch (ex) {
     console.error('Error in GetBricks:', ex); // Log error for debugging
     return JSON.stringify({ func: q.func, res: ex }); // Return structured error response
   }
 }
+
+
+
+
 
 
 interface GetDialogQuery {
@@ -1107,6 +1110,7 @@ interface WriteSpeechRequest {
   key: string;
   text: string;
   translate: string;
+  quiz:string;
 }
 
 interface WriteSpeechResponse {
@@ -1120,12 +1124,22 @@ export async function WriteSpeech(q: WriteSpeechRequest): Promise<WriteSpeechRes
     await sql.begin(async (tx) => {
       // Insert or update speech data
       await tx`
-        INSERT INTO speech (lang, key, text, translate)
-        VALUES (${q.lang}, ${q.key}, ${q.text}, ${q.translate})
+        INSERT INTO speech (lang, key, text, translate, quiz)
+        VALUES (
+          ${q.lang ?? null}, 
+          ${q.key ?? null}, 
+          ${q.text ?? null}, 
+          ${q.translate ?? null}, 
+          ${q.quiz ?? null} -- Заменяем undefined на null
+        )
         ON CONFLICT (key, lang) 
         DO UPDATE SET 
           lang = EXCLUDED.lang,
-          translate = EXCLUDED.translate
+          translate = EXCLUDED.translate,
+          quiz = CASE 
+            WHEN EXCLUDED.quiz <> '' OR speech.quiz = '' THEN EXCLUDED.quiz 
+            ELSE speech.quiz 
+          END
       `;
     });
 
@@ -1151,12 +1165,12 @@ interface ReadSpeechResponse {
 export async function ReadSpeech(q: ReadSpeechRequest): Promise<ReadSpeechResponse> {
   try {
     // Perform the database query to retrieve the translation
-    let res = await sql`SELECT translate FROM speech
+    let res = await sql`SELECT translate, quiz FROM speech
                         WHERE key = ${q.key} AND lang = ${q.lang}`;
 
     // If a result is found, return the translation
     if (res[0]) {
-      return { translate: res[0].translate };
+      return { translate: res[0].translate, quiz:res[0].quiz };
     } else {
       // Explicitly return a structured response when no data is found
       return { error: 'Translation not found' };

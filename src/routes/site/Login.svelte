@@ -30,10 +30,10 @@
 	  formData.email = url.searchParams.get('user');
   
 	  // Fetch translations once
-	  translated.nameLabel = await Translate('Имя', 'ru', $langs);
-	  translated.passwordLabel = await Translate('Пароль', 'ru', $langs);
-	  translated.confirmPasswordLabel = await Translate('Повторить пароль', 'ru', $langs);
-	  translated.registrationLabel = await Translate('Зарегистрироваться', 'ru', $langs);
+	  translated.nameLabel = await Translate('Имя', 'ru', $langs, 'login');
+	  translated.passwordLabel = await Translate('Пароль', 'ru', $langs, 'login');
+	  translated.confirmPasswordLabel = await Translate('Повторить пароль', 'ru', $langs, 'login');
+	  translated.registrationLabel = await Translate('Зарегистрироваться', 'ru', $langs, 'login');
 	});
   
 	function uploadImage(event) {

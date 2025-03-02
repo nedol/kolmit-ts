@@ -1,12 +1,12 @@
 
 
-export async function Translate(text: string, from_lang: string, to_lang: string) {
+export async function Translate(text: string, from_lang: string, to_lang: string, quiz: string) {
   try {   
 
 
     if (from_lang === to_lang) return text;
 
-    let question = { func: "translate",text: text, from_lang: from_lang, to_lang: to_lang };
+    let question = { func: "translate",text: text, from_lang: from_lang, to_lang: to_lang, quiz:quiz };
     
     text = text?.trim();
 

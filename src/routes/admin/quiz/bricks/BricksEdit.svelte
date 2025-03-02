@@ -89,7 +89,7 @@
     .then(async (resp) => {
 
       if (resp?.data) {
-        bricks_data.html = resp.data.html;      
+        bricks_data.html = resp.data?.html;      
         bricks_data.name = data.name;
         bricks_data.type = data.type?data.type:data.name.includes('Nieuws')?'news':'';
         bricks_data.prompt_type = resp.data.prompt_type;
@@ -153,9 +153,10 @@
     )
       .then((response) => response.json())
       .then((resp) => {
+        bricks_data.prompt_type = name;
         prompt = resp.resp.prompt.system + (resp.resp.prompt.user?resp.resp.prompt.user:'');
         prompt = prompt.replaceAll('${lang}', $llang);
-        prompt = prompt.replaceAll('${name}', bricks_data.name[$llang]);
+        prompt = prompt.replaceAll('${name}', bricks_data.name);
         prompt = prompt.replaceAll('${text}', bricks_data.context);
         prompt = prompt.replaceAll('${level}', data.level);
         prompt = prompt.replace('${qnty}', num);
@@ -191,7 +192,7 @@
             Object.keys(item).map(async (key: string) => {
               // console.log(key, item);
               if (item[key][$llang] && !item[key][$langs]) {
-                let tr = await Translate(item[key][$llang], $llang, $langs);
+                let tr = await Translate(item[key][$llang], $llang, $langs, bricks_data.name);
                 item[key][$langs] = tr;
                 bricks_data = bricks_data;
               }
@@ -234,23 +235,25 @@
 
   // Функция для сохранения текущего состояния в localStorage
   function OnSave() {
-    SaveDialogData(name, data);
+    SaveData(name, data);
     ChangeQuizName(name, data.name);
   }
 
 
 
-  async function SaveDialogData(name: string, data: any) {
+  async function SaveData(name: string, data: any) {
     const response = await fetch(`/admin/module`, {
       method: 'POST',
       body: JSON.stringify({
         func: 'upd_brks',
         owner: abonent,
         level: data.level,
-        name: name[$llang],
-        new_name: data.name[$llang],
+        name: name,
+        new_name: data.name,
         html: content,
         lang: $llang,
+        theme: data.theme,
+        prompt_type: bricks_data.prompt_type 
       }),
       headers: { 'Content-Type': 'application/json' },
     });
@@ -389,7 +392,7 @@
 <main>
   <div class="container">
     <div class="dialog-field">
-      {#await Translate('Title', 'en', $langs) then data}
+      {#await Translate('Title', 'en', $langs,bricks_data.name) then data}
         <label for="dialog_name">{data}</label>
       {/await}
 
@@ -402,7 +405,7 @@
     </div>
     {#if data.level}
       <div class="dialog-field">
-        {#await Translate('Level', 'en', $langs) then data}
+        {#await Translate('Level', 'en', $langs,bricks_data.name) then data}
           <label for="dialog_level">{data}</label>
         {/await}
 
@@ -412,7 +415,7 @@
 
     {#if $llang}
       <div class="dialog-field">
-        {#await Translate('Language', 'en', $langs) then data}
+        {#await Translate('Language', 'en', $langs,bricks_data.name) then data}
           <label for="dialog_lang">{data}</label>
         {/await}
 
@@ -429,7 +432,7 @@
     <Panel>
       <Header
         ><b>
-          {#await Translate('Content Builder', 'en', $langs) then data}
+          {#await Translate('Content Builder', 'en', $langs,bricks_data.name) then data}
             {data}
           {/await}
         </b></Header
@@ -561,7 +564,7 @@
             {:else if active === content_title}
               <Paper variant="unelevated">
                 <Content>
-                  {#await Translate('Use chatGPT to run the copied prompt and paste result here', 'en', $langs) then data}
+                  {#await Translate('Use chatGPT to run the copied prompt and paste result here', 'en', $langs,bricks_data.name) then data}
                     <!-- <textarea
                       id="dialog_content"
                       rows="20"
@@ -580,7 +583,7 @@
                     ></div> -->
                   {/await}
                   <button class="paste_content" on:click={PasteContent}>
-                    {#await Translate('Paste Content', 'en', $langs) then data}
+                    {#await Translate('Paste Content', 'en', $langs,bricks_data.name) then data}
                       {data}
                     {/await}
                   </button> 
@@ -591,7 +594,7 @@
 
           <div class="container">
             <button class="save" disabled on:click={CreateContent}>
-              {#await Translate('Create content', 'en', $langs) then data}
+              {#await Translate('Create content', 'en', $langs,bricks_data.name) then data}
                 {data}
               {/await}
             </button>
@@ -604,10 +607,10 @@
   <table>
     <thead>
       <tr>
-        {#await Translate('User 1', 'en', $langs) then data}
+        {#await Translate('User 1', 'en', $langs,bricks_data.name) then data}
           <th>{data}</th>{/await}
 
-        {#await Translate('User 2', 'en', $langs) then data}
+        {#await Translate('User 2', 'en', $langs,bricks_data.name) then data}
           <th>{data}</th>{/await}
       </tr>
     </thead>
@@ -651,10 +654,10 @@
       >add</IconButton
     >
     <div class="container">
-      {#await Translate('Copy data', 'en', $langs) then data}
+      {#await Translate('Copy data', 'en', $langs,bricks_data.name) then data}
         <button class="copy_content" on:click={() => OnCopyContent()}>{data}</button>
       {/await}
-      {#await Translate('Save', 'en', $langs) then data}
+      {#await Translate('Save', 'en', $langs,bricks_data.name) then data}
         <button class="save_content" on:click={() => OnSave()}>{data}</button>
       {/await}
     </div>

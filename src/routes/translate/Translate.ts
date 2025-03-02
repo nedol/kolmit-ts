@@ -13,89 +13,56 @@ const langs = [
 const pendingTranslations = new Map<string, Promise<string>>(); 
 
 // Translation function
-export async function Translate(text: string, from: string, to: string): Promise<string> {
+export async function Translate(text: string, from: string, to: string, quiz: string): Promise<string> {
   if (!text) return '';
 
-  // Clean the input text
-  text = text.replace(/\r\n/g, ' ');
+  // Очистка текста от переносов строк
+  text = text.replace(/\r\n/g, ' ').trim();
+  const cacheKey = md5(text);
 
-  // Split the text into sentences
-  const sentences = text.split(/(?<=[.!?])\s+/);
-  let translatedText = '';
+  // Проверяем наличие перевода в базе
+  let resp = await ReadSpeech({ lang: to, key: cacheKey });
 
-  // Process sentences in chunks of 5
-  for (let i = 0; i < sentences.length; i += 5) {
-    let chunk = sentences.slice(i, i + 5).join(' ').trim();
-    if (!chunk || chunk === '"') continue;
+  if (!resp?.translate) {
+    console.log(`Текст отсутствует в базе, выполняем перевод: ${text}`);
 
-    // Handle special characters like <<
-    const hasQuotes = chunk.includes('<<');
-    if (hasQuotes) {
-      chunk = chunk.replace(/<</g, ' ').replace(/>>/g, ' ');
-    }
+    try {
+      let translated = '';
 
-    const cacheKey = md5(chunk);
-
-    // Wait for existing translation if one is in progress
-    if (pendingTranslations.has(cacheKey)) {
-      console.log(`Ожидание перевода: ${chunk}`);
-      translatedText += await pendingTranslations.get(cacheKey);
-      continue;
-    }
-
-    // Check if the translation is already cached in the database
-    const resp = await ReadSpeech({ lang: to, key: cacheKey });
-    if (resp?.translate) {
-      // console.log(`Файл уже существует`);
-      translatedText += `${resp.translate} `;
-      continue;
-    }
-
-    console.log(`Файл НЕ существует`);
-    let translationPromise = (async () => {
-      let res = '';
-
-      try {
-        if (langs.includes(to)) {
-          // Use DeepL for supported languages
-          res = await translate(chunk, to.toUpperCase());
-        } else {
-          // Use Google Translate API for unsupported languages
-          const en = await translate(chunk, "EN");
-          res = await translatex(en, {
-            from: "en",
-            to: to,
-            forceBatch: true,
-            requestOptions: {
-              agent: new HttpsProxyAgent('https://164.132.175.159:3128'),
-            },
-          });
-          res = res.text;
-        }
-
-        // Restore special characters (<< >>)
-        if (hasQuotes) {
-          // res = res.text.replace(/\<(.*?)\>/g, '<<$1>>');                                                       
-        }
-
-        // Cache the translation in the database
-        await WriteSpeech({ lang: to, key: cacheKey, text: chunk, translate: res });
-
-      } catch (error) {
-        console.error('Ошибка перевода:', error);
-        res = chunk; // Return original text if translation fails
+      if (langs.includes(to)) {
+        translated = await translate(text, to.toUpperCase());
+      } else {
+        const en = await translate(text, "EN");
+        translated = await translatex(en, {
+          from: "en",
+          to: to,
+          forceBatch: true,
+          requestOptions: {
+            agent: new HttpsProxyAgent('https://164.132.175.159:3128'),
+          },
+        });
+        translated = translated.text;
       }
 
-      // Remove the item from the queue after translation
-      pendingTranslations.delete(cacheKey);
+      // Сохраняем в базу, если перевели
+      await WriteSpeech({
+        lang: to,
+        key: cacheKey,
+        text: text,
+        translate: translated,
+        quiz: quiz || resp?.quiz || '', // Берём новый quiz или оставляем старый
+      });
 
-      return res;
-    })();
+      resp = { translate: translated, quiz: quiz }; // Обновляем resp для возврата
 
-    // Add the translation task to the queue
-    pendingTranslations.set(cacheKey, translationPromise);
-    translatedText += await translationPromise;
+    } catch (error) {
+      console.error('Ошибка перевода:', error);
+      return text; // Если произошла ошибка, возвращаем исходный текст
+    }
+  } else {
+    console.log(`Текст уже есть в базе`);
   }
 
-  return translatedText.trim();
+  return resp.translate;
 }
+

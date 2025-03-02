@@ -109,7 +109,8 @@
           : (currentWord.example[$llang] = await Translate(
               currentWord.example['ru'],
               'ru',
-              $llang
+              $llang,
+              data.name
             ))),
         `${original}`
       );
@@ -607,13 +608,13 @@
 
     <div style="border:1px solid lightgrey;border-radius:5px;padding:-10px">
 
-      {#await Translate('Заполнить пропуски', 'ru', $langs) then data}
+      {#await Translate('Заполнить пропуски', 'ru', $langs,data.name) then data}
         <div class="title">{data}:</div>
       {/await}
 
       {#if translate}
         <div class="word">
-          {#await Translate(currentWord?.example[$llang], $llang, $langs) then data}
+          {#await Translate(currentWord?.example[$llang], $llang, $langs,data.name) then data}
             {@html data}
           {/await}       
         </div>

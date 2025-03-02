@@ -20,10 +20,10 @@
   {#if data.quiz.includes('dialog')}
     <DialogEdit {ChangeQuizName} />
   {:else if data.quiz.includes('bricks')}
-    <BricksEdit />
+    <BricksEdit {ChangeQuizName}/>
   {:else if data.quiz === 'word'}
     {#if $dc_state==="open" && $call_but_status === 'talk'}
-      <WordGameEdit {data} />
+      <WordGameEdit {data} {ChangeQuizName}/>
     {:else}
       <WordEdit />
     {/if}

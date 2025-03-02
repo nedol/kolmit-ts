@@ -3,7 +3,7 @@
 
   import ConText from '../Context.svelte';
 
-  //import '$lib/css/_Colored.scss';
+  import { NumberString, numberToDutchString } from '../listen/Listen.numbers.js';
 
   import TopAppBar, { Row, Title, Section } from '@smui/top-app-bar';
   import Button, { Label } from '@smui/button';
@@ -111,7 +111,7 @@
 
   // llang = data.llang;
   let showSpeakerButton = false;
-  let similarity:string;
+  let similarity:any;
 
   let tip_hidden_text = 'hidden-text';
   let cur_html = 0;
@@ -456,17 +456,23 @@
   }
 
   function SttResult(text) {
+
     stt_text = text[$llang];
 
-    const numbers = dialog_data.content[cur_qa].user2[$llang].match(/\b\d+\b/g);
+    let content = isFlipped?dialog_data.content[cur_qa].user1[$llang]:
+    dialog_data.content[cur_qa].user2[$llang];
+
+    const numbers = content.match(/\b\d+\b/g);
     if (numbers)
-      dialog_data.content[cur_qa].user2[$llang] = dialog_data.content[
-        cur_qa
-      ].user2[$llang].replace(/\b\d+\b/g, numberToDutchString(numbers[0]));
+      content = content.replace(/\b\d+\b/g, numberToDutchString(numbers[0]));
+
+    const numbers2 = stt_text.match(/\b\d+\b/g);
+    if(numbers2)
+      stt_text = stt_text.replace(/\b\d+\b/g, numberToDutchString(numbers2[0]));
 
     if (stt_text) {
       similarity = compareStrings(
-        dialog_data.content[cur_qa].user2[$llang]
+        content
           .toLowerCase()
           .trim()
           .replace(/[^\w\s]|_/g, ''),
@@ -687,7 +693,7 @@
           {/if} -->
         </Section>
         <Section align="start">
-          <div class="flip_button">
+          <div class="flip_button" on:click={onChangeUserClick}>
             <IconButton>
               <Icon tag="svg" viewBox="0 0 24 24">
                 <path fill="currentColor" d={mdiAccountConvertOutline} />
@@ -770,7 +776,7 @@
 
       <div class="container">
 
-          {#await Translate('Послушай вопрос', 'ru', $langs) then data}
+          {#await Translate('Послушай вопрос', 'ru', $langs, dialog_data?.name) then data}
             <div class="title" class:active_title={isActiveTitle[0]}>{data}:</div>
           {/await}
 
@@ -784,7 +790,7 @@
           {#if visibility[1]==='visible'}
             <div class="user1" style="visibility:{visibility[1]}">
               <span>
-                  {#await Translate(q[$llang], $llang, $langs) then data}
+                  {#await Translate(q[$llang], $llang, $langs, dialog_data?.name) then data}
                     {@html data}
                   {/await}
               </span>
@@ -834,7 +840,7 @@
               {/if}        
             </Section>
             <Section align="end">
-              <div class="speaker-button" on:click={speak(q[$llang])}>
+              <div class="speaker-button" class:active_title={isActiveTitle[0]} on:click={speak(q[$llang])}>
                 <IconButton>
                   <Icon tag="svg" viewBox="0 0 24 24">
                     <path fill="currentColor" d={mdiPlay} />
@@ -868,7 +874,7 @@
 
       <div class="container">
 
-        {#await Translate('Переведи и ответь', 'ru', $langs) then data_1}
+        {#await Translate('Переведи и ответь', 'ru', $langs, dialog_data?.name) then data_1}
           <div class="title"  class:active_title={isActiveTitle[1]}>{data_1}:</div>
         {/await}
         <!-- {#await Translate('(используй подсказки слов в случае необходимости)', 'ru', $langs) then data_2}
@@ -883,7 +889,7 @@
 
         <div class="user2_tr">
           {#if a && visibility[0] === 'visible'}
-              {#await Translate(a[$llang], $llang, $langs) then data}
+              {#await Translate(a[$llang], $llang, $langs, dialog_data?.name) then data}
                 {data}
               {/await}    
           {/if}  
@@ -940,7 +946,7 @@
                     </Icon>
                   </IconButton>
                   {#if isListening}
-                    {#await Translate('говори', 'ru', $llang) then data}
+                    {#await Translate('говори', 'ru', $llang, dialog_data?.name) then data}
                       <span>{data}</span>
                     {/await}
                   {/if}
@@ -1002,7 +1008,7 @@
             </div>
           {/if}
 
-          {#await Translate('Переведи и спроси', 'ru', $langs) then data}
+          {#await Translate('Переведи и спроси', 'ru', $langs, dialog_data?.name) then data}
             <div class="title" class:active_title={isActiveTitle[0]}>{data}:</div>
           {/await}
           <!-- {#await Translate('(используй подсказки слов в случае необходимости)', 'ru', $langs) then data_2}
@@ -1018,7 +1024,7 @@
 
           <div class="user2_tr">
             {#if a}
-                {#await Translate(a[$llang], $llang, $langs) then data}
+                {#await Translate(a[$llang], $llang, $langs, dialog_data?.name) then data}
                   {data}
                 {/await}
             {/if}
@@ -1050,72 +1056,69 @@
               )}
             {/if}
           </div>
+          <div style="position: relative;top: -13px;">
+            <Row>
+              <Section align="start">
 
-          <Row>
-            <Section align="start">
-
-              {#if !share_mode && isSTT}
-              <div
-                class="margins"
-                style="text-align: center; display: flex; align-items: center; justify-content: space-between;"
-              >
-                <div>
-                  <IconButton
-                    class="material-icons"
-                    aria-label="Back"
-                    on:click={onClickMicrophone}
-                  >
+                {#if !share_mode && isSTT}
+                <div
+                  class="margins"
+                  style="text-align: center; display: flex; align-items: center; justify-content: space-between;"
+                >
+                  <div>
+                    <IconButton
+                      class="material-icons"
+                      aria-label="Back"
+                      on:click={onClickMicrophone}
+                    >
+                      <Icon tag="svg" viewBox="0 0 24 24">
+                        {#if isListening}
+                          <path fill="currentColor" d={mdiMicrophone} />
+                        {:else}
+                          <path fill="currentColor" d={mdiMicrophoneOutline} />
+                        {/if}
+                      </Icon>
+                    </IconButton>
+                  </div>
+                  <Stt
+                    bind:this={stt}
+                    {SttResult}
+                    {StopListening}
+                    bind:display_audio
+                  ></Stt>
+                </div>
+              {/if}
+              </Section>
+              <Section align="end">
+                <div class="speaker-button" on:click={speak(a[$llang])}>
+                  <IconButton>
                     <Icon tag="svg" viewBox="0 0 24 24">
-                      {#if isListening}
-                        <path fill="currentColor" d={mdiMicrophone} />
-                      {:else}
-                        <path fill="currentColor" d={mdiMicrophoneOutline} />
-                      {/if}
+                      <path fill="currentColor" d={mdiPlay} />
                     </Icon>
                   </IconButton>
                 </div>
-                <Stt
-                  bind:this={stt}
-                  {SttResult}
-                  {StopListening}
-                  bind:display_audio
-                ></Stt>
-              </div>
-            {/if}
-            
+              </Section>
+              
+            </Row>
+        
+            <div  style="text-align: center;  margin-top: 20px;">
+              <span style="color: darkgreen;">
+                {@html stt_text}
 
+              </span> 
+              </div>    
+              {#if similarity}
+                <div class="similarity">
+                  <p>
+                    <span class="mdc-typography--overline" style="position:relative"
+                      >{similarity}
+                    </span>
+                  </p>
+                </div>
+              {/if}
 
-            </Section>
-            <Section align="end">
-              <div class="speaker-button" on:click={speak(a[$llang])}>
-                <IconButton>
-                  <Icon tag="svg" viewBox="0 0 24 24">
-                    <path fill="currentColor" d={mdiPlay} />
-                  </Icon>
-                </IconButton>
-              </div>
-            </Section>
-            
-          </Row>
-
-          <div  style="text-align: center;  margin-top: 20px;">
-            <span style="color: darkgreen;">
-              {@html stt_text}
-
-            </span> 
-            </div>    
-            {#if similarity}
-              <div class="similarity">
-                <p>
-                  <span class="mdc-typography--overline" style="position:relative"
-                    >{similarity}
-                  </span>
-                </p>
-              </div>
-            {/if}
-
-          </div> 
-  
+            </div> 
+        </div>
         <div class="container">
 
           {#if visibility[2]==='hidden' }
@@ -1124,14 +1127,14 @@
             </button>
           {/if}
 
-            {#await Translate('Послушай ответ', 'ru', $langs) then data}
+            {#await Translate('Послушай ответ', 'ru', $langs, dialog_data?.name) then data}
               <div class="title" class:active_title={isActiveTitle[1]}>{data}:</div>
             {/await}
 
            <div style="text-align: center;">
             <div class="user1" style="visibility:{visibility[2]}">
               {#if !dialog_data.content[cur_qa].user1[$langs]}
-                {#await Translate(q[$llang], $llang, $langs) then data}
+                {#await Translate(q[$llang], $llang, $langs, dialog_data?.name) then data}
                   {data}
                 {/await}
               {:else}
@@ -1150,7 +1153,7 @@
             {@html q[$llang]}
           </div>
 
-          <div style="top:-14px;height:64px">
+          <div style="position:relative;top:-14px;height:64px">
           
           <Row>
             <Section align="start">
@@ -1176,7 +1179,7 @@
               {/if}
             </Section>
             <Section align="end">
-              <div class="speaker-button" on:click={speak(q[$llang])}>
+              <div class="speaker-button" class:active_title={isActiveTitle[1]} on:click={speak(q[$llang])}>
                 <IconButton>
                   <Icon tag="svg" viewBox="0 0 24 24">
                     <path fill="currentColor" d={mdiPlay} />
@@ -1224,7 +1227,7 @@
     position: relative;
     box-sizing: border-box;
     width: 100%; */
-    /* height: 72px !important; */
+    /* height: 64px !important; */
     top:0px;
   }
   main_dlg {
@@ -1237,6 +1240,8 @@
     transition: transform 0.5s;
     height: 120vh;
   }
+
+
 
   .repeat_alert {
     position: absolute;
@@ -1319,7 +1324,7 @@
     position: relative;
     margin-left: auto;
     color: grey;
-    margin: 25px 5px auto 25px;
+    margin: 20px 5px auto 25px;
     font-size: x-small;
     z-index: 2;
     scale: .8;
