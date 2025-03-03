@@ -91,10 +91,10 @@ export class DataChannelOperator {
                 if (parsed.received) {
                     console.log('Received:', parsed.received);
                 }
-                if (parsed.hash) {
+                if (parsed.hash && this.dc.readyState ==='open') {
                     setTimeout(() => {
                         // Send acknowledgment
-                        this.dc.send(JSON.stringify({ type: 'ack', hash: parsed.hash }));
+                        // this.dc.send(JSON.stringify({ type: 'ack', hash: parsed.hash }));
                     }, 10);
                 }
                 if (data) {

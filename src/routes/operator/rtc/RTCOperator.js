@@ -62,16 +62,24 @@ export class RTCOperator extends RTCBase {
                 }
     
                 // Пересоздаём DataChannel
-                if (pc.dataChannel) {
-                    pc.dataChannel.close();
-                }
-                pc.dataChannel = pc.con.createDataChannel("chat");
-                setupDataChannel(pc.dataChannel); // Функция для обработки событий DataChannel
+                if ( false && this.DC) {
+                    this.DC.dc.close();
+             
+                  this.DC = pc.con.createDataChannel(this.main_key + ' data channel', {
+                    maxRetransmits: 10, 
+                    ordered: false,
+                  });
+              }
+
+                // setupDataChannel(pc.dataChannel); // Функция для обработки событий DataChannel
     
             } catch (error) {
                 console.error('Ошибка при перезапуске ICE:', error);
             } finally {
+              setTimeout(()=>{
                 this.isReconnecting = false;
+              }, 100)
+               
             }
         }
       }     
@@ -90,11 +98,18 @@ export class RTCOperator extends RTCBase {
 			if (pc.con.iceConnectionState === 'failed') {
 				/* possibly reconfigure the connection in some way here */
 				console.log(pc.pc_key + ' ICE state change event: failed', this);
-				/* then request ICE restart */
-        pc.con.restartIce();
-        this.InitRTC(this.main_pc, ()=>{
+           // Закрываем старое соединение перед пересозданием
+        try {
+          pc.con.getSenders().forEach(sender => pc.con.removeTrack(sender));
+          pc.con.close();
+        } catch (e) {
+            console.error("Ошибка при закрытии соединения", e);
+        }
 
-        })
+        // Создаём новый PeerConnection
+        this.InitRTC(this.main_pc, () => {
+            console.log("Новое PeerConnection успешно создано");
+        });
 			}
 
 			if (pc.con.iceConnectionState === 'completed') {
