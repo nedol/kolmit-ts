@@ -100,7 +100,7 @@ export class DataChannelOperator {
                 if (data) {
                     setTimeout(() => {
                         try {
-                            if (typeof data === 'string') {
+                            if (typeof data === 'string' && data!=="") {
                                 const parsedData = JSON.parse(data);
                                 msg.set(parsedData); // Assuming msg.set() is defined elsewhere
                             } else {

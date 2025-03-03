@@ -37,7 +37,6 @@ export async function load({ fetch, cookies, route, url }) {
 	};
 	try {
 
-
 		if(lvl){
 			res = cookies.get(`${lvl}.kolmit.operator.${abonent}`);
 			if(!res){

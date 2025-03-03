@@ -100,42 +100,69 @@ export class RTCBase {
 			// let res = fetch(this.signch.host.host_server+'kolmit/users/'+this.email+'/ice_conf.json');
 			// this.conf = (await (await res).json());
 		} catch (ex) {}
-
+	
 		let pc_config = {
 			iceTransportPolicy: 'all',
-			lifetimeDuration: this.conf.lifetimeDuration,
 			rtcpMuxPolicy: 'require',
 			bundlePolicy: 'balanced',
 			iceServers: this.conf.stun.concat(this.conf.turn)
 		};
-
+	
 		console.log('iceServers:', this.conf.stun.concat(this.conf.turn));
-
+	
 		if (this.pcPull[pc_key]) {
-			if (this.DC && this.DC.dc) {
-				this.DC.dc.close();
-				this.DC = null;
-			}
 			if (this.pcPull[pc_key].con) {
+				console.log("Закрываем старое соединение...");
+				this.pcPull[pc_key].con.getSenders().forEach(sender => this.pcPull[pc_key].con.removeTrack(sender));
 				this.pcPull[pc_key].con.close();
-				this.pcPull[pc_key].con = null;
 			}
+			if (this.DC && this.DC.dc) {
+				console.log("Закрываем старый DataChannel...");
+				this.DC.dc.close();
+			}
+			this.pcPull[pc_key] = null;
+			this.DC = null;
 		}
-
-		let params = {}; //this.pcPull[pc_key]?this.pcPull[pc_key].params:{};
-
-		this.pcPull[pc_key] = null;
+	
+		let params = {}; // Очищаем параметры старого соединения
+	
+		console.log("Создаём новый PeerConnection...");
 		this.pcPull[pc_key] = new Peer(this, pc_config, pc_key);
 		this.pcPull[pc_key].signal = this.signal;
 		this.pcPull[pc_key].params = params;
-
-		// setTimeout(()=>{
-		this.DC = new DataChannelOperator(this, this.pcPull[pc_key]);
-		this.startTime = Date.now();
-		cb();
-		// },1000);
+	
+		try {
+			// Подождем, пока соединение установится
+			await this.waitForConnection(this.pcPull[pc_key]);
+	
+			// Теперь создаем DataChannel
+			this.DC = new DataChannelOperator(this, this.pcPull[pc_key]);
+			this.startTime = Date.now();
+			console.log("Новое соединение и DataChannel готовы!");
+	
+			// Вызываем коллбек
+			cb();
+		} catch (error) {
+			console.error('Ошибка при установке нового соединения:', error);
+		}
+		
 	}
 
+	// Утилита для ожидания установления соединения
+	waitForConnection(pc) {
+		return new Promise((resolve, reject) => {
+			// Слушаем изменения состояния соединения
+			const checkConnection = () => {
+				if (pc.con.signalingState === 'stable') {
+					resolve();
+				} else {
+					setTimeout(checkConnection, 100);
+				}
+			};
+			checkConnection();
+		});
+	}
+	
 	gotStream(stream, cb) {
 		//log('Received local stream', this);
 
