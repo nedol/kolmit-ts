@@ -38,7 +38,6 @@ export class Peer {
 		par.status = 'call';
 		par.abonent = that.rtc.abonent;
 
-
 		return await this.signal.SendMessage(par);
 	}
 
@@ -100,6 +99,10 @@ export class Peer {
 				}
 				if (!this.params['loc_cand']) this.params['loc_cand'] = [];
 				this.params['loc_cand'].push(e.candidate);
+
+				if(this.rtc.DC.dc?.readyState==='open'){
+					this.rtc.DC.SendData({candidate:e.candidate});
+				}
 
 				if (!timr) {
 					timr = setTimeout(() => {

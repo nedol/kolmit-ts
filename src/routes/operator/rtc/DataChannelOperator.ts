@@ -49,8 +49,8 @@ export class DataChannelOperator {
     this.pc = pc;
     this.call_num = 3;
     this.dc = pc.con.createDataChannel(pc.pc_key + ' data channel', {
-      reliable: true,
-      ordered: true,
+      maxRetransmits: 10, 
+      ordered: false,
     });
 
     this.dc.onopen = () => {
@@ -82,61 +82,74 @@ export class DataChannelOperator {
     let receiveBuffer: BlobPart[] = [];
     let receivedSize = 0;
 
+    
     this.dc.onmessage = async (event) => {
-      try {
-        let parsed = JSON.parse(event.data);
-
-        if (parsed.type === 'eom') {
-          if (parsed.received) {
-            console.log(parsed.received);
-          }
-          if (parsed.hash) {
-            setTimeout(() => {
-              // Send acknowledgement if needed
-            }, 10);
-          }
-          if (data) {
-            setTimeout(() => {
-              try {
-                if (data && typeof data === 'string') {
-                    const parsedData = JSON.parse(data);
-                    msg.set(parsedData);
-                } else {
-                    console.error('Data is not a valid JSON string');
+        try {
+            const parsed = JSON.parse(event.data);
+    
+            if (parsed.type === 'eom') {
+                if (parsed.received) {
+                    console.log('Received:', parsed.received);
                 }
-              } catch (error) {
-                  console.error('Msg ошибка:', error);
-              } finally {
-                  data = ''; // Очистка данных
-              }
-            }, 10);
-          }
-          return;
+                if (parsed.hash) {
+                    setTimeout(() => {
+                        // Send acknowledgment
+                        this.dc.send(JSON.stringify({ type: 'ack', hash: parsed.hash }));
+                    }, 10);
+                }
+                if (data) {
+                    setTimeout(() => {
+                        try {
+                            if (typeof data === 'string') {
+                                const parsedData = JSON.parse(data);
+                                msg.set(parsedData); // Assuming msg.set() is defined elsewhere
+                            } else {
+                                console.error('Data is not a valid JSON string');
+                            }
+                        } catch (error) {
+                            console.error('Msg parsing error:', error);
+                        } finally {
+                            data = ''; // Clear data
+                        }
+                    }, 0);
+                }
+                return;
+            }
+    
+            // Accumulate data slices
+            if (parsed.slice) {
+                data += parsed.slice;
+            }
+    
+            // Handle file metadata
+            if (parsed.file) {
+                console.log('File metadata received:', parsed.file);
+            }
+    
+            // Handle end of file
+            if (parsed.type === 'eof') {
+                const received = new Blob(receiveBuffer);
+                receiveBuffer = []; // Reset buffer
+                receivedSize = 0; // Reset size
+    
+                if (confirm(`File received: ${parsed.file}. Size: ${parsed.length}. Save?`)) {
+                    const downloadLink = document.getElementById('download_href');
+                    if (downloadLink) {
+                        downloadLink.textContent = `Download ${parsed.file}`;
+                        downloadLink.href = URL.createObjectURL(received);
+                        downloadLink.download = parsed.file;
+                        downloadLink.click();
+                    } else {
+                        console.error('Download link element not found');
+                    }
+                }
+                return;
+            }
+        } catch (error) {
+            console.error('Error processing message:', error);
+            data = ''; // Clear data on error
+            if (!event.data.byteLength) return; // Skip binary data
         }
-
-        data += parsed.slice;
-        if (parsed.file) {
-          // Handle file metadata if needed
-        }
-        if (parsed.type === 'eof') {
-          const received = new Blob(receiveBuffer);
-          receiveBuffer = [];
-          receivedSize = 0;
-          if (
-            confirm(`Получен файл: ${parsed.file}. Размер: ${parsed.length}. Сохранить?`)
-          ) {
-            let download_href = document.getElementById('download_href') as HTMLAnchorElement;
-            download_href.textContent = `Получен файл: ${parsed.file}. Размер: ${parsed.length}. Сохранить?`;
-            download_href.href = URL.createObjectURL(received);
-            download_href.download = parsed.file;
-            download_href.click();
-          }
-          return;
-        }
-      } catch (ex) {
-        data = '';
-        if (!event.data.byteLength) return;
-      }
     };
   }
 
