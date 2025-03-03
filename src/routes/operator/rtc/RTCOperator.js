@@ -1,7 +1,7 @@
 import { writable } from 'svelte/store';
 import { DataChannelOperator } from './DataChannelOperator';
 import { RTCBase } from './RTCBase';
-import { langs } from '$lib/stores.ts';
+import { con_state } from '$lib/stores.ts';
 import { msg } from '$lib/stores.ts';
 
 export class RTCOperator extends RTCBase {
@@ -29,6 +29,9 @@ export class RTCOperator extends RTCBase {
 
   async onIceStateChange(pc, event) {
 		if (pc && pc.con !== null) {
+
+      con_state.set(pc.con.iceConnectionState);
+
 			if (pc.con.iceConnectionState === 'new') {
 				console.log(pc.pc_key + ' ICE state change event: new', this);
 			}
@@ -37,72 +40,41 @@ export class RTCOperator extends RTCBase {
 				console.log(pc.pc_key + ' ICE state change event: checking', this);
 			}
       
-      if (pc.con && pc.con.iceConnectionState === 'disconnected') {
-        console.log(pc.pc_key + ' ICE state change event: disconnected', this);
-        
+      if (pc.con.iceConnectionState === 'disconnected') {
+        console.log('ICE state change: disconnected');
+    
         if (!this.isReconnecting) {
-          this.isReconnecting = true; // Блокируем повторные попытки
-          console.log('Соединение потеряно, перезапуск...');
-      
-          try {
-            // Если поддерживается, запустить ICE Restart
-            if (pc.con && typeof pc.con.restartIce === 'function') {
-              console.log('Перезапуск ICE через restartIce()...');
-              pc.con.restartIce();
-      
-              // Ожидаем, пока состояние не изменится (ждём до 3 секунд)
-              await new Promise((resolve) => {
-                const checkState = () => {
-                  if (!pc.con) {
-                    console.warn('PeerConnection уже не существует, выходим.');
-                    Init(()=>{
-
-                    });
-                    resolve();
-                    return;
-                  }
-                  if (pc.con.iceConnectionState === 'connected' || pc.con.iceConnectionState === 'completed') {
-                    console.log('Соединение восстановлено после restartIce()');
-                    resolve();
-                  } else {
-                    setTimeout(checkState, 500);
-                  }
-                };
-                setTimeout(checkState, 500);
-              });
-         
-      
-            } else {
-              console.log('restartIce() не поддерживается, выполняем ручное восстановление...');
-            }
-      
-            // Проверяем signalingState перед установкой remoteDescription
-            if (pc.con && pc.con.signalingState !== 'stable') {
-              console.warn('signalingState нестабилен, пропускаем setRemoteDesc()');
-            } else if (pc.con) {
-              await this.pcPull[this.abonent].setRemoteDesc(this.pcPull[this.abonent].params['rem_desc']);
-            }
-      
-            // Повторно добавляем ICE-кандидатов
-            const candidates = this.pcPull[this.abonent].params['rem_cand'];
-            if (Array.isArray(candidates)) {
-              for (const candidate of candidates) {
-                if (candidate && pc.con) {
-                  await this.pcPull[this.abonent].con.addIceCandidate(candidate);
+            this.isReconnecting = true;
+    
+            console.log('Перезапуск ICE...');
+            pc.con.restartIce();
+    
+            try {
+                await this.pcPull[this.abonent].setRemoteDesc(this.pcPull[this.abonent].params['rem_desc']);
+                
+                const data = this.pcPull[this.abonent].params['rem_cand'];
+                if (Array.isArray(data)) {
+                    for (let c of data) {
+                        if (data[c]) {
+                            this.pcPull[this.abonent].con.addIceCandidate(data[c]);
+                        }
+                    }
                 }
-              }
+    
+                // Пересоздаём DataChannel
+                if (pc.dataChannel) {
+                    pc.dataChannel.close();
+                }
+                pc.dataChannel = pc.con.createDataChannel("chat");
+                setupDataChannel(pc.dataChannel); // Функция для обработки событий DataChannel
+    
+            } catch (error) {
+                console.error('Ошибка при перезапуске ICE:', error);
+            } finally {
+                this.isReconnecting = false;
             }
-      
-          } catch (error) {
-            console.error('Ошибка при перезапуске ICE:', error);
-          } finally {
-            // Сброс флага после завершения
-            this.isReconnecting = false;
-          }
         }
-      }
-      
-      
+      }     
       
 
 			if (pc.con.iceConnectionState === 'connected') {
@@ -110,6 +82,7 @@ export class RTCOperator extends RTCBase {
 				clearTimeout(this.checking_tmr);
 				console.log(pc.pc_key + ' ICE state change event: connected', this);
 				this.main_pc = pc.pc_key;
+
 				// call_but_status.set('active');
 				// this.DC = new DataChannelOperator(this, pc);
 			}
@@ -118,7 +91,10 @@ export class RTCOperator extends RTCBase {
 				/* possibly reconfigure the connection in some way here */
 				console.log(pc.pc_key + ' ICE state change event: failed', this);
 				/* then request ICE restart */
-				pc.con.restartIce();
+        pc.con.restartIce();
+        this.InitRTC(this.main_pc, ()=>{
+
+        })
 			}
 
 			if (pc.con.iceConnectionState === 'completed') {

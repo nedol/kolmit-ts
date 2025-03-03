@@ -19,6 +19,7 @@ export const lesson = writable({ visible: true , data: '' });
 export const click_call_func = writable();
 export const dc = writable();
 export const dc_state = writable('close');
+export const con_state = writable('');
 export const sql_st = writable();
 export const muted = writable(true);
 export const showBottomAppBar = writable(true);

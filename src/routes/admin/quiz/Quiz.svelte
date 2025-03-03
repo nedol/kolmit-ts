@@ -22,7 +22,7 @@
   {:else if data.quiz.includes('bricks')}
     <BricksEdit {ChangeQuizName}/>
   {:else if data.quiz === 'word'}
-    {#if $dc_state==="open" && $call_but_status === 'talk'}
+    {#if $dc_state==="connected" && $call_but_status === 'talk'}
       <WordGameEdit {data} {ChangeQuizName}/>
     {:else}
       <WordEdit />

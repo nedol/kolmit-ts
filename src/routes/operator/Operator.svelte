@@ -20,6 +20,7 @@
     signal,
     click_call_func,
     dc_state,
+    con_state,
     call_but_status,
     dicts,
     langs,
@@ -423,6 +424,12 @@
 
   function OnPlayVideo() {
     video_progress = false;
+  }
+
+  $:switch($con_state){
+    case 'disconnected':
+      // $call_but_status = 'inactive';
+    break;
   }
 
     /*TODO: дает*/
