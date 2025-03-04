@@ -153,10 +153,10 @@ export class Peer {
 
 		this.con.setLocalDescription(desc).then(
 			function () {
-				that.params['loc_desc'] = that.con.remoteDescription;
+				that.params['loc_desc'] = that.con.localDescription;
 			},
 			 (error)=> {
-				console.log('Failed to set remote description: ' + error.toString(), this);
+				console.log('Failed to set local description: ' + error.toString(), this);
 				//  this.con.close();
 				// this.con = new RTCPeerConnection(this.pc_config);
 				// this.setRemoteDesc(desc); 
