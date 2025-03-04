@@ -774,7 +774,7 @@
     {#if q || a}
       {#if !isFlipped}
 
-      <div class="container">
+      <div class="container question">
 
           {#await Translate('Послушай вопрос', 'ru', $langs, dialog_data?.name) then data}
             <div class="title" class:active_title={isActiveTitle[0]}>{data}:</div>
@@ -872,7 +872,7 @@
       </div>
       </div> 
 
-      <div class="container">
+      <div class="container answer">
 
         {#await Translate('Переведи и ответь', 'ru', $langs, dialog_data?.name) then data_1}
           <div class="title"  class:active_title={isActiveTitle[1]}>{data_1}:</div>
@@ -903,7 +903,9 @@
                 /(?<!")\b\p{L}+(?<!\s)(?!")/gu,
                 (match) => {
                   return `<span class="span_hidden" onclick="(this.style.color='#2196f3')" 
-                  style="display:inline-block; font-size:1.2em ; margin: 5px 0px; padding: 1px 5px;font-weight: 600;
+                  style="display:inline-block; font-size:1.2em ; 
+                  background-color: white;
+                  margin: 5px 0px; padding: 1px 5px;font-weight: 600;
                   border:1px;border-style:groove;border-color:lightblue;
                   border-radius: 5px;color:transparent;">${match}</span>`;
                 }
@@ -1039,7 +1041,9 @@
                 /(?<!")\b\p{L}+(?<!\s)(?!")/gu,
                 (match) => {
                   return `<span class="span_hidden" onclick="(this.style.color='#2196f3')" 
-                  style="display:inline-block; font-size:1.0em ; margin: 5px 0px; padding: 1px 5px;font-weight: 600;
+                  style="display:inline-block; font-size:1.0em ; 
+                  background-color: white;
+                  margin: 5px 0px; padding: 1px 5px;font-weight: 600;
                   border:1px;border-style:groove;border-color:lightblue;
                   border-radius: 5px;color:transparent;">${match}</span>`;
                 }
@@ -1241,15 +1245,12 @@
     height: 120vh;
   }
 
-
-
   .repeat_alert {
     position: absolute;
     left: 10px;
     scale: 0.7;
     z-index: 2;
   }
-
   .thumb_alert {
     position: absolute;
     width: 30px;
@@ -1284,6 +1285,14 @@
     align-items: center;
     border: 1px solid lightgrey;
     border-radius: 5px;
+  }
+
+  .question{
+    background-color: aliceblue;
+  }
+
+  .answer{
+    background-color:  aliceblue;
   }
 
   .bricks-header {
@@ -1480,7 +1489,7 @@
     font-size: 0.8em;
     margin-bottom: 0px;
     color: #333;
-    z-index: -1;
+    /* z-index: -1; */
   }
 
   .user2 {
@@ -1499,7 +1508,7 @@
     font-size: 0.8em;
     margin-bottom: 0px;
     color: #333;
-    z-index: -1;
+    /* z-index: -1; */
   }
 
   .tip {
