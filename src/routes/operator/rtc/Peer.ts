@@ -146,6 +146,26 @@ export class Peer {
 		}, that.onSetAnswerError);
 	}
 
+	setLocalDesc(desc) {
+		let that = this;
+		console.log('setLocalDescription start', that);
+		console.log('Peer connectionState:' + this.con.connectionState, that);
+
+		this.con.setLocalDescription(desc).then(
+			function () {
+				that.params['loc_desc'] = that.con.remoteDescription;
+			},
+			 (error)=> {
+				console.log('Failed to set remote description: ' + error.toString(), this);
+				//  this.con.close();
+				// this.con = new RTCPeerConnection(this.pc_config);
+				// this.setRemoteDesc(desc); 
+				// this.StartEvents(); 
+			}
+		);
+	}
+
+
 	setRemoteDesc(desc) {
 		let that = this;
 		console.log('setRemoteDescription start', that);

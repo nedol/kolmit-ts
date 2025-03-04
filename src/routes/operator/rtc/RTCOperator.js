@@ -49,7 +49,11 @@ export class RTCOperator extends RTCBase {
           pc.con.restartIce();
           try {
             // Перезапуск ICE без создания нового оффера
+
+              await this.pcPull[this.abonent].setLocalDesc(this.pcPull[this.abonent].params['loc_desc']);
+
               await this.pcPull[this.abonent].setRemoteDesc(this.pcPull[this.abonent].params['rem_desc']);
+
               const data = this.pcPull[this.abonent].params['rem_cand'] 
               if (Array.isArray(data )) {
                 for (let c in data ) {

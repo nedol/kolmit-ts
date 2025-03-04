@@ -13,7 +13,7 @@ const langs = [
 const pendingTranslations = new Map<string, Promise<string>>(); 
 
 // Translation function
-export async function Translate(text: string, from: string, to: string): Promise<string> {
+export async function Translate(text: string, from: string, to: string, quiz: string): Promise<string> {
   if (!text) return '';
 
   // Clean the input text
@@ -52,6 +52,7 @@ export async function Translate(text: string, from: string, to: string): Promise
     }
 
     console.log(`Файл НЕ существует`);
+    
     let translationPromise = (async () => {
       let res = '';
 
@@ -79,7 +80,13 @@ export async function Translate(text: string, from: string, to: string): Promise
         }
 
         // Cache the translation in the database
-        await WriteSpeech({ lang: to, key: cacheKey, text: chunk, translate: res });
+        await WriteSpeech({ 
+          lang: to, 
+          key: cacheKey, 
+          text: chunk, 
+          translate: res,
+          quiz: quiz || resp?.quiz || '' // Берём новый quiz или оставляем старый 
+        });
 
       } catch (error) {
         console.error('Ошибка перевода:', error);
