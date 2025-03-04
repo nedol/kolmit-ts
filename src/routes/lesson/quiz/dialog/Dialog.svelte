@@ -993,7 +993,7 @@
 
       </div>
       {:else if isFlipped}
-        <div class="container">
+        <div class="container question">
           {#if isThumb}
             <div class="thumb_alert" style="    margin-top: 0px;">
               <Icon tag="svg" color="green" viewBox="0 0 24 24">
@@ -1123,7 +1123,7 @@
 
             </div> 
         </div>
-        <div class="container">
+        <div class="container answer">
 
           {#if visibility[2]==='hidden' }
             <button class="hint-button" on:click={()=>onClickQ(2)}>
