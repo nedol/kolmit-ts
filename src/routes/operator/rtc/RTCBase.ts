@@ -113,8 +113,12 @@ export class RTCBase {
 		if (this.pcPull[pc_key]) {
 			if (this.pcPull[pc_key].con) {
 				console.log("Закрываем старое соединение...");
+				try{
 				this.pcPull[pc_key].con.getSenders().forEach(sender => this.pcPull[pc_key].con.removeTrack(sender));
 				this.pcPull[pc_key].con.close();
+				}catch(ex){
+					console.log(ex)
+				}
 			}
 			if (this.DC && this.DC.dc) {
 				console.log("Закрываем старый DataChannel...");

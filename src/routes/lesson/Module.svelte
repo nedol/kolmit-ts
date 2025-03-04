@@ -222,7 +222,7 @@
     }
 
     $signal.SendMessage(par, (data) => {
-      console.log(data.resp);
+      console.log(data);
     });
   };
 
