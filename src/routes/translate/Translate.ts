@@ -73,25 +73,34 @@ export async function Translate(text: string, from: string, to: string, quiz: st
           });
           res = res.text;
         }
-
-        // Restore special characters (<< >>)
-        if (hasQuotes) {
-          // res = res.text.replace(/\<(.*?)\>/g, '<<$1>>');                                                       
-        }
-
-        // Cache the translation in the database
-        await WriteSpeech({ 
-          lang: to, 
-          key: cacheKey, 
-          text: chunk, 
-          translate: res,
-          quiz: quiz || resp?.quiz || '' // Берём новый quiz или оставляем старый 
-        });
-
       } catch (error) {
-        console.error('Ошибка перевода:', error);
-        res = chunk; // Return original text if translation fails
+        console.error('Ошибка перевода с DeepL, используем fallback на translatex:', error);
+        
+        // If an exception occurs with translate(), fall back to translatex()
+        try {
+          res = await translatex(chunk, {
+            from: from,
+            to: to,
+            forceBatch: true,
+            requestOptions: {
+              agent: new HttpsProxyAgent('https://164.132.175.159:3128'),
+            },
+          });
+          res = res.text;
+        } catch (fallbackError) {
+          console.error('Ошибка перевода с fallback (translatex):', fallbackError);
+          res = chunk; // Return the original text if both translation services fail
+        }
       }
+
+      // Cache the translation in the database
+      await WriteSpeech({ 
+        lang: to, 
+        key: cacheKey, 
+        text: chunk, 
+        translate: res,
+        quiz: quiz || resp?.quiz || '' // Берём новый quiz или оставляем старый 
+      });
 
       // Remove the item from the queue after translation
       pendingTranslations.delete(cacheKey);

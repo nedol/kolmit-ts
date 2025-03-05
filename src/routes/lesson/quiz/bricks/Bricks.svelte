@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import { onMount , getContext, onDestroy} from 'svelte';
   import { slide } from 'svelte/transition';
   import ConText from '../Context.svelte';
@@ -34,6 +34,8 @@
   let stt, tts;
   // Разделяем предложение на слова
   let words = [];
+
+  let similarity:any;
 
 // Функция для отслеживания сфокусированных элементов
 let focusedIndex = 0;
@@ -81,6 +83,8 @@ let keys = [];
       mdiTranslate,
       mdiTranslateOff
   } from '@mdi/js';
+
+ 
 
 
   fetch(
@@ -512,8 +516,12 @@ let keys = [];
     if (numbers)
       sent_compare = sent_compare.replace(/\b\d+\b/g, numberToDutchString(numbers[0]));
 
-    if (stt_text) {
-      const similarity = compareStrings(
+    const numbers2 = stt_text.match(/\b\d+\b/g);
+    if(numbers2)
+      stt_text = stt_text.replace(/\b\d+\b/g, numberToDutchString(numbers2[0]));
+
+      if (stt_text) {
+      similarity = compareStrings(
         sent_compare
           .toLowerCase()
           .trim()
@@ -523,12 +531,7 @@ let keys = [];
           .trim()
           .replace(/[^\w\s]|_/g, '') //replace(/[0-9!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~]/g, '')
       );
-      stt_text += ` (${similarity.toFixed(0)}%)`;
-      if (similarity > 75) {
-        setTimeout(() => {
-          // onNextQA();
-        }, 3000);
-      }
+      similarity = `${similarity.toFixed(0)}%`;
     }
   }
 
@@ -620,6 +623,8 @@ let keys = [];
 
       const arr=bricks_data.text;
       if (curSentence < 0 || curSentence >= arr.length) return null;
+
+      similarity = ''
       
       let currentArticle = arr[curSentence].article;
       
@@ -757,7 +762,7 @@ let keys = [];
                 position="middle"
                 align="bottom-end - bottom-middle"
                 aria-label="unread count"
-                style="position:relative;top:-30px;right:-5px;scale:.8">{bricks_data?.text.length}</Badge
+                style="position:relative;top:-30px;right:-8px;scale:.8">{bricks_data?.text.length}</Badge
               >
             </span>
           </p>
@@ -921,6 +926,16 @@ let keys = [];
       {@html stt_text}
     </span>
   </div>
+
+  {#if similarity}
+    <div class="similarity">
+      <p>
+        <span class="mdc-typography--overline" style="position:relative"
+          >{similarity}
+        </span>
+      </p>
+    </div>
+  {/if}
 
   {/if}
 
@@ -1126,6 +1141,35 @@ let keys = [];
       'wght' 400,
       'GRAD' 0,
       'opsz' 24;
+  }
+
+  .similarity  p {
+    margin: 0;
+    font-size: 15px;
+    color: #333;
+  }
+  .similarity {
+    /* display: flex
+; */
+    /* justify-content: center; */
+    position: relative;
+    margin: 0 auto;
+    background-color: #f0f0f0;
+    padding: 0px;
+    border-radius: 20px;
+    width: 50px;
+    height: 30px;
+    /* float: right; */
+    /* bottom: 10px; */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    text-align: center;
+  }
+
+  .similarity  span {
+    font-weight: 700;
+    font-size: 15px;
+    color: #2ca838; /* цвет счетчика */
+    text-align: center;
   }
 
 

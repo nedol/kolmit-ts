@@ -1110,16 +1110,16 @@
                 {@html stt_text}
 
               </span> 
-              </div>    
-              {#if similarity}
-                <div class="similarity">
-                  <p>
-                    <span class="mdc-typography--overline" style="position:relative"
-                      >{similarity}
-                    </span>
-                  </p>
-                </div>
-              {/if}
+            </div>    
+            {#if similarity}
+              <div class="similarity">
+                <p>
+                  <span class="mdc-typography--overline" style="position:relative"
+                    >{similarity}
+                  </span>
+                </p>
+              </div>
+            {/if}
 
             </div> 
         </div>
