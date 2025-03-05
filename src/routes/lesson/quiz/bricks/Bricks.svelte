@@ -301,6 +301,7 @@ let keys = [];
     current_word = 0;
     focusedIndex = 0;
     stt_text = ''
+    similarity = ''
 
 
     if(curSentence >= bricks_data.text.length){
