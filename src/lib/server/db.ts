@@ -11,46 +11,28 @@ import { sql_st } from '$lib/stores.ts';
 import { redirect } from '@sveltejs/kit';
 import Email from './email.js';
 
-
-
 sql_st.subscribe((data) => {
   sql = data;
 });
 
+import { config } from 'dotenv';
+config();
+
 let { PGHOST, PGDATABASE, PGUSER, PGPASSWORD, ENDPOINT_ID } = process.env;
 
-const conStr = {
-  connectionStringSupabase:
-    'postgresql://postgres.abzyzzvokjdnwgjbitga:NissanPathfinder@386/aws-0-eu-central-1.pooler.supabase.com:5432',
-};
 
 const conStrNeon = {
-  connectionString:
-    'postgresql://nedooleg:nHLhfQB0WS5Y@ep-polished-bush-a2n4g5y9-pooler.eu-central-1.aws.neon.tech:5432/neondb?sslmode=require',
+  connectionString:ENDPOINT_ID,
 };
-
-export async function CreatePool_render(): Promise<void> {
-  sql_st.set(
-    postgres(conStrNeon.connectionString, {
-      host: 'dpg-ctdjkkjv2p9s73c6iua0-a.frankfurt-postgres.render.com',
-      port: 5432,
-      database: 'kolmit_jzl1',
-      username: 'kolmit_jzl1_user',
-      password: 'ncEr4gySWNJmCIUyahHROsST2gny0Mki',
-      idle_timeout: 20,
-      max_lifetime: 60 * 30,
-    })
-  );
-}
 
 export async function CreatePool_neon(): Promise<void> {
   sql_st.set(
     postgres(conStrNeon.connectionString, {
-      host: 'ep-polished-bush-a2n4g5y9-pooler.eu-central-1.aws.neon.tech',
+      host: PGHOST,
       port: 5432,
-      database: 'neondb',
-      username: 'nedooleg',
-      password: 'nHLhfQB0WS5Y',
+      database: PGDATABASE,
+      username: PGUSER,
+      password: PGPASSWORD,
     })
   );
 }

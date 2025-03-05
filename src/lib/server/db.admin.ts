@@ -15,37 +15,26 @@ sql_st.subscribe((data: Sql) => {
   sql = data;
 });
 
-const conStr = {
-  connectionStringSupabase:
-    'postgresql://postgres.abzyzzvokjdnwgjbitga:NissanPathfinder@386/aws-0-eu-central-1.pooler.supabase.com:5432',
-};
+import { config } from 'dotenv';
+config();
 
-export async function CreatePool_(resolve: (value: Sql | PromiseLike<Sql>) => void): Promise<void> {
-  sql_st(postgres(conStr.connectionStringSupabase, {
-    host: 'aws-0-eu-central-1.pooler.supabase.com',
-    port: 5432,
-    database: 'postgres',
-    username: 'postgres.abzyzzvokjdnwgjbitga',
-    password: 'NissanPathfinder@386',
-    idle_timeout: 20,
-    max_lifetime: 60 * 30,
-  }));
-  resolve(sql);
-}
+let { PGHOST, PGDATABASE, PGUSER, PGPASSWORD, ENDPOINT_ID } = process.env;
+
 
 const conStrNeon = {
-  connectionString:
-    'postgresql://nedooleg:nHLhfQB0WS5Y@ep-polished-bush-a2n4g5y9-pooler.eu-central-1.aws.neon.tech:5432/neondb?sslmode=require',
+  connectionString:ENDPOINT_ID,
 };
 
 export async function CreatePool_neon(): Promise<void> {
-  sql_st.set(postgres(conStrNeon.connectionString, {
-    host: 'ep-polished-bush-a2n4g5y9-pooler.eu-central-1.aws.neon.tech',
-    port: 5432,
-    database: 'neondb',
-    username: 'nedooleg',
-    password: 'nHLhfQB0WS5Y',
-  }));
+  sql_st.set(
+    postgres(conStrNeon.connectionString, {
+      host: PGHOST,
+      port: 5432,
+      database: PGDATABASE,
+      username: PGUSER,
+      password: PGPASSWORD,
+    })
+  );
 }
 
 interface AdminParams {

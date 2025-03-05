@@ -26,6 +26,11 @@
  * ```
  */
 declare module '$env/static/private' {
+	export const PGHOST: string;
+	export const PGDATABASE: string;
+	export const PGUSER: string;
+	export const PGPASSWORD: string;
+	export const ENDPOINT_ID: string;
 	export const ALLUSERSPROFILE: string;
 	export const APPDATA: string;
 	export const ChocolateyInstall: string;
@@ -143,6 +148,11 @@ declare module '$env/static/public' {
  */
 declare module '$env/dynamic/private' {
 	export const env: {
+		PGHOST: string;
+		PGDATABASE: string;
+		PGUSER: string;
+		PGPASSWORD: string;
+		ENDPOINT_ID: string;
 		ALLUSERSPROFILE: string;
 		APPDATA: string;
 		ChocolateyInstall: string;

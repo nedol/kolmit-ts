@@ -18,9 +18,6 @@ import axios from 'axios';
 
 import { config } from 'dotenv';
 config();
-
-
-
 const HF_TOKEN = process.env.HF_TOKEN_2;
 
 // const response_0 = await fetch(
