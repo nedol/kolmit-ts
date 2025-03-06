@@ -9,7 +9,7 @@
   });
 
   export async function GetGoogleTTS(lang, text, quiz){
-    console.log()
+
     if (!audio || (audio && text !== audio.text)) {
       text = text.replace(/<[^>]+>.*?<\/[^>]+>/g, '');
       const par = {
@@ -35,22 +35,38 @@
 
 
 
-  export async  function Speak_server(lang, text, quiz, cb_end) {
-    console.log()
-    const resp = await GetGoogleTTS(lang, text, quiz);
+  export async function Speak_server(lang, text, quiz, cb_end) {
+    try {
+        const key = `tts_${lang}_${btoa(text)}`; // Создаём уникальный ключ для localStorage
+        let audioSrc = localStorage.getItem(key);
 
-    if(resp?.resp.audio)
-    audio = new Audio(resp.resp.audio);
-      audio.type = 'audio/mpeg';
-      audio.text = text;
-      audio.playbackRate = lang === $langs ? 1 : 0.9;
-      if(cb_end)
-      audio.addEventListener('ended', function () {
-        cb_end();
-      });
-      
-      audio.play();
-  }
+        if (!audioSrc) {
+            // Если аудиофайл отсутствует в localStorage, запрашиваем у GetGoogleTTS
+            const resp = await GetGoogleTTS(lang, text, quiz);
+            if (!resp || !resp.resp?.audio) {
+                console.error("Ошибка: аудиофайл не получен.");
+                return;
+            }
+
+            audioSrc = resp.resp.audio;
+            localStorage.setItem(key, audioSrc); // Сохраняем в localStorage
+        }
+
+        let audio = new Audio(audioSrc);
+        audio.type = 'audio/mpeg';
+        audio.text = text;
+        audio.playbackRate = lang === 'en' ? 1 : 0.9;
+
+        if (cb_end) {
+            audio.addEventListener('ended', cb_end);
+        }
+
+        audio.play();
+    } catch (error) {
+        console.error("Ошибка в Speak_server:", error);
+    }
+}
+
 
   export function CollectGarbage() {}
 

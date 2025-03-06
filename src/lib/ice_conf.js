@@ -9,12 +9,12 @@ export let ice_conf = {
     {
       urls: "turn:18.195.84.86:3478?transport=tcp",
       username: 'kolmit',
-      credential: 'nissan@720',
+      credential: import.meta.env.VITE_TURN_CREDENTIAL, // Используем import.meta.env
     },
     {
       urls: "turn:18.195.84.86:3478?transport=udp",
       username: 'kolmit',
-      credential: 'nissan@720',
+      credential: import.meta.env.VITE_TURN_CREDENTIAL,
     }
   ],
   lifetimeDuration: '86400s',

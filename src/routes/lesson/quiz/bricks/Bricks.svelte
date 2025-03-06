@@ -357,7 +357,7 @@ let keys = [];
       const textToSpeak = getCorrectSpanString(isSTT || formattedSentence.every(item => item.class === "correct"));
 
       if (textToSpeak) {
-        const resp = await tts.GetGoogleTTS($llang, textToSpeak,  data.name);
+        const resp = await tts.Speak_server($llang, textToSpeak,  data.name);
         const speechData = resp.resp;
         audio = new Audio(speechData.audio);
         let  endTime;
