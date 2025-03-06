@@ -259,6 +259,7 @@
         data: {"content":dialog_data.content},
         theme: data.theme,
         lang: $llang,
+        prompt_type: dialog_data.prompt_type
       }),
       headers: { 'Content-Type': 'application/json' },
     });

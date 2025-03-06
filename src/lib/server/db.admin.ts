@@ -185,20 +185,31 @@ interface Query {
   func?: string;
   context?: string;
   operator?: string;
+  theme:string;
+  prompt_type: string;
 }
 
 export async function UpdateDialog(q: Query) {
   try {
     const res = await sql`
       INSERT INTO dialogs
-        (name, dialog, owner, html, level, timestamp)
+        (name, dialog, owner, html, level, theme, prompt_type, timestamp)
       VALUES
-        (${q.new_name}, ${q.data}, ${q.owner}, ${q.data?.html || ''}, ${q.level}, NOW())
+        (${q.new_name}, 
+        ${q.data}, 
+        ${q.owner}, 
+        ${q.data?.html || ''}, 
+        ${q.level}, 
+        ${q.theme},
+        ${q.prompt_type}, 
+        NOW())
       ON CONFLICT (name, owner, level)
       DO UPDATE SET
         name = EXCLUDED.name,
         html = EXCLUDED.html,
         dialog = EXCLUDED.dialog,
+        theme = EXCLUDED.theme,
+        prompt_type = EXCLUDED.prompt_type,
         timestamp = NOW()`;
     return { res };
   } catch (ex) {

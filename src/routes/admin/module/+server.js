@@ -32,7 +32,7 @@ export async function GET({ url, fetch, cookies }) {
 export async function POST({ request, url, fetch }) {
 	let resp;
 
-	const { func,owner, operator,level, name, new_name, data, theme, lang, context,html,prompt_type } = await request.json();
+	const { func,owner, operator,level, name, new_name, data, theme, lang, context,html, prompt_type } = await request.json();
 
 	switch (func) {
     case 'get_les':
@@ -42,7 +42,7 @@ export async function POST({ request, url, fetch }) {
       return response;
       break;
     case 'upd_dlg':
-      UpdateDialog({ owner, level, name, new_name, data, lang });
+      UpdateDialog({ owner, level, name, new_name, data, lang, theme,prompt_type });
       break;
     case 'upd_listen':
       UpdateListen({ owner, level, name, new_name, data, lang });

@@ -184,6 +184,7 @@ async function updateUsers(users: any[], q: any): Promise<string> {
   return JSON.stringify({ func: q.func, dep: users[0] });
 }
 
+
 export async function GetGroup(par: {
   abonent: string;
   operator: string;
@@ -199,6 +200,12 @@ export async function GetGroup(par: {
       WHERE operators.abonent=${par.abonent} 
       AND operator=${par.operator} AND psw=${par.psw}
     )`;
+    
+
+    if (group) {
+      const timestamp = new Date().toISOString(); // Получаем текущую метку времени
+      CreateSession(par.operator, md5(par.operator+timestamp));
+    }
 
   const oper = await sql`
     SELECT "group", abonent, role, operator, picture, lang, name
