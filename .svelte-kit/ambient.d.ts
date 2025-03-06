@@ -32,7 +32,7 @@ declare module '$env/static/private' {
 	export const PGPASSWORD: string;
 	export const ENDPOINT_ID: string;
 	export const HF_TOKEN: string;
-	export const TURN_CREDENTIAL: string;
+	export const VITE_TURN_CREDENTIAL: string;
 	export const ALLUSERSPROFILE: string;
 	export const APPDATA: string;
 	export const ChocolateyInstall: string;
@@ -156,7 +156,7 @@ declare module '$env/dynamic/private' {
 		PGPASSWORD: string;
 		ENDPOINT_ID: string;
 		HF_TOKEN: string;
-		TURN_CREDENTIAL: string;
+		VITE_TURN_CREDENTIAL: string;
 		ALLUSERSPROFILE: string;
 		APPDATA: string;
 		ChocolateyInstall: string;
