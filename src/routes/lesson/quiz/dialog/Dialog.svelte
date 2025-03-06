@@ -601,10 +601,10 @@
         await onNextQA();
         visibility[1] = 'visible';
         active = q[$langs];
-        tts.Speak_server($langs, active, onEndSpeak);
+        tts.Speak_server($langs, active, 'dialog',onEndSpeak);
       } else if (active === q[$llang]) {
         active = a[$langs];
-        tts.Speak_server($langs, active, onEndSpeak);
+        tts.Speak_server($langs, active, 'dialog',onEndSpeak);
       } else if (active === a[$langs]) {
         active = a[$llang];
         tts.Speak_server($llang, active, onEndSpeak);
@@ -613,7 +613,7 @@
 
     visibility[1] = 'visible';
     let active = q[$langs];
-    tts.Speak_server($langs, active, onEndSpeak);
+    tts.Speak_server($langs, active, 'dialog',onEndSpeak);
   }
 
   function onSTT(){

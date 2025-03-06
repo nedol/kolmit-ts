@@ -35,6 +35,8 @@
   // Разделяем предложение на слова
   let words = [];
 
+  let isEndSpeak = true;
+
   let similarity:any;
 
 // Функция для отслеживания сфокусированных элементов
@@ -343,52 +345,40 @@ let keys = [];
     .join(" ");;
   }
 
+  const SpeakText = async () => {
 
-  const SpeakText = async (isEndSpeak) => {
+    async function onEndSpeak() {
+          endSpeak();
+          audio = '';
+        }
 
       const endSpeak = ()=> {
           if(isEndSpeak===true)
           setTimeout(()=>{
             if(!isSTT)
               navSentence(++curSentence)
-          },500)          
+          },500)   
+          isEndSpeak = true;       
       }
 
       const textToSpeak = getCorrectSpanString(isSTT || formattedSentence.every(item => item.class === "correct"));
 
       if (textToSpeak) {
-        const resp = await tts.Speak_server($llang, textToSpeak,  data.name);
-        const speechData = resp.resp;
-        audio = new Audio(speechData.audio);
-        let  endTime;
-        audio.playbackRate = 0.9;   
+
+        tts.Speak_server($llang, textToSpeak, '', onEndSpeak);
+    
+        // const speechData = resp.resp;
+        // audio = new Audio(speechData.audio);
+        // let  endTime;
+        // audio.playbackRate = 0.9;   
   
 
-        if (focusedIndex >= formattedSentence.length-1){
-          audio.playbackRate = 0.9;   
-          audio.currentTime  = 0;
-        }
+        // if (focusedIndex >= formattedSentence.length-1){
+        //   audio.playbackRate = 0.9;   
+        //   audio.currentTime  = 0;
+        // }
+      }
 
-        if(!isSTT)
-            audio.addEventListener('ended', function () {
-              endSpeak();
-              audio = '';
-            });
-                 
-         // Отслеживание текущего времени
-        //  if( false && endTime)
-          audio.addEventListener('timeupdate', () => {
-            let endTime;
-            // if (speechData.ts.length > current_word + 5) {
-            //   endTime = speechData.ts[current_word + 5].end;
-            // } else if(speechData.ts.length>0){
-            //   endTime = speechData.ts[speechData.ts.length].end; // Если выходит за пределы массива, берем последний элемент
-            // }
-            // if(audio.currentTime  >= endTime)
-            //   audio.pause()
-          });
-         audio.play();
-      } 
   }
 
 
@@ -861,13 +851,13 @@ let keys = [];
         <span class={`${item.class} ${item.gr}`}
           tabindex="0" 
           value={item.value.replace(/<[^>]*>/g, '')}
-          on:click={() => {return; item.word=item.value; handleFormatted(item, index)}}
+          on:click={() => {focusedIndex=index;item.word=''; /*handleFormatted(item, index)*/}}
           on:focus={() => handleFocus(index)}>
           {@html item.word || item.placeholder}
         </span>
       {/each}
       {#if !isSTT || (isSTT && formattedSentence.some(item => item.class === "correct"))}
-        <div class="speaker-button" on:click={SpeakText}>
+        <div class="speaker-button" on:click={()=>{isEndSpeak=false; SpeakText()}}>
           <IconButton>
             <Icon tag="svg" viewBox="0 0 24 24">
               <path fill="currentColor" d={mdiPlay} />
