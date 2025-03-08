@@ -103,11 +103,13 @@ export async function Translate(text: string, from: string, to: string, quiz: st
     }
 
     console.log(`Файл НЕ существует`);
+    let pqt;
     
     let translationPromise = (async () => {
       let res = '';
+      
       try {
-        const pqt = preserveQuotedText(chunk);
+        pqt = preserveQuotedText(chunk);
 
         if (langs.includes(to)) {
           // Use DeepL for supported languages
