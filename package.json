@@ -66,6 +66,7 @@
     "@huggingface/hub": "^0.14.10",
     "@huggingface/inference": "^2.7.0",
     "@huggingface/transformers": "^3.3.2",
+    "@ifyour/deeplx": "^0.1.17",
     "@jhubbardsf/svelte-sortablejs": "^1.1.0",
     "@material/image-list": "^14.0.0",
     "@mdi/js": "^7.4.47",

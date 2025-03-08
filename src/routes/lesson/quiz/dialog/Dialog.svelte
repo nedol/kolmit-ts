@@ -777,8 +777,8 @@
     </div>
    
     {#if q || a}
-      {#if !isFlipped}
 
+      {#if !isFlipped}
       <div class="container question">
 
           {#await Translate('Послушай вопрос', 'ru', $langs, dialog_data?.name) then data}
