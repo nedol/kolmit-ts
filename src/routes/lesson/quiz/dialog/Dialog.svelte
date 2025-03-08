@@ -699,11 +699,11 @@
                 <path fill="currentColor" d={mdiAccountConvertOutline} />
               </Icon>
               {#if !isFlipped}
-                <Badge
+                <Badge           
                   position="middle"
                   align="bottom-end - bottom-middle"
                   aria-label="unread count"
-                  style="scale:.8">A</Badge
+                  style="background-color:orange;scale:.8">A</Badge
                 >
               {:else}
                 <Badge
@@ -719,17 +719,17 @@
         </Section>
         <Section align="start">
           <div class="counter">
-            <p>
               <span class="mdc-typography--overline" style="position:relative"
-                >{cur_qa + 1}
-                <Badge
-                  position="middle"
-                  align="bottom-end - bottom-middle"
-                  aria-label="unread count"
-                  style="margin-right:-10px;scale:.8">{total_cnt}</Badge
-                >
+                >{cur_qa + 1} 
               </span>
-            </p>
+              <Badge
+              position="middle"
+              align="bottom-end - bottom-middle"
+              aria-label="unread count"
+              style="position: relative;
+                    top: -30px;
+                    right: -7px;
+                    scale: 0.8;">{total_cnt}</Badge>     
           </div>
         </Section>
         <Section align="end">
@@ -753,26 +753,28 @@
   <!-- Ваш контент -->
   <div class="card">
 
-    {#if !dialog_data?.html}
+    <div style="">
       <Icon tag="svg" viewBox="0 0 24 24" width="25px" height="25px">
         <path fill="grey" d={mdiAccountMultiple} />
       </Icon>
-      <span
-        style="display:block-inline;position:relative;width:80%;top: -6px;color: lightgray;font-style: italic;font-size:smaller;font-family: serif;"
-        >{dialog_data?.name}</span>
 
-    {:else if dialog_data?.html}
-      <span on:click={() => (isCollapsed = !isCollapsed)}
-        style="display:block-inline;position:relative;width:80%;color: black;font-style: italic;font-size:smaller;font-family: serif;"
-        >{dialog_data?.name}</span>
+      {#if !dialog_data?.html}
+        <span
+          style="position:relative;bottom: 5px;color: lightgray;font-style: italic;font-size:smaller;font-family: serif;"
+          >{dialog_data?.name}</span>
 
-
-        {#if !isCollapsed}
-            <div class="collapsible" in:slide={{ duration: 300 }}>
-              <ConText data={dialog_data} {tts} />
-            </div>
-        {/if}
-    {/if}
+      {:else if dialog_data?.html}
+        <span on:click={() => (isCollapsed = !isCollapsed)}
+          style="position:relative;bottom: 5px;color: black;font-style: italic;font-size:smaller;font-family: serif;"
+          >{dialog_data?.name}</span>
+      {/if}
+      
+      {#if !isCollapsed}
+        <div class="collapsible" in:slide={{ duration: 300 }}>
+          <ConText data={dialog_data} {tts} />
+        </div>
+      {/if}
+    </div>
    
     {#if q || a}
       {#if !isFlipped}
@@ -1472,11 +1474,10 @@
 
   .title {
     width: fit-content;
-    margin: 20px auto; /* Центрирование второго элемента */
-    margin-top: 5px;
+    margin: 5px;
     color:lightgrey;
     line-height: normal;
-    text-align: center;
+    text-align: left;
     font-size: 0.8em;
     background-color:transparent; 
   }

@@ -747,13 +747,14 @@ let keys = [];
       <Section align="end">
         <div class="counter">
           <p>
-            <span class="mdc-typography--overline" style="position:relative"
+            <span class="mdc-typography--overline" style="position:relative;letter-spacing: -1.5px;"
               >{1+curSentence}
               <Badge
+
                 position="middle"
                 align="bottom-end - bottom-middle"
                 aria-label="unread count"
-                style="position:relative;top:-30px;right:-8px;scale:.8">{bricks_data?.text.length}</Badge
+                style="position:relative;top:-32px;right:-10px;scale:.8;letter-spacing: -1.5px;">{bricks_data?.text.length}</Badge
               >
             </span>
           </p>
@@ -839,10 +840,10 @@ let keys = [];
     </div>
     {/if}
     <div class="container">
-    <!-- Предложение с замененными словами -->
-    {#await Translate('Составить предложение', 'ru', $langs,data.name) then data}
-      <div class="title">{data}:</div>
-    {/await}
+      <!-- Предложение с замененными словами -->
+      {#await Translate('Составить предложение', 'ru', $langs,data.name) then data}
+        <div class="title">{data}:</div>
+      {/await}
       <!-- {#await Translate('(используй подсказки слов в случае необходимости)', 'ru', $langs) then data_2}
       <div class="title title2">{data_2}:</div>
       {/await} -->
@@ -1071,12 +1072,12 @@ let keys = [];
 
   .title {
       width: fit-content;
-      margin: 5px auto; /* Центрирование второго элемента */
-      margin-top: 5px;
+      margin: 5px; 
+
       color: #9eb2cc;
       line-height: normal;
-      text-align: center;
-      font-size: 0.9em;
+      text-align: left;
+      font-size: 0.8em;
       background-color:transparent; 
   }
   
@@ -1087,7 +1088,7 @@ let keys = [];
     gap: 10px;
     font-weight: 500;
     flex-wrap: wrap;
-    color: rgb(67, 65, 65);
+    color: #2196f3;
   }
 
   .formatted-list {
@@ -1097,7 +1098,7 @@ let keys = [];
     gap: 10px;
     font-weight: 700;
     flex-wrap: wrap;
-    color: rgb(67, 65, 65);
+    color: #2196f3;
   }
 
   .word-list span:not(.ver):not(.subj):not(.tijd):not(.plaats):not(.adv), 
