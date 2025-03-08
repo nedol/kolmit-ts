@@ -37,11 +37,12 @@
 
   export async function Speak_server(lang, text, quiz, cb_end) {
     try {
-        const key = `tts_${lang}_${btoa(text)}`; // Создаём уникальный ключ для localStorage
+        const key = `tts_${lang}_${btoa(text)}`; // Уникальный ключ
         let audioSrc = localStorage.getItem(key);
+        let keys = JSON.parse(localStorage.getItem("tts_keys")) || [];
 
         if (!audioSrc) {
-            // Если аудиофайл отсутствует в localStorage, запрашиваем у GetGoogleTTS
+            // Запрашиваем аудиофайл у GetGoogleTTS
             const resp = await GetGoogleTTS(lang, text, quiz);
             if (!resp || !resp.resp?.audio) {
                 console.error("Ошибка: аудиофайл не получен.");
@@ -49,7 +50,15 @@
             }
 
             audioSrc = resp.resp.audio;
-            localStorage.setItem(key, audioSrc); // Сохраняем в localStorage
+            localStorage.setItem(key, audioSrc);
+
+            // Обновляем массив ключей и удаляем старые записи
+            keys.push(key);
+            if (keys.length > 10) {
+                const oldestKey = keys.shift();
+                localStorage.removeItem(oldestKey);
+            }
+            localStorage.setItem("tts_keys", JSON.stringify(keys));
         }
 
         let audio = new Audio(audioSrc);
@@ -66,6 +75,7 @@
         console.error("Ошибка в Speak_server:", error);
     }
 }
+
 
 
   export function CollectGarbage() {}

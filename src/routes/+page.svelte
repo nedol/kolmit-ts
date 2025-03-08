@@ -40,6 +40,8 @@
 
   // Initialize necessary values and set context
   function Init() {
+    localStorage.clear();
+
     setContext('group_data', data.group);
     setContext('lvl', data.group[0].group);
     setContext('operator', data.operator[0]);

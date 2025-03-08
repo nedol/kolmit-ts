@@ -211,6 +211,10 @@
 {/if}
 
 <style>
+  :global(.mdc-top-app-bar__title){
+    font-size: large;
+    font-weight: 800;
+  }
   header {
     display: flex;
     justify-content: space-between;

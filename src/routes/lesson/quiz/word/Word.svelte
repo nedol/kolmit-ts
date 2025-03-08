@@ -561,7 +561,7 @@
                     position="middle"
                     align="bottom-end - bottom-middle"
                     aria-label="unread count"
-                    style="margin-right:-10px;scale:.8">{words.length}</Badge
+                    style="margin-right:-14px;scale:.8">{words.length}</Badge
                   >
                 </span>
               </p>
@@ -603,7 +603,15 @@
 
     <div class="container">
     <span
-      style="display:block;position:relative;top: 0px;left:5px;color: lightgray;font-style: italic;font-size:smaller;font-family: serif;"
+      style="    
+      display: block;
+      position: relative;
+      top: -10px;
+      left: 5px;
+      color: #70709e;
+      font-style: italic;
+      font-size: smaller;
+      font-family: serif;"
       >{data.name}</span>
 
     <div style="border:1px solid lightgrey;border-radius:5px;padding:-10px">
@@ -708,10 +716,10 @@
 }
 .title {
   font-size: medium;
-  color: lightgrey;
-  position: relative;
-  text-align: center;
-  margin-top: 10px;
+    color: lightgrey;
+    position: relative;
+    text-align: left;
+    margin: 2px;
 }
 
 .hint_button {
@@ -787,6 +795,7 @@ p {
   position: relative;
   text-align: center;
   overflow-y: hidden;
+  margin-top:20px;
   height: 40vh;
 }
 

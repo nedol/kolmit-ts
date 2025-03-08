@@ -754,8 +754,11 @@
   <div class="card">
 
     {#if !dialog_data?.html}
+      <Icon tag="svg" viewBox="0 0 24 24" width="25px" height="25px">
+        <path fill="grey" d={mdiAccountMultiple} />
+      </Icon>
       <span
-        style="display:block-inline;position:relative;width:80%;color: lightgray;font-style: italic;font-size:smaller;font-family: serif;"
+        style="display:block-inline;position:relative;width:80%;top: -6px;color: lightgray;font-style: italic;font-size:smaller;font-family: serif;"
         >{dialog_data?.name}</span>
 
     {:else if dialog_data?.html}

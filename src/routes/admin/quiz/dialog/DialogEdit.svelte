@@ -304,11 +304,13 @@
   }
 
   function OnContextChange() {
-    prompt = prompt.replace('${dialog_data_html}', dialog_data.html);
+    prompt = prompt.replace('${dialog_data_context}', dialog_data.context);
+    prompt=prompt;
   }
 
   function OnWordsChange() {
     prompt = prompt.replaceAll('${dialog_data_words}', dialog_data.words);
+    prompt=prompt;
   }
 
   function OnChangeContent(ev: Event) {
