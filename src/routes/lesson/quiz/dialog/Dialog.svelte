@@ -905,7 +905,7 @@
             {#if a && visibility[2] === 'hidden'}   
     
               {@html a[$llang].replace(
-                /(?<!")\b\p{L}+(?<!\s)(?!")/gu,
+                /[\p{L}\p{M}0-9.,€$%-]+/gu,
                 (match) => {
                   return `<span class="span_hidden" onclick="(this.style.color='#2196f3')" 
                   style="display:inline-block; font-size:1.2em ; 
@@ -917,7 +917,7 @@
               )}
             {:else if visibility[2] === 'visible'}
               {@html a[$llang].replace(
-                /(?<!")\b\p{L}+(?<!\s)(?!")/gu,
+                /[\p{L}\p{M}0-9.,€$%-]+/gu,
                 (match) => {
                   return `<span class="span_visible"  
                   style="display:inline-block; font-size:1.2em; margin: 5px 0px; padding: 1px 5px;font-weight: 600;
@@ -1043,7 +1043,7 @@
             {#if a && visibility[1] === 'hidden'}   
 
               {@html a[$llang].replace(
-                /(?<!")\b\p{L}+(?<!\s)(?!")/gu,
+                /[\p{L}\p{M}0-9.,€$%-]+/gu,
                 (match) => {
                   return `<span class="span_hidden" onclick="(this.style.color='#2196f3')" 
                   style="display:inline-block; font-size:1.0em ; 
@@ -1055,7 +1055,7 @@
               )}
             {:else if visibility[1] === 'visible'}
               {@html a[$llang].replace(
-                /(?<!")\b\p{L}+(?<!\s)(?!")/gu,
+                /[\p{L}\p{M}0-9.,€$%-]+/gu,
                 (match) => {
                   return `<span class="span_visible"  
                   style="display:inline-block; font-size:1.0em; margin: 5px 0px; padding: 1px 5px;font-weight: 600;
