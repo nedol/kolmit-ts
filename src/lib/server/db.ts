@@ -909,13 +909,13 @@ export async function GetLesson(q: { operator: string; owner: string; level?: st
     FROM (
       SELECT "name", "timestamp", 'dialog' AS "type" 
       FROM public.dialogs 
-      WHERE "type" = 'news' 
+      WHERE "prompt_type" = 'news' 
 
       UNION
 
       SELECT "name", "timestamp" AS "published", 'bricks' AS "type" 
       FROM public.bricks 
-      WHERE "type" = 'news'
+      WHERE "prompt_type" = 'news'
     ) AS combined
     GROUP BY "name", "type"
     ORDER BY "published" DESC
@@ -930,7 +930,7 @@ export async function GetLesson(q: { operator: string; owner: string; level?: st
       MAX((EXTRACT(EPOCH FROM "timestamp") * 1000)::BIGINT) AS "published", 
       "type"
     FROM public.context 
-    WHERE "type" = 'news' 
+    WHERE "prompt_type" = 'news' 
     GROUP BY "name", "data", "type"
     ORDER BY "published" DESC;
   `;
@@ -1099,6 +1099,7 @@ interface WriteSpeechRequest {
   key: string;
   text: string;
   translate: string;
+  provider:string;
   quiz:string;
 }
 
@@ -1113,18 +1114,20 @@ export async function WriteSpeech(q: WriteSpeechRequest): Promise<WriteSpeechRes
     await sql.begin(async (tx) => {
       // Insert or update speech data
       await tx`
-        INSERT INTO speech (lang, key, text, translate, quiz)
+        INSERT INTO speech (lang, key, text, translate, provider, quiz)
         VALUES (
           ${q.lang ?? null}, 
           ${q.key ?? null}, 
           ${q.text ?? null}, 
           ${q.translate ?? null}, 
+          ${q.provider ?? null}, 
           ${q.quiz ?? null} -- Заменяем undefined на null
         )
         ON CONFLICT (key, lang) 
         DO UPDATE SET 
           lang = EXCLUDED.lang,
           translate = EXCLUDED.translate,
+          provider = EXCLUDED.provider,
           quiz = CASE 
             WHEN EXCLUDED.quiz <> '' OR speech.quiz = '' THEN EXCLUDED.quiz 
             ELSE speech.quiz 

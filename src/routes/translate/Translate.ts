@@ -104,6 +104,7 @@ export async function Translate(text: string, from: string, to: string, quiz: st
 
     console.log(`Файл НЕ существует`);
     let pqt;
+    let provider=''
     
     let translationPromise = (async () => {
       let res = '';
@@ -114,6 +115,7 @@ export async function Translate(text: string, from: string, to: string, quiz: st
         if (langs.includes(to)) {
           // Use DeepL for supported languages
           res = await translate(pqt.modifiedString, to.toUpperCase(), from.toUpperCase(),undefined, undefined, false);
+          provider = 'deepl'
           res = restoreQuotedText(res,pqt.quotedTexts);
           // res = deeplx_query(chunk, to, from)
         } else {
@@ -127,6 +129,7 @@ export async function Translate(text: string, from: string, to: string, quiz: st
               agent: new HttpsProxyAgent('https://164.132.175.159:3128'),
             },
           });
+          provider = 'deepl'
           res = res.text;
         }
       } catch (error) {
@@ -143,7 +146,7 @@ export async function Translate(text: string, from: string, to: string, quiz: st
               agent: new HttpsProxyAgent('https://164.132.175.159:3128'),
             },
           });
-
+          provider = 'google'
           res = res.text;
         } catch (fallbackError) {
           console.error('Ошибка перевода с fallback (translatex):', fallbackError);
@@ -159,6 +162,7 @@ export async function Translate(text: string, from: string, to: string, quiz: st
         key: cacheKey, 
         text: chunk, 
         translate: res,
+        provider: provider,
         quiz: quiz || resp?.quiz || '' // Берём новый quiz или оставляем старый 
       });
 

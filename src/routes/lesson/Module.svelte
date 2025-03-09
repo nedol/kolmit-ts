@@ -160,7 +160,7 @@
     $llang = lesson_data.lang;
     $showBottomAppBar = true;
     news = lessonData.news;
-    const oneWeekAgo = Date.now() - 3 * 24 * 60 * 60 * 1000; // Получаем временную метку, соответствующую одной неделе наз    
+    const oneWeekAgo = Date.now() - 5 * 24 * 60 * 60 * 1000; // Получаем временную метку, соответствующую одной неделе наз    
     const tmp = [];
     news?.forEach((quiz) => {
       const isOlderThanOneWeek = quiz.published < oneWeekAgo;
@@ -170,7 +170,11 @@
         } else {
           tmp.push(quiz);
         }      
-    })
+    });
+      // Сортировка по убыванию (DESC) по published
+    news = tmp.sort((a, b) => b.published - a.published);
+    archive_news = archive_news.sort((a, b) => b.published - a.published);
+
     news = tmp;
   })
   
