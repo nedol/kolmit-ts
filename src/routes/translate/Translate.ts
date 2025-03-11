@@ -157,14 +157,15 @@ export async function Translate(text: string, from: string, to: string, quiz: st
       }
 
       // Cache the translation in the database
-      await WriteSpeech({ 
-        lang: to, 
-        key: cacheKey, 
-        text: chunk, 
-        translate: res,
-        provider: provider,
-        quiz: quiz || resp?.quiz || '' // Берём новый quiz или оставляем старый 
-      });
+      if(quiz || resp?.quiz )
+        await WriteSpeech({ 
+          lang: to, 
+          key: cacheKey, 
+          text: chunk, 
+          translate: res,
+          provider: provider,
+          quiz: quiz || resp?.quiz  // Берём новый quiz или оставляем старый 
+        });
 
       // Remove the item from the queue after translation
       pendingTranslations.delete(cacheKey);

@@ -24,7 +24,7 @@
     new_content = false,
     num = 5;
 
-  let bricks_data = { lang: '', content: [], words: [], html: [''], name: '', type:'' , original:'' };
+  let bricks_data = { lang: '', content: [], words: [], html: [''], name: '', prompt_type:'' , original:'' };
   const name = data.name;
   let dialog_task: HTMLDivElement, dialog_words, dialog_tmplt;
 
@@ -91,8 +91,7 @@
       if (resp?.data) {
         bricks_data.html = resp.data?.html;      
         bricks_data.name = data.name;
-        bricks_data.type = data.type?data.type:data.name.includes('Nieuws')?'news':'';
-        bricks_data.prompt_type = resp.data.prompt_type;
+        bricks_data.prompt_type = resp.data.prompt_type?resp.data.prompt_type:(data.type?data.type:data.name.includes('Nieuws')?'news':'');
         bricks_data.context = resp.data.context;
       }
       content  = bricks_data?.html;

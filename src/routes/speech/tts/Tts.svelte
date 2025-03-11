@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import { onMount, onDestroy, getContext } from 'svelte';
   import { langs } from '$lib/stores.ts';
 

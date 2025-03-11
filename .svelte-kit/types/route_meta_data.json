@@ -35,7 +35,7 @@
 		"src/routes/operator/+server.js"
 	],
 	"/operator/chat": [
-		"src/routes/operator/chat/+server.js"
+		"src/routes/operator/chat/+server.ts"
 	],
 	"/public": [
 		"src/routes/public/+page.server.ts",

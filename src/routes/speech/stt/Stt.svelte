@@ -161,7 +161,8 @@
     if (audioChunks[len - 1]?.size > 0) {
       sendAudioToRecognition(audioChunks[len - 1]);
       audioUrl = URL.createObjectURL(audioChunks[len - 1]);
-      display_audio = 'block';
+      if(display_audio!=='none')
+        display_audio = 'block';
     }
 
     // mediaStream.getTracks().forEach(function (el) {

@@ -1,383 +1,357 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
-  import { Translate } from '../../translate/Transloc.ts';
+  import { onDestroy, afterUpdate, onMount } from 'svelte';
+  import { writable } from 'svelte/store';
+  import { Translate } from '../../translate/Transloc';
+  import { langs, llang } from '$lib/stores';
+  import IconButton, { Icon } from '@smui/icon-button';
+  import emojiRegex from 'emoji-regex';
 
-
-
-  import {
-    langs,
-    llang,
-    dc,
-    msg,
-  } from '$lib/stores.ts';
-
-  $llang = 'nl';
-
+  import Tts from '../../speech/tts/Tts.svelte';
+  import Stt from '../../speech/stt/Stt.svelte';
 
   import {
-    mdiPagePreviousOutline,
-    mdiArrowRight,
-    mdiArrowLeft,
-    mdiShareVariant,
-    mdiMicrophone,
-    mdiMicrophoneOutline,
-    mdiAccountConvertOutline,
-    mdiVolumeHigh,
-    mdiPlay,
-    mdiHelp
+      mdiMicrophoneOutline ,
+      mdiMicrophone,
+      mdiTranslate,
+      mdiTranslateOff
   } from '@mdi/js';
 
-  import Button, { Label } from '@smui/button';
-  import IconButton, { Icon } from '@smui/icon-button';
+  let stt, tts;
 
-  import Stt from '../../speech/stt/Stt.svelte';
-  let stt: Stt;
-  import TTS from '../../speech/tts/Tts.svelte';
-  let tts:TTS;
-
-  let userInput = {};
-  let messages = [];
   let isListening = false;
   let display_audio = 'none';
+  let stt_text = '';
+  let isSTT = false;
 
-  let variant = 'outlined';
-  let showHint:number;
-  let to;
+  type Message = { role: 'user' | 'ai'; text: string };
+  type Messages = Message[];
 
-  $: if ($msg || $msg) {
-    const msg = $msg || $msg;
-    if (msg.func === 'chat') {
-      // console.log(msg.text[$llang]);
-      messages.unshift({ text: msg.text, isQuestion: 'answer' });
-      messages = messages;
-    }
-  }
+  let userInput = '';
+  let messages = writable<Messages>([]);
+  let loading = writable(false);
+  let to: NodeJS.Timeout;
 
-  // Function to call ChatGPT
-  async function callChat(text) {
-    try {
+  let isTranslated = false;
+  let translatedMessages = new Map(); // Кэш переведённых сообщений
 
-      if(to)
-        clearTimeout(to);
+  let messagesContainer;
 
-      let question = { text: text, lang: $langs, llang: $llang };
 
-      const response = await fetch(`./operator/chat`, {
-        method: 'POST',
-        body: JSON.stringify({ question }),
-        headers: { 'Content-Type': 'application/json' },
-      });
+  // Время последнего сообщения (можно сохранять в localStorage для сохранения между перезагрузками)
+  let lastMessageTime = localStorage.getItem('lastMessageTime')
+  ? parseInt(localStorage.getItem('lastMessageTime'))
+  : Date.now();
 
-      // userInput = '';
+  let reminderTimeout;
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
+  onMount(async() => {
+    // Отправляем reminder при входе в компонент
+    sendMessage(`Begin een gesprek in het Nederlands.`,'greeting');
 
-      const data = await response.json();
-
-      messages.unshift({ text: data.res, isQuestion: 'answer' });
-      messages = messages;
-
-      to = setTimeout(()=>{
-        //callChat('?') 
-
-      }, 20000)
- 
-
-    } catch (error) {
-      console.error('Произошла ошибка при обращении к серверу:', error);
-    }
-  }
-
- 
-
-  function handleKeyDown(event) {
-    if (event.key === 'Enter' && !event.shiftKey) {
-      event.preventDefault();
-      callChat();
-      SendDC('');
-    }
-  }
-
-  onMount(() => {
-    SendDC('Hallo');
+    // Запускаем таймер для проверки неактивности
+    startReminderTimer();
   });
 
-  async function speak(text) {
-    if(text)
-    tts.Speak_server($llang, text,'chat');
-  }
-
-  function micClicked() {
-    if (!isListening) {
-      isListening = true;
-      if (dc) {
-        stt.startAudioMonitoring($langs, $llang); // Здесь должен быть ваш код для активации микрофона
-      } else {
-        stt.startAudioMonitoring($llang, $langs);
-      } // Здесь должен быть ваш код для активации микрофона
-    } else {
-      stt.MediaRecorderStop();
-      isListening = false;
+  // Автопрокрутка вниз при обновлении сообщений
+  afterUpdate(() => {
+    if (messagesContainer) {
+      // Прокручиваем вниз (к последнему сообщению)
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
     }
+  });
+
+
+
+  // Отправка сообщения
+  async function sendMessage(msg:string ='', type:string = 'basic') {
+    if (!userInput.trim() && !msg.trim()) return;
+
+
+    // Добавляем сообщение пользователя в список
+    if(!msg)
+      messages.update((msgs) => [...msgs, { role: 'user', text: userInput }]);
+    const userMessage = msg?msg:userInput;
+    userInput = '';
+    loading.set(true);
+
+    const prompt_type = {quiz:'chat',type:type,lang:$llang};
+
+    // Вызываем AI
+    await callChat(prompt_type,userMessage);
   }
 
+  // Вызов ChatGPT
+  async function callChat(prompt_type: {}, text: string) {
+  try {
+    if (to) clearTimeout(to);
+
+    // Ограничиваем историю сообщений до 5 реплик с каждой стороны
+    let conversationHistory = $messages
+      .slice(-10) // Берем последние 10 сообщений (5 от пользователя и 5 от AI)
+      .map(msg => ({
+        role: msg.role === "ai" ? "assistant" : "user",
+        content: msg.text
+      }));
+
+    const params = {
+      prompt: prompt_type,
+      conversationHistory,
+      lang: $langs,
+      llang: $llang,
+      level: "B1.1"
+    };
+
+    const response = await fetch(`./operator/chat`, {
+      method: "POST",
+      body: JSON.stringify({ params }),
+      headers: { "Content-Type": "application/json" },
+    });
+
+    if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+
+    const data = await response.json();
+
+    // Добавляем ответ AI в список
+    messages.update((msgs) => [...msgs, { role: "ai", text: data.res }]);
+
+    // Обновляем время последнего сообщения
+    lastMessageTime = Date.now();
+    localStorage.setItem('lastMessageTime', lastMessageTime.toString()); // Сохраняем время
+    resetReminderTimer();
+
+    async function removeEmojis(input) {
+      const regex = emojiRegex();
+      return await input.replace(regex, '');
+    }
+
+    tts.Speak_server($llang, await removeEmojis(data.res), '', '');
+    console.log('tts');
+
+  } catch (error) {
+    console.error("Произошла ошибка при обращении к серверу:", error);
+    messages.update((msgs) => [...msgs, { role: "ai", text: "Ошибка при обработке запроса. Попробуйте снова." }]);
+  } finally {
+    loading.set(false);
+  }
+}
   function StopListening() {
     isListening = false;
-    display_audio = false;
   }
 
-
-  function SttResult(data: {}) {
-    if (data[$llang]) userInput = data;
-    userInput[$llang] = userInput[$llang].slice(0, 500);
-    messages.unshift({ text: userInput, isQuestion: 'question' });
-    messages = messages;
-    isListening = false;
-    // SendDC(data);
+  function SttResult(text) {
+    userInput = text[$llang];
+    sendMessage();
   }
 
-  function SendDC(text: string) {
-
-    if ($dc) {
-      $dc.SendData(
-        {
-          func: 'chat',
-          lang: $llang,
-          text: text ? text : 'test',
-        },
-        () => {
-          console.log();
-        }
-      );
-    } else {
-      // callChat(text || 'Расскажи о себе ');
+  function onClickMicrophone() {
+    if (isListening) {
+      stt_text = ''
+      stt.MediaRecorderStop();
+      isListening = false;
+      return;
     }
+
+    stt_text = ''
+
+    stt.startAudioMonitoring($llang, $langs);
+
+    isListening = true;
   }
 
-  function SendRepeat() {
-    variant = 'unelevated';
-    setTimeout(() => {
-      variant = 'outlined';
-    }, 1000);
-
-    if ($dc) {
-      $dc.SendData(
-        {
-          command: 'repeat',
-        },
-        () => {
-          console.log();
-        }
-      );
+  async function toggleTranslation(message) {
+    if (!translatedMessages.has(message.text)) {
+      const tr = await Translate(message.text, $llang, $langs, '');
+      translatedMessages.set(message.text, tr);
     }
+    message.isTranslated = !message.isTranslated;
+    $messages = $messages; // Принудительное обновление
   }
 
-  function ShowHint(index){
-    showHint = index;
+  function startReminderTimer() {
+    reminderTimeout = setTimeout(() => {
+      const currentTime = Date.now();
+      if (currentTime - lastMessageTime >= 5 * 60 * 1000) { // 5 минут в миллисекундах
+        sendMessage(`Blijf praten.`,'basic');
+      }
+    }, 5 * 60 * 1000); // Проверка через 5 минут
   }
+
+  function resetReminderTimer() {
+    if (reminderTimeout) {
+      clearTimeout(reminderTimeout);
+    }
+    startReminderTimer();
+  }
+
+    // Очистка таймера при размонтировании
+  onDestroy(() => {
+    if (to) clearTimeout(to);
+    if (reminderTimeout) clearTimeout(reminderTimeout);
+  });
 </script>
 
-<div class="chat-container" style="overflow-y: auto;">
-  {#each messages as { text, isQuestion }, index (index)}
-    <div style="display:inline-flex">
-      <div class="userMessage {isQuestion}" key={index}>
-        {text[$llang]}
-        {#if text[$langs] && showHint===index}
-          {#await Translate(text[$llang], $llang, $langs) then data}
-            <div class="original">{data}</div>
-          {/await} 
+<Tts bind:this={tts}></Tts>
+<div class="chat-container">
+  <Stt 
+    {SttResult}
+    {StopListening}
+    bind:display_audio
+    bind:this={stt}></Stt>
 
-          {:else}
-            <button class="hint-button" on:click={()=>{ShowHint(index)}}>
-              <span class="material-symbols-outlined"> ? </span>
-              <!-- <IconButton class="material-icons" on:click={()=>{}}>
-              <Icon tag="svg" viewBox="0 0 24 24">
-                <path fill="currentColor" d={mdiHelp} />
-              </Icon>
-            </IconButton> -->
-            </button>
-        {/if}
-      </div>
-      <div class="speaker-button">
-        <IconButton on:click={speak(text[$llang])}>
-          <Icon tag="svg" viewBox="0 0 24 24">
-            <path fill="currentColor" d={mdiPlay} />
-          </Icon>
-        </IconButton>
-      </div>
+  <div class="messages" bind:this={messagesContainer}>
+    {#each $messages as message, index (message.text)}
+    <div class="message {message.role} {message.role === 'user' && index === 0 ? 'first-message' : ''}">
+      <!--strong>{message.role === 'user' ? 'Вы' : 'AI'}:</strong--> 
+      {#if message.isTranslated && translatedMessages.has(message.text)}
+        {translatedMessages.get(message.text)}
+      {:else}
+        {message.text}
+      {/if}
+  
+      {#if message.role !== 'user' }
+        <div style="margin: 2px; float: inline-end;" on:click={() => toggleTranslation(message)}>
+          <IconButton>
+            <Icon tag="svg" viewBox="0 0 24 24">
+              {#if message.isTranslated}
+                <path fill="currentColor" d={mdiTranslate} />
+              {:else}
+                <path fill="currentColor" d={mdiTranslateOff} />
+              {/if}
+            </Icon>
+          </IconButton>
+        </div>
+      {/if}
     </div>
   {/each}
-</div>
-<br />
 
-<!-- <div
-  class="margins"
-  style="text-align: center; display: flex; align-items: center; justify-content: space-between;"
-> -->
-<div class="input-container">
-     <span style="position: absolute;
-    font-weight: bold;
-    top: 8px;
-    left: 26px;
-    font-size: x-small">{dc?$langs:$llang}</span>
-  <IconButton on:click={micClicked}>
-    <Icon tag="svg" viewBox="0 0 24 24">
-      {#if isListening}
-        <path fill="currentColor" d={mdiMicrophone} />
-      {:else}
-        <path fill="currentColor" d={mdiMicrophoneOutline} />
-      {/if}
-    </Icon>   
-  </IconButton>
-
-  <Stt bind:this={stt} bind:display_audio {SttResult} {StopListening}></Stt>
-
-  <TTS bind:this={tts}></TTS>
-
-  {#if $dc}
-
-    {#await Translate('Отправить', 'ru', $langs) then data}
-      <Button
-        on:click={() => {
-          // stt.SendRecognition()
-          SendDC(userInput[$llang]);
-        }}><Label>{data}</Label></Button
-      >
-    {/await}
-
-
-    <div class="repeat_but">
-      {#await Translate('Повторить', 'ru', $langs) then data}
-        <Button on:click={() => SendRepeat()} {variant}>
-          <Label>{data}</Label>
-        </Button>
+    {#if $loading}
+      {#await Translate('AI печатает...', 'ru', $langs, 'chat') then data}
+        <div class="loading" aria-live="polite">{data}</div>
       {/await}
-    </div>
-  {/if}
-</div>
-
-<!-- </div> -->
-
-<!-- <div class="input-container">
-
-  <div class="mic-button">
-    <IconButton on:click={micClicked}>
-      <Icon tag="svg" viewBox="0 0 24 24">
-        {#if isListening}
-          <path fill="currentColor" d={mdiMicrophone} />
-        {:else}
-          <path fill="currentColor" d={mdiMicrophoneOutline} />
-        {/if}
-      </Icon>
-    </IconButton>
+    {/if}
   </div>
-</div> -->
 
-<!-- <div class="textarea-container">
-  <textarea
-    id="myTextarea"
-    maxlength="500"
-    bind:value={userInput[$langs]}
-    on:keydown={handleKeyDown}
-    placeholder="Задайте вопрос..."
-  ></textarea>
-</div> -->
+  <div class="input-container">
+    <div>
+      <IconButton
+        class="material-icons"
+        aria-label="Back"
+        on:click={onClickMicrophone}
+      >
+        <Icon tag="svg" viewBox="0 0 24 24">
+          {#if isListening}
+            <path fill="currentColor" d={mdiMicrophone} />
+          {:else}
+            <path fill="currentColor" d={mdiMicrophoneOutline} />
+          {/if}
+        </Icon>
+      </IconButton>
+    </div>
+
+    {#await Translate('Введите сообщение...', 'ru', $langs, 'chat') then data}
+      <input
+        bind:value={userInput}
+        placeholder={data}
+        on:keydown={(e) => e.key === 'Enter' && sendMessage()}
+        aria-label="Введите сообщение"
+      />
+    {/await}
+    <button on:click={()=>{sendMessage()}} disabled={$loading} aria-label="Отправить сообщение">
+      {#await Translate('Отправить', 'ru', $langs, 'chat') then data}
+        {data}
+      {/await}
+    </button>
+  </div>
+</div>
 
 <style>
   .chat-container {
     display: flex;
-    flex-direction: column-reverse;
-    position: absolute;
-    width: 100dvw;
-    height: 70vh;
-    background-color: #f4f4f8;
+    flex-direction: column;
+    position: relative;
+    height: calc(100vh - 104px);
+    max-width: 98vw;
+    margin: auto;
+    border: 1px solid #ccc;
     border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    /* padding-bottom: 6px;  */
-  }
-
-  .userMessage {
-    margin: 5px;
-    padding: 5px;
-    border-radius: 5px;
-    user-select: text;
-    -webkit-user-select: text; /* для совместимости с Safari */
-    -moz-user-select: text; /* для совместимости с Firefox */
-    -ms-user-select: text; /* для совместимости с IE10+ */
-  }
-
-  .userMessage.question {
-    width: 88%;
-    background-color: #cce5ff;
-    float: left;
-  }
-
-  .userMessage.answer {
-    width: 88%;
-    background-color: #e0e0e0;
-    /* margin-left: 60px; */
-    float: right;
+    background: #f9f9f9;  
+    top: 10px;
   }
 
   .input-container {
     display: flex;
-    position: fixed;
-    flex-direction: row;
-    justify-content: space-between;
-    bottom: 60px;
-    padding: 0 10px; /* Добавляем отступы */
+    position: absolute;
     width: 95vw;
+    bottom: 5px;
+    padding: 10px;
+    background: #fff;
+    border-top: 1px solid #ccc;
   }
 
-  .speaker-button {
-    position: relative;
-    top: 5px;
+  .messages {
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    right:0;
+    flex-grow: 1;
+    padding: 10px;
+    padding-bottom: 60px;
+    position: absolute;
+    bottom: 0px;
   }
 
-  .original {
-    font-size: x-small;
-    color: rgb(40, 72, 113);
+  .message {
+ 
+    padding: 10px;
+    margin: 5px;
+    border-radius: 10px;
+    word-wrap: break-word;
+  }
+
+  .message.user {
+    max-width: 85%;
+    align-self: flex-end;
+    background: #c8f7c5;
+  }
+
+  .message.ai {
+    max-width: 85%;
+    align-self: flex-start;
+    background: #d0d1ff;
+  }
+
+  /* Убедитесь, что только первое сообщение пользователя выравнивается по правому краю */
+  .message.first-message {
+    align-self: flex-end;
+  }
+
+  input {
+    flex: 1;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
   }
 
   button {
-    position: relative;
-    bottom: 0px; /* Кнопка выше нижней границы на 30px */
-  }
-
-  .textarea-container {
-    position: relative;
-    display: inline-block;
-    width: 96vw;
-    margin-left: 2vw;
-    bottom: -3px;
-  }
-
-  .textarea-container textarea {
-    height: 10vh;
-    position: relative;
-    bottom: 0;
-    width: 98%;
-  }
-
-  .mic-button {
-    position: absolute;
-    top: 50%;
-    right: 10px; /* Отступ от правого края контейнера */
-    transform: translateY(-50%); /* Центрирование по вертикали */
-    background: transparent;
+    padding: 8px 12px;
     border: none;
-    font-size: 20px; /* Размер иконки */
+    background: #007bff;
+    color: white;
+    border-radius: 5px;
     cursor: pointer;
   }
 
-    .hint-button {
-    color: white;
-    background-color: #2196f3;
-    border-radius: 3px;
-    padding: 8px 20px;
+  button:disabled {
+    background: #ccc;
+    cursor: not-allowed;
   }
 
-  /* Стилизация textarea и кнопки по желанию */
+  .loading {
+    position: relative;
+    font-style: italic;
+    color: gray;
+    bottom: 0px; /* Помещаем под последнее сообщение */
+    left: 10px;
+    width: calc(100% - 20px); 
+  }
 </style>

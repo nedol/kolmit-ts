@@ -4,9 +4,9 @@ config();
 import { Client} from '@gradio/client';
 
 
-import { GetPrompt } from '../../../lib/server/db';
+import { GetPrompt } from '../../../lib/server/db.ts';
 
-import { Translate } from './../../translate/Translate.ts';
+import { Translate } from '../../translate/Translate.ts';
 
 import Groq from 'groq-sdk';
 

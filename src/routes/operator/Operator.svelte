@@ -510,7 +510,9 @@
 {/if}
 
 <div class="dialog" style="display: {dlg_display};">
-  <Chat></Chat>
+  {#if $view==='chat'}
+    <Chat></Chat>
+  {/if}
 </div>
 
 <div class="bottom-app-bar-wrapper" class:hide={!$showBottomAppBar}>

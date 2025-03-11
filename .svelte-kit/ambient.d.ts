@@ -33,6 +33,7 @@ declare module '$env/static/private' {
 	export const ENDPOINT_ID: string;
 	export const HF_TOKEN: string;
 	export const VITE_TURN_CREDENTIAL: string;
+	export const DEEPSEEK_API_KEY: string;
 	export const ALLUSERSPROFILE: string;
 	export const APPDATA: string;
 	export const ChocolateyInstall: string;
@@ -46,9 +47,7 @@ declare module '$env/static/private' {
 	export const ComSpec: string;
 	export const DriverData: string;
 	export const EDITOR: string;
-	export const EFC_5572: string;
-	export const FPS_BROWSER_APP_PROFILE_STRING: string;
-	export const FPS_BROWSER_USER_PROFILE_STRING: string;
+	export const EFC_15884: string;
 	export const GIT_ASKPASS: string;
 	export const HOME: string;
 	export const HOMEDRIVE: string;
@@ -159,6 +158,7 @@ declare module '$env/dynamic/private' {
 		ENDPOINT_ID: string;
 		HF_TOKEN: string;
 		VITE_TURN_CREDENTIAL: string;
+		DEEPSEEK_API_KEY: string;
 		ALLUSERSPROFILE: string;
 		APPDATA: string;
 		ChocolateyInstall: string;
@@ -172,9 +172,7 @@ declare module '$env/dynamic/private' {
 		ComSpec: string;
 		DriverData: string;
 		EDITOR: string;
-		EFC_5572: string;
-		FPS_BROWSER_APP_PROFILE_STRING: string;
-		FPS_BROWSER_USER_PROFILE_STRING: string;
+		EFC_15884: string;
 		GIT_ASKPASS: string;
 		HOME: string;
 		HOMEDRIVE: string;

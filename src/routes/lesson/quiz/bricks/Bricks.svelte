@@ -11,7 +11,6 @@
   import CircularProgress from '@smui/circular-progress';
 
   import Stt from '../../../speech/stt/Stt.svelte';
-
   
   let isListening = false;
 
@@ -289,8 +288,6 @@ let keys = [];
           SpeakText(true);
       }
   };
-
-
   
   const navSentence = async(nav)=>{
 
@@ -675,7 +672,6 @@ let keys = [];
       {/if}
       </Section>
       <Section align="start"> 
-
           <div>
             <IconButton
               class="material-icons"
