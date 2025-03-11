@@ -43,6 +43,7 @@
   : Date.now();
 
   let reminderTimeout;
+  let isReminderSent = false; // Флаг для отслеживания отправки напоминания
 
   onMount(async() => {
     // Отправляем reminder при входе в компонент
@@ -78,6 +79,8 @@
 
     // Вызываем AI
     await callChat(prompt_type,userMessage);
+
+    resetReminderTimer(); // Сбрасываем таймер при активности пользователя
   }
 
   // Вызов ChatGPT
@@ -117,7 +120,7 @@
     // Обновляем время последнего сообщения
     lastMessageTime = Date.now();
     localStorage.setItem('lastMessageTime', lastMessageTime.toString()); // Сохраняем время
-    resetReminderTimer();
+    // resetReminderTimer();
 
     async function removeEmojis(input) {
       const regex = emojiRegex();
@@ -168,25 +171,36 @@
   }
 
   function startReminderTimer() {
+
     reminderTimeout = setTimeout(() => {
       const currentTime = Date.now();
-      if (currentTime - lastMessageTime >= 5 * 60 * 1000) { // 5 минут в миллисекундах
-        sendMessage(`Blijf praten.`,'basic');
+      if (currentTime - lastMessageTime >= 30 * 1000) { // 5 минут неактивности
+        sendMessage(`Blijf praten.`, 'basic'); // Отправляем напоминание
+        stopReminderTimer(); // Останавливаем таймер после отправки
       }
-    }, 5 * 60 * 1000); // Проверка через 5 минут
+    }, 30 * 1000); // Проверка через 5 минут
   }
 
-  function resetReminderTimer() {
+    // Функция для остановки таймера
+    function stopReminderTimer() {
     if (reminderTimeout) {
       clearTimeout(reminderTimeout);
+      reminderTimeout = null; // Сбрасываем таймер
     }
-    startReminderTimer();
+  }
+
+  // Функция для сброса таймера при активности пользователя
+  function resetReminderTimer() {
+    // stopReminderTimer(); // Останавливаем текущий таймер
+    lastMessageTime = Date.now(); // Обновляем время последнего сообщения
+    localStorage.setItem('lastMessageTime', lastMessageTime.toString()); // Сохраняем в localStorage
+    // startReminderTimer(); // Запускаем таймер заново
   }
 
     // Очистка таймера при размонтировании
   onDestroy(() => {
     if (to) clearTimeout(to);
-    if (reminderTimeout) clearTimeout(reminderTimeout);
+    stopReminderTimer();
   });
 </script>
 
