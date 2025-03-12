@@ -151,7 +151,7 @@
   {/await}
   <div class="flexy-dad"> 
     {#each group as user, i}
-      {#if user && user.operator !== operator.operator}
+      {#if user?.operator !== operator.operator}
         <br />
         <div
           class="mdc-elevation--z{i + 1} flexy-boy"
@@ -170,7 +170,7 @@
       {/if}
     {/each}
   </div>
-  {#if true || window.location.hostname==='localhost'}
+  {#if operator.operator==='45e487f5af70416e7d46d6a4b00985de'||'9d6850204195034c24d3b6d430393b33'}
     <div class="flexy-dad tutor">
       <div class="mdc-elevation--z{1} flexy-boy">
         <Item style="text-align: center">

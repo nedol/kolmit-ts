@@ -761,7 +761,7 @@ export async function GetPrompt(name: string): Promise<{ prompt?: Prompt, error?
   try {
     // Fetch prompt data from the database
     const prompt = await sql<Prompt[]>`
-      SELECT system, user 
+      SELECT *
       FROM prompts
       WHERE name = ${name}
     `;
