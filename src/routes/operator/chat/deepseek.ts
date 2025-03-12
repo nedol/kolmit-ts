@@ -18,6 +18,7 @@ interface GenerateParams {
   context?: string; // Optional context for the prompt
   level: string; // Level for the prompt (e.g., A1, B2, C1)
   lang?: string; // Optional language (default to 'nl' if not provided)
+  llang?:string;
   theme?: string; // Optional theme for the conversation
   conversationHistory?: Array<{ role: "user" | "assistant"; content: string }>; // Optional conversation history
 }
@@ -59,12 +60,11 @@ export default async function generate_from_text_input(params: GenerateParams): 
 
     prompt = result.prompt; // Assign the fetched prompt 
 
-    // Set default language if not provided
-    const lang = params.lang || 'nl';
 
     // Replace placeholders in the system prompt
     const finalSystemPrompt = prompt.system
-      .replace(/\${lang}/g, lang)
+      .replace(/\${llang}/g, params.llang)
+      .replace(/\${lang}/g, params.lang)
       .replace(/\${level}/g, params.level)
       .replace(/\${theme}/g, params.theme || 'general conversation'); // Default theme if not provided
 
@@ -74,10 +74,10 @@ export default async function generate_from_text_input(params: GenerateParams): 
     ];
 
     // Generate completion using DeepSeek's API
-    const completion = await openai.chat.completions.create({
-      messages: system_messages,
-      model: "deepseek-chat",
-    });
+    // const completion = await openai.chat.completions.create({
+    //   messages: system_messages,
+    //   model: "deepseek-chat",
+    // });
 
     return prompt.user;
   }

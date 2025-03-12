@@ -23,7 +23,7 @@
   let stt_text = '';
   let isSTT = false;
 
-  type Message = { role: 'user' | 'ai'; text: string };
+  type Message = { role: 'user' | 'assistant'; text: string };
   type Messages = Message[];
 
   let userInput = '';
@@ -85,58 +85,88 @@
 
   // Вызов ChatGPT
   async function callChat(prompt_type: {}, text: string) {
-  try {
-    if (to) clearTimeout(to);
+    try {
+      if (to) clearTimeout(to);
 
-    // Ограничиваем историю сообщений до 5 реплик с каждой стороны
-    let conversationHistory = $messages
-      .slice(-10) // Берем последние 10 сообщений (5 от пользователя и 5 от AI)
-      .map(msg => ({
-        role: msg.role === "ai" ? "assistant" : "user",
-        content: msg.text
-      }));
+      // Ограничиваем историю сообщений до 5 реплик с каждой стороны
+      let conversationHistory = $messages
+        .slice(-6) // Берем последние 6 сообщений (5 от пользователя и 5 от AI)
+        .map(msg => ({
+          role: msg.role === "assistant" ? "assistant" : "user",
+          content: msg.text
+        }));
 
-    const params = {
-      prompt: prompt_type,
-      conversationHistory,
-      lang: $langs,
-      llang: $llang,
-      level: "B1.1"
-    };
+      const params = {
+        prompt: prompt_type,
+        conversationHistory,
+        lang: $langs,
+        llang: $llang,
+        level: "B1.1"
+      };
 
-    const response = await fetch(`./operator/chat`, {
-      method: "POST",
-      body: JSON.stringify({ params }),
-      headers: { "Content-Type": "application/json" },
-    });
+      const response = await fetch(`./operator/chat`, {
+        method: "POST",
+        body: JSON.stringify({ params }),
+        headers: { "Content-Type": "application/json" },
+      });
 
-    if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+      if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
 
-    const data = await response.json();
+      const data = await response.json();
 
-    // Добавляем ответ AI в список
-    messages.update((msgs) => [...msgs, { role: "ai", text: data.res }]);
+      const dataAr =  function splitText(text) {
+      // Создаем регулярные выражения динамически
+      const nlRegex = new RegExp(`<${$llang}>([\\s\\S]*?)<\/${$llang}>`);
+      const ruRegex = new RegExp(`<${$langs}>([\\s\\S]*?)<\/${$langs}>`);
 
-    // Обновляем время последнего сообщения
-    lastMessageTime = Date.now();
-    localStorage.setItem('lastMessageTime', lastMessageTime.toString()); // Сохраняем время
-    // resetReminderTimer();
+      // Поиск содержимого <nl>
+      const nlMatch = text.match(nlRegex);
+      const nlContent = nlMatch ? nlMatch[1].trim() : null;
 
-    async function removeEmojis(input) {
-      const regex = emojiRegex();
-      return await input.replace(regex, '');
+      // Поиск содержимого <ru>
+      const ruMatch = text.match(ruRegex);
+      const ruContent = ruMatch ? ruMatch[1].trim() : null;
+
+      return { [$llang]: nlContent, [$langs]: ruContent };
+
+      }(data.res);  
+
+      // Добавляем ответ AI в список
+      messages.update((msgs) => [...msgs, { role: "assistant", text: dataAr[$llang] , tr: dataAr[$langs]}]);
+
+      // Обновляем время последнего сообщения
+      lastMessageTime = Date.now();
+      localStorage.setItem('lastMessageTime', lastMessageTime.toString()); // Сохраняем время
+      // resetReminderTimer();
+
+      async function removeEmojis(input) {
+        const regex = emojiRegex();
+        return await input.replace(regex, '');
+      }
+
+      async function extractAIContent(input) {
+        const aiRegex = /<ai>([\s\S]*?)<\/ai>/;
+        const match = input.match(aiRegex);
+        return match ? match[1].trim() : null;
     }
 
-    tts.Speak_server($llang, await removeEmojis(data.res), '', '');
-    console.log('tts');
+    function removeCorTags(input) {
+        // Регулярное выражение для поиска тегов <cor> и их содержимого
+        const corRegex = /<cor>[\s\S]*?<\/cor>/g;
+        return input.replace(corRegex, '');
+    }
 
-  } catch (error) {
-    console.error("Произошла ошибка при обращении к серверу:", error);
-    messages.update((msgs) => [...msgs, { role: "ai", text: "Ошибка при обработке запроса. Попробуйте снова." }]);
-  } finally {
-    loading.set(false);
+    if(dataAr[$llang])
+      tts.Speak_server($llang, await removeCorTags(dataAr[$llang]), '', '');
+      console.log('tts');
+
+    } catch (error) {
+      console.error("Произошла ошибка при обращении к серверу:", error);
+      messages.update((msgs) => [...msgs, { role: "assistant", text: "Ошибка при обработке запроса. Попробуйте снова." }]);
+    } finally {
+      loading.set(false);
+    }
   }
-}
   function StopListening() {
     isListening = false;
   }
@@ -162,23 +192,25 @@
   }
 
   async function toggleTranslation(message) {
-    if (!translatedMessages.has(message.text)) {
-      const tr = await Translate(message.text, $llang, $langs, '');
-      translatedMessages.set(message.text, tr);
-    }
+    if (!message.tr) 
+      message.tr = await Translate(message.text, $llang, $langs, '');
+
+    translatedMessages.set(message.text, message.tr);
+
     message.isTranslated = !message.isTranslated;
     $messages = $messages; // Принудительное обновление
-  }
+  
+}
 
   function startReminderTimer() {
 
     reminderTimeout = setTimeout(() => {
       const currentTime = Date.now();
-      if (currentTime - lastMessageTime >= 30 * 1000) { // 5 минут неактивности
+      if (currentTime - lastMessageTime >= 1 * 60 * 1000) { // 5 минут неактивности
         sendMessage(`Blijf praten.`, 'basic'); // Отправляем напоминание
         stopReminderTimer(); // Останавливаем таймер после отправки
       }
-    }, 30 * 1000); // Проверка через 5 минут
+    }, 1 * 60 * 1000); // Проверка через 5 минут
   }
 
     // Функция для остановки таймера
@@ -217,9 +249,9 @@
     <div class="message {message.role} {message.role === 'user' && index === 0 ? 'first-message' : ''}">
       <!--strong>{message.role === 'user' ? 'Вы' : 'AI'}:</strong--> 
       {#if message.isTranslated && translatedMessages.has(message.text)}
-        {translatedMessages.get(message.text)}
+        {@html translatedMessages.get(message.text)}
       {:else}
-        {message.text}
+        {@html message.text}
       {/if}
   
       {#if message.role !== 'user' }
@@ -279,6 +311,11 @@
 </div>
 
 <style>
+  :global(cor){
+    color:red;
+    font-size: small;
+    font-weight: bold;
+  }
   .chat-container {
     display: flex;
     flex-direction: column;
@@ -306,16 +343,14 @@
     display: flex;
     flex-direction: column;
     overflow-y: auto;
-    right:0;
     flex-grow: 1;
-    padding: 10px;
+    padding: 20px;
     padding-bottom: 60px;
     position: absolute;
     bottom: 0px;
   }
 
-  .message {
- 
+  .message { 
     padding: 10px;
     margin: 5px;
     border-radius: 10px;
@@ -323,13 +358,17 @@
   }
 
   .message.user {
-    max-width: 85%;
+    position: relative;
+    width: 85%;
+    left:20px;
     align-self: flex-end;
     background: #c8f7c5;
   }
 
-  .message.ai {
-    max-width: 85%;
+  .message.assistant {
+    position: relative;
+    width: 85%;
+    right:20px;
     align-self: flex-start;
     background: #d0d1ff;
   }
