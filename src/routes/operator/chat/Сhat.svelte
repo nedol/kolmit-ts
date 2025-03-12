@@ -23,7 +23,7 @@
   let stt_text = '';
   let isSTT = false;
 
-  type Message = { role: 'user' | 'assistant'; text: string };
+  type Message = { role: 'user' | 'assistant'; text: string, tr: string, id: number };
   type Messages = Message[];
 
   let userInput = '';
@@ -70,7 +70,8 @@
 
     // Добавляем сообщение пользователя в список
     if(!msg)
-      messages.update((msgs) => [...msgs, { role: 'user', text: userInput }]);
+      messages.update((msgs) => [...msgs, { id: crypto.randomUUID(), role: 'user', text: userInput }]);
+
     const userMessage = msg?msg:userInput;
     userInput = '';
     loading.set(true);
@@ -132,7 +133,8 @@
       }(data.res);  
 
       // Добавляем ответ AI в список
-      messages.update((msgs) => [...msgs, { role: "assistant", text: dataAr[$llang] , tr: dataAr[$langs]}]);
+      messages.update(msgs =>  [...msgs, { id: crypto.randomUUID(), role: "assistant", text: dataAr[$llang], tr: dataAr[$langs] }]);
+
 
       // Обновляем время последнего сообщения
       lastMessageTime = Date.now();
@@ -162,7 +164,7 @@
 
     } catch (error) {
       console.error("Произошла ошибка при обращении к серверу:", error);
-      messages.update((msgs) => [...msgs, { role: "assistant", text: "Ошибка при обработке запроса. Попробуйте снова." }]);
+      messages.update((msgs) => [...msgs, { id: crypto.randomUUID(), role: "assistant", text: "Ошибка при обработке запроса. Попробуйте снова." }]);
     } finally {
       loading.set(false);
     }
@@ -245,7 +247,7 @@
     bind:this={stt}></Stt>
 
   <div class="messages" bind:this={messagesContainer}>
-    {#each $messages as message, index (message.text)}
+    {#each $messages as message, index (message.id)}
     <div class="message {message.role} {message.role === 'user' && index === 0 ? 'first-message' : ''}">
       <!--strong>{message.role === 'user' ? 'Вы' : 'AI'}:</strong--> 
       {#if message.isTranslated && translatedMessages.has(message.text)}
