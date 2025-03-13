@@ -16,14 +16,16 @@
       mdiTranslateOff
   } from '@mdi/js';
 
-  let stt, tts;
+  let stt: Stt | null = null; // Если `Stt` — это класс или компонент Svelte
+
+  let tts: Tts | null = null; // Если `Tts` — это класс или компонент Svelte
 
   let isListening = false;
   let display_audio = 'none';
   let stt_text = '';
   let isSTT = false;
 
-  type Message = { role: 'user' | 'assistant'; text: string, tr: string, id: number };
+  type Message = { role: 'user' | 'assistant' | 'system'; text: string; tr: string; id: string; isTranslated: boolean; };
   type Messages = Message[];
 
   let userInput = '';
@@ -34,15 +36,17 @@
   let isTranslated = false;
   let translatedMessages = new Map(); // Кэш переведённых сообщений
 
-  let messagesContainer;
+  let messagesContainer: HTMLElement | null = null;
+
 
 
   // Время последнего сообщения (можно сохранять в localStorage для сохранения между перезагрузками)
-  let lastMessageTime = localStorage.getItem('lastMessageTime')
-  ? parseInt(localStorage.getItem('lastMessageTime'))
-  : Date.now();
+  let lastMessageTime = parseInt(localStorage.getItem('lastMessageTime') ?? '0') || Date.now();
 
-  let reminderTimeout;
+
+  let reminderTimeout: NodeJS.Timeout | null = null;
+
+
   let isReminderSent = false; // Флаг для отслеживания отправки напоминания
 
   onMount(async() => {
@@ -70,7 +74,7 @@
 
     // Добавляем сообщение пользователя в список
     if(!msg)
-      messages.update((msgs) => [...msgs, { id: crypto.randomUUID(), role: 'user', text: userInput }]);
+      messages.update((msgs) => [...msgs, { id: crypto.randomUUID(), role: 'user', text: userInput, tr:"", isTranslated:false }]);
 
     const userMessage = msg?msg:userInput;
     userInput = '';
@@ -133,7 +137,7 @@
       }(data.res);  
 
       // Добавляем ответ AI в список
-      messages.update(msgs =>  [...msgs, { id: crypto.randomUUID(), role: "assistant", text: dataAr[$llang], tr: dataAr[$langs] }]);
+      messages.update(msgs =>  [...msgs, { id: crypto.randomUUID(), role: "assistant", text: dataAr[$llang], tr: dataAr[$langs] , isTranslated:false}]);
 
 
       // Обновляем время последнего сообщения
@@ -141,30 +145,30 @@
       localStorage.setItem('lastMessageTime', lastMessageTime.toString()); // Сохраняем время
       // resetReminderTimer();
 
-      async function removeEmojis(input) {
+      async function removeEmojis(input: string ) {
         const regex = emojiRegex();
         return await input.replace(regex, '');
       }
 
-      async function extractAIContent(input) {
+      async function extractAIContent(input: string ) {
         const aiRegex = /<ai>([\s\S]*?)<\/ai>/;
         const match = input.match(aiRegex);
         return match ? match[1].trim() : null;
     }
 
-    function removeCorTags(input) {
+    function removeCorTags(input: string ) {
         // Регулярное выражение для поиска тегов <cor> и их содержимого
         const corRegex = /<cor>[\s\S]*?<\/cor>/g;
         return input.replace(corRegex, '');
     }
 
     if(dataAr[$llang])
-      tts.Speak_server($llang, await removeCorTags(dataAr[$llang]), '', '');
+      tts?.Speak_server($llang, await removeCorTags(dataAr[$llang]), '', '');
       console.log('tts');
 
     } catch (error) {
       console.error("Произошла ошибка при обращении к серверу:", error);
-      messages.update((msgs) => [...msgs, { id: crypto.randomUUID(), role: "assistant", text: "Ошибка при обработке запроса. Попробуйте снова." }]);
+      messages.update((msgs) => [...msgs, { id: crypto.randomUUID(), role: "assistant", text: "Ошибка при обработке запроса. Попробуйте снова.", tr:"", isTranslated:false }]);
     } finally {
       loading.set(false);
     }
@@ -173,7 +177,7 @@
     isListening = false;
   }
 
-  function SttResult(text) {
+  function SttResult(text:string) {
     userInput = text[$llang];
     sendMessage();
   }
@@ -181,7 +185,7 @@
   function onClickMicrophone() {
     if (isListening) {
       stt_text = ''
-      stt.MediaRecorderStop();
+      stt?.MediaRecorderStop();
       isListening = false;
       return;
     }
@@ -193,7 +197,7 @@
     isListening = true;
   }
 
-  async function toggleTranslation(message) {
+  async function toggleTranslation(message:Message) {
     if (!message.tr) 
       message.tr = await Translate(message.text, $llang, $langs, '');
 
