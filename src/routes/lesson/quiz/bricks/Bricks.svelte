@@ -30,9 +30,17 @@
 
   let article_name = ''
 
-  let stt, tts;
-  // Разделяем предложение на слова
-  let words = [];
+  let stt: Stt | null = null; // Если `Stt` — это класс или компонент Svelte
+
+  let tts: Tts | null = null; // Если `Tts` — это класс или компонент Svelte
+
+  interface Word {
+    gr: string;
+    placeholder: string;
+    value: string;
+  }
+
+  let words: Word[] = [];
 
   let isEndSpeak = true;
 
@@ -41,10 +49,26 @@
 // Функция для отслеживания сфокусированных элементов
 let focusedIndex = 0;
 
-// Разделение предложения на placeholder'ы
-let formattedSentence = [];
+interface FormattedSentence {
+  gr: string;
+  placeholder: string;
+  value: string;
+  word:string;
+  class:string;
+}
 
-let bricks_data;
+let formattedSentence: FormattedSentence[] = [];
+
+interface Brick {
+  id: number;
+  text:{ sentence: string, article: string }[];
+  name: string;
+  color: string;
+  size: { width: number; height: number; };
+}
+
+let bricks_data: Brick;
+
 
 let isCollapsed = true;
 
@@ -53,11 +77,12 @@ let curSentence = 0;
 // let speechData = '';
 let current_word = 0;
 let audio;
-let display_audio;
+let display_audio:string;
 
-let keys = [];
+let keys: string[] = [];
 
-  export let data;
+  export let data: string = '';
+
   const operator = getContext('operator');
   // Исходное предложение
   let sentence = "";
@@ -85,9 +110,6 @@ let keys = [];
       mdiTranslateOff
   } from '@mdi/js';
 
- 
-
-
   fetch(
     `./lesson?bricks=${data.name}&theme=${data.theme}&owner=${operator.abonent}&level=${data.level}`
   )
@@ -107,7 +129,7 @@ let keys = [];
       return [];
     });
 
-  function extractTagName(tagString) {
+  function extractTagName(tagString:string) {
       const match = tagString.match(/^<(\w+)/); // Находим первую часть тега
       return match ? match[1] : ''; // Возвращаем название тега или null, если не найдено
   }
@@ -200,56 +222,61 @@ let keys = [];
   }
 
 
-  function splitHtmlIntoSentencesWithInnerTags(html) {
-    function removeEmojis(input) {
-        const regex = emojiRegex();
-        return input.replace(regex, '');
-    }
-
-    function formatTaggedText(input) {
-        return input.replace(/<(\w+)>(.*?)<\/\1>/g, (match, tag, content) => {
-            const words = content.match(/\S+|\s+/g) || []; // Разделяем на слова + пробелы
-            return words.map(word => {
-                if (word.trim()) return `<${tag}>${word}</${tag}>`;
-                return word; // Оставляем пробелы как есть
-            }).join('');
-        });
-    }
-
-      function shouldNotSplit(text, index) {
-          // Проверяем, находимся ли внутри любого тега (кроме <article>)
-          const match = text.slice(Math.max(0, index - 10), index + 10);
-          return /<(\w+)>([^<]*[A-Z]\.[A-Z]\.[^<]*)<\/\1>/i.test(match);
-      }
-
-      const parser = new DOMParser();
-      const doc = parser.parseFromString(html, 'text/html');
-      const articles = doc.querySelectorAll('article, aticle');
-
-      const sentences = Array.from(articles).flatMap(article => {
-          const htmlContent = formatTaggedText(removeEmojis(article.innerHTML.trim()));
-          const articleName = article.getAttribute('name') || ''; // Извлекаем название статьи из атрибута name
-      
-          return htmlContent
-              .split(/(?<!\b(?:Dr|Mr|Ms|Mrs|St))(?<=[.!?])\s+(?=<|\w|<\/\w+>)/g)
-              .map((sentence, index, arr) => {
-                  if (index > 0 && shouldNotSplit(arr[index - 1], arr[index - 1].length)) {
-                      return arr[index - 1] + ' ' + sentence; // Объединяем части, если не должно быть разделения
-                  }
-                  return sentence;
-              })
-              .filter(sentence => sentence.length > 0)
-              .map(sentence => ({
-                sentence,
-                article: articleName // Добавляем название статьи вместо outerHTML
-            }));;
-      });
-
-      return sentences;
+  function splitHtmlIntoSentencesWithInnerTags(html: string): { sentence: string, article: string }[] {
+  // Функция для удаления эмодзи
+  function removeEmojis(input: string): string {
+    const regex = emojiRegex();
+    return input.replace(regex, '');
   }
 
+  // Функция для форматирования текста с тегами
+  function formatTaggedText(input: string): string {
+    return input.replace(/<(\w+)>(.*?)<\/\1>/g, (match, tag, content) => {
+      const words = content.match(/\S+|\s+/g) || []; // Разделяем на слова + пробелы
+      return words.map(word => {
+        if (word.trim()) return `<${tag}>${word}</${tag}>`; // Возвращаем каждое слово внутри тега
+        return word; // Оставляем пробелы
+      }).join('');
+    });
+  }
+
+  // Функция, проверяющая, следует ли объединить предложения
+  function shouldNotSplit(text: string, index: number): boolean {
+    const match = text.slice(Math.max(0, index - 10), index + 10);
+    return /<(\w+)>([^<]*\b(?:[A-Z]\.[A-Z]\.)[^<]*)<\/\1>/i.test(match); // Проверка на аббревиатуры
+  }
+
+  // Разбор HTML с помощью DOMParser
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(html, 'text/html');
+  const articles = doc.querySelectorAll('article, aticle');
+
+  // Разделяем контент на предложения и добавляем их в массив
+  const sentences = Array.from(articles).flatMap(article => {
+    const htmlContent = formatTaggedText(removeEmojis(article.innerHTML.trim()));
+    const articleName = article.getAttribute('name') || ''; // Извлекаем название статьи
+
+    return htmlContent
+      .split(/(?<!\b(?:Dr|Mr|Ms|Mrs|St|Jr|Sr))(?<=[.!?])\s+(?=<|\w|<\/\w+>)/g)
+      .map((sentence, index, arr) => {
+        if (index > 0 && shouldNotSplit(arr[index - 1], arr[index - 1].length)) {
+          return arr[index - 1] + ' ' + sentence; // Объединяем предложения, если их не следует разделять
+        }
+        return sentence;
+      })
+      .filter(sentence => sentence.length > 0)
+      .map(sentence => ({
+        sentence,
+        article: articleName // Добавляем название статьи
+      }));
+  });
+
+  return sentences;
+}
+
+
   // Обработчик клика на слово
-  const handleClick = (word) => {
+  const handleClick = (word:string) => {
       // Присваиваем выбранное слово фокусируемому элементу
       if(formattedSentence[focusedIndex].value.toLowerCase().replace(/<[^>]*>/g, '') === word.value.toLowerCase().replace(/<[^>]*>/g, '')){
 
@@ -285,7 +312,7 @@ let keys = [];
   const checkCompletion = () => {
       // Если все элементы имеют класс "correct", вызываем функцию Speak
       if (formattedSentence.every(item => item.class === "correct")) {
-          SpeakText(true);
+          SpeakText();
       }
   };
   

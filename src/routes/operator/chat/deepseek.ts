@@ -23,7 +23,7 @@ interface GenerateParams {
   conversationHistory?: Array<{ role: "user" | "assistant"; content: string }>; // Optional conversation history
 }
 
-type GenerateResponse = string | undefined;
+type GenerateResponse = string | object | undefined;
 
 let prompt: Prompt | undefined; // Store the Prompt object
 
@@ -31,16 +31,16 @@ let openai: OpenAI;
 
 let system_messages: Array<{ role: "system" ; content: string }> = []
 
+let total_tokens: number | null = 0;
+
 
 export default async function generate_from_text_input(params: GenerateParams): Promise<GenerateResponse> {
-  // Fetch the prompt if not already fetched
   if (params.prompt.type === 'greeting') {
     const apiKey = process.env.DEEPSEEK_API_KEY;
     if (!apiKey) {
       throw new Error('DeepSeek API key is missing in environment variables');
     }
 
-    // Initialize OpenAI client with DeepSeek's base URL
     openai = new OpenAI({
       baseURL: 'https://api.deepseek.com',
       apiKey: apiKey,
@@ -48,64 +48,55 @@ export default async function generate_from_text_input(params: GenerateParams): 
 
     const result = await GetPrompt(`${params.prompt.quiz}.${params.prompt.type}.${params.prompt.lang}`);
 
-    // Check if the result contains an error
     if (result.error) {
       throw new Error(result.error);
     }
 
-    // Ensure the result contains the required Prompt object
     if (!result.prompt || !result.prompt.system || !result.prompt.user) {
       throw new Error('Failed to fetch valid prompt from GetPrompt');
     }
 
-    prompt = result.prompt; // Assign the fetched prompt 
+    prompt = result.prompt; 
 
-
-    // Replace placeholders in the system prompt
     const finalSystemPrompt = prompt.system
       .replace(/\${llang}/g, params.llang)
       .replace(/\${lang}/g, params.lang)
       .replace(/\${level}/g, params.level)
-      .replace(/\${theme}/g, params.theme || 'general conversation'); // Default theme if not provided
+      .replace(/\${theme}/g, params.theme || 'general conversation');
 
-    // Prepare the messages array
-    system_messages = [
-      { role: "system", content: finalSystemPrompt }, // System prompt
-    ];
-
-    // Generate completion using DeepSeek's API
-    // const completion = await openai.chat.completions.create({
-    //   messages: system_messages,
-    //   model: "deepseek-chat",
-    // });
+    system_messages = [{ role: "system", content: finalSystemPrompt }];
 
     return prompt.user;
   }
 
-  // Validate required properties
   if (!params.level) {
     throw new Error('Missing required property: level');
   }
 
   try {
-    // Prepare the messages array
+    let messages: Array<{ role: "user" | "assistant" | "system"; content: string }> = 
+      [...system_messages];
 
-    const messages: Array<{ role:  "user" | "system" |"assistant"; content: string }> = 
-        system_messages
-    
-
-        // Add conversation history if provided
     if (params.conversationHistory) {
-        messages.push(...params.conversationHistory);
+      // Оставляем только последние 2 сообщения от user и assistant
+      const filteredHistory = params.conversationHistory
+        .filter(msg => msg.role === "user" || msg.role === "assistant")
+        .slice(-4);
+      
+      messages = [...system_messages, ...filteredHistory];
     }
 
-    // Generate completion using DeepSeek's API
+    if(total_tokens>100000){
+      return {"tokens_limit":"10000","total_tokens":total_tokens};
+    }
+
     const completion = await openai.chat.completions.create({
-      messages:messages,
+      messages: messages,
       model: "deepseek-chat",
     });
 
-    // Return the generated response
+    total_tokens += completion.usage.total_tokens;
+
     return completion.choices[0].message.content;
 
   } catch (error) {

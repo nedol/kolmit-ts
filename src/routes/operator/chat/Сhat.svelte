@@ -13,7 +13,8 @@
       mdiMicrophoneOutline ,
       mdiMicrophone,
       mdiTranslate,
-      mdiTranslateOff
+      mdiTranslateOff,
+      mdiMicrophoneMessage
   } from '@mdi/js';
 
   let stt: Stt | null = null; // Если `Stt` — это класс или компонент Svelte
@@ -25,7 +26,7 @@
   let stt_text = '';
   let isSTT = false;
 
-  type Message = { role: 'user' | 'assistant' | 'system'; text: string; tr: string; id: string; isTranslated: boolean; };
+  type Message = { role: 'user' | 'assistant' | 'system'; text: string; tr: string; cor:string; id: string; isTranslated: boolean; };
   type Messages = Message[];
 
   let userInput = '';
@@ -38,6 +39,10 @@
 
   let messagesContainer: HTMLElement | null = null;
 
+  let isReply = true;
+  let isShowReply = false;
+
+  let dataAr:{}
 
 
   // Время последнего сообщения (можно сохранять в localStorage для сохранения между перезагрузками)
@@ -46,6 +51,7 @@
 
   let reminderTimeout: NodeJS.Timeout | null = null;
 
+  let selectedReplyId: string | null = null; // ID сообщения, для которого показаны ответы
 
   let isReminderSent = false; // Флаг для отслеживания отправки напоминания
 
@@ -74,7 +80,15 @@
 
     // Добавляем сообщение пользователя в список
     if(!msg)
-      messages.update((msgs) => [...msgs, { id: crypto.randomUUID(), role: 'user', text: userInput, tr:"", isTranslated:false }]);
+      messages.update((msgs) => [...msgs, 
+    { 
+      id: crypto.randomUUID(), 
+      role: 'user', 
+      text: userInput, 
+      tr:"", 
+      cor:"",
+      isTranslated:false 
+    }]);
 
     const userMessage = msg?msg:userInput;
     userInput = '';
@@ -90,13 +104,12 @@
 
   // Вызов ChatGPT
   async function callChat(prompt_type: {}, text: string) {
-    console.log('callChat')
     try {
       if (to) clearTimeout(to);
 
       // Ограничиваем историю сообщений до 5 реплик с каждой стороны
       let conversationHistory = $messages
-        .slice(-6) // Берем последние 6 сообщений (5 от пользователя и 5 от AI)
+        .slice(-2) // Берем последние 6 сообщений (5 от пользователя и 5 от AI)
         .map(msg => ({
           role: msg.role === "assistant" ? "assistant" : "user",
           content: msg.text
@@ -110,24 +123,25 @@
         level: "B1.1"
       };
 
-      console.log('callChat fetch',params)
-
       const response = await fetch(`./operator/chat`, {
         method: "POST",
         body: JSON.stringify({ params }),
         headers: { "Content-Type": "application/json" },
       });
 
-      console.log('callChat response',response)
-
       if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
 
       const data = await response.json();
 
+      if(data.res.tokens_limit){
+        alert("TOKEN LIMIT");
+        return;
+      }
+
       function splitText(text) {
-        // Создаем регулярные выражения динамически
-        const nlRegex = new RegExp(`<${$llang}>([\\s\\S]*?)<\/${$llang}>`);
-        const ruRegex = new RegExp(`<${$langs}>([\\s\\S]*?)<\/${$langs}>`);
+        // Регулярные выражения для поиска содержимого между тегами <nl> и <ru>
+        const nlRegex = /<nl>([\s\S]*?)<\/nl>/;
+        const ruRegex = /<ru>([\s\S]*?)<\/ru>/;
 
         // Поиск содержимого <nl>
         const nlMatch = text.match(nlRegex);
@@ -137,25 +151,47 @@
         const ruMatch = text.match(ruRegex);
         const ruContent = ruMatch ? ruMatch[1].trim() : null;
 
-        return { [$llang]: nlContent, [$langs]: ruContent };
+        // Функция для извлечения данных из блока (nl или ru)
+        const extractData = (content) => {
+            const corRegex = /<cor>([\s\S]*?)<\/cor>/;
+            const msgRegex = /<msg>([\s\S]*?)<\/msg>/;
+            const replyRegex = /<reply>([\s\S]*?)<\/reply>/g;
 
-      };  
+            const corMatch = content.match(corRegex);
+            const msgMatch = content.match(msgRegex);
+            const replyMatches = content.match(replyRegex);
 
-      const dataAr =  splitText(data.res);
-      
-      console.log('splitText')
+            return {
+                cor: corMatch ? corMatch[1].trim() : null,
+                msg: msgMatch ? msgMatch[1].trim() : null,
+                replies: replyMatches ? replyMatches.map(match => match.replace(/<\/?reply>/g, '').trim()) : [],
+            };
+        };
 
+        return {
+            nl: nlContent ? extractData(nlContent) : null,
+            ru: ruContent ? extractData(ruContent) : null,
+        };
+     }
+
+
+      dataAr =  splitText(data.res);
+    
       // Добавляем ответ AI в список
-      messages.update(msgs =>  [...msgs, { id: crypto.randomUUID(), role: "assistant", text: dataAr[$llang], tr: dataAr[$langs] , isTranslated:false}]);
-
-      console.log('messages.update');
+      messages.update(msgs =>  
+      [...msgs, 
+        { id: crypto.randomUUID(), 
+          role: "assistant", 
+          text: dataAr[$llang]?.msg, 
+          tr: dataAr[$langs]?.msg , 
+          cor: dataAr[$llang]?.cor,
+          isTranslated:false}
+      ]);
 
       // Обновляем время последнего сообщения
       lastMessageTime = Date.now();
       localStorage.setItem('lastMessageTime', lastMessageTime.toString()); // Сохраняем время
       // resetReminderTimer();
-
-      console.log('localStorage.setItem');
 
       async function removeEmojis(input: string ) {
         const regex = emojiRegex();
@@ -166,20 +202,13 @@
         const aiRegex = /<ai>([\s\S]*?)<\/ai>/;
         const match = input.match(aiRegex);
         return match ? match[1].trim() : null;
-    }
+      }
 
-    function removeCorTags(input: string ) {
-        // Регулярное выражение для поиска тегов <cor> и их содержимого
-        const corRegex = /<cor>[\s\S]*?<\/cor>/g;
-        return input.replace(corRegex, '');
-    }
+      if(dataAr[$llang]){
 
-    console.log('Before Speak_server');
-
-    if(dataAr[$llang])
-      tts?.Speak_server($llang, await removeCorTags(dataAr[$llang]), '', '');
-      
-    console.log('tts');
+        tts?.Speak_server($llang, dataAr[$llang].msg , '', '');
+        isReply = dataAr[$llang].replies?true:false;
+      }
 
     } catch (error) {
       console.error("Произошла ошибка при обращении к серверу:", error);
@@ -219,9 +248,16 @@
     translatedMessages.set(message.text, message.tr);
 
     message.isTranslated = !message.isTranslated;
-    $messages = $messages; // Принудительное обновление
-  
-}
+    $messages = $messages; // Принудительное обновление  
+  } 
+
+  function toggleReply(messageId: string) {
+    if (selectedReplyId === messageId) {
+      selectedReplyId = null; // Скрыть ответы, если они уже показаны для этого сообщения
+    } else {
+      selectedReplyId = messageId; // Показать ответы для выбранного сообщения
+    }
+  }
 
   function startReminderTimer() {
 
@@ -265,10 +301,20 @@
     bind:display_audio
     bind:this={stt}></Stt>
 
+   
   <div class="messages" bind:this={messagesContainer}>
-    {#each $messages as message (message.id)}
+
+    {#each $messages as message, index (message.id)}
     <div class="message {message.role} {message.role === 'user' && index === 0 ? 'first-message' : ''}">
       <!--strong>{message.role === 'user' ? 'Вы' : 'AI'}:</strong--> 
+      {#if message.cor}
+        {#if message.isTranslated && translatedMessages.has(message.cor)}
+            <cor> {@html translatedMessages.get(message.cor)}</cor>
+        {:else}
+          <cor> {@html message.cor}</cor>
+        {/if}
+      {/if}
+      
       {#if message.isTranslated && translatedMessages.has(message.text)}
         {@html translatedMessages.get(message.text)}
       {:else}
@@ -276,16 +322,33 @@
       {/if}
   
       {#if message.role !== 'user' }
-        <div style="margin: 2px; float: inline-end;" on:click={() => toggleTranslation(message)}>
-          <IconButton>
-            <Icon tag="svg" viewBox="0 0 24 24">
-              {#if message.isTranslated}
-                <path fill="currentColor" d={mdiTranslate} />
-              {:else}
-                <path fill="currentColor" d={mdiTranslateOff} />
-              {/if}
-            </Icon>
-          </IconButton>
+        {#if selectedReplyId === message.id}
+          {#each dataAr[$llang].replies as reply}
+            <reply>{reply}</reply>
+          {/each}
+        {/if}
+        <div style="display:flex;justify-content: space-between;">
+          {#if isReply}
+              <div on:click={() => toggleReply(message.id)} >
+                <IconButton>
+                  <Icon tag="svg" viewBox="0 0 24 24" style="scale:1">
+                    <path fill="green" d={mdiMicrophoneMessage} />
+                  </Icon>
+                </IconButton>
+              </div>
+            {/if}
+            <div 
+              on:click={() => toggleTranslation(message)}>
+              <IconButton>
+                <Icon tag="svg" viewBox="0 0 24 24">
+                  {#if message.isTranslated}
+                    <path fill="currentColor" d={mdiTranslate} />
+                  {:else}
+                    <path fill="currentColor" d={mdiTranslateOff} />
+                  {/if}
+                </Icon>
+              </IconButton>
+            </div>
         </div>
       {/if}
     </div>
@@ -333,15 +396,29 @@
 
 <style>
   :global(cor){
+    display:block;
     color:red;
     font-size: small;
     font-weight: bold;
   }
+
+  :global(reply){
+    display: block;
+    color:green;
+    font-size:medium;
+    font-weight: bold;
+  }
+
+  :global(reply) {
+    /* visibility: hidden; */
+  }
+
+
   .chat-container {
     display: flex;
     flex-direction: column;
     position: relative;
-    height: calc(100vh - 104px);
+    height: calc(100vh - 114px);
     max-width: 98vw;
     margin: auto;
     border: 1px solid #ccc;
@@ -363,12 +440,18 @@
   .messages {
     display: flex;
     flex-direction: column;
+    align-items: center; /* Центрирование сообщений */
+    /* justify-content: flex-end; */
+    /* height: 75vh; */
     overflow-y: auto;
+    width: 95%; 
+    /* max-width: 95%; */
+    margin: 0 auto; /* Центрирование блока */
     flex-grow: 1;
-    padding: 20px;
+    padding: 30px;
     padding-bottom: 60px;
     position: absolute;
-    bottom: 0px;
+    bottom: 6vh;
   }
 
   .message { 
@@ -380,17 +463,19 @@
 
   .message.user {
     position: relative;
-    width: 85%;
-    left:20px;
+    max-width: 85%;
+    left:1px;
     align-self: flex-end;
+    text-align: end;
     background: #c8f7c5;
   }
 
   .message.assistant {
     position: relative;
-    width: 85%;
+    max-width: 85%;
     right:20px;
     align-self: flex-start;
+    text-align: start;
     background: #d0d1ff;
   }
 
