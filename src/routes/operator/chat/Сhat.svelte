@@ -119,31 +119,38 @@
 
       const data = await response.json();
 
-      const dataAr =  function splitText(text) {
-      // Создаем регулярные выражения динамически
-      const nlRegex = new RegExp(`<${$llang}>([\\s\\S]*?)<\/${$llang}>`);
-      const ruRegex = new RegExp(`<${$langs}>([\\s\\S]*?)<\/${$langs}>`);
+      function splitText(text) {
+        // Создаем регулярные выражения динамически
+        const nlRegex = new RegExp(`<${$llang}>([\\s\\S]*?)<\/${$llang}>`);
+        const ruRegex = new RegExp(`<${$langs}>([\\s\\S]*?)<\/${$langs}>`);
 
-      // Поиск содержимого <nl>
-      const nlMatch = text.match(nlRegex);
-      const nlContent = nlMatch ? nlMatch[1].trim() : null;
+        // Поиск содержимого <nl>
+        const nlMatch = text.match(nlRegex);
+        const nlContent = nlMatch ? nlMatch[1].trim() : null;
 
-      // Поиск содержимого <ru>
-      const ruMatch = text.match(ruRegex);
-      const ruContent = ruMatch ? ruMatch[1].trim() : null;
+        // Поиск содержимого <ru>
+        const ruMatch = text.match(ruRegex);
+        const ruContent = ruMatch ? ruMatch[1].trim() : null;
 
-      return { [$llang]: nlContent, [$langs]: ruContent };
+        return { [$llang]: nlContent, [$langs]: ruContent };
 
-      }(data.res);  
+      };  
+
+      const dataAr =  splitText(data.res);
+      
+      console.log('splitText')
 
       // Добавляем ответ AI в список
       messages.update(msgs =>  [...msgs, { id: crypto.randomUUID(), role: "assistant", text: dataAr[$llang], tr: dataAr[$langs] , isTranslated:false}]);
 
+      console.log('messages.update');
 
       // Обновляем время последнего сообщения
       lastMessageTime = Date.now();
       localStorage.setItem('lastMessageTime', lastMessageTime.toString()); // Сохраняем время
       // resetReminderTimer();
+
+      console.log('localStorage.setItem');
 
       async function removeEmojis(input: string ) {
         const regex = emojiRegex();
@@ -162,9 +169,12 @@
         return input.replace(corRegex, '');
     }
 
+    console.log('Before Speak_server');
+
     if(dataAr[$llang])
       tts?.Speak_server($llang, await removeCorTags(dataAr[$llang]), '', '');
-      console.log('tts');
+      
+    console.log('tts');
 
     } catch (error) {
       console.error("Произошла ошибка при обращении к серверу:", error);
