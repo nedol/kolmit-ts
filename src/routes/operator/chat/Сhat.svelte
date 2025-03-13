@@ -90,6 +90,7 @@
 
   // Вызов ChatGPT
   async function callChat(prompt_type: {}, text: string) {
+    console.log('callChat')
     try {
       if (to) clearTimeout(to);
 
@@ -109,11 +110,15 @@
         level: "B1.1"
       };
 
+      console.log('callChat fetch',params)
+
       const response = await fetch(`./operator/chat`, {
         method: "POST",
         body: JSON.stringify({ params }),
         headers: { "Content-Type": "application/json" },
       });
+
+      console.log('callChat response',response)
 
       if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
 
@@ -261,7 +266,7 @@
     bind:this={stt}></Stt>
 
   <div class="messages" bind:this={messagesContainer}>
-    {#each $messages as message, index (message.id)}
+    {#each $messages as message (message.id)}
     <div class="message {message.role} {message.role === 'user' && index === 0 ? 'first-message' : ''}">
       <!--strong>{message.role === 'user' ? 'Вы' : 'AI'}:</strong--> 
       {#if message.isTranslated && translatedMessages.has(message.text)}
