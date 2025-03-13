@@ -1111,9 +1111,7 @@ interface WriteSpeechResponse {
 
 export async function WriteSpeech(q: WriteSpeechRequest): Promise<WriteSpeechResponse> {
   try {
-    await sql.begin(async (tx) => {
-      // Insert or update speech data
-      await tx`
+    await sql`
         INSERT INTO speech (lang, key, text, translate, provider, quiz)
         VALUES (
           ${q.lang ?? null}, 
@@ -1133,7 +1131,6 @@ export async function WriteSpeech(q: WriteSpeechRequest): Promise<WriteSpeechRes
             ELSE speech.quiz 
           END
       `;
-    });
 
     // Return success response
     return { success: true, message: "Data written successfully." };

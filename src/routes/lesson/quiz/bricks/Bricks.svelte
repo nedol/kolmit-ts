@@ -848,7 +848,7 @@ let keys = [];
         <span class={`${item.class} ${item.gr}`}
           tabindex="0" 
           value={item.value.replace(/<[^>]*>/g, '')}
-          on:click={() => {focusedIndex=index;item.word=''; /*handleFormatted(item, index)*/}}
+          on:click={() => {item.word=''; focusedIndex=index;handleFormatted(item, index)}}
           on:focus={() => handleFocus(index)}>
           {@html item.word || item.placeholder}
         </span>
