@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onDestroy, getContext, onMount } from 'svelte';
+  import { onDestroy, getContext,afterUpdate, onMount } from 'svelte';
   import { writable } from 'svelte/store';
   import { Translate } from '../../translate/Transloc';
   import { langs, llang, operatorst } from '$lib/stores';
@@ -45,7 +45,7 @@
   let dataAr:{}
 
   let operator = getContext('operator');
-
+  let lastMessage; // переменная для последнего сообщения
 
   // Время последнего сообщения (можно сохранять в localStorage для сохранения между перезагрузками)
   let lastMessageTime = parseInt(localStorage.getItem('lastMessageTime') ?? '0') || Date.now();
@@ -66,13 +66,12 @@
   });
 
   // Автопрокрутка вниз при обновлении сообщений
-
-
-  $: {
-    if (messagesContainer) {
-      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+  afterUpdate(() => {
+    if (lastMessage) {
+      lastMessage.scrollIntoView({ behavior: "smooth", block: "end" });
     }
-  }
+  });
+
 
   // Отправка сообщения
   async function sendMessage(msg:string ='', type:string = 'basic') {
@@ -318,7 +317,8 @@
   <div class="messages" bind:this={messagesContainer}>
     
     {#each $messages as message, index (message.id)}
-    <div class="message {message.role} {message.role === 'user' && index === 0 ? 'first-message' : ''}">
+    <div class="message {message.role} {message.role === 'user' && index === 0 ? 'first-message' : ''}"
+      bind:this={lastMessage} >
       <!--strong>{message.role === 'user' ? 'Вы' : 'AI'}:</strong--> 
       {#if message.cor}
         {#if message.isTranslated && translatedMessages.has(message.cor)}
@@ -439,11 +439,12 @@
   .chat-container {
     display: flex;
     flex-direction: column;
-    height: calc(100vh - 100px); /* Вычитаем высоту шапки и подвала */
+    height: calc(100vh - 78px);
   }
 
   .input-container {
     display: flex;
+    flex-shrink: 0; /* Фиксируем контейнер ввода внизу */
     bottom: 5px;
     padding: 10px;
     background: #fff;
@@ -454,7 +455,7 @@
     flex: 1;
     display: flex;
     flex-direction: column; /* Сообщения идут сверху вниз */
-    justify-content: flex-end; /* Новые сообщения появляются внизу */
+    /* justify-content: flex-end;  */
     align-items: flex-start;
     overflow-y: auto;
     padding: 10px;
@@ -472,6 +473,7 @@
   .message.user {
     position: relative;
     max-width: 85%;
+    top:74vh;
     align-self: flex-end;
     text-align: end;
     background: #c8f7c5;
@@ -480,6 +482,7 @@
   .message.assistant {
     position: relative;
     max-width: 85%;
+    top:74vh;
     align-self: flex-start;
     text-align: start;
     background: #d0d1ff;
@@ -513,6 +516,7 @@
 
   .loading {
     position: relative;
+    top:74vh;
     font-style: italic;
     color: gray;
     bottom: 0px; /* Помещаем под последнее сообщение */
