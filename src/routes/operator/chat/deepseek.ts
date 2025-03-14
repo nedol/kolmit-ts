@@ -13,6 +13,7 @@ interface Prompt {
 
 // Define the structure of the params object
 interface GenerateParams {
+  user_id:string;
   prompt: { quiz: string, type: string, lang: string };
   text: string; // User input text
   context?: string; // Optional context for the prompt
@@ -58,9 +59,9 @@ export default async function generate_from_text_input(params: GenerateParams): 
 
     prompt = result.prompt; 
 
-    total_tokens = await GetTodayTotalTokens();
+    total_tokens = await GetTodayTotalTokens(params.user_id);
 
-    if(total_tokens>50000){
+    if(total_tokens>50000 && params.user_id!='45e487f5af70416e7d46d6a4b00985de'){
       return {"tokens_limit":"50000","total_tokens":total_tokens};
     }
 
@@ -94,9 +95,9 @@ export default async function generate_from_text_input(params: GenerateParams): 
       messages = [...system_messages, ...filteredHistory];
     }
 
-    total_tokens = await GetTodayTotalTokens();
+    total_tokens = await GetTodayTotalTokens(params.user_id);
 
-    if(total_tokens>50000){
+    if(total_tokens>50000 && params.user_id!='45e487f5af70416e7d46d6a4b00985de'){
       return {"tokens_limit":"50000","total_tokens":total_tokens};
     }
 
@@ -107,7 +108,7 @@ export default async function generate_from_text_input(params: GenerateParams): 
 
     total_tokens += completion.usage.total_tokens;
 
-    UpdateLastSession(total_tokens);
+    UpdateLastSession(params.user_id,total_tokens);
 
     return completion.choices[0].message.content;
 

@@ -169,11 +169,12 @@ export async function CreateSession(
   `;
 }
 
-export async function GetLastSession() {
+export async function GetLastSession(user_id:string) {
   try {
     const latestSession = await sql`
       SELECT *
       FROM public.sessions
+      WHERE user_id=${user_id}
       ORDER BY created_at DESC
       LIMIT 1
     `;
@@ -190,7 +191,7 @@ export async function GetLastSession() {
   }
 }
 
-export async function GetTodayTotalTokens() {
+export async function GetTodayTotalTokens(user_id:string) {
   try {
     // Получаем текущую дату (без времени)
     const today = new Date().toISOString().split('T')[0];
@@ -199,7 +200,7 @@ export async function GetTodayTotalTokens() {
     const result = await sql`
       SELECT COALESCE(SUM(total_tokens), 0) AS total
       FROM public.sessions
-      WHERE DATE(created_at) = ${today}
+      WHERE user_id=${user_id} AND DATE(created_at) = ${today}
     `;
 
     // Возвращаем сумму total_tokens за сегодня
@@ -210,9 +211,9 @@ export async function GetTodayTotalTokens() {
   }
 }
 
-export async function UpdateLastSession(newTotalTokens) {
+export async function UpdateLastSession(user_id:string, newTotalTokens:number) {
   try {
-    const lastSession = await GetLastSession();
+    const lastSession = await GetLastSession(user_id);
 
     if (!lastSession) {
       console.log('No session to update.');
@@ -222,7 +223,7 @@ export async function UpdateLastSession(newTotalTokens) {
     const result = await sql`
       UPDATE public.sessions
       SET total_tokens = ${newTotalTokens}
-      WHERE id = ${lastSession.id}
+      WHERE user_id=${user_id} AND id = ${lastSession.id}
     `;
 
     console.log(`Updated ${result.count} row(s)`);

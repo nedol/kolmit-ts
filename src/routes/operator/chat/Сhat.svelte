@@ -1,8 +1,8 @@
 <script lang="ts">
-  import { onDestroy, afterUpdate, onMount } from 'svelte';
+  import { onDestroy, getContext, onMount } from 'svelte';
   import { writable } from 'svelte/store';
   import { Translate } from '../../translate/Transloc';
-  import { langs, llang } from '$lib/stores';
+  import { langs, llang, operatorst } from '$lib/stores';
   import IconButton, { Icon } from '@smui/icon-button';
   import emojiRegex from 'emoji-regex';
 
@@ -43,6 +43,8 @@
   let isShowReply = false;
 
   let dataAr:{}
+
+  let operator = getContext('operator');
 
 
   // Время последнего сообщения (можно сохранять в localStorage для сохранения между перезагрузками)
@@ -115,6 +117,7 @@
         }));
 
       const params = {
+        user_id: operator.operator,
         prompt: prompt_type,
         conversationHistory,
         lang: $langs,

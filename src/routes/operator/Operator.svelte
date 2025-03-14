@@ -22,7 +22,6 @@
     dc_state,
     con_state,
     call_but_status,
-    dicts,
     langs,
     showBottomAppBar,
   } from '$lib/stores.ts';
