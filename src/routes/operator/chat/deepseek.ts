@@ -110,7 +110,8 @@ export default async function generate_from_text_input(params: GenerateParams): 
 
     UpdateLastSession(params.user_id,total_tokens);
 
-    return completion.choices[0].message.content;
+    return completion.
+    choices[0].message.content;
 
   } catch (error) {
     console.error('Error generating response from DeepSeek API:', error);

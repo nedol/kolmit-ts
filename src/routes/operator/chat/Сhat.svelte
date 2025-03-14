@@ -439,20 +439,11 @@
   .chat-container {
     display: flex;
     flex-direction: column;
-    position: relative;
-    height: calc(100vh - 130px);
-    width: 95vw;
-    margin: 0 auto;
-    border: 1px solid #ccc;
-    border-radius: 10px;
-    background: #f9f9f9;
-    top: 47px;
+    height: calc(100vh - 100px); /* Вычитаем высоту шапки и подвала */
   }
 
   .input-container {
     display: flex;
-    position: absolute;
-    width: 92vw;
     bottom: 5px;
     padding: 10px;
     background: #fff;
@@ -460,17 +451,14 @@
   }
 
   .messages {
+    flex: 1;
     display: flex;
     flex-direction: column; /* Сообщения идут сверху вниз */
     justify-content: flex-end; /* Новые сообщения появляются внизу */
     align-items: flex-start;
     overflow-y: auto;
-    width: 95%;
-    padding: 30px;
-    bottom: 78px;
-    top: -10px;
-    height: 77vh;
-    scroll-behavior: smooth;
+    padding: 10px;
+    background-color: #f1f1f1;
   }
 
 
@@ -484,7 +472,6 @@
   .message.user {
     position: relative;
     max-width: 85%;
-    left:-8px;
     align-self: flex-end;
     text-align: end;
     background: #c8f7c5;
@@ -493,7 +480,6 @@
   .message.assistant {
     position: relative;
     max-width: 85%;
-    right:20px;
     align-self: flex-start;
     text-align: start;
     background: #d0d1ff;

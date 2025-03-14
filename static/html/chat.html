@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Чат</title>
+    <style>
+        /* Общие стили для страницы */
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: Arial, sans-serif;
+        }
+
+        /* Шапка и подвал */
+        header, footer {
+            height: 100px;
+            background-color: #4CAF50;
+            color: white;
+            text-align: center;
+            line-height: 100px;
+        }
+
+        /* Основная область чата */
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            height: calc(100% - 200px); /* Вычитаем высоту шапки и подвала */
+        }
+
+        /* Сообщения */
+        .messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px;
+            background-color: #f1f1f1;
+        }
+
+        /* Контейнер для ввода сообщений */
+        .input-container {
+            display: flex;
+            border-top: 1px solid #ddd;
+            padding: 10px;
+            background-color: #fff;
+        }
+
+        .input-container input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-right: 10px;
+        }
+
+        .input-container button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .input-container button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Чат</h1>
+    </header>
+
+    <div class="chat-container">
+        <div class="messages">
+            <!-- Здесь будут отображаться сообщения -->
+        </div>
+
+        <div class="input-container">
+            <input type="text" placeholder="Введите сообщение..." id="messageInput">
+            <button onclick="sendMessage()">Отправить</button>
+        </div>
+    </div>
+
+    <footer>
+        <p>© 2025 Чат</p>
+    </footer>
+
+    <script>
+        function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const messageText = input.value.trim();
+
+            if (messageText) {
+                const messageContainer = document.createElement('div');
+                messageContainer.textContent = messageText;
+                document.querySelector('.messages').appendChild(messageContainer);
+                input.value = ''; // Очистить поле ввода
+                document.querySelector('.messages').scrollTop = document.querySelector('.messages').scrollHeight; // Прокрутить вниз
+            }
+        }
+    </script>
+</body>
+</html>
