@@ -640,9 +640,9 @@
   .dialog {
     position: fixed;
     background-color: aliceblue;
-    top: 40px;
+    top: 50px;
     width: 100vw;
-    height: 90vh;
+    height: 87vh;
     right: 0vw;
     margin: 0px auto;
     z-index: 2;

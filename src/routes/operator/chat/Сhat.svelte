@@ -134,7 +134,18 @@
       const data = await response.json();
 
       if(data.res.tokens_limit){
-        alert("TOKEN LIMIT");
+        const msg= await Translate("Вы достигли суточного лимита сообщений.",'ru',$langs,'chat')
+        messages.update( msgs =>  
+        [...msgs, 
+          { 
+            id: crypto.randomUUID(), 
+            role: "assistant", 
+            text: msg, 
+            tr: '', 
+            cor: '',
+            isTranslated:false
+          }
+        ]);
         return;
       }
 
@@ -323,9 +334,15 @@
   
       {#if message.role !== 'user' }
         {#if selectedReplyId === message.id}
-          {#each dataAr[$llang].replies as reply}
-            <reply>{reply}</reply>
-          {/each}
+          {#if message.isTranslated} 
+            {#each dataAr[$langs].replies as reply}
+              <reply on:click={()=>{userInput=reply}}>{reply}</reply>
+            {/each}
+            {:else}
+            {#each dataAr[$llang].replies as reply}
+              <reply on:click={()=>{userInput=reply}}>{reply}</reply>
+            {/each}
+          {/if}  
         {/if}
         <div style="display:flex;justify-content: space-between;">
           {#if isReply}

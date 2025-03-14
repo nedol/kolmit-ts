@@ -136,9 +136,7 @@ interface OperatorParams {
   lang: string;
 }
 
-export async function CreateOperator(
-  par: OperatorParams
-): Promise<OperatorParams | undefined> {
+export async function CreateOperator(  par: OperatorParams): Promise<OperatorParams | undefined> {
   try {
     let res = await sql`
       UPDATE operators 
@@ -169,6 +167,68 @@ export async function CreateSession(
   await sql`
     SELECT create_session(${oper}, ${suid})
   `;
+}
+
+export async function GetLastSession() {
+  try {
+    const latestSession = await sql`
+      SELECT *
+      FROM public.sessions
+      ORDER BY created_at DESC
+      LIMIT 1
+    `;
+
+    if (latestSession.length === 0) {
+      console.log('No sessions found.');
+      return null;
+    }
+
+    return latestSession[0];
+  } catch (err) {
+    console.error('Error fetching last session:', err);
+    return null;
+  }
+}
+
+export async function GetTodayTotalTokens() {
+  try {
+    // Получаем текущую дату (без времени)
+    const today = new Date().toISOString().split('T')[0];
+
+    // Выполняем SQL-запрос для суммирования total_tokens за сегодня
+    const result = await sql`
+      SELECT COALESCE(SUM(total_tokens), 0) AS total
+      FROM public.sessions
+      WHERE DATE(created_at) = ${today}
+    `;
+
+    // Возвращаем сумму total_tokens за сегодня
+    return Number(result[0].total);
+  } catch (err) {
+    console.error('Error fetching today\'s total tokens:', err);
+    return 0; // В случае ошибки возвращаем 0
+  }
+}
+
+export async function UpdateLastSession(newTotalTokens) {
+  try {
+    const lastSession = await GetLastSession();
+
+    if (!lastSession) {
+      console.log('No session to update.');
+      return;
+    }
+
+    const result = await sql`
+      UPDATE public.sessions
+      SET total_tokens = ${newTotalTokens}
+      WHERE id = ${lastSession.id}
+    `;
+
+    console.log(`Updated ${result.count} row(s)`);
+  } catch (err) {
+    console.error('Error updating session:', err);
+  }
 }
 
 async function updateUsers(users: any[], q: any): Promise<string> {

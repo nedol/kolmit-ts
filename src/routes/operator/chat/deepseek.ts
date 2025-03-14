@@ -1,6 +1,6 @@
 import OpenAI from "openai";
 import { config } from 'dotenv';
-import { GetPrompt } from '../../../lib/server/db';
+import { GetPrompt,GetTodayTotalTokens,UpdateLastSession } from '../../../lib/server/db';
 
 // Load environment variables
 config();
@@ -58,6 +58,12 @@ export default async function generate_from_text_input(params: GenerateParams): 
 
     prompt = result.prompt; 
 
+    total_tokens = await GetTodayTotalTokens();
+
+    if(total_tokens>50000){
+      return {"tokens_limit":"50000","total_tokens":total_tokens};
+    }
+
     const finalSystemPrompt = prompt.system
       .replace(/\${llang}/g, params.llang)
       .replace(/\${lang}/g, params.lang)
@@ -65,6 +71,8 @@ export default async function generate_from_text_input(params: GenerateParams): 
       .replace(/\${theme}/g, params.theme || 'general conversation');
 
     system_messages = [{ role: "system", content: finalSystemPrompt }];
+
+    // UpdateLastSession(20);
 
     return prompt.user;
   }
@@ -86,8 +94,10 @@ export default async function generate_from_text_input(params: GenerateParams): 
       messages = [...system_messages, ...filteredHistory];
     }
 
-    if(total_tokens>100000){
-      return {"tokens_limit":"10000","total_tokens":total_tokens};
+    total_tokens = await GetTodayTotalTokens();
+
+    if(total_tokens>20000){
+      return {"tokens_limit":"20000","total_tokens":total_tokens};
     }
 
     const completion = await openai.chat.completions.create({
@@ -96,6 +106,8 @@ export default async function generate_from_text_input(params: GenerateParams): 
     });
 
     total_tokens += completion.usage.total_tokens;
+
+    UpdateLastSession(total_tokens);
 
     return completion.choices[0].message.content;
 
