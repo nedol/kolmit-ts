@@ -64,14 +64,13 @@
   });
 
   // Автопрокрутка вниз при обновлении сообщений
-  afterUpdate(() => {
+
+
+  $: {
     if (messagesContainer) {
-      // Прокручиваем вниз (к последнему сообщению)
       messagesContainer.scrollTop = messagesContainer.scrollHeight;
     }
-  });
-
-
+  }
 
   // Отправка сообщения
   async function sendMessage(msg:string ='', type:string = 'basic') {
@@ -140,7 +139,7 @@
           { 
             id: crypto.randomUUID(), 
             role: "assistant", 
-            text: msg, 
+            text: `<alert>${msg}</alert>`, 
             tr: '', 
             cor: '',
             isTranslated:false
@@ -234,7 +233,7 @@
 
   function SttResult(text:string) {
     userInput = text[$llang];
-    sendMessage();
+    // sendMessage();
   }
 
   function onClickMicrophone() {
@@ -314,7 +313,7 @@
 
    
   <div class="messages" bind:this={messagesContainer}>
-
+    
     {#each $messages as message, index (message.id)}
     <div class="message {message.role} {message.role === 'user' && index === 0 ? 'first-message' : ''}">
       <!--strong>{message.role === 'user' ? 'Вы' : 'AI'}:</strong--> 
@@ -335,12 +334,12 @@
       {#if message.role !== 'user' }
         {#if selectedReplyId === message.id}
           {#if message.isTranslated} 
-            {#each dataAr[$langs].replies as reply}
-              <reply on:click={()=>{userInput=reply}}>{reply}</reply>
+            {#each dataAr[$llang].replies as reply,i}
+              <reply on:click={()=>{userInput=dataAr[$llang].replies[i] }}>{reply}</reply>
             {/each}
             {:else}
-            {#each dataAr[$llang].replies as reply}
-              <reply on:click={()=>{userInput=reply}}>{reply}</reply>
+            {#each dataAr[$langs].replies as reply,i}
+              <reply on:click={()=>{userInput=dataAr[$llang].replies[i] }}>{reply}</reply>
             {/each}
           {/if}  
         {/if}
@@ -426,8 +425,11 @@
     font-weight: bold;
   }
 
-  :global(reply) {
-    /* visibility: hidden; */
+  :global(alert) {
+    display: block;
+    color:red;
+    font-size:medium;
+    font-weight: bold;
   }
 
 
@@ -435,19 +437,19 @@
     display: flex;
     flex-direction: column;
     position: relative;
-    height: calc(100vh - 114px);
-    max-width: 98vw;
-    margin: auto;
+    height: calc(100vh - 130px);
+    width: 95vw;
+    margin: 0 auto;
     border: 1px solid #ccc;
     border-radius: 10px;
-    background: #f9f9f9;  
-    top: 10px;
+    background: #f9f9f9;
+    top: 47px;
   }
 
   .input-container {
     display: flex;
     position: absolute;
-    width: 95vw;
+    width: 92vw;
     bottom: 5px;
     padding: 10px;
     background: #fff;
@@ -456,20 +458,18 @@
 
   .messages {
     display: flex;
-    flex-direction: column;
-    align-items: center; /* Центрирование сообщений */
-    /* justify-content: flex-end; */
-    /* height: 75vh; */
+    flex-direction: column; /* Сообщения идут сверху вниз */
+    justify-content: flex-end; /* Новые сообщения появляются внизу */
+    align-items: flex-start;
     overflow-y: auto;
-    width: 95%; 
-    /* max-width: 95%; */
-    margin: 0 auto; /* Центрирование блока */
-    flex-grow: 1;
+    width: 95%;
     padding: 30px;
-    padding-bottom: 60px;
-    position: absolute;
-    bottom: 6vh;
+    bottom: 78px;
+    top: -10px;
+    height: 77vh;
+    scroll-behavior: smooth;
   }
+
 
   .message { 
     padding: 10px;
@@ -481,7 +481,7 @@
   .message.user {
     position: relative;
     max-width: 85%;
-    left:1px;
+    left:-8px;
     align-self: flex-end;
     text-align: end;
     background: #c8f7c5;

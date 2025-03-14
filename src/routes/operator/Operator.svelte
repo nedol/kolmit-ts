@@ -502,18 +502,20 @@
 <!-- {@debug $view} -->
 
 
-<!-- {#if $view === 'group'} -->
-<Group  {rtc} bind:group={group}/>
 
 {#if $view === 'lesson'}
   <Module data={group_data} bind:group={group}/>
+
+{:else if $view==='chat'}
+  <Chat></Chat>   
+
+{:else if  $view === 'group'}
+  <Group  {rtc} bind:group={group}/>
 {/if}
 
-<div class="dialog" style="display: {dlg_display};">
-  {#if $view==='chat'}
-    <Chat></Chat>
-  {/if}
-</div>
+
+
+
 
 <div class="bottom-app-bar-wrapper" class:hide={!$showBottomAppBar}>
   <BottomAppBar variant="static" slot="oper" bind:this={bottomAppBar}>

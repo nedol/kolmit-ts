@@ -96,8 +96,8 @@ export default async function generate_from_text_input(params: GenerateParams): 
 
     total_tokens = await GetTodayTotalTokens();
 
-    if(total_tokens>20000){
-      return {"tokens_limit":"20000","total_tokens":total_tokens};
+    if(total_tokens>50000){
+      return {"tokens_limit":"50000","total_tokens":total_tokens};
     }
 
     const completion = await openai.chat.completions.create({
