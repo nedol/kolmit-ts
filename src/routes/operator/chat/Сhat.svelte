@@ -353,10 +353,10 @@
                 <reply on:click={()=>{userInput=dataAr[$llang]?.replies[i] }}>{reply}</reply>
               {:else}
               {#if dataAr[$langs]?.replies[i]}
-                <reply on:click={()=>{userInput=dataAr[$langs].replies[i]}}>{dataAr[$langs].replies[i]}</reply>
+                <reply on:click={()=>{userInput=reply}}>{dataAr[$langs].replies[i]}</reply>
               {:else}
                 {#await Translate(reply,$llang, $langs,'chat') then data}
-                  <reply on:click={()=>{userInput=data }}>{data}</reply>
+                  <reply on:click={()=>{userInput=reply }}>{data}</reply>
                 {/await}
                 {/if} 
               {/if}
