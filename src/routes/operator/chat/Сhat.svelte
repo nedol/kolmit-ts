@@ -31,7 +31,7 @@
   type Messages = Message[];
 
   let userInput = '';
-  let elInput;
+  let elInput:HTMLInputElement ;
   let messages = writable<Messages>([]);
   let loading = writable(false);
   let to: NodeJS.Timeout;
@@ -47,7 +47,7 @@
   let dataAr:{}
 
   let operator = getContext('operator');
-  let lastMessage; // переменная для последнего сообщения
+  let lastMessage:string; // переменная для последнего сообщения
 
   // Время последнего сообщения (можно сохранять в localStorage для сохранения между перезагрузками)
   let lastMessageTime = parseInt(localStorage.getItem('lastMessageTime') ?? '0') || Date.now();
@@ -70,6 +70,9 @@
   // Автопрокрутка вниз при обновлении сообщений
   afterUpdate(() => {
     if (lastMessage) {
+      lastMessage.scrollIntoView({ behavior: "smooth", block: "end" });
+    }
+    if(elInput){
       elInput.scrollIntoView({ behavior: "smooth", block: "end" });
     }
   });
@@ -300,6 +303,12 @@
     // startReminderTimer(); // Запускаем таймер заново
   }
 
+  function onKeydown(key){
+
+    elInput.scrollIntoView({ behavior: "smooth", block: "end" });
+    key === 'Enter' && sendMessage();
+  }
+
     // Очистка таймера при размонтировании
   onDestroy(() => {
     if (to) clearTimeout(to);
@@ -338,15 +347,21 @@
   
       {#if message.role !== 'user' }
         {#if selectedReplyId === message.id}
-          {#if message.isTranslated} 
+          <div class="reply_container">
             {#each dataAr[$llang].replies as reply,i}
-              <reply on:click={()=>{userInput=dataAr[$llang].replies[i] }}>{reply}</reply>
+              {#if message.isTranslated} 
+                <reply on:click={()=>{userInput=dataAr[$llang]?.replies[i] }}>{reply}</reply>
+              {:else}
+              {#if dataAr[$langs]?.replies[i]}
+                <reply on:click={()=>{userInput=dataAr[$langs].replies[i]}}>{dataAr[$langs].replies[i]}</reply>
+              {:else}
+                {#await Translate(reply,$llang, $langs,'chat') then data}
+                  <reply on:click={()=>{userInput=data }}>{data}</reply>
+                {/await}
+                {/if} 
+              {/if}
             {/each}
-            {:else}
-            {#each dataAr[$langs].replies as reply,i}
-              <reply on:click={()=>{userInput=dataAr[$llang].replies[i] }}>{reply}</reply>
-            {/each}
-          {/if}  
+          </div>
         {/if}
         <div style="display:flex;justify-content: space-between;">
           {#if isReply}
@@ -404,7 +419,7 @@
         bind:value={userInput}
         bind:this = {elInput}
         placeholder={data}
-        on:keydown={(e) => e.key === 'Enter' && sendMessage()}
+        on:keydown={(e) => {onKeydown(e.key)}}
         aria-label="Введите сообщение"
       />
     {/await}
@@ -422,8 +437,9 @@
 <style>
   :global(cor){
     display:block;
+    margin: 10px;
     color:red;
-    font-size: small;
+    font-size: medium;
     font-weight: bold;
   }
 
@@ -492,6 +508,9 @@
     align-self: flex-start;
     text-align: start;
     background: #d0d1ff;
+    color: #007bff;
+    font-size: large;
+    font-weight: bold;
   }
 
   /* Убедитесь, что только первое сообщение пользователя выравнивается по правому краю */
@@ -504,6 +523,11 @@
     padding: 8px;
     border: 1px solid #ccc;
     border-radius: 5px;
+  }
+
+  .reply_container{
+    display: block;
+    margin: 10px;
   }
 
   button {
