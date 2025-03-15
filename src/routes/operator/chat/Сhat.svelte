@@ -10,6 +10,10 @@
   import Stt from '../../speech/stt/Stt.svelte';
 
   import {
+    showBottomAppBar
+  } from '$lib/stores.ts';
+
+  import {
       mdiMicrophoneOutline ,
       mdiMicrophone,
       mdiTranslate,
@@ -62,7 +66,7 @@
   onMount(async() => {
     // Отправляем reminder при входе в компонент
     sendMessage(`Begin een gesprek in het Nederlands.`,'greeting');
-
+    $showBottomAppBar = false;
     // Запускаем таймер для проверки неактивности
     startReminderTimer();
   });
