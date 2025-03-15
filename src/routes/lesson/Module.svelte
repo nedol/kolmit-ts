@@ -160,7 +160,7 @@
     $llang = lesson_data.lang;
     $showBottomAppBar = true;
     news = lessonData.news;
-    const oneWeekAgo = Date.now() - 5 * 24 * 60 * 60 * 1000; // Получаем временную метку, соответствующую одной неделе наз    
+    const oneWeekAgo = Date.now() - 1 * 24 * 60 * 60 * 1000; // Получаем временную метку, соответствующую одной неделе наз    
     const tmp = [];
     news?.forEach((quiz) => {
       const isOlderThanOneWeek = quiz.published < oneWeekAgo;

@@ -14,7 +14,8 @@
       mdiMicrophone,
       mdiTranslate,
       mdiTranslateOff,
-      mdiMicrophoneMessage
+      mdiMicrophoneMessage,
+      mdiSendOutline
   } from '@mdi/js';
 
   let stt: Stt | null = null; // Если `Stt` — это класс или компонент Svelte
@@ -30,6 +31,7 @@
   type Messages = Message[];
 
   let userInput = '';
+  let elInput;
   let messages = writable<Messages>([]);
   let loading = writable(false);
   let to: NodeJS.Timeout;
@@ -68,7 +70,7 @@
   // Автопрокрутка вниз при обновлении сообщений
   afterUpdate(() => {
     if (lastMessage) {
-      lastMessage.scrollIntoView({ behavior: "smooth", block: "end" });
+      elInput.scrollIntoView({ behavior: "smooth", block: "end" });
     }
   });
 
@@ -400,15 +402,19 @@
     {#await Translate('Введите сообщение...', 'ru', $langs, 'chat') then data}
       <input
         bind:value={userInput}
+        bind:this = {elInput}
         placeholder={data}
         on:keydown={(e) => e.key === 'Enter' && sendMessage()}
         aria-label="Введите сообщение"
       />
     {/await}
     <button on:click={()=>{sendMessage()}} disabled={$loading} aria-label="Отправить сообщение">
-      {#await Translate('Отправить', 'ru', $langs, 'chat') then data}
-        {data}
-      {/await}
+       <IconButton
+        class="material-icons">
+        <Icon tag="svg" viewBox="0 0 24 24">
+          <path fill="white" d={mdiSendOutline} />
+        </Icon>
+    </IconButton>
     </button>
   </div>
 </div>

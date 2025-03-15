@@ -20,6 +20,7 @@ interface GenerateParams {
   level: string; // Level for the prompt (e.g., A1, B2, C1)
   lang?: string; // Optional language (default to 'nl' if not provided)
   llang?:string;
+  grammar:string[];
   theme?: string; // Optional theme for the conversation
   conversationHistory?: Array<{ role: "user" | "assistant"; content: string }>; // Optional conversation history
 }
@@ -65,14 +66,18 @@ export default async function generate_from_text_input(params: GenerateParams): 
       return {"tokens_limit":"50000","total_tokens":total_tokens};
     }
 
+    params.grammar = ['Vroeger...,nu..', 'Toen...']
+
     const finalSystemPrompt = prompt.system
       .replace(/\${llang}/g, params.llang)
       .replace(/\${lang}/g, params.lang)
       .replace(/\${level}/g, params.level)
+      .replace(/\${grammar}/g, params.grammar)
       .replace(/\${theme}/g, params.theme || 'general conversation');
 
     system_messages = [{ role: "system", content: finalSystemPrompt }];
 
+    console.log(finalSystemPrompt)
     // UpdateLastSession(20);
 
     return prompt.user;
@@ -106,7 +111,7 @@ export default async function generate_from_text_input(params: GenerateParams): 
       model: "deepseek-chat",
     });
 
-    total_tokens += completion.usage.total_tokens;
+    total_tokens = completion.usage.total_tokens;
 
     UpdateLastSession(params.user_id,total_tokens);
 
