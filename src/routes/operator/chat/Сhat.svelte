@@ -309,6 +309,11 @@
     key === 'Enter' && sendMessage();
   }
 
+  function SetInput(text:string){
+    userInput = text;
+    elInput.scrollIntoView({ behavior: "smooth", block: "end" });
+  }
+
     // Очистка таймера при размонтировании
   onDestroy(() => {
     if (to) clearTimeout(to);
@@ -350,13 +355,13 @@
           <div class="reply_container">
             {#each dataAr[$llang].replies as reply,i}
               {#if message.isTranslated} 
-                <reply on:click={()=>{userInput=dataAr[$llang]?.replies[i] }}>{reply}</reply>
+                <reply on:click={()=>{SetInput(dataAr[$llang]?.replies[i]) }}>{reply}</reply>
               {:else}
               {#if dataAr[$langs]?.replies[i]}
-                <reply on:click={()=>{userInput=reply}}>{dataAr[$langs].replies[i]}</reply>
+                <reply on:click={()=>{SetInput(reply)}}>{dataAr[$langs].replies[i]}</reply>
               {:else}
                 {#await Translate(reply,$llang, $langs,'chat') then data}
-                  <reply on:click={()=>{userInput=reply }}>{data}</reply>
+                  <reply on:click={()=>{SetInput(reply)}}>{data}</reply>
                 {/await}
                 {/if} 
               {/if}
@@ -471,6 +476,7 @@
     padding: 10px;
     background: #fff;
     border-top: 1px solid #ccc;
+    margin-top: 7px;
   }
 
   .messages {
