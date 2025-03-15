@@ -274,6 +274,8 @@
     } else {
       selectedReplyId = messageId; // Показать ответы для выбранного сообщения
     }
+
+    elInput.scrollIntoView({ behavior: "smooth", block: "end" });
   }
 
   function startReminderTimer() {
