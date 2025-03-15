@@ -7,13 +7,13 @@ export let ice_conf = {
   ],
   turn: [
     {
-      urls: "turn:18.195.84.86:3478?transport=tcp",
-      username: 'kolmit',
+      urls: "turn:relay1.expressturn.com:3478?transport=tcp",
+      username: import.meta.env.VITE_TURN_USER,
       credential: import.meta.env.VITE_TURN_CREDENTIAL, // Используем import.meta.env
     },
     {
-      urls: "turn:18.195.84.86:3478?transport=udp",
-      username: 'kolmit',
+      urls: "turn:relay1.expressturn.com:3478?transport=udp",
+      username: import.meta.env.VITE_TURN_USER,
       credential: import.meta.env.VITE_TURN_CREDENTIAL,
     }
   ],

@@ -32,6 +32,7 @@ declare module '$env/static/private' {
 	export const PGPASSWORD: string;
 	export const ENDPOINT_ID: string;
 	export const HF_TOKEN: string;
+	export const VITE_TURN_USER: string;
 	export const VITE_TURN_CREDENTIAL: string;
 	export const DEEPSEEK_API_KEY: string;
 	export const ALLUSERSPROFILE: string;
@@ -159,6 +160,7 @@ declare module '$env/dynamic/private' {
 		PGPASSWORD: string;
 		ENDPOINT_ID: string;
 		HF_TOKEN: string;
+		VITE_TURN_USER: string;
 		VITE_TURN_CREDENTIAL: string;
 		DEEPSEEK_API_KEY: string;
 		ALLUSERSPROFILE: string;
