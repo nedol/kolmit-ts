@@ -833,7 +833,7 @@ let keys: string[] = [];
   </TopAppBar>
 </div>
 
-<div class="card">
+<!-- <div class="card"> -->
 
 {#if bricks_data?.html}
   <div class="bricks-header">
@@ -973,7 +973,7 @@ let keys: string[] = [];
 
   <div style="height:100px"></div>
 
-</div>
+<!-- </div> -->
 
 <style>
 

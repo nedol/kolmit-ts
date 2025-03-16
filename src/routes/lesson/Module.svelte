@@ -1245,19 +1245,12 @@
     position: fixed;
     top: 50px;
     left: 0;
-    height: 100vh;
+    bottom:0;
     overflow-y: auto;
     width: 100vw;
     margin: 0 auto;
     background-color: #fff;
     font-size: large;
-    /*transition: transform 0.3s ease-in-out;
-
-    position: relative;
-    transform-style: preserve-3d;
-    transition: transform 0.5s; */
-
-    /* margin-top: 40px; */
   }
   .module_level {
     position: fixed;

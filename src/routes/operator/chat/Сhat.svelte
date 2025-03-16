@@ -511,6 +511,7 @@
     top: 0px;
     width: 100%;
     flex-direction: column;
+    /* height: 100vh; */
     /* height: calc(100vh - 42px); */
     bottom: 0px;
   }
