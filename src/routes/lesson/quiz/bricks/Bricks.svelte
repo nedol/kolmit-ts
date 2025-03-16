@@ -29,6 +29,8 @@
 
   let stt_text = '';
 
+  let sent_compare = '';
+
   let isPlayAuto = false;
 
   let playAutoColor = 'currentColor';
@@ -528,9 +530,10 @@ let keys: string[] = [];
   }
 
   function SttResult(text) {
+
     stt_text = text[$llang];
     const correct_str = getCorrectSpanString(true);
-    let sent_compare = correct_str;
+    sent_compare = correct_str;
 
     const numbers = sent_compare.match(/\b\d+\b/g);
     if (numbers)
@@ -940,6 +943,7 @@ let keys: string[] = [];
       bind:this={stt}
       {SttResult}
       {StopListening}
+      {original}
       bind:display_audio
     ></Stt>
   </div>

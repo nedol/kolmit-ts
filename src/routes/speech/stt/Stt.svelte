@@ -1,12 +1,12 @@
 <script lang="ts">
-  import { onMount, onDestroy } from 'svelte';
+  import { onMount, onDestroy, getContext } from 'svelte';
   import { MediaRecorder } from 'extendable-media-recorder';
   import type { IBlobEvent, IMediaRecorder } from 'extendable-media-recorder';
   // import { CreateMLCEngine } from '@mlc-ai/web-llm';
 
+  export let SttResult:string, StopListening, display_audio:string, original:string;
 
-
-  export let SttResult:string, StopListening, display_audio:string;
+  let operator = getContext('operator');
 
   // let MediaRecorder;
 
@@ -195,6 +195,8 @@
       formData.append('file', blob, 'audio.wav');
       formData.append('from_lang', from_lang);
       formData.append('to_lang', to_lang);
+      formData.append('operator', operator.operator);
+      formData.append('original', original);
 
       fetch('/speech/stt', {
         method: 'POST',

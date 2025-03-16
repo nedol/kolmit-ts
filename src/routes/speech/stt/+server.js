@@ -16,6 +16,8 @@ import { Client } from '@gradio/client';
 
 import axios from 'axios';
 
+import {SaveSTT} from '../../../lib/server/db';
+
 import { config } from 'dotenv';
 config();
 const HF_TOKEN = process.env.HF_TOKEN_2;
@@ -54,6 +56,8 @@ export async function POST({ url, fetch, cookies, request }) {
   const fileContent = formData.get('file');
   const from_lang = formData.get('from_lang');
   const to_lang = formData.get('to_lang');
+  const operator = formData.get('operator');
+  const original = formData.get('original');
 
   // Преобразование Blob в Buffer
   const buffer = await fileContent.arrayBuffer();
@@ -89,11 +93,15 @@ export async function POST({ url, fetch, cookies, request }) {
 
     // const result = await transcribeAudio(arrayBuffer,from_lang);
 
+   
+
     if (result) {
       resp = {
         [from_lang]: result,
         // [to_lang]: await Translate(result, from_lang, to_lang),
       };
+
+      SaveSTT(operator,result,from_lang, original);
     }
   } else {
     const result = await stt_whisper(arrayBuffer, from_lang,from_lang );
@@ -107,6 +115,9 @@ export async function POST({ url, fetch, cookies, request }) {
   }
 
   console.log(resp);
+
+
+
   let response = new Response(JSON.stringify({ resp }));
   response.headers.append('Access-Control-Allow-Origin', `*`);
   return response;

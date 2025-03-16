@@ -1405,3 +1405,40 @@ export async function UpdateUserLevel(text, operator) {
     throw error;
   }
 }
+
+export function GetSTT(){
+
+}
+
+export async function SaveSTT(operator, text='', lang='nl'){
+
+    try {
+      // Проверяем, что текст не пустой
+      if (!text || text.trim() === '') {
+        throw new Error("Текст не может быть пустым.");
+      }
+  
+
+      // Вставляем данные в таблицу stt (предположим, что такая таблица существует)
+      const result = await sql`
+        INSERT INTO stt (operator, data, lang)
+        VALUES (${operator},${text}, ${lang})
+        RETURNING data; -- Возвращаем ID новой записи
+      `;
+  
+      // Возвращаем успешный результат с ID новой записи
+      return {
+        success: true,
+        message: "Данные успешно сохранены."
+      };
+    } catch (error) {
+      // Логируем ошибку и возвращаем сообщение об ошибке
+      console.error("Ошибка при сохранении данных STT:", error);
+      return {
+        success: false,
+        message: "Не удалось сохранить данные.",
+        error: error.message,
+      };
+    }
+  
+}
