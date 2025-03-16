@@ -1379,11 +1379,12 @@ export async function UpdateUserLevel(text, operator) {
       throw new Error(`Оператор с ID ${operator} не найден.`);
     }
 
-    const currentLevel = currentLevelResult[0].level;
+    let currentLevel = currentLevelResult[0].level;
 
-    // Проверяем, что currentLevel не null или undefined
-    if (!currentLevel) {
-      throw new Error("Текущий уровень оператора не определён.");
+    // Если currentLevel равен null, устанавливаем значение по умолчанию
+    if (currentLevel === null || currentLevel === undefined) {
+      console.warn(`Текущий уровень оператора ${operator} не определён. Устанавливаем значение по умолчанию "0".`);
+      currentLevel = "0"; // Уровень по умолчанию
     }
 
     // Сравниваем уровни
