@@ -925,76 +925,79 @@ interface GetLessonResponse {
 export async function GetLesson(q: { operator: string; owner: string; level?: string; func?: string }): Promise<GetLessonResponse> {
   try {
     let res: Lesson[] = [];
+    let levels: string[] = [];
+    let news: NewsItem[] = [];
+    let context_news: NewsItem[] = [];
 
-    // Query based on operator and owner relationship
-    if (q.operator !== q.owner) {
-      res = await sql<Lesson[]>`
-        SELECT lessons.data, lessons.level, lessons.lang 
-        FROM lessons
-        JOIN operators ON (operators.operator = ${q.operator} AND operators.abonent = ${q.owner})
-        JOIN groups ON (groups.name = operators.group AND groups.level = lessons.level)
-        WHERE groups.owner = ${q.owner} AND lessons.owner = ${q.owner}
-        ORDER BY level DESC
-      `;
-    } else if (q.level) {
-      res = await sql<Lesson[]>`
-        SELECT data, level, lang 
-        FROM lessons 
-        WHERE owner = ${q.owner} AND level = ${q.level}  
-        ORDER BY level DESC
-      `;
-    } else {
-      res = await sql<Lesson[]>`
-        SELECT data, level, lang 
-        FROM lessons 
-        WHERE owner = ${q.owner}  
-        ORDER BY level DESC
-      `;
-    }
+    // Начинаем транзакцию
+    await sql.begin(async (sql) => {
+      // Query based on operator and owner relationship
+      if (q.operator !== q.owner) {
+        res = await sql<Lesson[]>`
+          SELECT lessons.data, lessons.level, lessons.lang 
+          FROM lessons
+          JOIN operators ON (operators.operator = ${q.operator} AND operators.abonent = ${q.owner})
+          JOIN groups ON (groups.name = operators.group AND groups.level = lessons.level)
+          WHERE groups.owner = ${q.owner} AND lessons.owner = ${q.owner}
+          ORDER BY level DESC
+        `;
+      } else if (q.level) {
+        res = await sql<Lesson[]>`
+          SELECT data, level, lang 
+          FROM lessons 
+          WHERE owner = ${q.owner} AND level = ${q.level}  
+          ORDER BY level DESC
+        `;
+      } else {
+        res = await sql<Lesson[]>`
+          SELECT data, level, lang 
+          FROM lessons 
+          WHERE owner = ${q.owner}  
+          ORDER BY level DESC
+        `;
+      }
 
-    // Get all levels for the owner
-    const levels = await getLevels(q.owner);
+      // Get all levels for the owner
+      levels = await getLevels(q.owner);
+
+      // Fetch news based on language and recent timestamp
+      news = await sql<NewsItem[]>`
+        SELECT 
+          json_build_object(${res[0]?.lang || 'en'}::text, "name") AS "name",  
+          MAX((EXTRACT(EPOCH FROM "timestamp") * 1000)::BIGINT) AS "published", 
+          "type"
+        FROM (
+          SELECT "name", "timestamp", 'dialog' AS "type" 
+          FROM public.dialogs 
+          WHERE "prompt_type" = 'news' 
+
+          UNION
+
+          SELECT "name", "timestamp" AS "published", 'bricks' AS "type" 
+          FROM public.bricks 
+          WHERE "prompt_type" = 'news'
+        ) AS combined
+        GROUP BY "name", "type"
+        ORDER BY "published" DESC
+        LIMIT 20;
+      `;
+
+      // Query for context-related news
+      context_news = await sql<NewsItem[]>`
+        SELECT 
+          json_build_object(quote_literal(${res[0]?.lang || 'en'}), "name") AS "name", 
+          "data", 
+          MAX((EXTRACT(EPOCH FROM "timestamp") * 1000)::BIGINT) AS "published", 
+          "type"
+        FROM public.context 
+        WHERE "prompt_type" = 'news' 
+        GROUP BY "name", "data", "type"
+        ORDER BY "published" DESC;
+      `;
+    });
 
     // Find lesson for the specific level
     const les = res.find((lesson) => lesson.level === q.level);
-
-    // Default to the first lesson if specific level is not found
-    const lang = res[0]?.lang || 'en'; // Defaulting to 'en' if lang is missing
-
-    // Fetch news based on language and recent timestamp
-    const news = await sql<NewsItem[]>`
-    SELECT 
-      json_build_object(${lang}::text, "name") AS "name",  
-      MAX((EXTRACT(EPOCH FROM "timestamp") * 1000)::BIGINT) AS "published", 
-      "type"
-    FROM (
-      SELECT "name", "timestamp", 'dialog' AS "type" 
-      FROM public.dialogs 
-      WHERE "prompt_type" = 'news' 
-
-      UNION
-
-      SELECT "name", "timestamp" AS "published", 'bricks' AS "type" 
-      FROM public.bricks 
-      WHERE "prompt_type" = 'news'
-    ) AS combined
-    GROUP BY "name", "type"
-    ORDER BY "published" DESC
-    LIMIT 20;
-  `;
-
-  // Query for context-related news
-  const context_news = await sql<NewsItem[]>`
-    SELECT 
-      json_build_object(quote_literal(${lang}), "name") AS "name", 
-      "data", 
-      MAX((EXTRACT(EPOCH FROM "timestamp") * 1000)::BIGINT) AS "published", 
-      "type"
-    FROM public.context 
-    WHERE "prompt_type" = 'news' 
-    GROUP BY "name", "data", "type"
-    ORDER BY "published" DESC;
-  `;
 
     // Return structured response
     return {
@@ -1010,7 +1013,6 @@ export async function GetLesson(q: { operator: string; owner: string; level?: st
     return { data: '', lang: 'en', level: '', levels: [], news: [], context_news: [] }; // Return empty/default values on error
   }
 }
-
 
 interface NewsItem {
   name: string;
