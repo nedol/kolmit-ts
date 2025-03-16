@@ -5,7 +5,7 @@
   import pkg from 'lodash';
   const { remove } = pkg;
 
-  import '$lib/css/Elevation.scss';
+  // import '$lib/css/Elevation.scss';
 
   import Textfield from '@smui/textfield';
 

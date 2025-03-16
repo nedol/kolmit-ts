@@ -205,7 +205,7 @@
           rtc.Call(operator);
           status = 'call';
 
-          video_element.load();
+          video_element?.load();
 
           window.scrollTo({ top: 0, behavior: 'smooth' });
         })();

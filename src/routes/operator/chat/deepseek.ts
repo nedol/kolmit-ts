@@ -1,6 +1,6 @@
 import OpenAI from "openai";
 import { config } from 'dotenv';
-import { GetPrompt,GetTodayTotalTokens,UpdateLastSession } from '../../../lib/server/db';
+import { GetQuizContext,GetPrompt,GetTodayTotalTokens,UpdateLastSession,UpdateUserLevel } from '../../../lib/server/db';
 
 // Load environment variables
 config();
@@ -43,6 +43,8 @@ export default async function generate_from_text_input(params: GenerateParams): 
       throw new Error('DeepSeek API key is missing in environment variables');
     }
 
+    const res = (params.name && params.type)? await GetQuizContext(params):'';
+
     openai = new OpenAI({
       baseURL: 'https://api.deepseek.com',
       apiKey: apiKey,
@@ -73,12 +75,15 @@ export default async function generate_from_text_input(params: GenerateParams): 
       .replace(/\${lang}/g, params.lang)
       .replace(/\${level}/g, params.level)
       .replace(/\${grammar}/g, params.grammar)
+      .replace(/\${context}/g, res.context)
       .replace(/\${theme}/g, params.theme || 'general conversation');
 
     system_messages = [{ role: "system", content: finalSystemPrompt }];
 
     console.log(finalSystemPrompt)
     // UpdateLastSession(20);
+
+    UpdateUserLevel('<user><level>B1.1</level></user>',params.user_id)
 
     return prompt.user;
   }
@@ -114,6 +119,8 @@ export default async function generate_from_text_input(params: GenerateParams): 
     total_tokens = completion.usage.total_tokens;
 
     UpdateLastSession(params.user_id,total_tokens);
+
+    // UpdateUserLevel(completion.choices[0].message.content,params.user_id)
 
     return completion.choices[0].message.content;
 

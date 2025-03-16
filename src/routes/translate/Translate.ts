@@ -1,4 +1,4 @@
-import { WriteSpeech, ReadSpeech } from '$lib/server/db.ts'; //src\lib\server\server.db.ts
+import { WriteTranslate, ReadSpeech } from '$lib/server/db.ts'; //src\lib\server\server.db.ts
 import md5 from 'md5'; // Импортируем библиотеку для генерации md5
 import { HttpsProxyAgent } from 'https-proxy-agent';
 import translatex from 'google-translate-api-x';
@@ -158,7 +158,7 @@ export async function Translate(text: string, from: string, to: string, quiz: st
 
       // Cache the translation in the database
       if(quiz || resp?.quiz )
-        await WriteSpeech({ 
+        await WriteTranslate({ 
           lang: to, 
           key: cacheKey, 
           text: chunk, 

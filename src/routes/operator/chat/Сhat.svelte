@@ -22,6 +22,8 @@
       mdiSendOutline
   } from '@mdi/js';
 
+  export let quiz;
+
   let stt: Stt | null = null; // Если `Stt` — это класс или компонент Svelte
 
   let tts: Tts | null = null; // Если `Tts` — это класс или компонент Svelte
@@ -76,9 +78,9 @@
     if (lastMessage) {
       lastMessage.scrollIntoView({ behavior: "smooth", block: "end" });
     }
-    if(elInput){
-      elInput.scrollIntoView({ behavior: "smooth", block: "end" });
-    }
+    // if(elInput){
+    //   elInput.scrollIntoView({ behavior: "smooth", block: "end" });
+    // }
   });
 
 
@@ -124,13 +126,18 @@
           content: msg.text
         }));
 
+
       const params = {
         user_id: operator.operator,
+        type: quiz?.quiz,
+        name:quiz?.name,
+        owner: operator.abonent,
         prompt: prompt_type,
         conversationHistory,
         lang: $langs,
         llang: $llang,
-        level: "B1.1"
+        level: "B1.1",
+        stt:stt_text
       };
 
       const response = await fetch(`./operator/chat`, {
@@ -159,42 +166,57 @@
         return;
       }
 
-      function splitText(text) {
-        // Регулярные выражения для поиска содержимого между тегами <nl> и <ru>
-        const nlRegex = /<nl>([\s\S]*?)<\/nl>/;
-        const ruRegex = /<ru>([\s\S]*?)<\/ru>/;
+      function splitText(text, llang, langs) {
+        // Регулярные выражения для поиска содержимого между тегами <nl>, <ru> и <user>
+        const nlRegex = new RegExp(`<${$llang}>([\\s\\S]*?)<\/${$llang}>`);
+        const ruRegex = new RegExp(`<${$langs}>([\\s\\S]*?)<\/${$langs}>`);
+        const userRegex = /<user>([\s\S]*?)<\/user>/;
 
         // Поиск содержимого <nl>
-        const nlMatch = text.match(nlRegex);
+        const nlMatch = nlRegex.exec(text);
         const nlContent = nlMatch ? nlMatch[1].trim() : null;
 
         // Поиск содержимого <ru>
-        const ruMatch = text.match(ruRegex);
+        const ruMatch = ruRegex.exec(text);
         const ruContent = ruMatch ? ruMatch[1].trim() : null;
 
-        // Функция для извлечения данных из блока (nl или ru)
-        const extractData = (content) => {
-            const corRegex = /<cor>([\s\S]*?)<\/cor>/;
-            const msgRegex = /<msg>([\s\S]*?)<\/msg>/;
-            const replyRegex = /<reply>([\s\S]*?)<\/reply>/g;
+        // Поиск содержимого <user>
+        const uMatch = userRegex.exec(text);
+        const uContent = uMatch ? uMatch[1].trim() : null;
 
-            const corMatch = content.match(corRegex);
-            const msgMatch = content.match(msgRegex);
-            const replyMatches = content.match(replyRegex);
+        // Функция для извлечения данных из блока (nl, ru или user)
+        const extractData = (content) => {
+            if (!content) return null;
+
+            const corRegex = /<cor>([\s\S]*?)<\/cor>/g;
+            const msgRegex = /<msg>([\s\S]*?)<\/msg>/g;
+            const replyRegex = /<reply>([\s\S]*?)<\/reply>/g;
+            const levelRegex = /<level>([\s\S]*?)<\/level>/g;
+
+            const corMatch = corRegex.exec(content);
+            const msgMatch = msgRegex.exec(content);
+            const levelMatch = levelRegex.exec(content);
+
+            const replies = [];
+            let replyMatch;
+            while ((replyMatch = replyRegex.exec(content)) !== null) {
+                replies.push(replyMatch[1].trim());
+            }
 
             return {
+                level: levelMatch ? levelMatch[1].trim() : null,
                 cor: corMatch ? corMatch[1].trim() : null,
                 msg: msgMatch ? msgMatch[1].trim() : null,
-                replies: replyMatches ? replyMatches.map(match => match.replace(/<\/?reply>/g, '').trim()) : [],
+                replies: replies,
             };
         };
 
         return {
-            nl: nlContent ? extractData(nlContent) : null,
-            ru: ruContent ? extractData(ruContent) : null,
+            [$llang]: nlContent ? extractData(nlContent) : null,
+            [$langs]: ruContent ? extractData(ruContent) : null,
+            user: uContent ? extractData(uContent) : null,
         };
-     }
-
+    }
 
       dataAr =  splitText(data.res);
     
@@ -343,8 +365,14 @@
       bind:this={lastMessage} >
       <!--strong>{message.role === 'user' ? 'Вы' : 'AI'}:</strong--> 
       {#if message.cor}
-        {#if message.isTranslated && translatedMessages.has(message.cor)}
+        {#if message.isTranslated} 
+          {#if translatedMessages.has(message.cor)}
             <cor> {@html translatedMessages.get(message.cor)}</cor>
+            {:else}
+            {#await Translate(message.cor, $llang, $langs, 'chat') then data}
+              <cor> {@html data}</cor>
+            {/await}
+          {/if}
         {:else}
           <cor> {@html message.cor}</cor>
         {/if}
@@ -471,6 +499,9 @@
 
   .chat-container {
     display: flex;
+    position: absolute;
+    top: -36px;
+    width:100%;
     flex-direction: column;
     height: calc(100vh - 78px);
   }

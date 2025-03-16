@@ -6,7 +6,7 @@
 
   import Tutor from '../tutor/Tutor.svelte';
 
-  import '$lib/css/Elevation.scss';
+  // import '$lib/css/Elevation.scss';
 
   import ImageList, {
     Item,

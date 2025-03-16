@@ -9,12 +9,17 @@
   import IconButton, { Icon } from '@smui/icon-button';
   import Badge from '@smui-extra/badge';
   import CircularProgress from '@smui/circular-progress';
+  import Chat from '../../../operator/chat/Сhat.svelte'
+  import Assistant from '../../../operator/chat/Assistant.svelte';
+
 
   import Stt from '../../../speech/stt/Stt.svelte';
   
   let isListening = false;
 
   let isSTT = false;
+
+  let isChat = false;
 
   let topAppBar;
 
@@ -657,7 +662,6 @@ let keys: string[] = [];
       article_name = arr[0].article;
       return; 
   }
-
   
   onDestroy(async()=>{
     $showBottomAppBar = true;
@@ -789,7 +793,10 @@ let keys: string[] = [];
           <Icon tag="svg" viewBox="0 0 24 24" style="visibility:hidden;display:absolute;margin:0px 10px 5px 10px ;scale:1.1;width:30px">
             <path fill={playAutoColor} d={mdiEarHearing} />
           </Icon>
-        </IconButton>
+        </IconButton>        
+      </div>
+      <div on:click={()=>{isChat=!isChat}}>
+        <Assistant></Assistant> 
       </div>
       </Section>
       <Section align="end">
@@ -952,6 +959,10 @@ let keys: string[] = [];
     </div>
   {/if}
 
+  {/if}
+
+  {#if isChat}
+    <Chat quiz={data}></Chat>
   {/if}
 
   <div style="height:100px"></div>

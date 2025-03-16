@@ -6,6 +6,8 @@
 
   import { Translate } from '../translate/Transloc.js';
 
+  // import Assistant from '../operator/chat/Assistant.svelte';
+
   import pkg from 'lodash';
   const { find, findIndex, remove } = pkg;
   import IconButton, { Icon } from '@smui/icon-button';
@@ -379,7 +381,7 @@
                 {#if theme.lessons}
                   {#each theme.lessons as lesson}
                     {#if lesson.quizes}
-
+                    
                       {#if theme.name[$llang].includes('Nieuws')}
                            <Accordion>
                             <Panel  style="margin-left:10px; width: 98%;">
@@ -389,271 +391,276 @@
                                 </div>
                               </Header>
                               <Content>
-                            {#each archive_news as quiz}
-                              {#if $dc?.dc.readyState === 'open' && (quiz.type==='dialog' || quiz.type==='word') } 
-                                  {#if quiz.name && quiz.published}
-                                    <div
-                                      class="quiz-container mdc-typography--caption"
-                                      type={quiz.type}
-                                      use:GetSubscribers
-                                      name={quiz.name[$llang]}
-                                    >
-                                    <div class="icon-wrapper">
-                                      <div>
-                                        {#if isNew(quiz.published, theme)}
-                                        {#await Translate('новый', 'ru', $llang,'module') then data}
-                                          <span  class="new-badge">{data}</span>
-                                          {/await}
-                                        {/if}
-                                      </div>
-                                
+                                {#each archive_news as quiz}                           
+                                  {#if $dc?.dc.readyState === 'open' && (quiz.type==='dialog' || quiz.type==='word') } 
+                                      {#if quiz.name && quiz.published}
+                                        <div
+                                          class="quiz-container mdc-typography--caption"
+                                          type={quiz.type}
+                                          use:GetSubscribers
+                                          name={quiz.name[$llang]}
+                                        >
+                                        <div class="icon-wrapper">
+                                          <div>
+                                            {#if isNew(quiz.published, theme)}
+                                            {#await Translate('новый', 'ru', $llang,'module') then data}
+                                              <span  class="new-badge">{data}</span>
+                                              {/await}
+                                            {/if}
+                                          </div>
                                     
-                                      {#if quiz.type==='bricks'}
-                                        <Icon tag="svg" viewBox="0 0 24 24" width="20px" height="20px"  fill="grey" scale='.5'>
-                                          <rect x="3" y="3" width="8" height="3" />
-                                          <rect x="13" y="3" width="8" height="3" />
-                                          <rect x="3" y="8" width="4" height="3" />
-                                          <rect x="9" y="8" width="6" height="3" />
-                                          <rect x="17" y="8" width="4" height="3" />
-                                          <rect x="3" y="13" width="8" height="3" />
-                                          <rect x="13" y="13" width="8" height="3" />
-                                          <rect x="3" y="18" width="4" height="3" />
-                                          <rect x="9" y="18" width="6" height="3" />
-                                          <rect x="17" y="18" width="4" height="3" />
-                                        </Icon>
-          
-                                      {:else if icons[quiz.type]}
-                                        <Icon tag="svg" viewBox="0 0 24 24" width="20px" height="20px">
-                                          <path fill="grey" d={icons[quiz.type]} />
-                                        </Icon>
-                                      {/if}
-                                    </div>                        
-                                      <a
-                                        href="#"
-                                        use:disablePanel
-                                        on:click={() => {
-                                          onClickQuiz(
-                                            quiz.type,
-                                            lesson_data.level,
-                                            theme,
-                                            quiz.name[$llang]
-                                          );
-                      
-                                        }}
-                                        style="width:100%;font-size:medium;"
-                                        {t}
-                                        type={quiz.type}
-                                        name={quiz.name[$llang]}
-                                        level={module.level}
-                                        theme={theme.name[$llang]}
-                                        title={quiz.title}
-                                        highlight={quiz.highlight || ''}
-                                        >{quiz.name[$llang]}
-                                      </a><span />
-          
-                                      {#if $call_but_status!=='inactive' && (quiz.type === 'dialog' || quiz.type === 'word')}
-          
-                                        <div class="form-field-container">
-                                  
-                                            <Checkbox
-                                              on:click={$OnCheckQU}
-                                              name={quiz.name[$llang]}
-                                              type={quiz.type}
-                                              bind:checked={checked[quiz.type][
+                                        
+                                          {#if quiz.type==='bricks'}
+                                            <Icon tag="svg" viewBox="0 0 24 24" width="20px" height="20px"  fill="grey" scale='.5'>
+                                              <rect x="3" y="3" width="8" height="3" />
+                                              <rect x="13" y="3" width="8" height="3" />
+                                              <rect x="3" y="8" width="4" height="3" />
+                                              <rect x="9" y="8" width="6" height="3" />
+                                              <rect x="17" y="8" width="4" height="3" />
+                                              <rect x="3" y="13" width="8" height="3" />
+                                              <rect x="13" y="13" width="8" height="3" />
+                                              <rect x="3" y="18" width="4" height="3" />
+                                              <rect x="9" y="18" width="6" height="3" />
+                                              <rect x="17" y="18" width="4" height="3" />
+                                            </Icon>
+
+              
+                                          {:else if icons[quiz.type]}
+                                            <Icon tag="svg" viewBox="0 0 24 24" width="20px" height="20px">
+                                              <path fill="grey" d={icons[quiz.type]} />
+                                            </Icon>
+                                          {/if}
+                                        </div>                        
+                                          <a
+                                            href="#"
+                                            use:disablePanel
+                                            on:click={() => {
+                                              onClickQuiz(
+                                                quiz.type,
+                                                lesson_data.level,
+                                                theme,
                                                 quiz.name[$llang]
-                                              ]}
-                                              touch
-                                            ></Checkbox>
-                                
-                                        </div>
-                                      {/if}
-                                    </div>
-          
-                                    {#if $call_but_status !== 'inactive' && quiz_users[quiz.type] && quiz_users[quiz.type][quiz.name[$llang]]}
-                                      <div class="user-cards">
-                                        {#each quiz_users[quiz.type][quiz.name[$llang]] as qu, q}
-                                          {#if qu.operator !== operator.operator && find( group, { operator: qu.operator } )}
-                                            <div
-                                              on:click={() => {
-                                                OnClickUserCard(
-                                                  qu.operator,
-                                                  theme,
-                                                  module,
-                                                  quiz
-                                                );
-                                              }}
-                                              operator={qu.operator}
-                                              {t}
-                                            >
-                                              <Card
-                                                style="width:30px;  margin-right:15px"
-                                              >
-                                                <Media
-                                                  class="card-media-square"
-                                                  aspectRatio="square"
-                                                >
-                                                  <MediaContent>
-                                                    <img
-                                                      src={qu.src}
-                                                      alt=""
-                                                      width="22px"
-                                                      style="position:relative; left:3px"
-                                                    />
-                                                  </MediaContent>
-                                                </Media>
-                                                <!-- <Content style="color: #888; font-size:smaller">{name}</Content> -->
-                                                <h3
-                                                  class="mdc-typography--subtitle2"
-                                                  style="margin: -7px; color: #888;font-size:x-small;text-align:center;z-index:1"
-                                                >
-                                                  {#if qu.name}
-                                                    {qu.name.slice(0, 8)}
-                                                  {:else}
-                                                    {qu.operator.slice(0, 8)}
-                                                  {/if}
-                                                </h3>
-                                              </Card>
+                                              );
+                          
+                                            }}
+                                            style="width:100%;font-size:medium;"
+                                            {t}
+                                            type={quiz.type}
+                                            name={quiz.name[$llang]}
+                                            level={module.level}
+                                            theme={theme.name[$llang]}
+                                            title={quiz.title}
+                                            highlight={quiz.highlight || ''}
+                                            >{quiz.name[$llang]}
+                                          </a><span />
+                                          
+                                          {#if $call_but_status!=='inactive' && (quiz.type === 'dialog' || quiz.type === 'word')}
+              
+                                            <div class="form-field-container">
+                                      
+                                                <Checkbox
+                                                  on:click={$OnCheckQU}
+                                                  name={quiz.name[$llang]}
+                                                  type={quiz.type}
+                                                  bind:checked={checked[quiz.type][
+                                                    quiz.name[$llang]
+                                                  ]}
+                                                  touch
+                                                ></Checkbox>
+                                    
                                             </div>
                                           {/if}
-                                        {/each}
-                                      </div>
-                                    {/if}
-                                  {/if}
-                                {:else}
-                                  {#if quiz.name && quiz.published}
-                                  <div
-                                    class="quiz-container mdc-typography--caption"
-                                    type={quiz.type}
-                                    use:GetSubscribers
-                                    name={quiz.name[$llang]}
-                                  >
-                                  <div class="icon-wrapper">
-                                    <div>
-                                      {#if isNew(quiz.published, theme)}
-                                      {#await Translate('новый', 'ru', $llang,'module') then data}
-                                        <span  class="new-badge">{data}</span>
-                                        {/await}
-                                      {/if}
-                                    </div>
-                              
-                                  
-                                    {#if quiz.type==='bricks'}
-                                      <Icon tag="svg" viewBox="0 0 24 24" width="20px" height="20px"  fill="grey" scale='.5'>
-                                        <rect x="3" y="3" width="8" height="3" />
-                                        <rect x="13" y="3" width="8" height="3" />
-                                        <rect x="3" y="8" width="4" height="3" />
-                                        <rect x="9" y="8" width="6" height="3" />
-                                        <rect x="17" y="8" width="4" height="3" />
-                                        <rect x="3" y="13" width="8" height="3" />
-                                        <rect x="13" y="13" width="8" height="3" />
-                                        <rect x="3" y="18" width="4" height="3" />
-                                        <rect x="9" y="18" width="6" height="3" />
-                                        <rect x="17" y="18" width="4" height="3" />
-                                      </Icon>
-        
-                                    {:else if icons[quiz.type]}
-                                      <Icon tag="svg" viewBox="0 0 24 24" width="20px" height="20px">
-                                        <path fill="grey" d={icons[quiz.type]} />
-                                      </Icon>
-                                    {/if}
-                                  </div>                        
-                                    <a
-                                      href="#"
-                                      use:disablePanel
-                                      on:click={() => {
-                                        onClickQuiz(
-                                          quiz.type,
-                                          lesson_data.level,
-                                          theme,
-                                          quiz.name[$llang]
-                                        );
-                    
-                                      }}
-                                      style="width:100%;font-size:medium;"
-                                      {t}
-                                      type={quiz.type}
-                                      name={quiz.name[$llang]}
-                                      level={module.level}
-                                      theme={theme.name[$llang]}
-                                      title={quiz.title}
-                                      highlight={quiz.highlight || ''}
-                                      >{quiz.name[$llang]}
-                                    </a><span />
-        
-                                    {#if $call_but_status!=='inactive' && (quiz.type === 'dialog' || quiz.type === 'word')}
-        
-                                      <div class="form-field-container">
-                                
-                                          <Checkbox
-                                            on:click={$OnCheckQU}
-                                            name={quiz.name[$llang]}
-                                            type={quiz.type}
-                                            bind:checked={checked[quiz.type][
-                                              quiz.name[$llang]
-                                            ]}
-                                            touch
-                                          ></Checkbox>
-                              
-                                      </div>
-                                    {/if}
-                                  </div>
-        
-                                  {#if $call_but_status !== 'inactive' && quiz_users[quiz.type] && quiz_users[quiz.type][quiz.name[$llang]]}
-                                    <div class="user-cards">
-                                      {#each quiz_users[quiz.type][quiz.name[$llang]] as qu, q}
-                                        {#if qu.operator !== operator.operator && find( group, { operator: qu.operator } )}
-                                          <div
-                                            on:click={() => {
-                                              OnClickUserCard(
-                                                qu.operator,
-                                                theme,
-                                                module,
-                                                quiz
-                                              );
-                                            }}
-                                            operator={qu.operator}
-                                            {t}
-                                          >
-                                            <Card
-                                              style="width:30px;  margin-right:15px"
-                                            >
-                                              <Media
-                                                class="card-media-square"
-                                                aspectRatio="square"
-                                              >
-                                                <MediaContent>
-                                                  <img
-                                                    src={qu.src}
-                                                    alt=""
-                                                    width="22px"
-                                                    style="position:relative; left:3px"
-                                                  />
-                                                </MediaContent>
-                                              </Media>
-                                              <!-- <Content style="color: #888; font-size:smaller">{name}</Content> -->
-                                              <h3
-                                                class="mdc-typography--subtitle2"
-                                                style="margin: -7px; color: #888;font-size:x-small;text-align:center;z-index:1"
-                                              >
-                                                {#if qu.name}
-                                                  {qu.name.slice(0, 8)}
-                                                {:else}
-                                                  {qu.operator.slice(0, 8)}
-                                                {/if}
-                                              </h3>
-                                            </Card>
+                                        </div>
+                                        
+                                        {#if $call_but_status !== 'inactive' && quiz_users[quiz.type] && quiz_users[quiz.type][quiz.name[$llang]]}
+                                          <div class="user-cards">
+                                            
+                                            {#each quiz_users[quiz.type][quiz.name[$llang]] as qu, q}
+                                              {#if qu.operator !== operator.operator && find( group, { operator: qu.operator } )}
+                                                <div
+                                                  on:click={() => {
+                                                    OnClickUserCard(
+                                                      qu.operator,
+                                                      theme,
+                                                      module,
+                                                      quiz
+                                                    );
+                                                  }}
+                                                  operator={qu.operator}
+                                                  {t}
+                                                >
+                                                  <Card
+                                                    style="width:30px;  margin-right:15px"
+                                                  >
+                                                    <Media
+                                                      class="card-media-square"
+                                                      aspectRatio="square"
+                                                    >
+                                                      <MediaContent>
+                                                        <img
+                                                          src={qu.src}
+                                                          alt=""
+                                                          width="22px"
+                                                          style="position:relative; left:3px"
+                                                        />
+                                                      </MediaContent>
+                                                    </Media>
+                                                    <!-- <Content style="color: #888; font-size:smaller">{name}</Content> -->
+                                                    <h3
+                                                      class="mdc-typography--subtitle2"
+                                                      style="margin: -7px; color: #888;font-size:x-small;text-align:center;z-index:1"
+                                                    >
+                                                      {#if qu.name}
+                                                        {qu.name.slice(0, 8)}
+                                                      {:else}
+                                                        {qu.operator.slice(0, 8)}
+                                                      {/if}
+                                                    </h3>
+                                                  </Card>
+                                                </div>
+                                              {/if}
+                                            {/each}
                                           </div>
                                         {/if}
-                                      {/each}
-                                    </div>
-                                  {/if}
-                                  {/if}
-                                {/if}
-                            {/each}
+                                      {/if}
+                                    {:else}
+                                      {#if quiz.name && quiz.published}
+                                      <div
+                                        class="quiz-container mdc-typography--caption"
+                                        type={quiz.type}
+                                        use:GetSubscribers
+                                        name={quiz.name[$llang]}
+                                      >
+                                      <div class="icon-wrapper">
+                                        <div>
+                                          {#if isNew(quiz.published, theme)}
+                                          {#await Translate('новый', 'ru', $llang,'module') then data}
+                                            <span  class="new-badge">{data}</span>
+                                            {/await}
+                                          {/if}
+                                        </div>
+                                  
+                                      
+                                        {#if quiz.type==='bricks'}
+                                          <Icon tag="svg" viewBox="0 0 24 24" width="20px" height="20px"  fill="grey" scale='.5'>
+                                            <rect x="3" y="3" width="8" height="3" />
+                                            <rect x="13" y="3" width="8" height="3" />
+                                            <rect x="3" y="8" width="4" height="3" />
+                                            <rect x="9" y="8" width="6" height="3" />
+                                            <rect x="17" y="8" width="4" height="3" />
+                                            <rect x="3" y="13" width="8" height="3" />
+                                            <rect x="13" y="13" width="8" height="3" />
+                                            <rect x="3" y="18" width="4" height="3" />
+                                            <rect x="9" y="18" width="6" height="3" />
+                                            <rect x="17" y="18" width="4" height="3" />
+                                          </Icon>
+            
+                                        {:else if icons[quiz.type]}
+                                          <Icon tag="svg" viewBox="0 0 24 24" width="20px" height="20px">
+                                            <path fill="grey" d={icons[quiz.type]} />
+                                          </Icon>
+                                        {/if}
+                                      </div>                        
+                                        <a
+                                          href="#"
+                                          use:disablePanel
+                                          on:click={() => {
+                                            onClickQuiz(
+                                              quiz.type,
+                                              lesson_data.level,
+                                              theme,
+                                              quiz.name[$llang]
+                                            );
+                        
+                                          }}
+                                          style="width:100%;font-size:medium;"
+                                          {t}
+                                          type={quiz.type}
+                                          name={quiz.name[$llang]}
+                                          level={module.level}
+                                          theme={theme.name[$llang]}
+                                          title={quiz.title}
+                                          highlight={quiz.highlight || ''}
+                                          >{quiz.name[$llang]}
+                                        </a><span />
+            
+                                        {#if $call_but_status!=='inactive' && (quiz.type === 'dialog' || quiz.type === 'word')}
+            
+                                          <div class="form-field-container">
+                                    
+                                              <Checkbox
+                                                on:click={$OnCheckQU}
+                                                name={quiz.name[$llang]}
+                                                type={quiz.type}
+                                                bind:checked={checked[quiz.type][
+                                                  quiz.name[$llang]
+                                                ]}
+                                                touch
+                                              ></Checkbox>
+                                  
+                                          </div>
+                                        {/if}
+                                      </div>
+            
+                                      {#if $call_but_status !== 'inactive' && quiz_users[quiz.type] && quiz_users[quiz.type][quiz.name[$llang]]}
+                                        <div class="user-cards">
+                                        
+                                          {#each quiz_users[quiz.type][quiz.name[$llang]] as qu, q}
+                                            {#if qu.operator !== operator.operator && find( group, { operator: qu.operator } )}
+                                              <div
+                                                on:click={() => {
+                                                  OnClickUserCard(
+                                                    qu.operator,
+                                                    theme,
+                                                    module,
+                                                    quiz
+                                                  );
+                                                }}
+                                                operator={qu.operator}
+                                                {t}
+                                              >
+                                                <Card
+                                                  style="width:30px;  margin-right:15px"
+                                                >
+                                                  <Media
+                                                    class="card-media-square"
+                                                    aspectRatio="square"
+                                                  >
+                                                    <MediaContent>
+                                                      <img
+                                                        src={qu.src}
+                                                        alt=""
+                                                        width="22px"
+                                                        style="position:relative; left:3px"
+                                                      />
+                                                    </MediaContent>
+                                                  </Media>
+                                                  <!-- <Content style="color: #888; font-size:smaller">{name}</Content> -->
+                                                  <h3
+                                                    class="mdc-typography--subtitle2"
+                                                    style="margin: -7px; color: #888;font-size:x-small;text-align:center;z-index:1"
+                                                  >
+                                                    {#if qu.name}
+                                                      {qu.name.slice(0, 8)}
+                                                    {:else}
+                                                      {qu.operator.slice(0, 8)}
+                                                    {/if}
+                                                  </h3>
+                                                </Card>
+                                              </div>
+                                            {/if}
+                                          {/each}
+                                        </div>
+                                      {/if}
+                                      {/if}
+                                    {/if}
+                                {/each}
+
                               </Content>
                             </Panel>
                           </Accordion>
                         {#each news as quiz}
+                        
                           {#if $dc?.dc.readyState === 'open' && (quiz.type==='dialog' || quiz.type==='word') } 
                             {#if quiz.name && quiz.published}
                             <div
@@ -733,6 +740,7 @@
 
                             {#if $call_but_status !== 'inactive' && quiz_users[quiz.type] && quiz_users[quiz.type][quiz.name[$llang]]}
                               <div class="user-cards">
+                               
                                 {#each quiz_users[quiz.type][quiz.name[$llang]] as qu, q}
                                   {#if qu.operator !== operator.operator && find( group, { operator: qu.operator } )}
                                     <div
@@ -789,6 +797,7 @@
                               use:GetSubscribers
                               name={quiz.name[$llang]}
                             >
+                          
                             <div class="icon-wrapper">
                               <div>
                                 {#if isNew(quiz.published, theme)}
@@ -818,6 +827,7 @@
                                   <path fill="grey" d={icons[quiz.type]} />
                                 </Icon>
                               {/if}
+                     
                             </div>                        
                               <a
                                 href="#"
@@ -859,7 +869,9 @@
                             </div>
 
                             {#if $call_but_status !== 'inactive' && quiz_users[quiz.type] && quiz_users[quiz.type][quiz.name[$llang]]}
+                            
                               <div class="user-cards">
+                               
                                 {#each quiz_users[quiz.type][quiz.name[$llang]] as qu, q}
                                   {#if qu.operator !== operator.operator && find( group, { operator: qu.operator } )}
                                     <div
@@ -909,12 +921,14 @@
                             {/if}
                             {/if}
                           {/if}
+              
                         {/each}
                       {/if}
 
-                      {#each lesson.quizes as quiz}               
+                      {#each lesson.quizes as quiz}  
+                                 
                         {#if !theme.name[$llang].includes('Nieuws')}
-                        {#if $dc?.dc.readyState === 'open' && (quiz.type==='dialog' || quiz.type==='word') } 
+                          {#if $dc?.dc.readyState === 'open' && (quiz.type==='dialog' || quiz.type==='word') } 
                             <Panel class="panel">                                            
                                 {#if quiz.name[$llang] && quiz.published}
                                   <div
@@ -996,7 +1010,9 @@
 
                                   {#if $call_but_status !== 'inactive' && quiz_users[quiz.type] && quiz_users[quiz.type][quiz.name[$llang]]}
                                     <div class="user-cards">
+                                     
                                       {#each quiz_users[quiz.type][quiz.name[$llang]] as qu, q}
+                                    
                                         {#if qu.operator !== operator.operator && find( group, { operator: qu.operator } )}
                                           <div
                                             on:click={() => {
@@ -1040,6 +1056,7 @@
                                             </Card>
                                           </div>
                                         {/if}
+                                  
                                       {/each}
                                     </div>
                                   {/if}
@@ -1127,6 +1144,7 @@
 
                                 {#if $call_but_status !== 'inactive' && quiz_users[quiz.type] && quiz_users[quiz.type][quiz.name[$llang]]}
                                   <div class="user-cards">
+                                   
                                     {#each quiz_users[quiz.type][quiz.name[$llang]] as qu, q}
                                       {#if qu.operator !== operator.operator && find( group, { operator: qu.operator } )}
                                         <div
@@ -1178,7 +1196,9 @@
                             </Panel>
                           {/if}
                         {/if}
-                      {/each}              
+                        
+                      {/each}  
+                            
                       <div  style="height:80px"></div>
                     {/if}
                   {/each}

@@ -1155,7 +1155,7 @@ export async function GetDict(q: GetDictRequest): Promise<any> {
   }
 }
 
-interface WriteSpeechRequest {
+interface WriteTranslateRequest {
   lang: string;
   key: string;
   text: string;
@@ -1164,16 +1164,16 @@ interface WriteSpeechRequest {
   quiz:string;
 }
 
-interface WriteSpeechResponse {
+interface WriteTranslateResponse {
   success: boolean;
   message: string;
   error?: any;
 }
 
-export async function WriteSpeech(q: WriteSpeechRequest): Promise<WriteSpeechResponse> {
+export async function WriteTranslate(q: WriteTranslateRequest): Promise<WriteTranslateResponse> {
   try {
     await sql`
-        INSERT INTO speech (lang, key, text, translate, provider, quiz)
+        INSERT INTO translate (lang, key, text, translate, provider, quiz)
         VALUES (
           ${q.lang ?? null}, 
           ${q.key ?? null}, 
@@ -1188,8 +1188,8 @@ export async function WriteSpeech(q: WriteSpeechRequest): Promise<WriteSpeechRes
           translate = EXCLUDED.translate,
           provider = EXCLUDED.provider,
           quiz = CASE 
-            WHEN EXCLUDED.quiz <> '' OR speech.quiz = '' THEN EXCLUDED.quiz 
-            ELSE speech.quiz 
+            WHEN EXCLUDED.quiz <> '' OR translate.quiz = '' THEN EXCLUDED.quiz 
+            ELSE translate.quiz 
           END
       `;
 
@@ -1197,7 +1197,7 @@ export async function WriteSpeech(q: WriteSpeechRequest): Promise<WriteSpeechRes
     return { success: true, message: "Data written successfully." };
   } catch (ex) {
     // Log the error and return a failure message with error details
-    console.error("Error writing speech:", ex);
+    console.error("Error writing translate:", ex);
     return { success: false, message: "Failed to write data.", error: ex };
   }
 }
@@ -1215,7 +1215,7 @@ interface ReadSpeechResponse {
 export async function ReadSpeech(q: ReadSpeechRequest): Promise<ReadSpeechResponse> {
   try {
     // Perform the database query to retrieve the translation
-    let res = await sql`SELECT translate, quiz FROM speech
+    let res = await sql`SELECT translate, quiz FROM translate
                         WHERE key = ${q.key} AND lang = ${q.lang}`;
 
     // If a result is found, return the translation
@@ -1251,8 +1251,8 @@ export async function GetUsersEmail(owner, level) {
 }
 
 export async function GetUsers(par) {
-  let operators,
-    admin = '';
+  let operators;
+  let admin;
 
   try {
     if (par.abonent) {
@@ -1270,16 +1270,125 @@ export async function GetUsers(par) {
       `;
 
       admin = await sql`
-			SELECT 
-			*,
-			operator as email
-			FROM operators
-			WHERE role='admin' AND operators.abonent=${par.abonent}
-			`;
+        SELECT 
+        *,
+        operator as email
+        FROM operators
+        WHERE role='admin' AND operators.abonent=${par.abonent}
+        `;
     } 
   } catch (ex) {
     console.log();
   }
 
   return { operators, admin };
+}
+
+export async function GetQuizContext(params) {
+  try {
+    // Debugging: Log the parameters
+    console.log('Query Parameters:', params);
+
+    // Validate and sanitize the table name
+    const validTypes = ['bricks', 'quizzes', 'other_valid_table']; // Add valid table names here
+    if (!validTypes.includes(params.type)) {
+      throw new Error(`Invalid table type: ${params.type}`);
+    }
+
+    // Manually construct the query with the table name
+    const query = `
+      SELECT html as context
+      FROM public.${params.type}
+      WHERE name = $1 AND owner = $2 AND level = $3
+    `;
+
+    // Debugging: Log the query
+    console.log('Generated Query:', query);
+
+    // Execute the query with parameters
+    const res = await sql.unsafe(query, [params.name, params.owner, params.level]);
+
+    // Debugging: Log the query result
+    console.log('Query Result:', res);
+
+    // Return the first row (or null if no rows are found)
+    return res.length > 0 ? res[0] : null;
+  } catch (error) {
+    // Log the error and rethrow it
+    console.error('Error in GetQuizContext:', error);
+    throw error;
+  }
+}
+
+export async function UpdateUserLevel(text, operator) {
+
+  function compareLevels(currentLevel, newLevel) {
+    // Разделяем уровни на части
+    const currentParts = currentLevel.split('.');
+    const newParts = newLevel.split('.');
+  
+    // Сравниваем каждую часть
+    for (let i = 0; i < Math.max(currentParts.length, newParts.length); i++) {
+      const currentPart = parseInt(currentParts[i] || '0', 10); // Если часть отсутствует, считаем её равной 0
+      const newPart = parseInt(newParts[i] || '0', 10);
+  
+      if (newPart > currentPart) {
+        return true; // Новый уровень выше
+      } else if (newPart < currentPart) {
+        return false; // Новый уровень ниже
+      }
+      // Если части равны, переходим к следующей
+    }
+  
+    return false; // Уровни равны
+  }
+
+  const userRegex = /<user>([\s\S]*?)<\/user>/;
+  const levelRegex = /<level>([\s\S]*?)<\/level>/;
+
+  // Поиск содержимого <user>
+  const uMatch = userRegex.exec(text);
+  const uContent = uMatch ? uMatch[1].trim() : null;
+
+  if (!uContent) {
+    throw new Error("Тег <user> не найден в тексте.");
+  }
+
+  // Поиск уровня в содержимом <user>
+  const levelMatch = levelRegex.exec(uContent);
+  const newLevel = levelMatch ? levelMatch[1].trim() : null;
+
+  if (!newLevel) {
+    throw new Error("Тег <level> не найден в содержимом <user>.");
+  }
+
+  try {
+    // Получаем текущий уровень оператора из базы данных
+    const currentLevelResult = await sql`
+      SELECT level FROM operators WHERE "operator" = ${operator}
+    `;
+
+    if (currentLevelResult.length === 0) {
+      throw new Error(`Оператор с ID ${operator} не найден.`);
+    }
+
+    const currentLevel = currentLevelResult[0].level;
+
+    // Сравниваем уровни
+    if (compareLevels(currentLevel, newLevel)) {
+      // Если новый уровень выше, обновляем
+      const result = await sql`
+        UPDATE operators
+        SET level = ${newLevel}
+        WHERE "operator" = ${operator}
+      `;
+
+      console.log(`Уровень оператора ${operator} успешно обновлён на ${newLevel}.`);
+    } else {
+      console.warn(`Уровень оператора ${operator} не обновлён, так как новый уровень ${newLevel} не выше текущего ${currentLevel}.`);
+    }
+  } catch (error) {
+    console.error("Ошибка при обновлении уровня оператора:", error);
+    throw error;
+  }
 }
