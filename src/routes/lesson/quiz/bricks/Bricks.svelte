@@ -81,6 +81,8 @@ let isCollapsed = true;
 
 let curSentence = 0;
 
+let cleanedSentences;
+
 // let speechData = '';
 let current_word = 0;
 let audio;
@@ -151,7 +153,7 @@ let keys: string[] = [];
       const sentences = bricks_data.text;
 
       // Убираем HTML-теги
-      const cleanedSentences = sentences.map(sent_obj => sent_obj.sentence.replace(/<[^>]*>/g, ''));
+      cleanedSentences = sentences.map(sent_obj => sent_obj.sentence.replace(/<[^>]*>/g, ''));
 
       // Функция для разделения массива на пакеты по 5 предложений
       const chunkArray = (arr, size) =>
@@ -943,7 +945,7 @@ let keys: string[] = [];
       bind:this={stt}
       {SttResult}
       {StopListening}
-      original={sent_compare}
+      original={cleanedSentences[curSentence]}
       bind:display_audio
     ></Stt>
   </div>

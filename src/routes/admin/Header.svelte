@@ -38,7 +38,7 @@
 </script>
 
 <!-- {#if $dicts && $langs && $dicts['CLASS'][$langs]} -->
-<header>
+
   <div class="top-app-bar-container flexor">
     <TopAppBar bind:this={topAppBar} variant="fixed" dense>
       <Row>
@@ -93,18 +93,18 @@
     </TopAppBar>
     <div class="flexor-content"></div>
   </div>
-</header>
+
 
 <!-- {/if} -->
 
 <style>
-  header {
+  /* header {
     position: absolute;
     display: flex;
     justify-content: space-between;
     top: 0;
     width: 100%;
-  }
+  } */
   .top-app-bar-container {
     /* max-width: 480px; */
     /* width: 100%; */

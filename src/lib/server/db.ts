@@ -1410,20 +1410,32 @@ export function GetSTT(){
 
 }
 
-export async function SaveSTT(operator, text='', lang='nl'){
+export async function SaveSTT(operator, text='', lang='nl', original=null){
 
     try {
-      // Проверяем, что текст не пустой
-      if (!text || text.trim() === '') {
-        throw new Error("Текст не может быть пустым.");
-      }
-  
+    // Проверяем, что текст не пустой
+    if (!text || text.trim() === '') {
+      throw new Error("Текст не может быть пустым.");
+    }
+
+    // Проверяем, что текст не короче 20 символов
+    if (text.length < 20) {
+      throw new Error("Текст должен содержать не менее 20 символов.");
+    } 
 
       // Вставляем данные в таблицу stt (предположим, что такая таблица существует)
       const result = await sql`
-        INSERT INTO stt (operator, data, lang)
-        VALUES (${operator},${text}, ${lang})
-        RETURNING data; -- Возвращаем ID новой записи
+      INSERT INTO stt (operator, data, lang, original)
+      VALUES (
+      ${operator}, 
+      ${text}, 
+      ${lang}, 
+      ${original !== null && original !== undefined && original !== 'undefined' ? original : sql`NULL`}
+      )
+      ON CONFLICT (original,operator, lang, data) 
+      DO UPDATE SET
+        data = EXCLUDED.data
+      RETURNING data
       `;
   
       // Возвращаем успешный результат с ID новой записи

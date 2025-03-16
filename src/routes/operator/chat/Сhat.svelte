@@ -75,12 +75,13 @@
 
   // Автопрокрутка вниз при обновлении сообщений
   afterUpdate(() => {
+
+    if(elInput){
+      elInput.scrollIntoView({ behavior: "smooth", block: "end" });
+    }
     if (lastMessage) {
       lastMessage.scrollIntoView({ behavior: "smooth", block: "end" });
     }
-    // if(elInput){
-    //   elInput.scrollIntoView({ behavior: "smooth", block: "end" });
-    // }
   });
 
 
@@ -429,11 +430,7 @@
     </div>
   {/each}
 
-    {#if $loading}
-      {#await Translate('AI печатает...', 'ru', $langs, 'chat') then data}
-        <div class="loading" aria-live="polite">{data}</div>
-      {/await}
-    {/if}
+
   </div>
 
   <div class="input-container">
@@ -452,7 +449,17 @@
         </Icon>
       </IconButton>
     </div>
-
+    {#if $loading}
+      {#await Translate('AI печатает...', 'ru', $langs, 'chat') then data}
+      <input disabled
+        bind:value={userInput}
+        bind:this = {elInput}
+        placeholder={data}
+        on:keydown={(e) => {onKeydown(e.key)}}
+        aria-label="Введите сообщение"
+      />
+      {/await}
+    {:else}
     {#await Translate('Введите сообщение...', 'ru', $langs, 'chat') then data}
       <input
         bind:value={userInput}
@@ -462,6 +469,7 @@
         aria-label="Введите сообщение"
       />
     {/await}
+    {/if}
     <button on:click={()=>{sendMessage()}} disabled={$loading} aria-label="Отправить сообщение">
        <IconButton
         class="material-icons">
@@ -500,10 +508,11 @@
   .chat-container {
     display: flex;
     position: absolute;
-    top: -36px;
-    width:100%;
+    top: 0px;
+    width: 100%;
     flex-direction: column;
-    height: calc(100vh - 78px);
+    /* height: calc(100vh - 42px); */
+    bottom: 0px;
   }
 
   .input-container {
@@ -513,7 +522,7 @@
     padding: 10px;
     background: #fff;
     border-top: 1px solid #ccc;
-    margin-top: 7px;
+    margin-top: auto;
   }
 
   .messages {
