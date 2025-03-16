@@ -6,7 +6,7 @@
 
 
 
-  export let SttResult, StopListening, display_audio;
+  export let SttResult:string, StopListening, display_audio:string;
 
   // let MediaRecorder;
 
@@ -234,19 +234,16 @@
   });
 </script>
 
+<div class="audio_container"  style="display:{display_audio};    height: 25px;    margin: 0 auto;">
 <audio
   bind:this={audioPlayer}
   src={audioUrl}
   controls
-  style="display:{display_audio}"
+
 ></audio>
+</div>
 
 <!-- <button on:click={playAudio}>Воспроизвести</button> -->
 
 <style>
-  audio {
-    height: 25px;
-    margin: 0 auto;
-    /* width: 30vw; */
-  }
 </style>
