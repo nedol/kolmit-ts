@@ -29,6 +29,12 @@ export async function GET({ url, fetch, cookies }) {
   const lesson = url.searchParams.get('lesson');
   const lvl = url.searchParams.get('level');
   let data;
+
+  function delay(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  await delay(500); // Задержка в 1 секунду
   // debugger;
   if (text) {
     // let resp = await fetch('/src/routes/operator/operator/lesson/' + path);

@@ -15,7 +15,6 @@ let audioContext,
 	silenceTimer;
 let model,
 	recognizer,
-	loadedModel,
 	audioBuffer = [];
 const threshold = 20;
 const silenceDelay = 2000; //  секунды тишины
@@ -33,7 +32,6 @@ let to_lang = 'en';
           channelCount: 1,
           sampleRate: 48000,
           sampleSize: 16,
-          volume: 1.0,
         },
 	});
 

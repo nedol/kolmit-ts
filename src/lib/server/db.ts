@@ -1325,6 +1325,11 @@ export async function GetQuizContext(params) {
 export async function UpdateUserLevel(text, operator) {
 
   function compareLevels(currentLevel, newLevel) {
+    // Проверяем, что currentLevel и newLevel не null или undefined
+    if (!currentLevel || !newLevel) {
+      throw new Error("Один из уровней не определён.");
+    }
+
     // Разделяем уровни на части
     const currentParts = currentLevel.split('.');
     const newParts = newLevel.split('.');
@@ -1375,6 +1380,11 @@ export async function UpdateUserLevel(text, operator) {
     }
 
     const currentLevel = currentLevelResult[0].level;
+
+    // Проверяем, что currentLevel не null или undefined
+    if (!currentLevel) {
+      throw new Error("Текущий уровень оператора не определён.");
+    }
 
     // Сравниваем уровни
     if (compareLevels(currentLevel, newLevel)) {

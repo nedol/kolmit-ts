@@ -41,8 +41,7 @@
           autoGainControl: true,
           channelCount: 1,
           sampleRate: 48000,
-          sampleSize: 16,
-          volume: 1.0,
+          sampleSize: 16
         },
         video: false, // Если видео не нужно
       });
