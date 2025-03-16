@@ -37,6 +37,8 @@ let total_tokens: number | null = 0;
 
 
 export default async function generate_from_text_input(params: GenerateParams): Promise<GenerateResponse> {
+
+  // return generateFromTextInput(params);
   if (params.prompt.type === 'greeting') {
     const apiKey = process.env.DEEPSEEK_API_KEY;
     if (!apiKey) {
@@ -50,7 +52,9 @@ export default async function generate_from_text_input(params: GenerateParams): 
       apiKey: apiKey,
     });
 
-    const result = await GetPrompt(`${params.prompt.quiz}.${params.prompt.type}.${params.prompt.lang}`);
+    console.log('propmt req:',`${params.prompt.quiz}.${params.prompt.type}.${params.prompt.lang}`)
+
+    const result = await GetPrompt(`chat.greeting.${params.prompt.lang}`);
 
     if (result.error) {
       throw new Error(result.error);
@@ -80,7 +84,7 @@ export default async function generate_from_text_input(params: GenerateParams): 
 
     system_messages = [{ role: "system", content: finalSystemPrompt }];
 
-    console.log(finalSystemPrompt)
+    // console.log(finalSystemPrompt)
     // UpdateLastSession(20);
 
     UpdateUserLevel('<user><level>B1.1</level></user>',params.user_id)
@@ -124,6 +128,81 @@ export default async function generate_from_text_input(params: GenerateParams): 
 
     return completion.choices[0].message.content;
 
+  } catch (error) {
+    console.error('Error generating response from DeepSeek API:', error);
+    throw new Error('Failed to generate response from DeepSeek API');
+  }
+}
+
+export async function generateFromTextInput(params: GenerateParams): Promise<GenerateResponse> {
+  const apiKey = process.env.DEEPSEEK_API_KEY;
+  if (!apiKey) {
+    throw new Error('DeepSeek API key is missing in environment variables');
+  }
+
+  const openai = new OpenAI({
+    baseURL: 'https://api.deepseek.com',
+    apiKey: apiKey,
+  });
+
+  if (params.prompt.type === 'greeting') {
+    // Проверка наличия обязательных параметров
+    if (!params.prompt.quiz || !params.prompt.type || !params.prompt.lang) {
+      throw new Error('Missing required properties in params.prompt');
+    }
+
+    const res = (params.name && params.type) ? await GetQuizContext(params) : '';
+    const promptKey = `${params.prompt.quiz}.${params.prompt.type}.${params.prompt.lang}`;
+    console.log('Fetching prompt with key:', promptKey);
+
+    const result = await GetPrompt(promptKey);
+    if (result.error) {
+      throw new Error(result.error);
+    }
+
+    if (!result.prompt || !result.prompt.system || !result.prompt.user) {
+      throw new Error('Failed to fetch valid prompt from GetPrompt');
+    }
+
+    const finalSystemPrompt = result.prompt.system
+      .replace(/\${llang}/g, params.llang || '')
+      .replace(/\${lang}/g, params.lang || '')
+      .replace(/\${level}/g, params.level || '')
+      .replace(/\${grammar}/g, params.grammar?.join(', ') || '')
+      .replace(/\${context}/g, res.context || '')
+      .replace(/\${theme}/g, params.theme || 'general conversation');
+
+    const systemMessages = [{ role: "system", content: finalSystemPrompt }];
+    UpdateUserLevel('<user><level>B1.1</level></user>', params.user_id);
+
+    return { content: result.prompt.user };
+  }
+
+  if (!params.level) {
+    throw new Error('Missing required property: level');
+  }
+
+  try {
+    const totalTokens = await GetTodayTotalTokens(params.user_id);
+    if (totalTokens > 50000 && params.user_id !== '45e487f5af70416e7d46d6a4b00985de') {
+      return { tokens_limit: "50000", total_tokens: totalTokens };
+    }
+
+    const messages = [...systemMessages];
+    if (params.conversationHistory) {
+      const filteredHistory = params.conversationHistory
+        .filter(msg => msg.role === "user" || msg.role === "assistant")
+        .slice(-4);
+      messages.push(...filteredHistory);
+    }
+
+    const completion = await openai.chat.completions.create({
+      messages: messages,
+      model: "deepseek-chat",
+    });
+
+    UpdateLastSession(params.user_id, completion.usage.total_tokens);
+    return { content: completion.choices[0].message.content };
   } catch (error) {
     console.error('Error generating response from DeepSeek API:', error);
     throw new Error('Failed to generate response from DeepSeek API');
