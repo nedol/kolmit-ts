@@ -488,21 +488,21 @@
     display:block;
     margin: 10px;
     color:red;
-    font-size: medium;
+    font-size: small;
     font-weight: bold;
   }
 
   :global(reply){
     display: block;
     color:green;
-    font-size:medium;
+    font-size:small;
     font-weight: bold;
   }
 
   :global(alert) {
     display: block;
     color:red;
-    font-size:medium;
+    font-size:small;
     font-weight: bold;
   }
 
