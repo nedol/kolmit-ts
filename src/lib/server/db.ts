@@ -960,28 +960,6 @@ export async function GetLesson(q: { operator: string; owner: string; level?: st
       // Get all levels for the owner
       levels = await getLevels(q.owner);
 
-      // Fetch news based on language and recent timestamp
-      news = await sql<NewsItem[]>`
-        SELECT 
-          json_build_object(${res[0]?.lang || 'en'}::text, "name") AS "name",  
-          MAX((EXTRACT(EPOCH FROM "timestamp") * 1000)::BIGINT) AS "published", 
-          "type"
-        FROM (
-          SELECT "name", "timestamp", 'dialog' AS "type" 
-          FROM public.dialogs 
-          WHERE "prompt_type" = 'news' 
-
-          UNION
-
-          SELECT "name", "timestamp" AS "published", 'bricks' AS "type" 
-          FROM public.bricks 
-          WHERE "prompt_type" = 'news'
-        ) AS combined
-        GROUP BY "name", "type"
-        ORDER BY "published" DESC
-        LIMIT 20;
-      `;
-
       // Query for context-related news
       context_news = await sql<NewsItem[]>`
         SELECT 
@@ -1005,7 +983,6 @@ export async function GetLesson(q: { operator: string; owner: string; level?: st
       lang: les?.lang || res[0]?.lang || 'en', // Default to 'en' if not found
       level: les?.level || res[0]?.level || '', // Default to first lesson's level if not found
       levels: levels,
-      news: news,
       context_news: context_news
     };
   } catch (ex) {

@@ -161,7 +161,7 @@
     module = lesson_data. module;
     $llang = lesson_data.lang;
     $showBottomAppBar = true;
-    news = lessonData.news;
+    news = lessonData.data.module.themes[0].lessons[0].quizes;
     const oneWeekAgo = Date.now() - 1 * 24 * 60 * 60 * 1000; // Получаем временную метку, соответствующую одной неделе наз    
     const tmp = [];
     news?.forEach((quiz) => {
