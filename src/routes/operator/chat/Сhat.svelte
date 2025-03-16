@@ -76,11 +76,13 @@
   // Автопрокрутка вниз при обновлении сообщений
   afterUpdate(() => {
 
-    if(elInput){
-      elInput.scrollIntoView({ behavior: "smooth", block: "end" });
-    }
+
     if (lastMessage) {
       lastMessage.scrollIntoView({ behavior: "smooth", block: "end" });
+    }
+
+    if(elInput){
+      elInput.scrollIntoView({ behavior: "smooth", block: "end" });
     }
   });
 
@@ -562,7 +564,7 @@
     text-align: start;
     background: #d0d1ff;
     color: #007bff;
-    font-size: large;
+    font-size: medium;
     font-weight: bold;
   }
 
