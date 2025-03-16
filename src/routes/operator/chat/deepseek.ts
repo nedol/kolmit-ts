@@ -87,7 +87,7 @@ export default async function generate_from_text_input(params: GenerateParams): 
     // console.log(finalSystemPrompt)
     // UpdateLastSession(20);
 
-    UpdateUserLevel('<user><level>B1.1</level></user>',params.user_id)
+    // UpdateUserLevel('<user><level>B1.1</level></user>',params.user_id)
 
     return prompt.user;
   }
