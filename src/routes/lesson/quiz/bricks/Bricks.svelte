@@ -943,7 +943,7 @@ let keys: string[] = [];
       bind:this={stt}
       {SttResult}
       {StopListening}
-      {original}
+      original={sent_compare}
       bind:display_audio
     ></Stt>
   </div>
