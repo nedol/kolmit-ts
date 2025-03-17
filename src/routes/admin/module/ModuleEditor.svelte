@@ -34,8 +34,6 @@
 
   import Quiz from '../quiz/Quiz.svelte';
 
-  let value = 'dialog';
-
   import { view } from '$lib/stores.ts';
     import { prompt_data } from '../../operator/chat/prompt/prompt_data';
 
@@ -69,7 +67,7 @@
 
   let news;
 
-  const quizes = ['выбери quiz...',  'dialog', 'word', 'bricks'];
+  const quizes = ['выбери quiz...',  'dialogs', 'words', 'bricks'];
 
   let containerWidth = '100%'; // Исходная ширина - 100% ширины родительского окна
   let containerHeight = '100vh';
@@ -537,7 +535,7 @@
                                     level={lesson_data.data.module.level}
                                     highlight={quiz.highlight || ''}
                                   >
-                                    {#if quiz.type === 'dialog'}
+                                    {#if quiz.type === 'dialogs'}
                                       <Icon
                                         tag="svg"
                                         viewBox="0 0 24 24"

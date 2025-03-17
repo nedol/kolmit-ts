@@ -92,9 +92,9 @@
   let news = [],archive_news= [], news_=[];
   
   const icons = {
-    dialog: mdiAccountMultiple,
+    dialogs: mdiAccountMultiple,
     text: mdiTextBoxOutline,
-    word: mdiFileWordBoxOutline,
+    words: mdiFileWordBoxOutline,
     listen: mdiEarHearing,
   };
 

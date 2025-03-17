@@ -17,11 +17,11 @@
 
 <!-- {@debug quiz} -->
 {#if data.quiz}
-  {#if data.quiz.includes('dialog')}
+  {#if data.quiz.includes('dialogs')}
     <DialogEdit {ChangeQuizName} />
   {:else if data.quiz.includes('bricks')}
     <BricksEdit {ChangeQuizName}/>
-  {:else if data.quiz === 'word'}
+  {:else if data.quiz === 'words'}
     {#if $dc_state==="connected" && $call_but_status === 'talk'}
       <WordGameEdit {data} {ChangeQuizName}/>
     {:else}
