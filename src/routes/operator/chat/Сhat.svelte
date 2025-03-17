@@ -82,9 +82,9 @@
       }
     }, 100);
 
-    // if(elInput){
-    //   elInput.scrollIntoView({ behavior: "smooth", block: "end" });
-    // }
+    if(elInput){
+      elInput.scrollIntoView({ behavior: "smooth", block: "end" });
+    }
   });
 
 

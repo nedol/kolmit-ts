@@ -781,8 +781,8 @@ export async function GetDialog(q: GetDialogQuery): Promise<Dialog | string> {
     `;
 
     // Fetch brick data (HTML content)
-    const bricks = await sql<{ html: string }[]>`
-      SELECT html, prompt_type 
+    const bricks = await sql<{ data: string }[]>`
+      SELECT data, prompt_type 
       FROM bricks
       WHERE name = ${q.name} 
         AND owner = ${q.owner} 
@@ -801,7 +801,7 @@ export async function GetDialog(q: GetDialogQuery): Promise<Dialog | string> {
       dialog[0] = {}
     }
 
-    dialog[0].brick = bricks[0]?.html || ''; // Add brick HTML if available
+    dialog[0].brick = bricks[0]?.data || ''; // Add brick HTML if available
     dialog[0].context = context[0]?.data || ''; // Add context data if available
   
 
@@ -1276,9 +1276,9 @@ export async function GetQuizContext(params) {
 
     // Manually construct the query with the table name
     const query = `
-      SELECT html as context
+      SELECT data AS context
       FROM public.${params.type}
-      WHERE name = $1 AND owner = $2 AND level = $3
+      WHERE name = $1::text AND owner::text = $2 AND level::text = $3
     `;
 
     // Debugging: Log the query

@@ -1263,14 +1263,15 @@
     top:0px;
   }
   maindlg {
-    /* overflow-y: auto; */
+    position: relative;
+    display: block;
     transition: transform 0.3s ease-in-out;
-    width: 100vw;
-    margin: 0 auto; 
+    width: 99vw;
+    margin: 0 auto;
     position: relative;
     transform-style: preserve-3d;
     transition: transform 0.5s;
-    height: 120vh;
+    height: 93vh;
   }
 
   .repeat_alert {
@@ -1591,7 +1592,8 @@
     border-radius: 5px;
     margin: 0 auto;
     position: relative;
-    height: calc(100vh - 80px);
+    /* height: calc(100vh - 80px); */
+    bottom:0;
     margin-left: 10px;
     margin-right: 10px;
   }

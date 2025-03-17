@@ -75,12 +75,13 @@ export default async function generate_from_text_input(params: GenerateParams): 
     params.grammar = ['Vroeger...,nu..', 'Toen...']
 
     const finalSystemPrompt = prompt.system
-      .replace(/\${llang}/g, params.llang)
-      .replace(/\${lang}/g, params.lang)
-      .replace(/\${level}/g, params.level)
+      .replaceAll(/\${llang}/g, params.llang)
+      .replaceAll(/\${lang}/g, params.lang)
+      .replaceAll(/\${level}/g, params.level)
+      .replaceAll(/\${type}/g, params.type)
       // .replace(/\${grammar}/g, params.grammar)
-      .replace(/\<context>([\s\S]*?)<\/context>/g, `<context>${res.context}</context>`)
-      .replace(/\${theme}/g, params.theme || 'general conversation');
+      .replaceAll(/\<context>([\s\S]*?)<\/context>/g, `<context>${res.context}</context>`)
+      .replaceAll(/\${theme}/g, params.name || 'general conversation');
 
     system_messages = [{ role: "system", content: finalSystemPrompt }];
 
