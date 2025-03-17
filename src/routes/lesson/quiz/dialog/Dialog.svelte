@@ -220,7 +220,7 @@
     )
       .then((response) => response.json())
       .then(async(dlg_data) => {
-        dialog_data = dlg_data.data.dialog;
+        dialog_data = dlg_data.data.data;
         
         if (dlg_data.data.html) {
           dialog_data.html = dlg_data.data.html; //splitHtmlContent(data.data.html);

@@ -139,7 +139,7 @@ export async function POST({ request, url, fetch }) {
         });
         if (dlg.subscribe?.length > 0)
           resp = {
-            [q.type]: { quiz: dlg.dialog?.name, subscribers: dlg.subscribe },
+            [q.type]: { quiz: dlg.data?.name, subscribers: dlg.subscribe },
           };
       } else if (q.type === 'word') {
         const dlg = await GetWords({
@@ -149,7 +149,7 @@ export async function POST({ request, url, fetch }) {
         });
         if (dlg.subscribe?.length > 0)
           resp = {
-            [q.type]: { quiz: dlg.dialog?.name, subscribers: dlg.subscribe },
+            [q.type]: { quiz: dlg.data?.name, subscribers: dlg.subscribe },
           };
       }
       break;

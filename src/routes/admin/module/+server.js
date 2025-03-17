@@ -32,7 +32,7 @@ export async function GET({ url, fetch, cookies }) {
 export async function POST({ request, url, fetch }) {
 	let resp;
 
-	const { func,owner, operator,level, name, new_name, data, theme, lang, context,html, prompt_type } = await request.json();
+	const { func,owner, operator,level, name, new_name, theme, lang, context, data, prompt_type } = await request.json();
 
 	switch (func) {
     case 'get_les':
@@ -51,7 +51,7 @@ export async function POST({ request, url, fetch }) {
       UpdateWords({ owner, level, name, new_name, data, lang, context });
       break;
     case 'upd_brks':
-      UpdateBricks({ owner, level, name, new_name, lang, html, prompt_type, theme });
+      UpdateBricks({ owner, level, name, new_name, lang, data, prompt_type, theme });
       break;  
   }
 

@@ -24,7 +24,7 @@
     new_content = false,
     num = 5;
 
-  let bricks_data = { lang: '', content: [], words: [], html: [''], name: '', prompt_type:'' , original:'' };
+  let bricks_data = { lang: '', content: [], words: [], data: [''], name: '', prompt_type:'' , original:'' };
   const name = data.name;
   let dialog_task: HTMLDivElement, dialog_words, dialog_tmplt;
 
@@ -89,12 +89,12 @@
     .then(async (resp) => {
 
       if (resp?.data) {
-        bricks_data.html = resp.data?.html;      
+        bricks_data.data = resp.data?.data;      
         bricks_data.name = data.name;
         bricks_data.prompt_type = resp.data.prompt_type?resp.data.prompt_type:(data.type?data.type:data.name.includes('Nieuws')?'news':'');
         bricks_data.context = resp.data.context;
       }
-      content  = bricks_data?.html;
+      content  = bricks_data?.data;
       //DB
       fetch(
         `./admin?prompt=bricks.${bricks_data.prompt_type}.${$langs}&quiz_name=${data.name}&prompt_owner=${abonent}&prompt_level=${data.level}&prompt_theme=${data.theme}`
@@ -127,7 +127,7 @@
             );
           }
 
-          bricks_data.html = resp.resp.words[0]?.context;
+          bricks_data.data = resp.resp.words[0]?.context;
 
           if (data.theme.grammar) prompt = prompt.replaceAll('${grammar}', JSON.stringify(data.theme.grammar)) 
 
@@ -249,7 +249,7 @@
         level: data.level,
         name: name,
         new_name: data.name,
-        html: content,
+        data: content,
         lang: $llang,
         theme: data.theme,
         prompt_type: bricks_data.prompt_type 
@@ -276,8 +276,8 @@
       .then((data) => {
         if (data.data.content[0]) {
           bricks_data.content = bricks_data.content.concat(data.data.content);
-          if (data.data.html) {
-            bricks_data.html = splitHtmlContent(data.data.html);
+          if (data.data.data) {
+            bricks_data.data = splitHtmlContent(data.data.data);
           }
           bricks_data.name = name;
           new_content = true;
