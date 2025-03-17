@@ -105,6 +105,9 @@ export default async function generate_from_text_input(params: GenerateParams): 
       const filteredHistory = params.conversationHistory
         .filter(msg => msg.role === "user" || msg.role === "assistant")
         .slice(-2);
+
+      // Удаляем два последних сообщения из params.conversationHistory
+      params.conversationHistory.splice(-2);
       
       messages = [...system_messages, ...filteredHistory];
     }

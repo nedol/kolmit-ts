@@ -800,9 +800,15 @@ let keys: string[] = [];
           </Icon>
         </IconButton>        
       </div>
+      {#if isChat}
       <div on:click={()=>{isChat=!isChat}}>
         <Assistant></Assistant> 
       </div>
+      {:else}
+        <div on:click={()=>{isChat=!isChat}} style="filter: grayscale(100%);">
+          <Assistant></Assistant> 
+        </div>
+      {/if}
       </Section>
       <Section align="end">
         <Icon

@@ -76,14 +76,15 @@
   // Автопрокрутка вниз при обновлении сообщений
   afterUpdate(() => {
 
+    setTimeout(() => {
+      if (messagesContainer && messagesContainer.lastElementChild) {
+        messagesContainer.lastElementChild.scrollIntoView({ behavior: "smooth", block: "end" });
+      }
+    }, 100);
 
-    if (lastMessage) {
-      lastMessage.scrollIntoView({ behavior: "smooth", block: "end" });
-    }
-
-    if(elInput){
-      elInput.scrollIntoView({ behavior: "smooth", block: "end" });
-    }
+    // if(elInput){
+    //   elInput.scrollIntoView({ behavior: "smooth", block: "end" });
+    // }
   });
 
 
