@@ -78,8 +78,8 @@ export default async function generate_from_text_input(params: GenerateParams): 
       .replace(/\${llang}/g, params.llang)
       .replace(/\${lang}/g, params.lang)
       .replace(/\${level}/g, params.level)
-      .replace(/\${grammar}/g, params.grammar)
-      .replace(/\${context}/g, res.context)
+      // .replace(/\${grammar}/g, params.grammar)
+      .replace(/\<context>([\s\S]*?)<\/context>/g, `<context>${res.context}</context>`)
       .replace(/\${theme}/g, params.theme || 'general conversation');
 
     system_messages = [{ role: "system", content: finalSystemPrompt }];
@@ -104,10 +104,13 @@ export default async function generate_from_text_input(params: GenerateParams): 
       // Оставляем только последние 2 сообщения от user и assistant
       const filteredHistory = params.conversationHistory
         .filter(msg => msg.role === "user" || msg.role === "assistant")
-        .slice(-4);
+        .slice(-2);
       
       messages = [...system_messages, ...filteredHistory];
     }
+
+    messages[0].content = messages[0].content.replace(/<dialog>([\s\S]*?)<\/dialog>/, `<dialog>${JSON.stringify(params.conversationHistory)}</dialog>`);
+    console.log(messages[0].content)
 
     total_tokens = await GetTodayTotalTokens(params.user_id);
 
