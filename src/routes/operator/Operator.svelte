@@ -31,7 +31,6 @@
   // import {Dict} from '$lib/js/$dicts'
   import Group from './Group.svelte';
   let group_data = getContext('group_data');
-  let group = [];
 
   import { RTCOperator } from './rtc/RTCOperator';
 
@@ -493,7 +492,7 @@
   }
 
   onDestroy(() => {
-    group = '';
+    group_data = '';
     document.removeEventListener('visibilitychange', handleVisibilityChange);
   });
 </script>
@@ -503,13 +502,13 @@
 
 
 {#if $view === 'lesson'}
-  <Module data={group_data} bind:group={group}/>
+  <Module data={group_data} bind:group={group_data}/>
 
 {:else if $view==='chat'}
   <Chat></Chat>   
 
 {:else if  $view === 'group'}
-  <Group  {rtc} bind:group={group}/>
+  <Group  {rtc} bind:group={group_data}/>
 {/if}
 
 

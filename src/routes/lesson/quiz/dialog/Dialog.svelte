@@ -222,8 +222,8 @@
       .then(async(dlg_data) => {
         dialog_data = dlg_data.data.data;
         
-        if (dlg_data.data.html) {
-          dialog_data.html = dlg_data.data.html; //splitHtmlContent(data.data.html);
+        if (dlg_data.data.data) {
+          dialog_data.html = dlg_data.data.data; //splitHtmlContent(data.data.data);
         }
         dialog_data.name = data.name;
         Dialog();

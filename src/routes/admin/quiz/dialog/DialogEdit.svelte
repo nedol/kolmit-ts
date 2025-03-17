@@ -283,8 +283,8 @@
       .then((data) => {
         if (data.data.content[0]) {
           dialog_data.content = dialog_data.content.concat(data.data.content);
-          if (data.data.html) {
-            dialog_data.html = splitHtmlContent(data.data.html);
+          if (data.data.data) {
+            dialog_data.html = splitHtmlContent(data.data.data);
           }
           dialog_data.name = name;
           new_content = true;

@@ -119,8 +119,8 @@
 
   let panel_disabled = true;
 
-  let checked = { dialog: {}, word: {} };
-  let quiz_users = { dialog: {}, word: {} };
+  let checked = { dialogs: {}, word: {} };
+  let quiz_users = { dialogs: {}, word: {} };
 
   $: if (Array.isArray($msg)) {
     try {
@@ -162,7 +162,7 @@
     $llang = lesson_data.lang;
     $showBottomAppBar = true;
     news = lessonData.data.module.themes[0].lessons[0].quizes;
-    const oneWeekAgo = Date.now() - 1 * 24 * 60 * 60 * 1000; // Получаем временную метку, соответствующую одной неделе наз    
+    const oneWeekAgo = Date.now() - 3 * 24 * 60 * 60 * 1000; // Получаем временную метку, соответствующую одной неделе наз    
     const tmp = [];
     news?.forEach((quiz) => {
       const isOlderThanOneWeek = quiz.published < oneWeekAgo;
@@ -278,7 +278,7 @@
       if (data && data.resp) {
         const key = Object.keys(data.resp)[0];
         data.resp[key].subscribers?.map((user) => {
-          const quiz = data.resp.word?.quiz || data.resp.dialog?.quiz;
+          const quiz = data.resp.word?.quiz || data.resp.data?.quiz;
           const key = Object.keys(data.resp)[0];
           BuildQuizUsers(quiz, user, key);
           if (user === operator.operator) {
@@ -392,7 +392,7 @@
                               </Header>
                               <Content>
                                 {#each archive_news as quiz}                           
-                                  {#if $dc?.dc.readyState === 'open' && (quiz.type==='dialogs' || quiz.type==='words') } 
+                                  {#if $dc?.dc.readyState === 'open' && (quiz.type==='dialogs' || quiz.type==='word') } 
                                       {#if quiz.name && quiz.published}
                                         <div
                                           class="quiz-container mdc-typography--caption"
@@ -454,7 +454,7 @@
                                             >{quiz.name[$llang]}
                                           </a><span />
                                           
-                                          {#if $call_but_status!=='inactive' && (quiz.type === 'dialogs' || quiz.type === 'words')}
+                                          {#if $call_but_status!=='inactive' && (quiz.type === 'dialogs' || quiz.type === 'word')}
               
                                             <div class="form-field-container">
                                       
@@ -584,7 +584,7 @@
                                           >{quiz.name[$llang]}
                                         </a><span />
             
-                                        {#if $call_but_status!=='inactive' && (quiz.type === 'dialogs' || quiz.type === 'words')}
+                                        {#if $call_but_status!=='inactive' && (quiz.type === 'dialogs' || quiz.type === 'word')}
             
                                           <div class="form-field-container">
                                     
@@ -661,7 +661,7 @@
                           </Accordion>
                         {#each news as quiz}
                         
-                          {#if $dc?.dc.readyState === 'open' && (quiz.type==='dialogs' || quiz.type==='words') } 
+                          {#if $dc?.dc.readyState === 'open' && (quiz.type==='dialogs' || quiz.type==='word') } 
                             {#if quiz.name && quiz.published}
                             <div
                               class="quiz-container mdc-typography--caption"
@@ -722,7 +722,7 @@
                                 >{quiz.name[$llang]}
                               </a><span />
 
-                              {#if $call_but_status!=='inactive' && (quiz.type === 'dialogs' || quiz.type === 'words')}
+                              {#if $call_but_status!=='inactive' && (quiz.type === 'dialogs' || quiz.type === 'word')}
 
                                 <div class="form-field-container">                      
                                     <Checkbox
@@ -852,7 +852,7 @@
                                 >{quiz.name[$llang]}
                               </a><span />
 
-                              {#if $call_but_status!=='inactive' && (quiz.type === 'dialogs' || quiz.type === 'words')}
+                              {#if $call_but_status!=='inactive' && (quiz.type === 'dialogs' || quiz.type === 'word')}
 
                                 <div class="form-field-container">                      
                                     <Checkbox
@@ -928,7 +928,7 @@
                       {#each lesson.quizes as quiz}  
                                  
                         {#if !theme.name[$llang].includes('Nieuws')}
-                          {#if $dc?.dc.readyState === 'open' && (quiz.type==='dialogs' || quiz.type==='words') } 
+                          {#if $dc?.dc.readyState === 'open' && (quiz.type==='dialogs' || quiz.type==='word') } 
                             <Panel class="panel">                                            
                                 {#if quiz.name[$llang] && quiz.published}
                                   <div
@@ -990,7 +990,7 @@
                                       >{quiz.name[$llang]}
                                     </a><span />
 
-                                    {#if $call_but_status!=='inactive' && (quiz.type === 'dialogs' || quiz.type === 'words')}
+                                    {#if $call_but_status!=='inactive' && (quiz.type === 'dialogs' || quiz.type === 'word')}
         
                                       <div class="form-field-container">
                                 
@@ -1124,17 +1124,15 @@
                                     >{quiz.name[$llang]}
                                   </a><span />
 
-                                  {#if $call_but_status!=='inactive' && (quiz.type === 'dialogs' || quiz.type === 'words')}
+                                  {#if $call_but_status!=='inactive' && (quiz.type === 'dialogs' || quiz.type === 'word')}
       
                                     <div class="form-field-container">
-                              
+              
                                         <Checkbox
                                           on:click={$OnCheckQU}
                                           name={quiz.name[$llang]}
                                           type={quiz.type}
-                                          bind:checked={checked[quiz.type][
-                                            quiz.name[$llang]
-                                          ]}
+                                          bind:checked={checked[quiz.type][quiz.name[$llang]]}
                                           touch
                                         ></Checkbox>
                             
