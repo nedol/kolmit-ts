@@ -3,6 +3,9 @@
 
   import ConText from '../Context.svelte';
 
+  import Chat from '../../../operator/chat/Сhat.svelte'
+  import Assistant from '../../../operator/chat/Assistant.svelte';
+
   import { NumberString, numberToDutchString } from '../listen/Listen.numbers.js';
 
   import TopAppBar, { Row, Title, Section } from '@smui/top-app-bar';
@@ -59,6 +62,8 @@
   let dialog_data: any;
 
   let isFlipped = false;
+
+  let isChat = false;
 
   let isRepeat = false,
     isThumb = false;
@@ -363,7 +368,7 @@
       await dc.SendData(
         {
           lesson: {
-            quiz: 'dialog',
+            quiz: 'dialogs',
             llang: $llang,
             level: data.level,
             name: dialog_data.name,
@@ -389,7 +394,7 @@
       user1: dialog_data.content[cur_qa].user1,
       user2: dialog_data.content[cur_qa].user2,
       a_shfl: a_shfl,
-      quiz: data.quiz,
+      quiz: 'dialogs',
     };
     data.quiz = data.quiz === 'dialog.client' ? 'dialog' : 'dialog.client';
     const client_quiz =
@@ -640,7 +645,7 @@
 
 <Tts bind:this={tts}></Tts>
 
-<main_dlg>
+<maindlg>
   <div class="top-app-bar-container flexor">
     <TopAppBar bind:this={topAppBar} variant="fixed">
       <Row>
@@ -733,6 +738,17 @@
           </div>
         </Section>
         <Section align="end">
+        <Section align="end">
+            {#if isChat}
+            <div on:click={()=>{isChat=!isChat}}>
+              <Assistant></Assistant> 
+            </div>
+            {:else}
+              <div on:click={()=>{isChat=!isChat}} style="filter: grayscale(100%);">
+                <Assistant></Assistant> 
+              </div>
+            {/if}
+        </Section>
 
         </Section>
         <Section align="end">
@@ -1217,9 +1233,16 @@
         </span>
       </div>
     {/if}
-    <div style="height:200px" />
+
+
+    <div style="height:100px" />
   </div>
-</main_dlg>
+
+  
+  {#if isChat}
+    <Chat quiz={data}></Chat>
+  {/if}
+</maindlg>
 
 <style scoped>
 
@@ -1239,7 +1262,7 @@
     /* height: 64px !important; */
     top:0px;
   }
-  main_dlg {
+  maindlg {
     /* overflow-y: auto; */
     transition: transform 0.3s ease-in-out;
     width: 100vw;

@@ -18,7 +18,7 @@
 <div />
 <!-- {@debug quiz} -->
 {#if quiz}
-  {#if quiz.includes('dialog')}
+  {#if quiz.includes('dialogs')}
     <Dialog {data} />
   {:else if quiz.includes('bricks')}
     <Bricks {data} />
@@ -30,7 +30,7 @@
     {:else}
       <Listen {data} />
     {/if}
-  {:else if quiz === 'word'}
+  {:else if quiz === 'words'}
     {#if $call_but_status === 'talk'}
       <WordGame {data} />
     {:else if $call_but_status === 'inactive' || $call_but_status === 'active'}

@@ -799,16 +799,16 @@ let keys: string[] = [];
             <path fill={playAutoColor} d={mdiEarHearing} />
           </Icon>
         </IconButton>        
-      </div>
-      {#if isChat}
-      <div on:click={()=>{isChat=!isChat}}>
-        <Assistant></Assistant> 
-      </div>
-      {:else}
-        <div on:click={()=>{isChat=!isChat}} style="filter: grayscale(100%);">
+        </div>
+        {#if isChat}
+        <div on:click={()=>{isChat=!isChat}}>
           <Assistant></Assistant> 
         </div>
-      {/if}
+        {:else}
+          <div on:click={()=>{isChat=!isChat}} style="filter: grayscale(100%);">
+            <Assistant></Assistant> 
+          </div>
+        {/if}
       </Section>
       <Section align="end">
         <Icon

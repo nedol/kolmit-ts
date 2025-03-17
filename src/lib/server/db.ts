@@ -1269,7 +1269,7 @@ export async function GetQuizContext(params) {
     console.log('Query Parameters:', params);
 
     // Validate and sanitize the table name
-    const validTypes = ['bricks', 'quizzes', 'other_valid_table']; // Add valid table names here
+    const validTypes = ['bricks', 'words', 'dialogs']; // Add valid table names here
     if (!validTypes.includes(params.type)) {
       throw new Error(`Invalid table type: ${params.type}`);
     }

@@ -392,7 +392,7 @@
                               </Header>
                               <Content>
                                 {#each archive_news as quiz}                           
-                                  {#if $dc?.dc.readyState === 'open' && (quiz.type==='dialog' || quiz.type==='word') } 
+                                  {#if $dc?.dc.readyState === 'open' && (quiz.type==='dialogs' || quiz.type==='words') } 
                                       {#if quiz.name && quiz.published}
                                         <div
                                           class="quiz-container mdc-typography--caption"
@@ -454,7 +454,7 @@
                                             >{quiz.name[$llang]}
                                           </a><span />
                                           
-                                          {#if $call_but_status!=='inactive' && (quiz.type === 'dialog' || quiz.type === 'word')}
+                                          {#if $call_but_status!=='inactive' && (quiz.type === 'dialogs' || quiz.type === 'words')}
               
                                             <div class="form-field-container">
                                       
@@ -584,7 +584,7 @@
                                           >{quiz.name[$llang]}
                                         </a><span />
             
-                                        {#if $call_but_status!=='inactive' && (quiz.type === 'dialog' || quiz.type === 'word')}
+                                        {#if $call_but_status!=='inactive' && (quiz.type === 'dialogs' || quiz.type === 'words')}
             
                                           <div class="form-field-container">
                                     
@@ -661,7 +661,7 @@
                           </Accordion>
                         {#each news as quiz}
                         
-                          {#if $dc?.dc.readyState === 'open' && (quiz.type==='dialog' || quiz.type==='word') } 
+                          {#if $dc?.dc.readyState === 'open' && (quiz.type==='dialogs' || quiz.type==='words') } 
                             {#if quiz.name && quiz.published}
                             <div
                               class="quiz-container mdc-typography--caption"
@@ -722,7 +722,7 @@
                                 >{quiz.name[$llang]}
                               </a><span />
 
-                              {#if $call_but_status!=='inactive' && (quiz.type === 'dialog' || quiz.type === 'word')}
+                              {#if $call_but_status!=='inactive' && (quiz.type === 'dialogs' || quiz.type === 'words')}
 
                                 <div class="form-field-container">                      
                                     <Checkbox
@@ -852,7 +852,7 @@
                                 >{quiz.name[$llang]}
                               </a><span />
 
-                              {#if $call_but_status!=='inactive' && (quiz.type === 'dialog' || quiz.type === 'word')}
+                              {#if $call_but_status!=='inactive' && (quiz.type === 'dialogs' || quiz.type === 'words')}
 
                                 <div class="form-field-container">                      
                                     <Checkbox
@@ -928,7 +928,7 @@
                       {#each lesson.quizes as quiz}  
                                  
                         {#if !theme.name[$llang].includes('Nieuws')}
-                          {#if $dc?.dc.readyState === 'open' && (quiz.type==='dialog' || quiz.type==='word') } 
+                          {#if $dc?.dc.readyState === 'open' && (quiz.type==='dialogs' || quiz.type==='words') } 
                             <Panel class="panel">                                            
                                 {#if quiz.name[$llang] && quiz.published}
                                   <div
@@ -990,7 +990,7 @@
                                       >{quiz.name[$llang]}
                                     </a><span />
 
-                                    {#if $call_but_status!=='inactive' && (quiz.type === 'dialog' || quiz.type === 'word')}
+                                    {#if $call_but_status!=='inactive' && (quiz.type === 'dialogs' || quiz.type === 'words')}
         
                                       <div class="form-field-container">
                                 
@@ -1124,7 +1124,7 @@
                                     >{quiz.name[$llang]}
                                   </a><span />
 
-                                  {#if $call_but_status!=='inactive' && (quiz.type === 'dialog' || quiz.type === 'word')}
+                                  {#if $call_but_status!=='inactive' && (quiz.type === 'dialogs' || quiz.type === 'words')}
       
                                     <div class="form-field-container">
                               
