@@ -645,7 +645,6 @@
 
 <Tts bind:this={tts}></Tts>
 
-<maindlg>
   <div class="top-app-bar-container flexor">
     <TopAppBar bind:this={topAppBar} variant="fixed">
       <Row>
@@ -1242,7 +1241,7 @@
   {#if isChat}
     <Chat quiz={data}></Chat>
   {/if}
-</maindlg>
+
 
 <style scoped>
 
@@ -1262,17 +1261,7 @@
     /* height: 64px !important; */
     top:0px;
   }
-  maindlg {
-    position: relative;
-    display: block;
-    transition: transform 0.3s ease-in-out;
-    width: 99vw;
-    margin: 0 auto;
-    position: relative;
-    transform-style: preserve-3d;
-    transition: transform 0.5s;
-    height: 93vh;
-  }
+
 
   .repeat_alert {
     position: absolute;
