@@ -193,7 +193,7 @@ let iframe;
     <div class="speaker-button">
       <IconButton
         on:click={() => {
-          PlayAutoText(data.html, quiz);
+          PlayAutoText(data.data, quiz);
         }}
       >
         <Icon tag="svg" viewBox="0 0 24 24">
@@ -201,7 +201,7 @@ let iframe;
         </Icon>
       </IconButton>
     </div>
-    <iframe bind:this={iframe} class="context" srcdoc={data.html} on:load={OnLoad}></iframe>
+    <iframe bind:this={iframe} class="context" srcdoc={data.data} on:load={OnLoad}></iframe>
   {/if}
 </div>
 
