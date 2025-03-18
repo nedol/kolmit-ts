@@ -243,15 +243,16 @@
         ]);
     
       // Добавляем ответ AI в список
-      messages.update(msgs =>  
-      [...msgs, 
-        { id: crypto.randomUUID(), 
-          role: "assistant", 
-          text: dataAr[$llang]?.msg, 
-          tr: dataAr[$langs]?.msg , 
-          cor:'',
-          isTranslated:false}
-      ]);
+      if(dataAr[$llang]?.msg)
+        messages.update(msgs =>  
+        [...msgs, 
+          { id: crypto.randomUUID(), 
+            role: "assistant", 
+            text: dataAr[$llang]?.msg, 
+            tr: dataAr[$langs]?.msg , 
+            cor:'',
+            isTranslated:false}
+        ]);
 
       
 
