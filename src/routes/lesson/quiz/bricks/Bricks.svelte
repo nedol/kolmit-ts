@@ -841,7 +841,7 @@ let keys: string[] = [];
 
 <!-- <div class="card"> -->
 
-{#if bricks_data?.html}
+{#if bricks_data?.data}
   <div class="bricks-header">
     <Icon tag="svg" viewBox="0 0 24 24" width="30px" height="30px" fill="grey"> 
       <svg aria-hidden="true" viewBox="0 0 24 24" width="20px" height="20px">
