@@ -33,7 +33,7 @@
   let stt_text = '';
   let isSTT = false;
 
-  type Message = { role: 'user' | 'assistant' | 'system'; text: string; tr: string; cor:string; id: string; isTranslated: boolean; };
+  type Message = { role: 'user' | 'assistant' | 'system'; text: string; tr: string; cor:string | ''; id: string; isTranslated: boolean; };
   type Messages = Message[];
 
   let userInput = '';
@@ -75,17 +75,11 @@
 
   // Автопрокрутка вниз при обновлении сообщений
   afterUpdate(() => {
-
-    setTimeout(() => {
-      if (messagesContainer && messagesContainer.lastElementChild) {
-        messagesContainer.lastElementChild.scrollIntoView({ behavior: "smooth", block: "end" });
-      }
-    }, 100);
-
-    if(elInput){
-      elInput.scrollIntoView({ behavior: "smooth", block: "end" });
-    }
-  });
+  // Проверяем, было ли изменено поле ввода
+  if (elInput) {
+    elInput.scrollIntoView({ behavior: "smooth", block: "end" });
+  }
+});
 
 
   // Отправка сообщения
@@ -104,6 +98,12 @@
       cor:"",
       isTranslated:false 
     }]);
+
+    if (messagesContainer) {
+        setTimeout(() => {
+          messagesContainer?.lastElementChild?.scrollIntoView({ behavior: "smooth", block: "end" });
+        }, 100);
+      }
 
     const userMessage = msg?msg:userInput;
     userInput = '';
@@ -124,7 +124,7 @@
 
       // Ограничиваем историю сообщений до 5 реплик с каждой стороны
       let conversationHistory = $messages
-        .slice(-10) // Берем последние 6 сообщений (5 от пользователя и 5 от AI)
+        .slice(-10) // Берем последние 10 сообщений (5 от пользователя и 5 от AI)
         .map(msg => ({
           role: msg.role === "assistant" ? "assistant" : "user",
           content: msg.text
@@ -167,6 +167,12 @@
             isTranslated:false
           }
         ]);
+
+        if (messagesContainer) {
+        setTimeout(() => {
+          messagesContainer.lastElementChild.scrollIntoView({ behavior: "smooth", block: "end" });
+        }, 100);
+      }
         return;
       }
 
@@ -220,9 +226,21 @@
             [$langs]: ruContent ? extractData(ruContent) : null,
             user: uContent ? extractData(uContent) : null,
         };
-    }
+      }
 
       dataAr =  splitText(data.res);
+
+      // Добавляем cor в список
+      if(dataAr[$llang]?.cor)
+        messages.update(msgs =>  
+        [...msgs, 
+          { id: crypto.randomUUID(), 
+            role: "user", 
+            text:'',
+            tr:dataAr[$langs]?.cor,
+            cor: dataAr[$llang]?.cor,
+            isTranslated:false}
+        ]);
     
       // Добавляем ответ AI в список
       messages.update(msgs =>  
@@ -231,14 +249,21 @@
           role: "assistant", 
           text: dataAr[$llang]?.msg, 
           tr: dataAr[$langs]?.msg , 
-          cor: dataAr[$llang]?.cor,
+          cor:'',
           isTranslated:false}
       ]);
 
+      
+
+      setTimeout(() => {
+        messagesContainer?.lastElementChild?.scrollIntoView({ behavior: "smooth", block: "end" });
+      }, 100);
+      
       // Обновляем время последнего сообщения
       lastMessageTime = Date.now();
       localStorage.setItem('lastMessageTime', lastMessageTime.toString()); // Сохраняем время
       // resetReminderTimer();
+
 
       async function removeEmojis(input: string ) {
         const regex = emojiRegex();
@@ -296,7 +321,13 @@
 
     message.isTranslated = !message.isTranslated;
     $messages = $messages; // Принудительное обновление  
+
+    
+    setTimeout(() => {
+      messagesContainer?.lastElementChild?.scrollIntoView({ behavior: "smooth", block: "end" });
+    }, 100);
   } 
+
 
   function toggleReply(messageId: string) {
     if (selectedReplyId === messageId) {
@@ -304,8 +335,9 @@
     } else {
       selectedReplyId = messageId; // Показать ответы для выбранного сообщения
     }
-
-    elInput.scrollIntoView({ behavior: "smooth", block: "end" });
+    setTimeout(() => {
+      messagesContainer?.lastElementChild?.scrollIntoView({ behavior: "smooth", block: "end" });
+    }, 100);
   }
 
   function startReminderTimer() {
@@ -514,7 +546,7 @@
   .chat-container {
     display: flex;
     position: absolute;
-    top: 0px;
+    top: 50px;
     width: 100%;
     flex-direction: column;
     /* height: 100vh; */
