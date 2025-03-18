@@ -79,7 +79,7 @@ export default async function generate_from_text_input(params: GenerateParams): 
       .replaceAll(/\${lang}/g, params.lang)
       .replaceAll(/\${level}/g, params.level)
       .replaceAll(/\${type}/g, params.type)
-      // .replace(/\${grammar}/g, params.grammar)
+      .replaceAll(/\${grammar}/g, params.grammar)
       .replaceAll(/\<context>([\s\S]*?)<\/context>/g, `<context>${res.context}</context>`)
       .replaceAll(/\${theme}/g, params.name || 'general conversation');
 
