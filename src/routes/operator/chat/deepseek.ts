@@ -90,7 +90,7 @@ export default async function generate_from_text_input(params: GenerateParams): 
 
     // UpdateUserLevel('<user><level>B1.1</level></user>',params.user_id)
 
-    return prompt.user;
+    //return prompt.user;
   }
 
   if (!params.level) {
