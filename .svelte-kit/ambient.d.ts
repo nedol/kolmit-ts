@@ -35,6 +35,8 @@ declare module '$env/static/private' {
 	export const VITE_TURN_USER: string;
 	export const VITE_TURN_CREDENTIAL: string;
 	export const DEEPSEEK_API_KEY: string;
+	export const SB_CON_STR: string;
+	export const SB_CON_PSW: string;
 	export const ALLUSERSPROFILE: string;
 	export const APPDATA: string;
 	export const ChocolateyInstall: string;
@@ -161,6 +163,8 @@ declare module '$env/dynamic/private' {
 		VITE_TURN_USER: string;
 		VITE_TURN_CREDENTIAL: string;
 		DEEPSEEK_API_KEY: string;
+		SB_CON_STR: string;
+		SB_CON_PSW: string;
 		ALLUSERSPROFILE: string;
 		APPDATA: string;
 		ChocolateyInstall: string;

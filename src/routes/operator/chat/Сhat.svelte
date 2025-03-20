@@ -121,7 +121,7 @@
 
     // Ограничиваем историю сообщений до 5 реплик с каждой стороны
     let conversationHistory = $messages
-      .slice(-10) // Берем последние 10 сообщений (5 от пользователя и 5 от AI)
+      .slice(-20) // Берем последние 10 сообщений (5 от пользователя и 5 от AI)
       .map(msg => ({
         role: msg.role === "assistant" ? "assistant" : "user",
         content: msg.text
