@@ -252,7 +252,7 @@ export async function GetGroup(par: {
   psw: string;
 }): Promise<{ group: any; oper: any }> {
   const group = await sql`
-    SELECT "group", abonent, role, operator, picture, lang, name
+    SELECT "group", abonent, role, operator, picture, lang, name, level
     FROM operators
     WHERE operators.abonent=${par.abonent} 
     AND operators.operator=${par.operator}
@@ -269,7 +269,7 @@ export async function GetGroup(par: {
     }
 
   const oper = await sql`
-    SELECT "group", abonent, role, operator, picture, lang, name
+    SELECT "group", abonent, role, operator, picture, lang, name, level
     FROM operators
     WHERE operators.abonent=${par.abonent} AND operator=${par.operator}
   `;

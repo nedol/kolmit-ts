@@ -107,6 +107,34 @@ export class SignalingChannel {
     }
   }
 
+  
+  SendPrompt(par) {
+
+    this.callback = cb;
+
+    this.status = par.status;
+
+    try {
+      if (this.socket && this.socket.readyState === WebSocket.OPEN) {
+        this.socket.send(JSON.stringify({ par }));
+      } else {
+        console.log('Соединение с WebSocket не установлено, добавление сообщения в очередь');
+        this.messageQueue.push(par);
+        if (!this.socket || this.socket.readyState >= WebSocket.CLOSING) {
+          this.initializeWebSocket();
+        }
+      }
+
+      if (par.status === 'close') {
+        this.closeConnection();
+      } else if (par.status === 'open' && !this.isOpen) {
+        this.initializeWebSocket();
+      }
+    } catch (error) {
+      console.error('Ошибка при отправке сообщения:', error);
+    }
+  }
+
   closeConnection() {
     this.isOpen = false;
     this.stopHeartbeat(); // Остановка пинга при закрытии соединения

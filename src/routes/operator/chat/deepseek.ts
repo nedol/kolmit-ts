@@ -5,6 +5,7 @@ import { GetQuizContext,GetPrompt,GetTodayTotalTokens,UpdateLastSession,UpdateUs
 // Load environment variables
 config();
 
+
 // Typing for TypeScript (assuming Prompt is defined in db.ts)
 interface Prompt {
   system: string;
@@ -93,9 +94,9 @@ export default async function generate_from_text_input(params: GenerateParams): 
     //return prompt.user;
   }
 
-  if (!params.level) {
-    throw new Error('Missing required property: level');
-  }
+  // if (!params.level) {
+  //   throw new Error('Missing required property: level');
+  // }
 
   try {
     let messages: Array<{ role: "user" | "assistant" | "system"; content: string }> = 
@@ -122,6 +123,7 @@ export default async function generate_from_text_input(params: GenerateParams): 
       return {"tokens_limit":"50000","total_tokens":total_tokens};
     }
 
+
     const completion = await openai.chat.completions.create({
       messages: messages,
       model: "deepseek-chat",
@@ -133,7 +135,7 @@ export default async function generate_from_text_input(params: GenerateParams): 
 
     // UpdateUserLevel(completion.choices[0].message.content,params.user_id)
 
-    return completion.choices[0].message.content;
+    return completion. choices[0].message.content;
 
   } catch (error) {
     console.error('Error generating response from DeepSeek API:', error);

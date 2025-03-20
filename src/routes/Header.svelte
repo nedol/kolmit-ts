@@ -47,7 +47,7 @@
   let abonent = '';
 
 
-  let lvl  = new URL(window.location.href).searchParams.get('lvl')||''
+  let lvl  = '';// = new URL(window.location.href).searchParams.get('lvl')||''
   if(!lvl)
     lvl =  getContext('lvl')||'';
 

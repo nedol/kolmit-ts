@@ -43,7 +43,7 @@
     localStorage.clear();
 
     setContext('group_data', data.group);
-    setContext('lvl', data.group[0].group);
+    setContext('lvl', data.lvl);
     setContext('operator', data.operator[0]);
     setContext('abonent', data.abonent);
 
