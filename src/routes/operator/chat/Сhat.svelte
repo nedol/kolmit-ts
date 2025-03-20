@@ -157,7 +157,7 @@
           // });
 
 
-            if(data.res.tokens_limit){
+            if(data.response.tokens_limit){
               const msg= await Translate("Вы достигли суточного лимита сообщений.",'ru',$langs,'chat')
               messages.update( msgs =>  
               [...msgs, 
@@ -231,7 +231,7 @@
               };
             }
 
-            dataAr =  splitText(data.res);
+            dataAr =  splitText(data.response);
 
             // Добавляем cor в список
             if(dataAr[$llang]?.cor)
