@@ -1036,6 +1036,7 @@ let keys: string[] = [];
   .container {
     /* display: flex; */
     top: 15px;
+    margin: 10px;
     margin-bottom: 15px;
     position: relative;
     justify-content: space-between;
@@ -1124,7 +1125,7 @@ let keys: string[] = [];
       font-size: 0.8em;
       flex-direction: column;
       align-items: center;
-      margin-top: 10px;
+      margin:10px;
       text-align: center;
       line-height: 1.2 !important;
   }
