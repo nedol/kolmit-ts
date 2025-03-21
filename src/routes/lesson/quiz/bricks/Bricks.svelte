@@ -12,6 +12,9 @@
   import Chat from '../../../operator/chat/Сhat.svelte'
   import Assistant from '../../../operator/chat/Assistant.svelte';
 
+  import pkg from 'lodash';
+  const { find } = pkg;
+
 
   import Stt from '../../../speech/stt/Stt.svelte';
   
@@ -667,6 +670,20 @@ let keys: string[] = [];
       article_name = arr[0].article;
       return; 
   }
+
+  const getCurrentArticle = ()=>{
+    
+    const arr=bricks_data.text;
+    if (curSentence < 0 || curSentence >= arr.length) return null;
+
+    let currentArticle = arr[curSentence].article;
+
+    const article = 
+    arr.filter(item => item.article === currentArticle)
+    .map(item => item.sentence); ;
+    return article;
+
+  }
   
   onDestroy(async()=>{
     $showBottomAppBar = true;
@@ -974,7 +991,7 @@ let keys: string[] = [];
   {/if}
 
   {#if isChat}
-    <Chat quiz={data}></Chat>
+    <Chat quiz={data} context={getCurrentArticle()}></Chat>
   {/if}
 
   <div style="height:100px"></div>

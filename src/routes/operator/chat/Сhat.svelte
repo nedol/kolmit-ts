@@ -18,7 +18,7 @@
       mdiSendOutline
   } from '@mdi/js';
 
-  export let quiz;
+  export let quiz, context:string[] = [];
 
   let stt: Stt | null = null; // Если `Stt` — это класс или компонент Svelte
 
@@ -136,6 +136,7 @@
         owner: operator.abonent,
         prompt: prompt_type,
         conversationHistory,
+        context: context,
         lang: $langs,
         llang: $llang,
         level: "B1.1",

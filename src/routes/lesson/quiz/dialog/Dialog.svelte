@@ -1239,7 +1239,7 @@
 
   
   {#if isChat}
-    <Chat quiz={data}></Chat>
+    <Chat quiz={data} context={JSON.stringify(dialog_data.content)}></Chat>
   {/if}
 
 
