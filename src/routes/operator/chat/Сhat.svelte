@@ -247,7 +247,7 @@
               ]);
         
             // Добавляем ответ AI в список
-            if(dataAr[$llang]?.msg)
+            if(dataAr[$llang]?.msg){
               messages.update(msgs =>  
               [...msgs, 
                 { id: crypto.randomUUID(), 
@@ -256,7 +256,11 @@
                   tr: dataAr[$langs]?.msg , 
                   cor:'',
                   isTranslated:false}
-              ]);      
+              ]);   
+            
+            }else{
+              throw new Error("Нет ответа.");
+            }
 
             setTimeout(() => {
               messagesContainer?.lastElementChild?.scrollIntoView({ behavior: "smooth", block: "end" });
@@ -270,7 +274,7 @@
 
             async function removeEmojis(input: string ) {
               const regex = emojiRegex();
-              return await input.replace(regex, '');
+              return input.replace(regex, '');
             }
 
             async function extractAIContent(input: string ) {

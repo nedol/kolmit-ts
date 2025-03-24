@@ -218,28 +218,7 @@ export async function POST({ request, url, fetch, cookies }) {
       }
 
       break;
-    case 'offer':
-      try {
-        SetParams(q);
-        BroadcastOperatorStatus(q, 'offer');
 
-        // const operators = await getOperators(q, 'offer');
-        // let resp = {
-        //   operators: operators,
-        // };
-
-      } catch (ex) {
-        console.log();
-      }
-
-      break;
-
-    case 'call':
-      HandleCall(q);
-
-      break;
-
-    case 'status':
       if (q.status === 'call') {
         if (q.type === 'operator') {
           const item = global.rtcPool[q.type][q.abonent][q.operator][q.uid];

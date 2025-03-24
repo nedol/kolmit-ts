@@ -201,7 +201,7 @@ let iframe;
         </Icon>
       </IconButton>
     </div>
-    <iframe bind:this={iframe} class="context" srcdoc={data.data} on:load={OnLoad}></iframe>
+    <iframe bind:this={iframe} class="context" srcdoc={data.html} on:load={OnLoad}></iframe>
   {/if}
 </div>
 
@@ -227,7 +227,7 @@ let iframe;
     width: 100vw;
     height: calc(100vh - 56px - 45px - 50px); 
     border:0;
-    /* overflow-y:auto; */
+    overflow-y:auto;
     background-color: aliceblue;
     scrollbar-width: none; /* Firefox */
     -ms-overflow-style: none; /* IE и Edge */

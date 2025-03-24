@@ -26,7 +26,7 @@
 
   let topAppBar;
 
-  let translate = false;
+  let isTranslate = false;
 
   let span_equal = true;
 
@@ -54,6 +54,8 @@
 
   let isEndSpeak = true;
 
+  let isTip = false;
+
   let similarity:any;
 
 // Функция для отслеживания сфокусированных элементов
@@ -79,7 +81,6 @@ interface Brick {
 
 let bricks_data: Brick;
 
-
 let isCollapsed = true;
 
 let curSentence = 0;
@@ -90,6 +91,12 @@ let cleanedSentences;
 let current_word = 0;
 let audio;
 let display_audio:string;
+
+let rate = 0;
+
+$: if(bricks_data?.text[curSentence].cnt && bricks_data?.text[curSentence].total){
+  rate = bricks_data.text[curSentence].cnt/bricks_data.text[curSentence].total*100
+}
 
 let keys: string[] = [];
 
@@ -122,6 +129,7 @@ let keys: string[] = [];
       mdiTranslateOff
   } from '@mdi/js';
 
+
   fetch(
     `./lesson?bricks=${data.name}&theme=${data.theme}&owner=${operator.abonent}&level=${data.level}`
   )
@@ -132,6 +140,12 @@ let keys: string[] = [];
       // Преобразуем HTML в текст и разбиваем на массив предложений
       // bricks_data.text = htmlToText(bricks_data.html).replaceAll('"','').split(/(?<=[.?!])\s+/);
       bricks_data.text = splitHtmlIntoSentencesWithInnerTags(data.data.data.replaceAll('"',''));//.replaceAll('"','').split(/(?<=[.?!])\s+/);
+
+      bricks_data.html = data.data.data;
+      
+      bricks_data.text[curSentence].cnt = 0;
+      
+      bricks_data.text[curSentence].total = 0;
 
       InitData();
 
@@ -150,8 +164,6 @@ let keys: string[] = [];
     if (!bricks_data?.text) return;
 
     try {
-
-
       // Собираем все предложения
       const sentences = bricks_data.text;
 
@@ -171,7 +183,7 @@ let keys: string[] = [];
       }
 
       // Текущее предложение
-      const sentence = bricks_data.text[curSentence];
+      const sentence = bricks_data.text[curSentence].sentence;
 
       article_name = sentence.article || '\u00a0\u00a0\u00a0\u00a0\u00a0'
 
@@ -194,8 +206,8 @@ let keys: string[] = [];
     }
   };
 
-  const formatWords = (sent_obj) =>
-    sent_obj.sentence
+  const formatWords = (sentence) =>
+    sentence
     .trim()
     .split(/[\s,:\.]+/)
     .filter(word => word)
@@ -288,36 +300,44 @@ let keys: string[] = [];
 
 
   // Обработчик клика на слово
-  const handleClick = (word:string) => {
-      // Присваиваем выбранное слово фокусируемому элементу
-      if(formattedSentence[focusedIndex].value.toLowerCase().replace(/<[^>]*>/g, '') === word.value.toLowerCase().replace(/<[^>]*>/g, '')){
+  const handleClick = (word:Word) => {
 
-          formattedSentence[focusedIndex].word =  word.value ;
-          formattedSentence[focusedIndex].class = "correct";
+    bricks_data.text[curSentence].total++;
+    // Присваиваем выбранное слово фокусируемому элементу
+    if(formattedSentence[focusedIndex].value.toLowerCase().replace(/<[^>]*>/g, '') === word.value.toLowerCase().replace(/<[^>]*>/g, '')){
 
-          // После того как слово присвоено, ищем следующий элемент для фокуса
-          if(formattedSentence.length-1 > focusedIndex){
-            focusedIndex = Math.min(focusedIndex + 1, formattedSentence.length - 1);
-          }
-
-          // Устанавливаем фокус на следующий элемент
-          requestAnimationFrame(() => {
-              const nextElement = document.querySelectorAll('.formatted-list span')[focusedIndex];
-              if (nextElement) {
-              nextElement.focus();
-              }
-          });
-
-           // Проверяем, все ли слова правильно заполнены
-          setTimeout(()=>{
-            checkCompletion();
-          },100) 
         
+        
+        bricks_data.text[curSentence].cnt +=  (isTip?0:isTranslate?1:2);    
 
-      }else{
-          formattedSentence[focusedIndex].word =  word.value ;
-          formattedSentence[focusedIndex].class = "incorrect";
-      }
+      
+        formattedSentence[focusedIndex].word =  word.value ;
+        formattedSentence[focusedIndex].class = "correct";
+
+        // После того как слово присвоено, ищем следующий элемент для фокуса
+        if(formattedSentence.length-1 > focusedIndex){
+          focusedIndex = Math.min(focusedIndex + 1, formattedSentence.length - 1);
+        }
+
+        // Устанавливаем фокус на следующий элемент
+        requestAnimationFrame(() => {
+            const nextElement = document.querySelectorAll('.formatted-list span')[focusedIndex];
+            if (nextElement) {
+            nextElement.focus();
+            }
+        });
+
+          // Проверяем, все ли слова правильно заполнены
+        setTimeout(()=>{
+          checkCompletion();
+        },100) 
+
+
+    }else{
+        formattedSentence[focusedIndex].word =  word.value ;
+        formattedSentence[focusedIndex].class = "incorrect";
+        // bricks_data.text[curSentence].cnt--
+    }
   };
 
       // Проверка завершения
@@ -333,7 +353,7 @@ let keys: string[] = [];
     if(nav==='prev'){
       --curSentence
     }else if(nav==='next'){
-      ++curSentence
+      ++curSentence;
     }
 
     current_word = 0;
@@ -341,10 +361,13 @@ let keys: string[] = [];
     stt_text = ''
     similarity = ''
 
-
     if(curSentence >= bricks_data.text.length){
       curSentence = 0;
     }
+
+    bricks_data.text[curSentence].cnt = 0;
+
+    bricks_data.text[curSentence].total = 0;
 
     sentence = bricks_data.text[curSentence].sentence;
     article_name = bricks_data.text[curSentence].article || '\u00a0\u00a0\u00a0\u00a0\u00a0'
@@ -369,7 +392,10 @@ let keys: string[] = [];
             value: word.trim()
           }));
 
-      // words =  Array.from(new Set(sentence.trim().split(/[\s,:\.]+/).filter(word => word !== "")))    
+      // words =  Array.from(new Set(sentence.trim().split(/[\s,:\.]+/).filter(word => word !== "")))   
+      
+      
+
 
       MakeBricks();
   }
@@ -452,11 +478,17 @@ let keys: string[] = [];
 
   const onToggleWord = ()=>{
 
+    focusedIndex = 0;
+
     const sent_obj = bricks_data.text[curSentence];
+
+    bricks_data.text[curSentence].cnt = 0;
 
     sentence = sent_obj.sentence.trim();
 
-      if(!span_equal){    
+      if(!span_equal){   
+        
+        // isTip=true;
 
         formattedSentence = sentence.split(/[\s:\.]+/)
           .filter(word => word) // Оставляем только существующие слова
@@ -510,7 +542,7 @@ let keys: string[] = [];
   }
 
   function ToggleTranslate(){
-    translate = !translate
+    isTranslate = !isTranslate
   }
 
   function onClickMicrophone() {
@@ -627,6 +659,7 @@ let keys: string[] = [];
 
       async function endLangSpeak(){
         await navSentence('next');
+
         PlayAutoContent();
       }
 
@@ -652,7 +685,9 @@ let keys: string[] = [];
       const arr=bricks_data.text;
       if (curSentence < 0 || curSentence >= arr.length) return null;
 
-      similarity = ''
+      similarity = '';
+
+      isTip = false;
       
       let currentArticle = arr[curSentence].article;
       
@@ -687,6 +722,26 @@ let keys: string[] = [];
   
   onDestroy(async()=>{
     $showBottomAppBar = true;
+
+    if(curSentence>=10){
+
+    const par = {
+      func: 'set_rate',
+      rate: rate
+    };
+
+    fetch('/operator', {
+      method: 'POST',
+      // mode: 'no-cors',
+      body: JSON.stringify({ par }),
+      headers: {
+        'Content-Type': 'application/json',
+        // Authorization: `Bearer ${token}`
+      }
+    });
+  }
+
+
   })
 </script>
 
@@ -799,7 +854,6 @@ let keys: string[] = [];
             <span class="mdc-typography--overline" style="position:relative;letter-spacing: -1.5px;"
               >{1+curSentence}
               <Badge
-
                 position="middle"
                 align="bottom-end - bottom-middle"
                 aria-label="unread count"
@@ -834,7 +888,7 @@ let keys: string[] = [];
           style="margin:10px 5px 10px 5px; scale:1.1; width:25px"
           on:click={ToggleTranslate}
         >
-        {#if translate}
+        {#if isTranslate}
           <path fill="grey" d={mdiTranslateOff}/>
         {:else}
           <path fill="white" d={mdiTranslate}/>
@@ -888,15 +942,17 @@ let keys: string[] = [];
 
   <span class='article' on:click={toNextArticle}>{article_name}</span>
   <div>
-    {#if translate}
+    {#if isTranslate}
     <div class="trans">
       <!-- Исходное предложение -->
-      <!-- <p>{bricks_data.translate[curSentence]}</p> -->
+      <!-- <p>{bricks_data.isTranslate[curSentence]}</p> -->
       {#await Translate(sentence.replace(/<[^>]*>/g, ''), $llang, $langs,data.name) then data}
         <p>{data}</p>
       {/await}
     </div>
+
     {/if}
+
     <div class="container">
       <!-- Предложение с замененными словами -->
       {#await Translate('Составить предложение', 'ru', $langs,data.name) then data}
@@ -905,6 +961,15 @@ let keys: string[] = [];
       <!-- {#await Translate('(используй подсказки слов в случае необходимости)', 'ru', $langs) then data_2}
       <div class="title title2">{data_2}:</div>
       {/await} -->
+
+      <div class="rate similarity" style="position:relative; float:right; bottom:20px">
+        <p>
+          <span class="mdc-typography--overline" 
+            >{rate.toFixed(0)}
+          </span>
+        </p>
+      </div>
+
     <div class="formatted-list">
       {#each formattedSentence as item, index}
         <span class={`${item.class} ${item.gr}`}
@@ -916,7 +981,7 @@ let keys: string[] = [];
         </span>
       {/each}
       {#if !isSTT || (isSTT && formattedSentence.some(item => item.class === "correct"))}
-        <div class="speaker-button" on:click={()=>{isEndSpeak=false; SpeakText()}}>
+        <div class="speaker-button" on:click={()=>{isEndSpeak=false;  isTip=true; SpeakText()}}>
           <IconButton>
             <Icon tag="svg" viewBox="0 0 24 24">
               <path fill="currentColor" d={mdiPlay} />
@@ -1015,7 +1080,7 @@ let keys: string[] = [];
     position: relative;
     top:0px; 
     height: 45px;
-  /* transform: scale(1.2) translate(-4%,0%);
+  /* transform: scale(1.2) isTranslate(-4%,0%);
   transform-origin: center ;  */
   }
 
@@ -1201,7 +1266,7 @@ let keys: string[] = [];
 
   .similarity  p {
     margin: 0;
-    font-size: 15px;
+    font-size: 12px;
     color: #333;
   }
   .similarity {
@@ -1223,7 +1288,7 @@ let keys: string[] = [];
 
   .similarity  span {
     font-weight: 700;
-    font-size: 15px;
+    font-size: 12px;
     color: #2ca838; /* цвет счетчика */
     text-align: center;
   }

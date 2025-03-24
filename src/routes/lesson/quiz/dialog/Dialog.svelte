@@ -223,7 +223,8 @@
         dialog_data = dlg_data.data.data;
         
         if (dlg_data.data.data) {
-          dialog_data.html = dlg_data.data.data; //splitHtmlContent(data.data.data);
+          dialog_data.html = dlg_data.data.brick; //splitHtmlContent(data.data.data);
+          console.log(dialog_data.html)
         }
         dialog_data.name = data.name;
         Dialog();
@@ -1262,6 +1263,12 @@
     top:0px;
   }
 
+  main{
+      overflow-y: auto;
+      height: calc(90vh - 56px);
+      margin: 0px 15px 0 15px;
+  }
+
 
   .repeat_alert {
     position: absolute;
@@ -1581,7 +1588,8 @@
     border-radius: 5px;
     margin: 0 auto;
     position: relative;
-    /* height: calc(100vh - 80px); */
+    height: calc(100vh - 80px);
+    /* height: -webkit-fill-available; */
     bottom:0;
     margin-left: 10px;
     margin-right: 10px;

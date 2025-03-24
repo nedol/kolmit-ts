@@ -1433,3 +1433,31 @@ export async function SaveSTT(operator, text='', lang='nl', original=null){
     }
   
 }
+
+export async function SetRate(par) {
+  console.log(par); // Debugging purposes
+
+  try {
+    const result = await sql`
+      INSERT INTO rate.bricks (name, words, errors, operator, tip)
+      VALUES (
+        ${par.quiz}, 
+        ${par.word.words}, 
+        ${par.word.errors}, 
+        ${par.operator},
+        ${Boolean(par.tip)}
+      )
+      ON CONFLICT (operator, name) 
+      DO UPDATE SET
+        words = EXCLUDED.words,
+        errors = EXCLUDED.errors,
+        tip = EXCLUDED.tip
+      RETURNING *; 
+    `;
+
+    return result; // Return the result of the query
+  } catch (ex) {
+    console.error('Error in SetRate:', ex); // More detailed error logging
+    throw ex; // Rethrow the error to handle it elsewhere
+  }
+}
