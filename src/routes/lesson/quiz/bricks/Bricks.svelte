@@ -95,7 +95,7 @@ let display_audio:string;
 let rate = 0;
 
 $: if(bricks_data?.text[curSentence].cnt && bricks_data?.text[curSentence].total){
-  rate = bricks_data.text[curSentence].cnt/bricks_data.text[curSentence].total*100
+  rate = (bricks_data?.text[curSentence].cnt/bricks_data?.text[curSentence].total)*100
 }
 
 let keys: string[] = [];
@@ -369,7 +369,10 @@ let keys: string[] = [];
 
     bricks_data.text[curSentence].total = 0;
 
+    rate = 0;
+
     sentence = bricks_data.text[curSentence].sentence;
+    
     article_name = bricks_data.text[curSentence].article || '\u00a0\u00a0\u00a0\u00a0\u00a0'
 
     // const resp = await tts.GetGoogleTTS($llang, sentence.replace(/<[^>]*>/g, ''),  data.name);
@@ -483,6 +486,10 @@ let keys: string[] = [];
     const sent_obj = bricks_data.text[curSentence];
 
     bricks_data.text[curSentence].cnt = 0;
+
+    bricks_data.text[curSentence].total = 0;
+
+    rate = 0;
 
     sentence = sent_obj.sentence.trim();
 
