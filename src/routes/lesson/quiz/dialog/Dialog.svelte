@@ -949,7 +949,7 @@
         <div>
           <Row style="height:64px;">
             <Section align="start">
-              {#if !share_mode && isSTT}
+              {#if isSTT}
               <div
                 class="margins"
                 style="text-align: center; display: flex; align-items: center; justify-content: space-between;">
@@ -967,6 +967,13 @@
                         <path fill="currentColor" d={mdiMicrophoneOutline} />
                       {/if}
                     </Icon>
+                    <Badge
+                      position="middle"
+                      align="bottom-end - bottom-middle"
+                      aria-label="unread count"
+                      style="position:absolute;top:2px;right:-1px;color:black;background-color:lightgrey;scale:.8;letter-spacing: 1.5px;">{$llang}
+                    </Badge>
+
                   </IconButton>
                   {#if isListening}
                     {#await Translate('говори', 'ru', $llang, dialog_data?.name) then data}
@@ -1085,11 +1092,11 @@
             <Row>
               <Section align="start">
 
-                {#if !share_mode && isSTT}
-                <div
-                  class="margins"
-                  style="text-align: center; display: flex; align-items: center; justify-content: space-between;"
-                >
+                {#if isSTT}
+                  <div
+                    class="margins"
+                    style="text-align: center; display: flex; align-items: center; justify-content: space-between;"
+                  >
                   <div>
                     <IconButton
                       class="material-icons"
@@ -1103,16 +1110,24 @@
                           <path fill="currentColor" d={mdiMicrophoneOutline} />
                         {/if}
                       </Icon>
-                    </IconButton>
+
+                      <Badge
+                        position="middle"
+                        align="bottom-end - bottom-middle"
+                        aria-label="unread count"
+                        style="position:absolute;top:2px;right:-1px;color:black;background-color:lightgrey;scale:.8;letter-spacing: 1.5px;">{$llang}
+                      </Badge>
+
+                      </IconButton>
+                    </div>
+                    <Stt
+                      bind:this={stt}
+                      {SttResult}
+                      {StopListening}
+                      bind:display_audio
+                    ></Stt>
                   </div>
-                  <Stt
-                    bind:this={stt}
-                    {SttResult}
-                    {StopListening}
-                    bind:display_audio
-                  ></Stt>
-                </div>
-              {/if}
+                {/if}
               </Section>
               <Section align="end">
                 <div class="speaker-button" on:click={speak(a[$llang])}>
@@ -1588,8 +1603,8 @@
     border-radius: 5px;
     margin: 0 auto;
     position: relative;
-    height: calc(100vh - 80px);
-    /* height: -webkit-fill-available; */
+    /* height: calc(100vh - 80px); */
+    height: -webkit-fill-available;
     bottom:0;
     margin-left: 10px;
     margin-right: 10px;

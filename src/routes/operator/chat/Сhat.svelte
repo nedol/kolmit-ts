@@ -5,7 +5,7 @@
   import { showBottomAppBar, langs, llang, signal} from '$lib/stores';
   import IconButton, { Icon } from '@smui/icon-button';
   import emojiRegex from 'emoji-regex';
-
+  import Badge from '@smui-extra/badge';
   import Tts from '../../speech/tts/Tts.svelte';
   import Stt from '../../speech/stt/Stt.svelte';
 
@@ -478,7 +478,7 @@
   </div>
 
   <div class="input-container">
-    <div>
+    <div style="margin-right:10px">
       <IconButton
         class="material-icons"
         aria-label="Back"
@@ -491,6 +491,13 @@
             <path fill="currentColor" d={mdiMicrophoneOutline} />
           {/if}
         </Icon>
+        
+        <Badge
+        position="middle"
+        align="bottom-end - bottom-middle"
+        aria-label="unread count"
+        style="position:absolute;top:2px;right:-1px;color:black;background-color:lightgrey;scale:.8;letter-spacing: 1.5px;">{$llang}</Badge>
+
       </IconButton>
     </div>
     {#if $loading}
@@ -566,6 +573,7 @@
   .input-container {
     display: flex;
     flex-shrink: 0; /* Фиксируем контейнер ввода внизу */
+    left:10px;
     bottom: 5px;
     padding: 10px;
     background: #fff;

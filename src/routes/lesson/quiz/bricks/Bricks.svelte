@@ -21,6 +21,8 @@
   
   let isListening = false;
 
+  let isProgress = true;
+
   let isSTT = false;
 
   let isChat = false;
@@ -93,7 +95,7 @@ let cleanedSentences;
 // let speechData = '';
 let current_word = 0;
 let audio;
-let display_audio:string;
+let display_audio:string = 'none';
 
 let rate = 0;
 
@@ -208,6 +210,7 @@ let keys: string[] = [];
       // Создаём кирпичики
       setTimeout(()=>{
         MakeBricks();
+        isProgress = false;
       },100);
 
 
@@ -1034,7 +1037,7 @@ let keys: string[] = [];
       style="text-align: center; display: flex; align-items: center; justify-content: space-between;">
       <div>
  
-          <IconButton   disabled={bricks_data.text[curSentence].cnt<=0}
+          <IconButton   disabled={bricks_data?.text[curSentence].cnt<=0}
             class="material-icons"
             aria-label="Back"
             on:click={onClickMicrophone}>
@@ -1045,6 +1048,13 @@ let keys: string[] = [];
                 <path fill="currentColor" d={mdiMicrophoneOutline} />
               {/if}
             </Icon>
+
+            <Badge
+              position="middle"
+              align="bottom-end - bottom-middle"
+              aria-label="unread count"
+              style="position:absolute;top:2px;right:-1px;color:black;background-color:lightgrey;scale:.8;letter-spacing: 1.5px;">{$llang}
+            </Badge>
           </IconButton>
 
       </div>
@@ -1073,6 +1083,23 @@ let keys: string[] = [];
       </div>
     {/if}
   </div>  
+{/if}
+
+<br />
+
+
+{#if isProgress}
+  <div style="text-align:center">
+    <span
+      class="material-symbols-outlined"
+      style="font-size: 20px; color: blue; scale:1.5;"
+    >
+      <CircularProgress
+        style="top: 200px;height: 50px; width: 50px;"
+        indeterminate
+      />
+    </span>
+  </div>
 {/if}
 
 {#if isChat}
