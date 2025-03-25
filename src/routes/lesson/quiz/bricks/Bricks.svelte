@@ -29,6 +29,8 @@
 
   let topAppBar;
 
+  let isCorrectSpanString = false;
+
   let isTranslate = false;
 
   let isColorised = false;
@@ -320,6 +322,8 @@ let keys: string[] = [];
     if(formattedSentence[focusedIndex].value.toLowerCase().replace(/<[^>]*>/g, '') === word.value.toLowerCase().replace(/<[^>]*>/g, '')){
               
         bricks_data.text[curSentence].cnt +=  (isTip?0:isTranslate?1:isColorised?1:2);
+
+        isCorrectSpanString = true;
       
         formattedSentence[focusedIndex].word =  word.value ;
         formattedSentence[focusedIndex].class = "correct";
@@ -368,7 +372,9 @@ let keys: string[] = [];
     current_word = 0;
     focusedIndex = 0;
     stt_text = ''
-    similarity = ''
+    similarity = '';
+    isCorrectSpanString = false;
+    isTip = false;
 
     if(curSentence >= bricks_data.text.length){
       curSentence = 0;
@@ -485,8 +491,6 @@ let keys: string[] = [];
 
     focusedIndex = 0;
 
-
-
     const sent_obj = bricks_data.text[curSentence];
 
     bricks_data.text[curSentence].cnt = 0;
@@ -567,7 +571,9 @@ let keys: string[] = [];
       return;
     }
 
-    stt_text = ''
+    stt_text = '';
+
+    similarity = '';
 
     stt.startAudioMonitoring($llang, $langs);
 
@@ -696,6 +702,8 @@ let keys: string[] = [];
 
   const toNextArticle = () => {
     const arr = bricks_data.text; // The array with the sentences.
+
+    isCorrectSpanString = false;
 
     // Check if curSentence is within the valid range.
     if (curSentence < 0 || curSentence >= arr.length) return null;
@@ -1037,7 +1045,7 @@ let keys: string[] = [];
       style="text-align: center; display: flex; align-items: center; justify-content: space-between;">
       <div>
  
-          <IconButton   disabled={bricks_data?.text[curSentence].cnt<=0}
+          <IconButton   disabled={!isCorrectSpanString}
             class="material-icons"
             aria-label="Back"
             on:click={onClickMicrophone}>
