@@ -6,7 +6,7 @@
   import Chat from '../../../operator/chat/Сhat.svelte'
   import Assistant from '../../../operator/chat/Assistant.svelte';
 
-  import { NumberString, numberToDutchString } from '../listen/Listen.numbers.js';
+  import { NumberString, numberToDutchString } from '$lib/tts/Listen.numbers.js';
 
   import TopAppBar, { Row, Title, Section } from '@smui/top-app-bar';
   import Button, { Label } from '@smui/button';

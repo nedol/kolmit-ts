@@ -3,6 +3,7 @@
   import { slide } from 'svelte/transition';
   import ConText from '../Context.svelte';
   import { Translate } from '../../../translate/Transloc';
+  import { NumberString, numberToDutchString } from '$lib/tts/Listen.numbers.js';
   import Tts from '../../../speech/tts/Tts.svelte';
   import emojiRegex from 'emoji-regex';
   import TopAppBar, { Row, Title, Section } from '@smui/top-app-bar';
@@ -314,8 +315,7 @@ let keys: string[] = [];
     bricks_data.text[curSentence].total++;
     // Присваиваем выбранное слово фокусируемому элементу
     if(formattedSentence[focusedIndex].value.toLowerCase().replace(/<[^>]*>/g, '') === word.value.toLowerCase().replace(/<[^>]*>/g, '')){
-        
-        
+              
         bricks_data.text[curSentence].cnt +=  (isTip?0:isTranslate?1:isColorised?1:2);
       
         formattedSentence[focusedIndex].word =  word.value ;
@@ -400,7 +400,9 @@ let keys: string[] = [];
     MakeBricks();
   }
 
-  function getCorrectSpanString(isCorrect){
+
+
+  function  getCorrectSpanString(isCorrect){
     const elements = document.querySelectorAll(isCorrect?".formatted-list > .correct":".formatted-list > span:not(.correct)");
     return Array.from(elements)
     .map(el => el.getAttribute('value')?.trim() || "")
@@ -581,13 +583,13 @@ let keys: string[] = [];
     const correct_str = getCorrectSpanString(true);
     sent_compare = correct_str;
 
-    const numbers = sent_compare.match(/\b\d+\b/g);
+    const numbers = sent_compare.match(/\d+/g);
     if (numbers)
-      sent_compare = sent_compare.replace(/\b\d+\b/g, numberToDutchString(numbers[0]));
+      sent_compare = sent_compare.replace(/\d+/g, numberToDutchString(numbers[0]));
 
-    const numbers2 = stt_text.match(/\b\d+\b/g);
+    const numbers2 = stt_text.match(/\d+/g);
     if(numbers2)
-      stt_text = stt_text.replace(/\b\d+\b/g, numberToDutchString(numbers2[0]));
+      stt_text = stt_text.replace(/\d+/g, numberToDutchString(numbers2[0]));
 
       if (stt_text) {
       similarity = compareStrings(
@@ -1022,22 +1024,20 @@ let keys: string[] = [];
   </div>
 </div>
 
-
-
-  {#if isSTT}
-    <div class="container">
-      {#await Translate('Check a pronanciation', 'en', $langs) then data}
-        <div class="title">{data}:</div>
-      {/await}
-          
-      <div class="margins"
-        style="text-align: center; display: flex; align-items: center; justify-content: space-between;">
-        <div>
-          <IconButton
+{#if isSTT}
+  <div class="container">
+    {#await Translate('Check a pronanciation', 'en', $langs) then data}
+      <div class="title">{data}:</div>
+    {/await}
+        
+    <div class="margins"
+      style="text-align: center; display: flex; align-items: center; justify-content: space-between;">
+      <div>
+ 
+          <IconButton   disabled={bricks_data.text[curSentence].cnt<=0}
             class="material-icons"
             aria-label="Back"
-            on:click={onClickMicrophone}
-          >
+            on:click={onClickMicrophone}>
             <Icon tag="svg" viewBox="0 0 24 24">
               {#if isListening}
                 <path fill="currentColor" d={mdiMicrophone} />
@@ -1046,44 +1046,44 @@ let keys: string[] = [];
               {/if}
             </Icon>
           </IconButton>
-        </div>
-        <Stt
-          bind:this={stt}
-          {SttResult}
-          {StopListening}
-          original={cleanedSentences[curSentence]}
-          bind:display_audio
-        ></Stt>
+
       </div>
+      <Stt
+        bind:this={stt}
+        {SttResult}
+        {StopListening}
+        original={cleanedSentences[curSentence]}
+        bind:display_audio
+      ></Stt>
+    </div>
 
-      <div style="text-align: center;  margin-top: 20px;">
-        <span style="color: darkgreen;">
-          {@html stt_text}
-        </span>
+    <div style="text-align: center;  margin-top: 30px;">
+      <span style="color: darkgreen;">
+        {@html stt_text}
+      </span>
+    </div>
+
+    {#if similarity}
+      <div class="similarity">
+        <p>
+          <span class="mdc-typography--overline" style="position:relative"
+            >{similarity}
+          </span>
+        </p>
       </div>
+    {/if}
+  </div>  
+{/if}
 
-      {#if similarity}
-        <div class="similarity">
-          <p>
-            <span class="mdc-typography--overline" style="position:relative"
-              >{similarity}
-            </span>
-          </p>
-        </div>
-      {/if}
-    </div>  
-  {/if}
+{#if isChat}
+  <Chat quiz={data} context={getCurrentArticle()}></Chat>
+{/if}
 
-  {#if isChat}
-    <Chat quiz={data} context={getCurrentArticle()}></Chat>
-  {/if}
-
-  <div style="height:100px"></div>
+<div style="height:100px"></div>
 
 <!-- </div> -->
 
 <style>
-
   :global(.mdc-top-app-bar__row){
       height:48px
   }
