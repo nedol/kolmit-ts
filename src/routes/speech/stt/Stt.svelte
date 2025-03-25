@@ -235,7 +235,7 @@
   });
 </script>
 
-<div class="audio_container"  style="display:{display_audio};    height: 25px;    margin: 0 auto;">
+<div class="audio_container"  style="display:{display_audio};height: 25px; margin: 0 auto;">
 <audio
   bind:this={audioPlayer}
   src={audioUrl}

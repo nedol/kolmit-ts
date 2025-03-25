@@ -28,6 +28,8 @@
 
   let isTranslate = false;
 
+  let isColorised = false;
+
   let span_equal = true;
 
   let stt_text = '';
@@ -94,9 +96,16 @@ let display_audio:string;
 
 let rate = 0;
 
-$: if(bricks_data?.text[curSentence].cnt && bricks_data?.text[curSentence].total){
-  rate = (bricks_data?.text[curSentence].cnt/bricks_data?.text[curSentence].total)*100
+$: {
+  if (bricks_data?.text[curSentence]?.cnt !== undefined && 
+    bricks_data?.text[curSentence]?.total !== undefined && 
+    bricks_data?.text[curSentence]?.total!==0 )  {
+      rate = (bricks_data.text[curSentence].cnt / bricks_data.text[curSentence].total) * 100;
+  } else {
+    rate = 0;  // Если cnt или total неопределены, устанавливаем rate в 0
+  }
 }
+
 
 let keys: string[] = [];
 
@@ -185,7 +194,7 @@ let keys: string[] = [];
       // Текущее предложение
       const sentence = bricks_data.text[curSentence].sentence;
 
-      article_name = sentence.article || '\u00a0\u00a0\u00a0\u00a0\u00a0'
+      article_name = bricks_data.text[curSentence].article || '\u00a0\u00a0\u00a0\u00a0\u00a0'
 
       // Получение озвучки через TTS
       // const { resp } = await tts.GetGoogleTTS($llang, sentence.replace(/<[^>]*>/g, ''), data?.name);
@@ -305,11 +314,9 @@ let keys: string[] = [];
     bricks_data.text[curSentence].total++;
     // Присваиваем выбранное слово фокусируемому элементу
     if(formattedSentence[focusedIndex].value.toLowerCase().replace(/<[^>]*>/g, '') === word.value.toLowerCase().replace(/<[^>]*>/g, '')){
-
         
         
-        bricks_data.text[curSentence].cnt +=  (isTip?0:isTranslate?1:2);    
-
+        bricks_data.text[curSentence].cnt +=  (isTip?0:isTranslate?1:isColorised?1:2);
       
         formattedSentence[focusedIndex].word =  word.value ;
         formattedSentence[focusedIndex].class = "correct";
@@ -331,7 +338,6 @@ let keys: string[] = [];
         setTimeout(()=>{
           checkCompletion();
         },100) 
-
 
     }else{
         formattedSentence[focusedIndex].word =  word.value ;
@@ -375,32 +381,23 @@ let keys: string[] = [];
     
     article_name = bricks_data.text[curSentence].article || '\u00a0\u00a0\u00a0\u00a0\u00a0'
 
-    // const resp = await tts.GetGoogleTTS($llang, sentence.replace(/<[^>]*>/g, ''),  data.name);
-    //   speechData = resp.resp;
-    //   console.log('speechData:',speechData)
-      // sentence = sentence;
-      words = sentence.trim().split(/[\s,:\.]+/)
+    words = sentence.trim().split(/[\s,:\.]+/)
+      .filter(word => word) // Оставляем только существующие слова
+      .map((word) => ({
+          gr: extractTagName(word),
+          placeholder: "\u00a0\u00a0\u00a0\u00a0\u00a0", 
+          value: word.trim()
+      })); 
+    // Создаём массив для предложения с placeholder'ами
+    formattedSentence = sentence.trim().split(/[\s,:\.]+/)
         .filter(word => word) // Оставляем только существующие слова
         .map((word) => ({
-            gr: extractTagName(word),
-            placeholder: "\u00a0\u00a0\u00a0\u00a0\u00a0", 
-            value: word.trim()
-        })); 
-      // Создаём массив для предложения с placeholder'ами
-      formattedSentence = sentence.trim().split(/[\s,:\.]+/)
-          .filter(word => word) // Оставляем только существующие слова
-          .map((word) => ({
-            gr: extractTagName(word),
-            placeholder: "\u00a0\u00a0\u00a0\u00a0\u00a0", 
-            value: word.trim()
-          }));
+          gr: extractTagName(word),
+          placeholder: "\u00a0\u00a0\u00a0\u00a0\u00a0", 
+          value: word.trim()
+        }));
 
-      // words =  Array.from(new Set(sentence.trim().split(/[\s,:\.]+/).filter(word => word !== "")))   
-      
-      
-
-
-      MakeBricks();
+    MakeBricks();
   }
 
   function getCorrectSpanString(isCorrect){
@@ -483,6 +480,8 @@ let keys: string[] = [];
 
     focusedIndex = 0;
 
+
+
     const sent_obj = bricks_data.text[curSentence];
 
     bricks_data.text[curSentence].cnt = 0;
@@ -495,7 +494,8 @@ let keys: string[] = [];
 
       if(!span_equal){   
         
-        // isTip=true;
+        // isTip=true;;
+        isColorised = true;
 
         formattedSentence = sentence.split(/[\s:\.]+/)
           .filter(word => word) // Оставляем только существующие слова
@@ -520,6 +520,8 @@ let keys: string[] = [];
         }));
 
       }else{
+
+        isColorised = false;
 
         formattedSentence = sentence.replace(/<[^>]*>/g, '').split(/[\s,:\.]+/)
           .filter(word => word) // Оставляем только существующие слова
@@ -687,31 +689,37 @@ let keys: string[] = [];
 
   }
 
-  const toNextArticle = ()=>{
+  const toNextArticle = () => {
+    const arr = bricks_data.text; // The array with the sentences.
 
-      const arr=bricks_data.text;
-      if (curSentence < 0 || curSentence >= arr.length) return null;
+    // Check if curSentence is within the valid range.
+    if (curSentence < 0 || curSentence >= arr.length) return null;
 
-      similarity = '';
+    let currentArticle = arr[curSentence].article; // Get the current article name.
+    let foundNextArticle = false; // Flag to track if we found the next article.
 
-      isTip = false;
-      
-      let currentArticle = arr[curSentence].article;
-      
-      for (let i = curSentence + 1; i < arr.length; i++) {
-          if (arr[i].article !== currentArticle) {
-            curSentence=i;
-            MakeBricks()
+    // Start from the next sentence to find the next article.
+    for (let i = curSentence + 1; i < arr.length; i++) {
+      console.log()
+        if (arr[i].article !== currentArticle) {
+            // Found the next article
+            MakeBricks();
             article_name = arr[i].article;
-            return;
-          }
-      }
-      // Если нет следующего объекта с другим article
-      curSentence = 0;
-      MakeBricks()
-      article_name = arr[0].article;
-      return; 
-  }
+            curSentence = i;
+            foundNextArticle = true;
+            break;
+        }
+    }
+
+    // If no next article is found, reset to the first sentence of the first article.
+    if (!foundNextArticle) {
+        curSentence = 0;
+        MakeBricks();
+        article_name = arr[0].article;
+    }
+}
+
+
 
   const getCurrentArticle = ()=>{
     
@@ -969,7 +977,7 @@ let keys: string[] = [];
       <div class="title title2">{data_2}:</div>
       {/await} -->
 
-      <div class="rate similarity" style="position:relative; float:right; bottom:20px">
+      <div class="rate">
         <p>
           <span class="mdc-typography--overline" 
             >{rate.toFixed(0)}
@@ -1014,52 +1022,56 @@ let keys: string[] = [];
   </div>
 </div>
 
+
+
   {#if isSTT}
-  {#await Translate('Check a pronanciation', 'en', $langs) then data}
-    <div class="title">{data}:</div>
-  {/await}
-      
-  <div class="margins"
-    style="text-align: center; display: flex; align-items: center; justify-content: space-between;">
-    <div>
-      <IconButton
-        class="material-icons"
-        aria-label="Back"
-        on:click={onClickMicrophone}
-      >
-        <Icon tag="svg" viewBox="0 0 24 24">
-          {#if isListening}
-            <path fill="currentColor" d={mdiMicrophone} />
-          {:else}
-            <path fill="currentColor" d={mdiMicrophoneOutline} />
-          {/if}
-        </Icon>
-      </IconButton>
-    </div>
-    <Stt
-      bind:this={stt}
-      {SttResult}
-      {StopListening}
-      original={cleanedSentences[curSentence]}
-      bind:display_audio
-    ></Stt>
-  </div>
-  <div style="text-align: center;  margin-top: 20px;">
-    <span style="color: darkgreen;">
-      {@html stt_text}
-    </span>
-  </div>
+    <div class="container">
+      {#await Translate('Check a pronanciation', 'en', $langs) then data}
+        <div class="title">{data}:</div>
+      {/await}
+          
+      <div class="margins"
+        style="text-align: center; display: flex; align-items: center; justify-content: space-between;">
+        <div>
+          <IconButton
+            class="material-icons"
+            aria-label="Back"
+            on:click={onClickMicrophone}
+          >
+            <Icon tag="svg" viewBox="0 0 24 24">
+              {#if isListening}
+                <path fill="currentColor" d={mdiMicrophone} />
+              {:else}
+                <path fill="currentColor" d={mdiMicrophoneOutline} />
+              {/if}
+            </Icon>
+          </IconButton>
+        </div>
+        <Stt
+          bind:this={stt}
+          {SttResult}
+          {StopListening}
+          original={cleanedSentences[curSentence]}
+          bind:display_audio
+        ></Stt>
+      </div>
 
-  {#if similarity}
-    <div class="similarity">
-      <p>
-        <span class="mdc-typography--overline" style="position:relative"
-          >{similarity}
+      <div style="text-align: center;  margin-top: 20px;">
+        <span style="color: darkgreen;">
+          {@html stt_text}
         </span>
-      </p>
-    </div>
-  {/if}
+      </div>
 
+      {#if similarity}
+        <div class="similarity">
+          <p>
+            <span class="mdc-typography--overline" style="position:relative"
+              >{similarity}
+            </span>
+          </p>
+        </div>
+      {/if}
+    </div>  
   {/if}
 
   {#if isChat}
@@ -1106,11 +1118,11 @@ let keys: string[] = [];
   }
 
   .container {
-    /* display: flex; */
+    position: relative;
     top: 15px;
     margin: 10px;
     margin-bottom: 15px;
-    position: relative;
+    padding: 10px;
     justify-content: space-between;
     align-items: center;
     border: 1px solid lightgrey;
@@ -1271,33 +1283,39 @@ let keys: string[] = [];
       'opsz' 24;
   }
 
-  .similarity  p {
+  .rate{
+    position:relative; 
+    float:right; 
+    right: -6px;
+    bottom:30px;
+  }
+
+  .similarity, .rate  p {
     margin: 0;
-    font-size: 12px;
+    font-size: 10px;
     color: #333;
   }
-  .similarity {
-    /* display: flex
-; */
-    /* justify-content: center; */
+  .similarity, .rate {
     position: relative;
     margin: 0 auto;
     background-color: #f0f0f0;
     padding: 0px;
     border-radius: 20px;
-    width: 50px;
+    width: 30px;
     height: 30px;
-    /* float: right; */
-    /* bottom: 10px; */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
     text-align: center;
   }
 
-  .similarity  span {
+  .similarity, .rate  span {
     font-weight: 700;
-    font-size: 12px;
+    font-size: 15px;
     color: #2ca838; /* цвет счетчика */
     text-align: center;
+  }
+
+  .rate span{   
+    font-size: 10px;
   }
 
 
