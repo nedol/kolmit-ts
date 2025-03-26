@@ -750,9 +750,12 @@ let keys: string[] = [];
 
     const validData = bricks_data.text.filter(sentence => sentence.cnt !== undefined && sentence.total > 0);
 
-    const avgRatio = validData.length 
-      ? validData.reduce((acc, sentence) => acc + (sentence.cnt / sentence.total), 0) / validData.length 
-      : 0;
+    // Сумма всех cnt и total
+    const sum = validData.reduce((acc, sentence) => {
+      acc.cntSum += sentence.cnt;
+      acc.totalSum += sentence.total;
+      return acc;
+    }, { cntSum: 0, totalSum: 0 });
 
     if(curSentence>=1){
 
@@ -761,7 +764,8 @@ let keys: string[] = [];
       operator:operator.operator,
       level:data.level,
       name:data.name,
-      rate:avgRatio.toFixed(2)*100,
+      rate:sum.cntSum,
+      total:sum.totalSum,
       type:'bricks'
     };
 

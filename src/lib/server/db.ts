@@ -1439,17 +1439,19 @@ export async function SetRate(par) {
 
   try {
     const result = await sql`
-      INSERT INTO rate (operator, name, level, rate, type)
+      INSERT INTO rate (operator, name, level, rate, type, total)
       VALUES (
         ${par.operator},
         ${par.name},
         ${par.level}, 
         ${par.rate},
-        ${par.type}
+        ${par.type},
+        ${par.total}
       )
       ON CONFLICT (operator, name, level, type) 
       DO UPDATE SET
-        rate = EXCLUDED.rate
+        rate = EXCLUDED.rate,
+        total = EXCLUDED.total
       RETURNING *; 
     `;
 
