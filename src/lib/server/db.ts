@@ -1436,23 +1436,19 @@ export async function SaveSTT(operator, text='', lang='nl', original=null){
 
 export async function SetRate(par) {
   console.log(par); // Debugging purposes
-return;
 
   try {
     const result = await sql`
-      INSERT INTO rate.bricks (name, words, errors, operator, tip)
+      INSERT INTO rate_bricks (operator, name, level, rate)
       VALUES (
-        ${par.quiz}, 
-        ${par.word.words}, 
-        ${par.word.errors}, 
         ${par.operator},
-        ${Boolean(par.tip)}
+        ${par.name},
+        ${par.level}, 
+        ${par.rate}
       )
-      ON CONFLICT (operator, name) 
+      ON CONFLICT (operator, name, level) 
       DO UPDATE SET
-        words = EXCLUDED.words,
-        errors = EXCLUDED.errors,
-        tip = EXCLUDED.tip
+        rate = EXCLUDED.rate
       RETURNING *; 
     `;
 

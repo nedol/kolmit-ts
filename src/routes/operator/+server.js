@@ -13,7 +13,7 @@ export async function POST(event) {
 	
 		case 'set_rate':
 	
-			SetRate(par.rate);
+			SetRate(par);
 		
 		break;
 	}

@@ -409,8 +409,6 @@ let keys: string[] = [];
     MakeBricks();
   }
 
-
-
   function  getCorrectSpanString(isCorrect){
     const elements = document.querySelectorAll(isCorrect?".formatted-list > .correct":".formatted-list > span:not(.correct)");
     return Array.from(elements)
@@ -697,7 +695,6 @@ let keys: string[] = [];
         });
         audio.play();
     }
-
   }
 
   const toNextArticle = () => {
@@ -751,11 +748,20 @@ let keys: string[] = [];
   onDestroy(async()=>{
     $showBottomAppBar = true;
 
+    const validData = bricks_data.text.filter(sentence => sentence.cnt !== undefined && sentence.total > 0);
+
+    const avgRatio = validData.length 
+      ? validData.reduce((acc, sentence) => acc + (sentence.cnt / sentence.total), 0) / validData.length 
+      : 0;
+
     if(curSentence>=1){
 
     const par = {
       func: 'set_rate',
-      rate: rate
+      operator:operator.operator,
+      level:data.level,
+      name:data.name,
+      rate:avgRatio.toFixed(2)*100
     };
 
     fetch('/operator', {
