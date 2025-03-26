@@ -751,7 +751,7 @@ let keys: string[] = [];
   onDestroy(async()=>{
     $showBottomAppBar = true;
 
-    if(curSentence>=10){
+    if(curSentence>=1){
 
     const par = {
       func: 'set_rate',
@@ -956,7 +956,7 @@ let keys: string[] = [];
         <rect x="17" y="18" width="4" height="3"></rect>
       </svg>
     </Icon>
-    <span class="bricks_name" on:click={() => (isCollapsed = !isCollapsed)}>
+    <span class="bricks_name" on:click={() => {isCollapsed = !isCollapsed; isTip=true}}>
       {bricks_data?.name}
     </span>
   </div>

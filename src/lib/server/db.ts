@@ -1436,6 +1436,7 @@ export async function SaveSTT(operator, text='', lang='nl', original=null){
 
 export async function SetRate(par) {
   console.log(par); // Debugging purposes
+return;
 
   try {
     const result = await sql`
