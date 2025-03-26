@@ -35,6 +35,8 @@
 
   let isColorised = false;
 
+  let isError = false;
+
   let span_equal = true;
 
   let stt_text = '';
@@ -99,17 +101,7 @@ let current_word = 0;
 let audio;
 let display_audio:string = 'none';
 
-let rate = 0;
-
-$: {
-  if (bricks_data?.text[curSentence]?.cnt !== undefined && 
-    bricks_data?.text[curSentence]?.total !== undefined && 
-    bricks_data?.text[curSentence]?.total!==0 )  {
-      rate = (bricks_data.text[curSentence].cnt / bricks_data.text[curSentence].total) * 100;
-  } else {
-    rate = 0;  // Если cnt или total неопределены, устанавливаем rate в 0
-  }
-}
+let rate = {cnt:0, total:0};
 
 
 let keys: string[] = [];
@@ -156,10 +148,6 @@ let keys: string[] = [];
       bricks_data.text = splitHtmlIntoSentencesWithInnerTags(data.data.data.replaceAll('"',''));//.replaceAll('"','').split(/(?<=[.?!])\s+/);
 
       bricks_data.html = data.data.data;
-      
-      bricks_data.text[curSentence].cnt = 0;
-      
-      bricks_data.text[curSentence].total = 0;
 
       InitData();
 
@@ -317,13 +305,15 @@ let keys: string[] = [];
   // Обработчик клика на слово
   const handleClick = (word:Word) => {
 
-    bricks_data.text[curSentence].total++;
+    rate.total++;
     // Присваиваем выбранное слово фокусируемому элементу
     if(formattedSentence[focusedIndex].value.toLowerCase().replace(/<[^>]*>/g, '') === word.value.toLowerCase().replace(/<[^>]*>/g, '')){
               
-        bricks_data.text[curSentence].cnt +=  (isTip?0:isTranslate?1:isColorised?1:2);
+        rate.cnt += isError ? 0 : (isTip ? 0 : (isTranslate ? 1 : 4)) + (isColorised ? 1 : 2);
 
         isCorrectSpanString = true;
+
+        isError = false;
       
         formattedSentence[focusedIndex].word =  word.value ;
         formattedSentence[focusedIndex].class = "correct";
@@ -349,7 +339,7 @@ let keys: string[] = [];
     }else{
         formattedSentence[focusedIndex].word =  word.value ;
         formattedSentence[focusedIndex].class = "incorrect";
-        // bricks_data.text[curSentence].cnt--
+        isError = true;
     }
   };
 
@@ -379,12 +369,6 @@ let keys: string[] = [];
     if(curSentence >= bricks_data.text.length){
       curSentence = 0;
     }
-
-    bricks_data.text[curSentence].cnt = 0;
-
-    bricks_data.text[curSentence].total = 0;
-
-    rate = 0;
 
     sentence = bricks_data.text[curSentence].sentence;
     
@@ -490,12 +474,6 @@ let keys: string[] = [];
     focusedIndex = 0;
 
     const sent_obj = bricks_data.text[curSentence];
-
-    bricks_data.text[curSentence].cnt = 0;
-
-    bricks_data.text[curSentence].total = 0;
-
-    rate = 0;
 
     sentence = sent_obj.sentence.trim();
 
@@ -764,8 +742,8 @@ let keys: string[] = [];
       operator:operator.operator,
       level:data.level,
       name:data.name,
-      rate:sum.cntSum,
-      total:sum.totalSum,
+      rate:rate.cnt,
+      total:rate.total,
       type:'bricks'
     };
 
@@ -1004,7 +982,7 @@ let keys: string[] = [];
       <div class="rate">
         <p>
           <span class="mdc-typography--overline" 
-            >{rate.toFixed(0)}
+            >{rate.cnt.toFixed(0)}
           </span>
         </p>
       </div>

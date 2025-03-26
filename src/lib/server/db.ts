@@ -1450,7 +1450,7 @@ export async function SetRate(par) {
       )
       ON CONFLICT (operator, name, level, type) 
       DO UPDATE SET
-        rate = EXCLUDED.rate,
+        rate = GREATEST(rate.rate, EXCLUDED.rate),
         total = EXCLUDED.total
       RETURNING *; 
     `;
