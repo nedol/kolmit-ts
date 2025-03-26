@@ -1439,14 +1439,15 @@ export async function SetRate(par) {
 
   try {
     const result = await sql`
-      INSERT INTO rate_bricks (operator, name, level, rate)
+      INSERT INTO rate (operator, name, level, rate, type)
       VALUES (
         ${par.operator},
         ${par.name},
         ${par.level}, 
-        ${par.rate}
+        ${par.rate},
+        ${par.type}
       )
-      ON CONFLICT (operator, name, level) 
+      ON CONFLICT (operator, name, level, type) 
       DO UPDATE SET
         rate = EXCLUDED.rate
       RETURNING *; 

@@ -761,7 +761,8 @@ let keys: string[] = [];
       operator:operator.operator,
       level:data.level,
       name:data.name,
-      rate:avgRatio.toFixed(2)*100
+      rate:avgRatio.toFixed(2)*100,
+      type:'bricks'
     };
 
     fetch('/operator', {
