@@ -27,64 +27,36 @@
   let to_lang = 'en';
 
   onMount(async () => {
-    // if (typeof window !== 'undefined') {
-    //   const module = await import('extendable-media-recorder');
-    //   MediaRecorder = module.default;
-      
-    // }
-
-    try {
-      mediaStream = await navigator.mediaDevices.getUserMedia({
-        audio: {
-          echoCancellation: true,
-          noiseSuppression: true,
-          autoGainControl: true,
-          channelCount: 1,
-          sampleRate: 48000,
-          sampleSize: 16
-        },
-        video: false, // Если видео не нужно
-      });
-
-
-      // Проверка mediaStream на наличие
-      if (mediaStream) {
-        const audioContext = new AudioContext();
-        audioAnalyser = audioContext.createAnalyser();
-        const source = audioContext.createMediaStreamSource(mediaStream);
-        source.connect(audioAnalyser);
-
-        const noiseSuppression = audioContext.createDynamicsCompressor();
-        noiseSuppression.threshold.value = -20;
-        source.connect(noiseSuppression);
-      } else {
-        console.error(
-          'Нет доступа к микрофону или пользователь отказался от доступа.'
-        );
+  try {
+    mediaStream = await navigator.mediaDevices.getUserMedia({
+      audio: {
+        echoCancellation: true,
+        noiseSuppression: true,
+        autoGainControl: true,
+        channelCount: 1,
+        sampleRate: 48000,
+        sampleSize: 16
       }
-    } catch (error) {
-      console.error('Ошибка доступа к микрофону:', error);
-    }
+    });
 
-    audioChunks = [];
-    audioUrl = '';
-    const options = {
-      bitsPerSecond: 44100,
-      // mimeType: 'audio/wav',
-      // audioBitsPerSecond: 128000 // Битрейт аудио (по желанию)
-    };
+    if (!mediaStream) throw new Error("Не удалось получить MediaStream");
 
-    mediaRecorder = new MediaRecorder(mediaStream, options);
+    mediaRecorder = new MediaRecorder(mediaStream, { bitsPerSecond: 44100 });
 
     mediaRecorder.ondataavailable = (e) => {
       audioChunks.push(e.data);
     };
 
-    mediaRecorder.onstop = (e) => {
+    mediaRecorder.onstop = () => {
       stopRecording();
       StopListening();
     };
-  });
+  } catch (error) {
+    console.error("Ошибка доступа к микрофону:", error);
+    alert("Пожалуйста, разрешите доступ к микрофону в настройках браузера.");
+  }
+});
+
 
   export async function startAudioMonitoring(from, to) {
     from_lang = from;
