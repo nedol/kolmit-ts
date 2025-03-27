@@ -43,7 +43,7 @@
 
   let messagesContainer: HTMLElement | null = null;
 
-  let isReply = true;
+  let isReply = false;
   let isShowReply = false;
 
   let dataAr:{}
@@ -68,6 +68,17 @@
     $showBottomAppBar = false;
     // Запускаем таймер для проверки неактивности
     startReminderTimer();
+
+    messages.update(msgs =>  
+      [...msgs, 
+        { id: crypto.randomUUID(), 
+          role: "system", 
+          text: context.join(" "),
+          tr:'',
+          cor: '',
+          isTranslated:false}
+      ]);
+
   });
 
   // Автопрокрутка вниз при обновлении сообщений
@@ -127,7 +138,6 @@
         content: msg.text
       }));
 
-
       const params = {
         func:"chat",
         user_id: operator.operator,
@@ -143,9 +153,7 @@
         stt:stt_text
       };
 
-
-      $signal.SendMessage(params,async (res) => {
-    
+      $signal.SendMessage(params,async (res) => {    
         handleData(res);
       });    
 
@@ -406,7 +414,7 @@
   <div class="messages" bind:this={messagesContainer}>
     
     {#each $messages as message, index (message.id)}
-    <div class="message {message.role} {message.role === 'user' && index === 0 ? 'first-message' : ''}"
+    <div class="message {message.role} {message.role === 'user'}"
       bind:this={lastMessage} >
       <!--strong>{message.role === 'user' ? 'Вы' : 'AI'}:</strong--> 
       {#if message.cor}
@@ -429,36 +437,38 @@
         {@html message.text}
       {/if}
   
-      {#if message.role !== 'user' }
-        {#if selectedReplyId === message.id}
-          <div class="reply_container">
-            {#each dataAr[$llang].replies as reply,i}
-              {#if message.isTranslated} 
-                <reply on:click={()=>{SetInput(dataAr[$llang]?.replies[i]) }}>{reply}</reply>
-              {:else}
-              {#if dataAr[$langs]?.replies[i]}
-                <reply on:click={()=>{SetInput(reply)}}>{dataAr[$langs].replies[i]}</reply>
-              {:else}
-                {#await Translate(reply,$llang, $langs,'chat') then data}
-                  <reply on:click={()=>{SetInput(reply)}}>{data}</reply>
-                {/await}
-                {/if} 
-              {/if}
-            {/each}
-          </div>
+      {#if message.role === 'assistant' }
+          {#if selectedReplyId === message.id}
+            <div class="reply_container">
+              {#each dataAr[$llang].replies as reply,i}
+                {#if message.isTranslated} 
+                  <reply on:click={()=>{SetInput(dataAr[$llang]?.replies[i]) }}>{reply}</reply>
+                {:else}
+                {#if dataAr[$langs]?.replies[i]}
+                  <reply on:click={()=>{SetInput(reply)}}>{dataAr[$langs].replies[i]}</reply>
+                {:else}
+                  {#await Translate(reply,$llang, $langs,'chat') then data}
+                    <reply on:click={()=>{SetInput(reply)}}>{data}</reply>
+                  {/await}
+                  {/if} 
+                {/if}
+              {/each}
+            </div>
+          {/if}
         {/if}
-        <div style="display:flex;justify-content: space-between;">
-          {#if isReply}
-              <div on:click={() => toggleReply(message.id)} >
-                <IconButton>
-                  <Icon tag="svg" viewBox="0 0 24 24" style="scale:1">
-                    <path fill="green" d={mdiMicrophoneMessage} />
-                  </Icon>
-                </IconButton>
-              </div>
-            {/if}
-            <div 
-              on:click={() => toggleTranslation(message)}>
+        <div style="display:flex;justify-content: space-between;">  
+          {#if isReply && message.role === 'assistant' }        
+            <div on:click={() => toggleReply(message.id)} >
+              <IconButton>
+                <Icon tag="svg" viewBox="0 0 24 24" style="scale:1">
+                  <path fill="green" d={mdiMicrophoneMessage} />
+                </Icon>
+              </IconButton>
+            </div>
+          {/if}
+          
+          {#if message.role === 'assistant'}        
+            <div on:click={() => toggleTranslation(message)}>
               <IconButton>
                 <Icon tag="svg" viewBox="0 0 24 24">
                   {#if message.isTranslated}
@@ -469,8 +479,19 @@
                 </Icon>
               </IconButton>
             </div>
+            {:else if message.role === 'user' && message.cor}
+              <div on:click={() => toggleTranslation(message)}>
+                <IconButton>
+                  <Icon tag="svg" viewBox="0 0 24 24">
+                      <path fill="currentColor" d={mdiTranslate} />
+                  </Icon>
+                </IconButton>
+              </div>
+          {/if}
         </div>
-      {/if}
+
+       
+     
     </div>
   {/each}
 
@@ -600,13 +621,25 @@
     word-wrap: break-word;
   }
 
+  .message.system {
+    position: relative;
+    max-width: 85%;
+    top:74vh;
+    align-self: flex-start;
+    text-align: center;
+    background: #c8cfd5;
+    color: #007bff;
+    font-size: medium;
+    font-weight: bold;
+  }
+
   .message.user {
     position: relative;
     max-width: 85%;
     top:74vh;
     align-self: flex-end;
     text-align: end;
-    background: #c8f7c5;
+    background: #ecf7c5;
   }
 
   .message.assistant {

@@ -27,6 +27,8 @@
 
   let isChat = false;
 
+  let responseTime = 15;
+
   let topAppBar;
 
   let isCorrectSpanString = false;
@@ -309,7 +311,18 @@ let keys: string[] = [];
     // Присваиваем выбранное слово фокусируемому элементу
     if(formattedSentence[focusedIndex].value.toLowerCase().replace(/<[^>]*>/g, '') === word.value.toLowerCase().replace(/<[^>]*>/g, '')){
               
-        rate.cnt += isError ? 0 : (isTip ? 0 : (isTranslate ? 1 : 4)) + (isColorised ? 1 : 2);
+      let timeBonus = 0;
+      if (responseTime <= 3) timeBonus = 10;
+      else if (responseTime <= 5) timeBonus = 8;
+      else if (responseTime <= 7) timeBonus = 6;
+      else if (responseTime <= 10) timeBonus = 4;
+      else if (responseTime <= 15) timeBonus = 2;
+
+      rate.cnt += (isError ? 0 : 
+        (isTip ? 0 : 
+          (isTranslate ? 1 : 3)))  // Перевод даёт меньше баллов
+        + (isColorised ? 1 : 2)   // Схема анализа даёт меньше баллов
+        + timeBonus;              // Баллы за скорость
 
         isCorrectSpanString = true;
 
@@ -688,7 +701,7 @@ let keys: string[] = [];
 
     // Start from the next sentence to find the next article.
     for (let i = curSentence + 1; i < arr.length; i++) {
-      console.log()
+
         if (arr[i].article !== currentArticle) {
             // Found the next article
             MakeBricks();

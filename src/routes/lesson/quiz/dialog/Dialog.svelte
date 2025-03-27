@@ -1373,7 +1373,7 @@
     position: relative;
     margin-left: auto;
     color: grey;
-    margin: 20px 5px auto 25px;
+    margin: 10px 5px auto 25px;
     font-size: x-small;
     z-index: 2;
     scale: .8;
