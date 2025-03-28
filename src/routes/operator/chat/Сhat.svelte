@@ -73,7 +73,7 @@
       [...msgs, 
         { id: crypto.randomUUID(), 
           role: "system", 
-          text: context.join(" "),
+          text: Array.isArray(context)?context.join(" "):'',
           tr:'',
           cor: '',
           isTranslated:false}
@@ -458,7 +458,7 @@
           {/if}
         {/if}
         <div style="display:flex;justify-content: space-between;">  
-          {#if isReply && message.role === 'assistant' }        
+          {#if isReply && message.role === 'assistant' && quiz.quiz!=='dialogs' }        
             <div on:click={() => toggleReply(message.id)} >
               <IconButton>
                 <Icon tag="svg" viewBox="0 0 24 24" style="scale:1">
