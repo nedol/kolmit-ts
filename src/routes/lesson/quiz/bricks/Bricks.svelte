@@ -324,6 +324,7 @@ let keys: string[] = [];
         + (isColorised ? 1 : 2)   // Схема анализа даёт меньше баллов
         + timeBonus;              // Баллы за скорость
 
+
         isCorrectSpanString = true;
 
         isError = false;
@@ -371,6 +372,9 @@ let keys: string[] = [];
     }else if(nav==='next'){
       ++curSentence;
     }
+
+          
+    saveRate();
 
     current_word = 0;
     focusedIndex = 0;
@@ -735,10 +739,8 @@ let keys: string[] = [];
     return article;
 
   }
-  
-  onDestroy(async()=>{
-    $showBottomAppBar = true;
 
+  function saveRate(){
     const validData = bricks_data.text.filter(sentence => sentence.cnt !== undefined && sentence.total > 0);
 
     // Сумма всех cnt и total
@@ -750,27 +752,30 @@ let keys: string[] = [];
 
     if(curSentence>=1){
 
-    const par = {
-      func: 'set_rate',
-      operator:operator.operator,
-      level:data.level,
-      name:data.name,
-      rate:rate.cnt,
-      total:rate.total,
-      type:'bricks'
-    };
+      const par = {
+        func: 'set_rate',
+        operator:operator.operator,
+        level:data.level,
+        name:data.name,
+        rate:rate.cnt,
+        total:rate.total,
+        type:'bricks'
+      };
 
-    fetch('/operator', {
-      method: 'POST',
-      // mode: 'no-cors',
-      body: JSON.stringify({ par }),
-      headers: {
-        'Content-Type': 'application/json',
-        // Authorization: `Bearer ${token}`
-      }
-    });
+      fetch('/operator', {
+        method: 'POST',
+        // mode: 'no-cors',
+        body: JSON.stringify({ par }),
+        headers: {
+          'Content-Type': 'application/json',
+          // Authorization: `Bearer ${token}`
+        }
+      });
+    }
   }
-
+  
+  onDestroy(async()=>{
+    $showBottomAppBar = true;
 
   })
 </script>
