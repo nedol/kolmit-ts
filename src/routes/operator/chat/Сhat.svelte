@@ -267,6 +267,7 @@
               ]);   
             
             }else{
+              loading.set(false);
               throw new Error("Нет ответа.");
             }
 
@@ -300,6 +301,7 @@
         } catch (error) {
           console.error("Произошла ошибка при обращении к серверу:", error);
           messages.update((msgs) => [...msgs, { id: crypto.randomUUID(), role: "assistant", text: "Ошибка при обработке запроса. Попробуйте снова.", tr:"", isTranslated:false }]);
+         
         } finally {
           loading.set(false);
         }      
@@ -445,12 +447,12 @@
       {#if message.role === 'assistant' }
           {#if selectedReplyId === message.id}
             <div class="reply_container">
-              {#each dataAr[$llang].replies as reply,i}
+              {#each dataAr[$llang]?.replies as reply,i}
                 {#if message.isTranslated} 
                   <reply on:click={()=>{SetInput(dataAr[$llang]?.replies[i]) }}>{reply}</reply>
                 {:else}
                 {#if dataAr[$langs]?.replies[i]}
-                  <reply on:click={()=>{SetInput(reply)}}>{dataAr[$langs].replies[i]}</reply>
+                  <reply on:click={()=>{SetInput(reply)}}>{dataAr[$langs]?.replies[i]}</reply>
                 {:else}
                   {#await Translate(reply,$llang, $langs,'chat') then data}
                     <reply on:click={()=>{SetInput(reply)}}>{data}</reply>
