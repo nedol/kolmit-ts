@@ -334,7 +334,8 @@
     if (!message.tr) 
       message.tr = await Translate(message.text, $llang, $langs, '');
 
-    translatedMessages.set(message.text, message.tr);
+    if(message.role!=='user')  
+      translatedMessages.set(message.text, message.tr);
 
     message.isTranslated = !message.isTranslated;
     $messages = $messages; // Принудительное обновление  
@@ -465,32 +466,23 @@
                 </Icon>
               </IconButton>
             </div>
-          {/if}
-          
-          {#if message.role === 'assistant'}        
-            <div on:click={() => toggleTranslation(message)}>
+          {/if}          
+    
+          {#if message.role === 'assistant' || (message.role === 'user' && message.cor)}
+            <div on:click={() => toggleTranslation(message )}>
               <IconButton>
                 <Icon tag="svg" viewBox="0 0 24 24">
                   {#if message.isTranslated}
-                    <path fill="currentColor" d={mdiTranslate} />
+                    <path fill={message.role === 'user'?'red':"currentColor"} d={mdiTranslate} />
                   {:else}
-                    <path fill="currentColor" d={mdiTranslateOff} />
+                    <path fill={message.role === 'user'?'red':"currentColor"} d={mdiTranslateOff} />
                   {/if}
                 </Icon>
               </IconButton>
             </div>
-            {:else if message.role === 'user' && message.cor}
-              <div on:click={() => toggleTranslation(message)}>
-                <IconButton>
-                  <Icon tag="svg" viewBox="0 0 24 24">
-                      <path fill="currentColor" d={mdiTranslate} />
-                  </Icon>
-                </IconButton>
-              </div>
           {/if}
-        </div>
-
-       
+      
+        </div>    
      
     </div>
   {/each}

@@ -101,7 +101,7 @@ let cleanedSentences;
 // let speechData = '';
 let current_word = 0;
 let audio;
-let display_audio:string = 'none';
+let display_audio:string = 'block';
 
 let rate = {cnt:0, total:0};
 

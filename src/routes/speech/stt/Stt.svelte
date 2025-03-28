@@ -51,11 +51,21 @@
       stopRecording();
       StopListening();
     };
+
+    // **Добавляем инициализацию audioAnalyser**
+    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    const mediaStreamSource = audioContext.createMediaStreamSource(mediaStream);
+    
+    audioAnalyser = audioContext.createAnalyser();
+    audioAnalyser.fftSize = 256;
+    mediaStreamSource.connect(audioAnalyser);
+    
   } catch (error) {
     console.error("Ошибка доступа к микрофону:", error);
     alert("Пожалуйста, разрешите доступ к микрофону в настройках браузера.");
   }
 });
+
 
 
   export async function startAudioMonitoring(from, to) {
@@ -207,7 +217,7 @@
   });
 </script>
 
-<div class="audio_container"  style="display:{display_audio};height: 25px; margin: 0 auto;">
+<div class="audio_container"  style="display:{display_audio}">
 <audio
   bind:this={audioPlayer}
   src={audioUrl}
@@ -219,4 +229,12 @@
 <!-- <button on:click={playAudio}>Воспроизвести</button> -->
 
 <style>
+  .audio_container{
+    position: relative;
+    height: 50px; 
+    margin: 0 auto;
+  }
+  audio{
+    height:inherit
+  }
 </style>
