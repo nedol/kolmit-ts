@@ -30,16 +30,16 @@ export class SignalingChannel {
   }
 
   initializeWebSocket(reconnectAttempt = 1) {
-    // return;
+    if (this.isOpen) return; // Если уже открыто, не создаем новое соединение
 
+    console.log('Инициализация WebSocket...');
     this.socket = new WebSocket(this.socketUrl);
-    this.status = "inactive";
+    this.isOpen = false;
 
     this.socket.onopen = () => {
       console.log('WebSocket соединение установлено');
       this.isOpen = true;
-      reconnectAttempt = 1; // Сбросить попытки переподключения
-      // this.startHeartbeat(); // Запуск пинга
+      reconnectAttempt = 1; 
       this.processQueue();
     };
 
@@ -53,8 +53,7 @@ export class SignalingChannel {
     this.socket.onclose = () => {
       console.log('WebSocket соединение закрыто');
       this.isOpen = false;
-      this.stopHeartbeat(); // Остановка пинга
-      const delay = Math.min(1000 * reconnectAttempt, 30000); // Увеличивать задержку до 30 секунд
+      const delay = Math.min(1000 * reconnectAttempt, 30000);
       setTimeout(() => this.initializeWebSocket(reconnectAttempt + 1), delay);
     };
 
@@ -62,7 +61,6 @@ export class SignalingChannel {
       console.error('WebSocket ошибка:', error);
     };
   }
-
   startHeartbeat() {
     // return;
     this.stopHeartbeat(); // Убедитесь, что старый таймер остановлен

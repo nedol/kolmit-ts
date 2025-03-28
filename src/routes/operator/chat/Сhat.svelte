@@ -423,9 +423,13 @@
           {#if translatedMessages.has(message.cor)}
             <cor> {@html translatedMessages.get(message.cor)}</cor>
             {:else}
-            {#await Translate(message.cor, $llang, $langs, 'chat') then data}
-              <cor> {@html data}</cor>
-            {/await}
+            {#if dataAr[$langs].cor}
+              <cor>{@html dataAr[$langs].cor}</cor>
+            {:else}
+              {#await Translate(message.cor, $llang, $langs, 'chat') then data}
+                <cor> {@html data}</cor>
+              {/await}
+            {/if}
           {/if}
         {:else}
           <cor> {@html message.cor}</cor>
@@ -458,7 +462,7 @@
           {/if}
         {/if}
         <div style="display:flex;justify-content: space-between;">  
-          {#if isReply && message.role === 'assistant' && quiz.quiz!=='dialogs' }        
+          {#if isReply && message.role === 'assistant' && quiz.quiz!=='dialog' }        
             <div on:click={() => toggleReply(message.id)} >
               <IconButton>
                 <Icon tag="svg" viewBox="0 0 24 24" style="scale:1">
