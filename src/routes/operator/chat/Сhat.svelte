@@ -18,7 +18,7 @@
       mdiSendOutline
   } from '@mdi/js';
 
-  export let quiz, context:string[] = [];
+  export let quiz = {quiz:''}, context:string[] = [];
 
   let stt: Stt | null = null; // Если `Stt` — это класс или компонент Svelte
 
