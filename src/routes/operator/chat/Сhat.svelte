@@ -29,10 +29,13 @@
   let stt_text = '';
   let isSTT = false;
 
+  let words = 'undefined'
+
   type Message = { role: 'user' | 'assistant' | 'system'; text: string; tr: string; cor:string | ''; id: string; isTranslated: boolean; };
   type Messages = Message[];
 
   let userInput = '';
+  
   let elInput:HTMLInputElement ;
   let messages = writable<Messages>([]);
   let loading = writable(false);
@@ -147,6 +150,7 @@
         prompt: prompt_type,
         conversationHistory,
         context: context,
+        words:words,
         lang: $langs,
         llang: $llang,
         level: "B1.1",
@@ -159,14 +163,8 @@
 
       async function handleData(data){
         try{
-          // const response = await fetch(`./operator/chat`, {
-          //   method: "POST",
-          //   body: JSON.stringify({ params }),
-          //   headers: { "Content-Type": "application/json" },
-          // });
 
-
-            if(data.response.tokens_limit){
+          if(data.response.tokens_limit){
               const msg= await Translate("Вы достигли суточного лимита сообщений.",'ru',$langs,'chat')
               messages.update( msgs =>  
               [...msgs, 
@@ -214,10 +212,12 @@
                   const msgRegex = /<msg>([\s\S]*?)<\/msg>/g;
                   const replyRegex = /<reply>([\s\S]*?)<\/reply>/g;
                   const levelRegex = /<level>([\s\S]*?)<\/level>/g;
+                  const wordsRegex = /<words>([\s\S]*?)<\/words>/g;
 
                   const corMatch = corRegex.exec(content);
                   const msgMatch = msgRegex.exec(content);
                   const levelMatch = levelRegex.exec(content);
+                  const wordsMatch = wordsRegex.exec(content);
 
                   const replies = [];
                   let replyMatch;
@@ -230,6 +230,7 @@
                       cor: corMatch ? corMatch[1].trim() : null,
                       msg: msgMatch ? msgMatch[1].trim() : null,
                       replies: replies,
+                      words: wordsMatch?wordsMatch[1].trim() : null
                   };
               };
 
@@ -264,7 +265,10 @@
                   tr: dataAr[$langs]?.msg , 
                   cor:'',
                   isTranslated:false}
-              ]);   
+              ]);  
+              
+              if(dataAr[$llang]?.words)
+                  words = dataAr[$llang]?.words
             
             }else{
               loading.set(false);
