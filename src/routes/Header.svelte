@@ -46,10 +46,11 @@
   let topAppBar;
   let abonent = '';
 
+  const operator = getContext('operator')
 
   let lvl  = '';// = new URL(window.location.href).searchParams.get('lvl')||''
   if(!lvl)
-    lvl =  getContext('operator').level||'';
+    lvl =  operator?.level||'';
 
 
 

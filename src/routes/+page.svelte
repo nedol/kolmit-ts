@@ -4,7 +4,7 @@
   import Operator from './operator/Operator.svelte';
   import Login from './site/Login.svelte';
   import { SignalingChannel } from './signalingChannel.ts';
-  import { signal, langs, llang, ice_conf, view } from '$lib/stores.ts';
+  import { signal, langs, ice_conf, dicts, view } from '$lib/stores.ts';
 
   // Define types for the data structure
   interface OperatorData {
@@ -36,11 +36,14 @@
   let name: string | undefined;
   let user_pic: string | undefined;
 
+  $dicts = data.dict[0];
+
   // Initialize necessary values and set context
   function Init() {
     localStorage.clear();
 
     setContext('group_data', data.group);
+    setContext('lvl', data.lvl);
     setContext('operator', data.operator[0]);
     setContext('abonent', data.abonent);
 
