@@ -12,12 +12,6 @@
   export let data;
 
 
-
-  $: if (data.dict[0]){
-     $dicts = (data.dict[0]);
-    //  setContext('dict', new Dict(data.dict[0]))
-  }
-
   let operator = data.operator,
     abonent = data.abonent,
     name = data.name;

@@ -18,7 +18,7 @@
       mdiSendOutline
   } from '@mdi/js';
 
-  export let quiz = {quiz:''}, context:string[] = [];
+  export let prompt_type="basic", quiz = {quiz:''}, context:string[] = [];
 
   let stt: Stt | null = null; // Если `Stt` — это класс или компонент Svelte
 
@@ -67,7 +67,7 @@
 
   onMount(async() => {
     // Отправляем reminder при входе в компонент
-    sendMessage(`Begin een gesprek in het Nederlands.`,'greeting');
+    sendMessage(`Begin een gesprek in het Nederlands.`,prompt_type);
     $showBottomAppBar = false;
     // Запускаем таймер для проверки неактивности
     startReminderTimer();
@@ -151,9 +151,10 @@
         conversationHistory,
         context: context,
         words:words,
-        lang: $langs,
-        llang: $llang,
+        langs: $langs,
+        llang: $llang || 'nl',
         level: "B1.1",
+        ulvl:operator.level,
         stt:stt_text
       };
 

@@ -27,8 +27,6 @@
 
   const operator = getContext('operator');
 
-  let dict = $dicts;
-
   let share_mode = false;
   let share_button = false;
 

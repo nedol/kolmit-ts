@@ -63,120 +63,119 @@ function restoreQuotedText(modifiedString, quotedTexts) {
 
 
 // Translation function
-export async function Translate(text: string, from: string, to: string, quiz: string): Promise<string> {
-  if (!text) return '';
+// Translation function with optimizations
+export async function Translate(
+  text: string,
+  from: string,
+  to: string,
+  quiz: string
+): Promise<string> {
+  if (!text?.trim()) return '';
 
-  // Clean the input text
-  text = text.replace(/\r\n/g, ' ');
+  // Pre-process text once
+  const processedText = text.replace(/\r\n/g, ' ');
+  const sentences = processedText.split(/(?<=[.!?])\s+/).filter(s => s.trim() && s !== '"');
+  const translatedChunks: string[] = [];
 
-  // Split the text into sentences
-  const sentences = text.split(/(?<=[.!?])\s+/);
-  let translatedText = '';
+  // Process sentences in parallel batches
+  const batchSize = 5;
+  const batchCount = Math.ceil(sentences.length / batchSize);
 
-  // Process sentences in chunks of 5
-  for (let i = 0; i < sentences.length; i += 5) {
-    let chunk = sentences.slice(i, i + 5).join(' ').trim();
-    if (!chunk || chunk === '"') continue;
+  for (let batchIndex = 0; batchIndex < batchCount; batchIndex++) {
+    const start = batchIndex * batchSize;
+    const end = start + batchSize;
+    const chunk = sentences.slice(start, end).join(' ').trim();
 
-   
-    // Handle special characters like <<
-    const hasQuotes = chunk.includes('<<');
-    if (hasQuotes) {
-      chunk = chunk.replace(/<</g, ' ').replace(/>>/g, ' ');
-    }
+    if (!chunk) continue;
 
-    const cacheKey = md5(chunk);
+    // Handle special quotes more efficiently
+    const normalizedChunk = chunk.replace(/<</g, ' ').replace(/>>/g, ' ');
+    const cacheKey = md5(normalizedChunk);
 
-    // Wait for existing translation if one is in progress
+    // Check for pending translations first
     if (pendingTranslations.has(cacheKey)) {
-      console.log(`Ожидание перевода: ${chunk}`);
-      translatedText += await pendingTranslations.get(cacheKey);
+      console.log(`Waiting for existing translation: ${chunk.substring(0, 30)}...`);
+      translatedChunks.push(await pendingTranslations.get(cacheKey));
       continue;
     }
 
-    // Check if the translation is already cached in the database
-    const resp = await ReadSpeech({ lang: to, key: cacheKey });
-    if (resp?.translate) {
-      // console.log(`Файл уже существует`);
-      translatedText += `${resp.translate} `;
+    // Check cache
+    const cached = await ReadSpeech({ lang: to, key: cacheKey });
+    if (cached?.translate) {
+      translatedChunks.push(cached.translate);
       continue;
     }
 
-    console.log(`Файл НЕ существует`);
-    let pqt;
-    let provider=''
-    
-    let translationPromise = (async () => {
-      let res = '';
-      
-      try {
-        pqt = preserveQuotedText(chunk);
-
-        if (langs.includes(to)) {
-          // Use DeepL for supported languages
-          res = await translate(pqt.modifiedString, to.toUpperCase(), from.toUpperCase(),undefined, undefined, false);
-          provider = 'deepl'
-          res = restoreQuotedText(res,pqt.quotedTexts);
-          // res = deeplx_query(chunk, to, from)
-        } else {
-          // Use Google Translate API for unsupported languages
-          const en = await translate(chunk, "EN");
-          res = await translatex(en, {
-            from: "en",
-            to: to,
-            forceBatch: true,
-            requestOptions: {
-              agent: new HttpsProxyAgent('https://164.132.175.159:3128'),
-            },
-          });
-          provider = 'deepl'
-          res = res.text;
-        }
-      } catch (error) {
-        console.error('Ошибка перевода с DeepL, используем fallback на translatex:', error);
-        
-        // If an exception occurs with translate(), fall back to translatex()
-        try {          
-
-          res = await translatex(chunk, {
-            from: from,
-            to: to,
-            forceBatch: true,
-            requestOptions: {
-              agent: new HttpsProxyAgent('https://164.132.175.159:3128'),
-            },
-          });
-          provider = 'google'
-          res = res.text;
-        } catch (fallbackError) {
-          console.error('Ошибка перевода с fallback (translatex):', fallbackError);
-          res = chunk; // Return the original text if both translation services fail
-        }
-
-        res = restoreQuotedText(res,pqt.quotedTexts);
-      }
-
-      // Cache the translation in the database
-      if(quiz || resp?.quiz )
-        await WriteTranslate({ 
-          lang: to, 
-          key: cacheKey, 
-          text: chunk, 
-          translate: res,
-          provider: provider,
-          quiz: quiz || resp?.quiz  // Берём новый quiz или оставляем старый 
-        });
-
-      // Remove the item from the queue after translation
-      pendingTranslations.delete(cacheKey);
-
-      return res;
-    })();
-
-    // Add the translation task to the queue
+    // Create and store translation promise
+    const translationPromise = translateChunk(normalizedChunk, from, to, cacheKey, quiz || cached?.quiz);
     pendingTranslations.set(cacheKey, translationPromise);
-    translatedText += await translationPromise;
+    translatedChunks.push(await translationPromise);
   }
 
-  return translatedText.trim();
+  return translatedChunks.join(' ').trim();
+}
+
+// Extracted chunk translation logic
+async function translateChunk(
+  chunk: string,
+  from: string,
+  to: string,
+  cacheKey: string,
+  quiz: string
+): Promise<string> {
+  let provider = '';
+  let result = chunk;
+  const { modifiedString, quotedTexts } = preserveQuotedText(chunk);
+
+  try {
+    if (langs.includes(to)) {
+      // Try DeepL first for supported languages
+      result = await translate(modifiedString, to.toUpperCase(), from.toUpperCase());
+      provider = 'deepl';
+    } else {
+      // Fallback to Google Translate via English pivot
+      const enText = await translate(modifiedString, "EN");
+      const translated = await translatex(enText, {
+        from: "en",
+        to,
+        forceBatch: true,
+        requestOptions: { agent: new HttpsProxyAgent('https://164.132.175.159:3128') },
+      });
+      result = translated.text;
+      provider = 'google';
+    }
+  } catch (primaryError) {
+    console.error('Primary translation failed, using fallback:', primaryError);
+    try {
+      const fallbackResult = await translatex(modifiedString, {
+        from,
+        to,
+        forceBatch: true,
+        requestOptions: { agent: new HttpsProxyAgent('https://164.132.175.159:3128') },
+      });
+      result = fallbackResult.text;
+      provider = 'google-fallback';
+    } catch (fallbackError) {
+      console.error('Fallback translation failed:', fallbackError);
+    }
+  }
+
+  // Restore quoted text if we modified it
+  result = restoreQuotedText(result, quotedTexts);
+
+  // Cache the result if needed
+  if (quiz) {
+    await WriteTranslate({
+      lang: to,
+      key: cacheKey,
+      text: chunk,
+      translate: result,
+      provider,
+      quiz
+    });
+  }
+
+  // Clean up
+  pendingTranslations.delete(cacheKey);
+  return result;
 }

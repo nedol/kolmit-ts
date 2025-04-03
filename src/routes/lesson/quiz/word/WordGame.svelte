@@ -38,7 +38,6 @@
     lesson,
     llang,
     view,
-    dicts,
     dc,
     dc_state,
     msg,
@@ -47,7 +46,6 @@
     OnCheckQU,
   } from '$lib/stores.ts';
 
-  let dict = $dicts;
 
   export let data;
 

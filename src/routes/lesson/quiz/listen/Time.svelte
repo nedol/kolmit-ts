@@ -21,9 +21,8 @@
   import TTS from '../../../speech/tts/Tts.svelte';
   let tts;
 
-  import { lesson , dc, dc_state ,langs, llang , dicts } from '$lib/stores.ts';
+  import { lesson , dc, dc_state ,langs, llang } from '$lib/stores.ts';
 
-  let dict = $dicts;
 
   let share_mode = false;
   let share_button = false;

@@ -41,7 +41,7 @@
 	  if (file) {
 		loadImage(file, (img) => {
 		  if (img.type === 'error') {
-			console.error($dicts['Ошибка загрузки изображения'][lang]);
+			console.error('Ошибка загрузки изображения');
 			alert('Error loading image');
 		  } else {
 			formData.picture = img.toDataURL();
@@ -79,7 +79,7 @@
 	  <Textfield
 		name="email"
 		bind:value={formData.email}
-		label="{$dicts['Email'][lang]}:"
+		label="Email"
 		required
 	  />
 	  <Textfield

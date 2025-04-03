@@ -98,7 +98,6 @@ export async function load({ fetch, cookies, route, url }) {
 		check: true,
 		host: host,
 		// url: decodeURIComponent(url.toString()),
-		lvl: oper[0].level||lvl,
 		cookies:res,
 		operator: oper,
 		abonent: abonent,

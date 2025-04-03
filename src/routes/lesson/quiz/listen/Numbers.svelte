@@ -24,7 +24,6 @@
 
   import { dicts, lesson, dc_state, dc, langs, llang } from '$lib/stores.ts';
 
-  let dict = $dicts;
 
   let share_mode = false;
   let share_button = false;

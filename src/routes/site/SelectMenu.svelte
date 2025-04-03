@@ -5,7 +5,7 @@
 	import IconButton from '@smui/button';
 
 	let options;
-	export let lang = 'en';
+	export let lang = 'nl';
 
 	let isListOpen = false; // Добавляем переменную для отслеживания состояния списка
 

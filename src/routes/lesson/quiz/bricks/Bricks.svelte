@@ -372,7 +372,6 @@ let keys: string[] = [];
     }else if(nav==='next'){
       ++curSentence;
     }
-
           
     saveRate();
 
@@ -776,6 +775,12 @@ let keys: string[] = [];
   
   onDestroy(async()=>{
     $showBottomAppBar = true;
+    bricks_data = null;
+    if (audio) {
+      audio.pause();
+      audio = null;
+    }
+    if (stt) stt = null;
 
   })
 </script>
@@ -1118,7 +1123,7 @@ let keys: string[] = [];
 {/if}
 
 {#if isChat}
-  <Chat quiz={data} context={getCurrentArticle()}></Chat>
+  <Chat quiz={data} context={getCurrentArticle()} prompt_type='greeting'></Chat>
 {/if}
 
 <div style="height:100px"></div>

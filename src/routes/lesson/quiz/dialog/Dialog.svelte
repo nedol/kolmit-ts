@@ -26,18 +26,14 @@
   import {
     lesson,
     langs,
-    dicts,
     llang,
-    view,
     dc,
-    dc_state,
     msg,
     call_but_status,
     showBottomAppBar,
     OnCheckQU,
   } from '$lib/stores.ts';
 
-  const dict = $dicts;
 
   import {
     mdiRepeat,
@@ -1255,7 +1251,7 @@
 
   
   {#if isChat}
-    <Chat quiz={data} context={JSON.stringify(dialog_data.content)}></Chat>
+    <Chat quiz={data} context={JSON.stringify(dialog_data.content)} prompt_type="greeting"></Chat>
   {/if}
 
 

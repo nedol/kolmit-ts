@@ -28,7 +28,6 @@
 
   import CircularProgress from '@smui/circular-progress';
 
-  // import {Dict} from '$lib/js/$dicts'
   import Group from './Group.svelte';
   let group_data = getContext('group_data');
 
@@ -68,8 +67,9 @@
   setContext('SetDlgDisplay', SetDlgDisplay);
  
 
-  $: if ($view === 'chat') dlg_display = 'block';
-  else dlg_display = 'none';
+  $: if ($view === 'chat'){
+     dlg_display = 'none';
+  } else dlg_display = 'none';
 
   $posterst = 'assets/operator.svg';
 
@@ -101,8 +101,6 @@
 
   const abonent = operator.abonent;
   const name = operator.name;
-
-  const uid = operator.operator;
 
   let container;
 
@@ -177,11 +175,14 @@
 
       if(group_data.length<=1)
         $view = 'lesson'
-      
 
-    // setTimeout(()=>{
-    //   OnClickCallButton();//активировать
-    // },1000)
+
+
+    setTimeout(()=>{
+      if(!operator.level){  
+        $view = 'chat'
+      }
+    },1000)
 
   });
 
@@ -505,7 +506,7 @@
   <Module data={group_data} bind:group={group_data}/>
 
 {:else if $view==='chat'}
-  <Chat></Chat>   
+  <Chat prompt_type="basic"></Chat>   
 
 {:else if  $view === 'group'}
   <Group  {rtc} bind:group={group_data}/>

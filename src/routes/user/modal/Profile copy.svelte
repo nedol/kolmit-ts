@@ -25,7 +25,7 @@
   lang = $langs;
 
   import { dicts } from '../rtc/stores.ts';
-  const dict = $dicts;
+
 
   async function setForm(form) {
     // window.parent.document.body.append(document.getElementsByClassName('form-signin')[0]);

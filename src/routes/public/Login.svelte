@@ -26,7 +26,7 @@
     formData.picture = '/assets/operator.svg';
   }
 
-  let lang = 'en';
+  let lang = 'nl';
   $: if (lang) {
     formData.lang = lang;
   }
@@ -56,7 +56,7 @@
         file,
         function (img, data) {
           if (img.type === 'error') {
-            console.error($dicts['Ошибка загрузки изображения'][lang]);
+            console.error('Ошибка загрузки изображения');
           } else {
             width = img.width;
             height = img.height;
@@ -103,7 +103,6 @@
       <Textfield
         name="email"
         bind:value={formData.email}
-        label="{$dicts['Email'][lang]}:"
         required
       />
     </div>
@@ -113,7 +112,7 @@
         type="text"
         name="name"
         bind:value={formData.name}
-        label="{$dicts['Имя'][lang]}:"
+        label="Имя"
         required
       />
     </div>
@@ -123,7 +122,6 @@
         type="password"
         name="psw"
         bind:value={formData.psw}
-        label="{$dicts['Пароль'][lang]}:"
         required
       />
     </div>
@@ -133,7 +131,7 @@
         type="password"
         name="confirmPassword"
         bind:value={formData.confirmPassword}
-        label="{$dicts['Повторить пароль'][lang]}:"
+        label="Повторить пароль"
         required
       />
     </div>
@@ -163,7 +161,7 @@
 <!-- <SelectMenu bind:lang /> -->
 
 {#if !passwordMatch}
-  <p style="color: red;">{$dicts['Пароли не совпадают'][lang]}</p>
+  <p style="color: red;">{'Пароли не совпадают'}</p>
 {/if}
 
 <figure>

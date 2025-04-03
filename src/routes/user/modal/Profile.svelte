@@ -24,7 +24,6 @@
 	let lang = 'en';
 	lang = $langs;
 
-	const dict = $dicts;
 
 	async function setForm(form) {
 		// window.parent.document.body.append(document.getElementsByClassName('form-signin')[0]);

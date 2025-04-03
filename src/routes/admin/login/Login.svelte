@@ -83,7 +83,7 @@
     <div>
       <Textfield
         bind:value={formData.email}
-        label="{$dicts['Email',$langs]}:"
+        label="Email:"
         required
       />
     </div>
@@ -93,7 +93,7 @@
         type="text"
         name="name"
         bind:value={formData.name}
-        label="{$dicts['Имя'][$langs]}:"
+
         required
       />
     </div>
@@ -103,7 +103,7 @@
         type="password"
         name="psw"
         bind:value={formData.psw}
-        label="{$dicts['Пароль'][$langs]}:"
+        label="Пароль"
         required
       />
     </div>
@@ -113,19 +113,19 @@
         type="password"
         name="confirmPassword"
         bind:value={formData.confirmPassword}
-        label="{$dicts['Повторить пароль'][$langs]}:"
+        label="Повторить пароль"
         required
       />
     </div>
 
     <div>
-      <Button class="upload-button">{$dicts['Sign In'][$langs]}</Button>
+      <Button class="upload-button">{'Sign In'}</Button>
     </div>
   </div>
 </form>
 
 {#if !passwordMatch}
-  <p style="color: red;">{$dicts['Пароли не совпадают'][$langs]}</p>
+  <p style="color: red;">{'Пароли не совпадают'}</p>
 {/if}
 
 <style>

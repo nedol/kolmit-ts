@@ -5,9 +5,6 @@
   import { langs, nlang } from '$lib/stores.ts';
   import { view } from '$lib/stores.ts';
 
-  // import { Dict } from '../dict/dict';
-  // $view = 'lesson';
-
   import GroupEditor from './group/GroupEditor.svelte';
 
   import { dicts } from '$lib/stores.ts';
@@ -15,10 +12,6 @@
 
   export let data;
 
-  $: if (data.dict[0]) {
-    $dicts = data.dict[0];
-    // setContext('dict', new Dict(data.dict[0]));
-  }
 
   let operator = data.operator,
     abonent = data.abonent,
