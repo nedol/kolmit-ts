@@ -157,10 +157,13 @@
         ulvl:operator.level,
         stt:stt_text
       };
+      
+      console.log('SendMessage',params)
 
       $signal.SendMessage(params,async (res) => {    
+         console.log('handleData',res)
         handleData(res);
-      });    
+      });  ;    
 
       async function handleData(data){
         try{
