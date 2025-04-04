@@ -94,7 +94,7 @@
 
 
   // Отправка сообщения
-  async function sendMessage(msg:string ='', type:string = 'basic') {
+  async function sendMessage(msg:string ='', type:string = 'greeting') {
     if (!userInput.trim() && !msg.trim()) return;
 
 
@@ -153,11 +153,11 @@
         words:words,
         langs: $langs,
         llang: $llang || 'nl',
-        level: "B1.1",
+        level: "2.1",
         ulvl:operator.level,
         stt:stt_text
       };
-      
+
       console.log('SendMessage',params)
 
       $signal.SendMessage(params,async (res) => {    
@@ -373,7 +373,7 @@
     reminderTimeout = setTimeout(() => {
       const currentTime = Date.now();
       if (currentTime - lastMessageTime >= 1 * 60 * 1000) { // 5 минут неактивности
-        sendMessage(`Blijf praten.`, 'basic'); // Отправляем напоминание
+        sendMessage(`Blijf praten.`, type); // Отправляем напоминание
         stopReminderTimer(); // Останавливаем таймер после отправки
       }
     }, 1 * 60 * 1000); // Проверка через 5 минут

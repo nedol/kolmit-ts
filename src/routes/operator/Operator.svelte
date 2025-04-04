@@ -506,7 +506,7 @@
   <Module data={group_data} bind:group={group_data}/>
 
 {:else if $view==='chat'}
-  <Chat prompt_type="basic"></Chat>   
+  <Chat prompt_type={operator.level?"greeting":'basic'}></Chat>   
 
 {:else if  $view === 'group'}
   <Group  {rtc} bind:group={group_data}/>

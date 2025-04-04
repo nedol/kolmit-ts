@@ -1166,14 +1166,12 @@ let keys: string[] = [];
 
   .container {
     position: relative;
-    top: 15px;
-    margin: 10px;
-    margin-bottom: 15px;
-    padding: 10px;
+    padding: 5px;
     justify-content: space-between;
     align-items: center;
     border: 1px solid lightgrey;
     border-radius: 5px;
+    margin:5px 10px;
   }
   .hint-button {
       border: 0px;
@@ -1208,7 +1206,6 @@ let keys: string[] = [];
     display: flex;;
     justify-content: center;
     align-items: center;
-    height: 3vh;
     color: #2196f3;
     font-style: italic;
     font-size: small;
@@ -1246,6 +1243,7 @@ let keys: string[] = [];
       font-size: 15px;
       color: #ff5733; /* цвет счетчика */
   }
+
   main{
       overflow-y: auto;
       height: calc(90vh - 56px);
@@ -1256,10 +1254,10 @@ let keys: string[] = [];
       font-size: 0.8em;
       flex-direction: column;
       align-items: center;
-      margin:10px;
       text-align: center;
       line-height: 1.2 !important;
   }
+
   .placeholder {
     border-bottom: 1px dashed #000;
     cursor: pointer;
@@ -1450,7 +1448,6 @@ let keys: string[] = [];
 
   @keyframes border-blink {
     0%, 100% {
-
       box-shadow: 0 0 0px 0 var(--border-color, rgb(124, 124, 139)); /* Без тени */
   }
   50% {

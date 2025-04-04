@@ -864,6 +864,27 @@ export async function getLevels(owner: string): Promise<string[]> {
   }
 }
 
+interface Group {
+  group: string;
+}
+
+export async function getGroups(owner: string): Promise<string[]> {
+  try {
+    // Fetch levels for the given owner
+    const groups = await sql<Group[]>`
+      SELECT "group" 
+      FROM lessons 
+      WHERE owner = ${owner}
+    `;
+
+    // If levels are found, return an array of level strings
+    return groups.map((item) => item.group);
+  } catch (ex) {
+    console.error('Error in getLevels:', ex);
+    return []; // Return an empty array if an error occurs
+  }
+}
+
 
 interface Lesson {
   owner: string;
@@ -929,51 +950,34 @@ export async function GetLesson(q: { operator: string; owner: string; level?: st
     let res: Lesson[] = [];
     let levels: string[] = [];
     let news: NewsItem[] = [];
-    let context_news: NewsItem[] = [];
+    let operatorGroup: string | null = null;
 
     // Начинаем транзакцию
     await sql.begin(async (sql) => {
+      // First get the operator's group
+      const operatorInfo = await sql<{group: string}[]>`
+        SELECT "group" FROM operators 
+        WHERE operator = ${q.operator} AND abonent = ${q.owner}
+        LIMIT 1
+      `;
+      operatorGroup = operatorInfo[0]?.group || null;
+
       // Query based on operator and owner relationship
-      if (q.operator !== q.owner) {
+      if (operatorGroup) {
         res = await sql<Lesson[]>`
-          SELECT lessons.data, lessons.level, lessons.lang 
+          SELECT lessons.data, lessons.lang 
           FROM lessons
-          JOIN operators ON (operators.operator = ${q.operator} AND operators.abonent = ${q.owner})
-          JOIN groups ON (groups.name = operators.group AND groups.level = lessons.level)
+          JOIN groups ON (groups.name = ${operatorGroup} AND groups.name = lessons.group)
           WHERE groups.owner = ${q.owner} AND lessons.owner = ${q.owner}
-          ORDER BY level DESC
-        `;
-      } else if (q.level) {
-        res = await sql<Lesson[]>`
-          SELECT data, level, lang 
-          FROM lessons 
-          WHERE owner = ${q.owner} AND level = ${q.level}  
-          ORDER BY level DESC
         `;
       } else {
         res = await sql<Lesson[]>`
-          SELECT data, level, lang 
+          SELECT data,  lang 
           FROM lessons 
           WHERE owner = ${q.owner}  
-          ORDER BY level DESC
         `;
       }
 
-      // Get all levels for the owner
-      levels = await getLevels(q.owner);
-
-      // Query for context-related news
-      context_news = await sql<NewsItem[]>`
-        SELECT 
-          json_build_object(quote_literal(${res[0]?.lang || 'en'}), "name") AS "name", 
-          "data", 
-          MAX((EXTRACT(EPOCH FROM "timestamp") * 1000)::BIGINT) AS "published", 
-          "type"
-        FROM public.context 
-        WHERE "prompt_type" = 'news' 
-        GROUP BY "name", "data", "type"
-        ORDER BY "published" DESC;
-      `;
     });
 
     // Find lesson for the specific level
@@ -983,16 +987,18 @@ export async function GetLesson(q: { operator: string; owner: string; level?: st
     return {
       data: les?.data || res[0]?.data || '', // Default to first lesson's data if not found
       lang: les?.lang || res[0]?.lang || 'en', // Default to 'en' if not found
-      level: les?.level || res[0]?.level || '', // Default to first lesson's level if not found
-      levels: levels,
-      context_news: context_news
+      operatorGroup: operatorGroup // Include the found group in response if needed
     };
   } catch (ex) {
     console.error('Error in GetLesson:', ex);
-    return { data: '', lang: 'en', level: '', levels: [], news: [], context_news: [] }; // Return empty/default values on error
+    return { 
+      data: '', 
+      lang: 'en', 
+      operatorGroup: null, 
+      news: [], 
+    }; // Return empty/default values on error
   }
 }
-
 interface NewsItem {
   name: string;
   published: number;
