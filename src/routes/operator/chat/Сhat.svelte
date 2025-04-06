@@ -69,7 +69,7 @@
 
   onMount(async() => {
     // Отправляем reminder при входе в компонент
-    sendMessage(`Begin een gesprek in het Nederlands.`,prompt_type);
+    sendMessage(`Begin een gesprek in het Nederlands.`);
     $showBottomAppBar = false;
     // Запускаем таймер для проверки неактивности
     startReminderTimer();
@@ -383,7 +383,7 @@
     reminderTimeout = setTimeout(() => {
       const currentTime = Date.now();
       if (currentTime - lastMessageTime >= 1 * 60 * 1000) { // 5 минут неактивности
-        sendMessage(`Blijf praten.`, 'greeting'); // Отправляем напоминание
+        sendMessage(`Blijf praten.`); // Отправляем напоминание
         stopReminderTimer(); // Останавливаем таймер после отправки
       }
     }, 1 * 60 * 1000); // Проверка через 5 минут
