@@ -42,7 +42,7 @@
 
   import { llang, langs, dicts } from '$lib/stores.ts';
 
-  import {Translate} from '../../../routes/translate/Transloc.ts'
+  import {Transloc} from '../../../routes/translate/Transloc.ts'
 
 
   let user_lang = 'en';
@@ -169,7 +169,7 @@
                   <div style="display:inline-flex">
                     <div style="display:block;">
                       <Content>
-                        {#await Translate('Language', 'en', $langs, 'group') then data}
+                        {#await Transloc('Language', 'en', $langs, 'group') then data}
                           <Textfield
                             class="shaped-filled"
                             variant="filled"
@@ -179,7 +179,7 @@
                         {/await}
                       </Content>
                       <Content>
-                        {#await Translate('Name', 'en', $langs, 'group') then data}
+                        {#await Transloc('Name', 'en', $langs, 'group') then data}
                           <Textfield
                             class="shaped-filled"
                             variant="filled"
@@ -227,7 +227,7 @@
               </div>
             {:else}
               <Button variant="outlined" class="save" on:click={saveClassData}>
-                {#await Translate('Save', 'en', $langs, 'group') then data}
+                {#await Transloc('Save', 'en', $langs, 'group') then data}
                   <Label>{data}</Label>
                 {/await}
               </Button>
@@ -274,7 +274,7 @@
                     }}
                     variant="outlined"
                   >
-                    {#await Translate('добавить пользователя', 'ru', $langs, 'group') then data}
+                    {#await Transloc('добавить пользователя', 'ru', $langs, 'group') then data}
                       <Label>{data}</Label>
                     {/await}
                   </Button>
@@ -291,7 +291,7 @@
 
 <div class="add_class">
   <Button class="material-icons" variant="outlined" on:click={OnAddClass}>
-    {#await Translate('добавить группу', 'ru', $langs) then data}
+    {#await Transloc('добавить группу', 'ru', $langs) then data}
       <Label>{data}</Label>
     {/await}</Button
   >

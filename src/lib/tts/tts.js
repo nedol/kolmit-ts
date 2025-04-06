@@ -685,7 +685,7 @@ function moveme(pos){
 
 function adv(){
 // if(getCookie("adv")!="yes"){
-   GEBI('adv').innerHTML='<div align=center><table width="100%"><tr><td width="98%" align="center"><a href="http://imtranslator.net/translate-and-speak/"><div style="font-size:14px;color:#0E75B3;font-weight:600;">We\'ve just launched a new Translate and Speak site. <span style="font-size:14px;color:#BE3B34;font-weight:600;">Check out the new features >></span></div></a></td><td width="2%" align="center"><img style="cursor:pointer;" onClick="var ob=GEBI(\'adv\'); ob.style.display=\'none\';ob.style.background=\'white\';setCookie(\'advr\',1);return false;" src="images/close.gif" alt="Close" title="Close" border=0></td></tr></table></div>';
+   GEBI('adv').innerHTML='<div align=center><table width="100%"><tr><td width="98%" align="center"><a href="http://imtranslator.net/translate-and-speak/"><div style="font-size:14px;color:#0E75B3;font-weight:600;">We\'ve just launched a new Transloc and Speak site. <span style="font-size:14px;color:#BE3B34;font-weight:600;">Check out the new features >></span></div></a></td><td width="2%" align="center"><img style="cursor:pointer;" onClick="var ob=GEBI(\'adv\'); ob.style.display=\'none\';ob.style.background=\'white\';setCookie(\'advr\',1);return false;" src="images/close.gif" alt="Close" title="Close" border=0></td></tr></table></div>';
    GEBI('adv').style.display='block';
 //   setCookie("adv","yes");
 // }

@@ -2,7 +2,7 @@
   import { onMount , getContext, onDestroy} from 'svelte';
   import { slide } from 'svelte/transition';
   import ConText from '../Context.svelte';
-  import { Translate } from '../../../translate/Transloc';
+  import { Transloc } from '../../../translate/Transloc';
   import { NumberString, numberToDutchString } from '$lib/tts/Listen.numbers.js';
   import Tts from '../../../speech/tts/Tts.svelte';
   import emojiRegex from 'emoji-regex';
@@ -33,7 +33,7 @@
 
   let isCorrectSpanString = false;
 
-  let isTranslate = false;
+  let isTransloc = false;
 
   let isColorised = false;
 
@@ -320,7 +320,7 @@ let keys: string[] = [];
 
       rate.cnt += (isError ? 0 : 
         (isTip ? 0 : 
-          (isTranslate ? 1 : 3)))  // Перевод даёт меньше баллов
+          (isTransloc ? 1 : 3)))  // Перевод даёт меньше баллов
         + (isColorised ? 1 : 2)   // Схема анализа даёт меньше баллов
         + timeBonus;              // Баллы за скорость
 
@@ -551,8 +551,8 @@ let keys: string[] = [];
       formattedSentence = formattedSentence
   }
 
-  function ToggleTranslate(){
-    isTranslate = !isTranslate
+  function ToggleTransloc(){
+    isTransloc = !isTransloc
   }
 
   function onClickMicrophone() {
@@ -926,9 +926,9 @@ let keys: string[] = [];
           tag="svg"
           viewBox="0 0 24 24"
           style="margin:10px 5px 10px 5px; scale:1.1; width:25px"
-          on:click={ToggleTranslate}
+          on:click={ToggleTransloc}
         >
-        {#if isTranslate}
+        {#if isTransloc}
           <path fill="grey" d={mdiTranslateOff}/>
         {:else}
           <path fill="white" d={mdiTranslate}/>
@@ -982,11 +982,11 @@ let keys: string[] = [];
 
   <span class='article' on:click={toNextArticle}>{article_name}</span>
   <div>
-    {#if isTranslate}
+    {#if isTransloc}
     <div class="trans">
       <!-- Исходное предложение -->
-      <!-- <p>{bricks_data.isTranslate[curSentence]}</p> -->
-      {#await Translate(sentence.replace(/<[^>]*>/g, ''), $llang, $langs,data.name) then data}
+      <!-- <p>{bricks_data.isTransloc[curSentence]}</p> -->
+      {#await Transloc(sentence.replace(/<[^>]*>/g, ''), $llang, $langs,data.name) then data}
         <p>{data}</p>
       {/await}
     </div>
@@ -995,10 +995,10 @@ let keys: string[] = [];
 
     <div class="container">
       <!-- Предложение с замененными словами -->
-      {#await Translate('Составить предложение', 'ru', $langs,data.name) then data}
+      {#await Transloc('Составить предложение', 'ru', $langs,data.name) then data}
         <div class="title">{data}:</div>
       {/await}
-      <!-- {#await Translate('(используй подсказки слов в случае необходимости)', 'ru', $langs) then data_2}
+      <!-- {#await Transloc('(используй подсказки слов в случае необходимости)', 'ru', $langs) then data_2}
       <div class="title title2">{data_2}:</div>
       {/await} -->
 
@@ -1035,7 +1035,7 @@ let keys: string[] = [];
 <div class="container">
   <div>
     <!-- Горизонтальный список слов -->
-    {#await Translate('используя набор слов', 'ru', $langs,data.name) then data}
+    {#await Transloc('используя набор слов', 'ru', $langs,data.name) then data}
         <div class="title">{data}:</div>
     {/await}
 
@@ -1049,7 +1049,7 @@ let keys: string[] = [];
 
 {#if isSTT}
   <div class="container">
-    {#await Translate('Check a pronanciation', 'en', $langs) then data}
+    {#await Transloc('Check a pronanciation', 'en', $langs) then data}
       <div class="title">{data}:</div>
     {/await}
         
@@ -1146,7 +1146,7 @@ let keys: string[] = [];
     position: relative;
     top:0px; 
     height: 45px;
-  /* transform: scale(1.2) isTranslate(-4%,0%);
+  /* transform: scale(1.2) isTransloc(-4%,0%);
   transform-origin: center ;  */
   }
 
@@ -1185,12 +1185,12 @@ let keys: string[] = [];
     display: flex;
     align-items: center;
     gap: 10px; /* Отступ между элементами */
+    margin-top: 5px;
   }
 
 
   .bricks_name{
     position:relative;
-    margin: 10px;
     width:80%;
     color: black;
     font-style: italic;
@@ -1209,6 +1209,8 @@ let keys: string[] = [];
     color: #2196f3;
     font-style: italic;
     font-size: small;
+    margin-left: 10px;
+    margin-right: 10px;
   }
   .speaker-button {
     display: inline-flex;

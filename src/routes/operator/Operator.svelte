@@ -91,7 +91,7 @@
   $call_but_status = 'inactive';
 
   import { editable } from '$lib/stores.ts';
-  import { Translate } from '../translate/Transloc';
+  import { Transloc } from '../translate/Transloc';
   $: if ($editable) {
     edited_display = $editable;
   }
@@ -548,7 +548,7 @@
     <Section>
       {#if remote.text.display && remote.text.name}
         <div class="remote_text_display" style="display:{remote.text.display};">
-          {#await Translate('Тебя вызывает - ', 'ru', $langs,remote.text.name) then data}
+          {#await Transloc('Тебя вызывает - ', 'ru', $langs,remote.text.name) then data}
             <p class="remote_msg">
               {data}
               {remote.text.name}
@@ -608,7 +608,7 @@
     </Section>
   </BottomAppBar>
 
-  {#await Translate(rtcSupportText, 'ru', $langs,'operator') then data}
+  {#await Transloc(rtcSupportText, 'ru', $langs,'operator') then data}
     <span style="position:fixed;bottom:0;font-size:smaller;color:red"
       >{data}</span
     >

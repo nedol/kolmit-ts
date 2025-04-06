@@ -115,7 +115,7 @@ export class Dict {
     }
 
 
-    Translate(from, to, cb) {
+    Transloc(from, to, cb) {
 
         // if (from === to) {
         //     cb();

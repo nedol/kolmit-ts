@@ -7,7 +7,7 @@
   import Select, { Option } from '@smui/select';
 
   // import words from './80.json';
-  import { Translate } from '../../../translate/Transloc';
+  import { Transloc } from '../../../translate/Transloc';
   // translate.engine = 'google';
   // translate.from = $llang;
 
@@ -235,7 +235,7 @@
 
   $: if ($msg?.msg) {
     (async () => {
-      alert(await Translate($msg?.msg, 'ru', $langs,data.name));
+      alert(await Transloc($msg?.msg, 'ru', $langs,data.name));
       if ($msg) $msg.msg = '';
     })();
   }
@@ -349,7 +349,7 @@
     if (currentWord.example[$langs]) {
       example = currentWord['example'][$langs];
     } else if (currentWord.example[$llang]) {
-      example = await Translate(currentWord['example'][$llang], $llang, $langs,data.name);
+      example = await Transloc(currentWord['example'][$llang], $llang, $langs,data.name);
     }
 
     const regex = /(<<\w+>>)\s+(<<\w+>>)/;
@@ -363,7 +363,7 @@
     resultElement = replaceWordWithInput(
       currentWord?.example[$llang]
         ? currentWord?.example[$llang]
-        : await Translate(currentWord.example['ru'], 'ru', $llang,data.name),
+        : await Transloc(currentWord.example['ru'], 'ru', $llang,data.name),
       `${original}`
     );
 
@@ -875,13 +875,13 @@
             {#if isFlipped}
               {#if showNextButton}
                 <button on:click={nextWord} class="next-button"
-                  >{#await Translate('Вперед', 'ru', $langs) then data}
+                  >{#await Transloc('Вперед', 'ru', $langs) then data}
                     {data}
                   {/await}</button
                 >
               {:else if showCheckButton}
                 <button on:click={checkInput} class="check-button">
-                  {#await Translate('Проверить', 'ru', $langs) then data}
+                  {#await Transloc('Проверить', 'ru', $langs) then data}
                     {data}
                   {/await}
                 </button>
@@ -935,11 +935,11 @@
         </div>
       {/if} -->
 
-      {#await Translate(label[isFlipped], 'ru', $langs) then data}
+      {#await Transloc(label[isFlipped], 'ru', $langs) then data}
         <div class="title">{data}</div>
       {/await}
     {:else}
-      {#await Translate(label[isFlipped], 'ru', $langs) then data}
+      {#await Transloc(label[isFlipped], 'ru', $langs) then data}
         <div class="title">{data}:</div>
       {/await}
       {#if showHints[isFlipped]}
@@ -973,7 +973,7 @@
                 </span>
                 <!-- {/if} -->
               {:else}
-                {#await Translate(hint?.example['ru'], 'ru', $llang) then data}
+                {#await Transloc(hint?.example['ru'], 'ru', $llang) then data}
                   <span
                     class="hint_button {hint.disabled}"
                     on:click={(ev) => {
@@ -1013,7 +1013,7 @@
               </span>
               <!-- {/if} -->
             {:else}
-              {#await Translate(hint?.example['ru'], 'ru', $langs) then data}
+              {#await Transloc(hint?.example['ru'], 'ru', $langs) then data}
                 <span
                   class="hint_button {hint.disabled}"
                   on:click={(ev) => {

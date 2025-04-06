@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onDestroy, getContext,afterUpdate, onMount } from 'svelte';
   import { writable } from 'svelte/store';
-  import { Translate } from '../../translate/Transloc';
+  import { Transloc } from '../../translate/Transloc';
   import { showBottomAppBar, langs, llang, signal} from '$lib/stores';
   import IconButton, { Icon } from '@smui/icon-button';
   import emojiRegex from 'emoji-regex';
@@ -31,7 +31,7 @@
 
   let words = 'undefined'
 
-  type Message = { role: 'user' | 'assistant' | 'system'; text: string; tr: string; cor:string | ''; id: string; isTranslated: boolean; };
+  type Message = { role: 'user' | 'assistant' | 'system'; text: string; tr: string; cor:string | ''; id: string; isTranslate: boolean; };
   type Messages = Message[];
 
   let userInput = '';
@@ -41,7 +41,9 @@
   let loading = writable(false);
   let to: NodeJS.Timeout;
 
-  let isTranslated = false;
+  let isTranslate = false;
+  let isTip = false;
+
   let translatedMessages = new Map(); // Кэш переведённых сообщений
 
   let messagesContainer: HTMLElement | null = null;
@@ -79,7 +81,7 @@
           text: Array.isArray(context)?context.join(" "):'',
           tr:'',
           cor: '',
-          isTranslated:false}
+          isTranslate:false}
       ]);
 
   });
@@ -94,9 +96,9 @@
 
 
   // Отправка сообщения
-  async function sendMessage(msg:string ='', type:string = 'greeting') {
-    if (!userInput.trim() && !msg.trim()) return;
+  async function sendMessage(msg:string ='') {
 
+    if (!userInput.trim() && !msg.trim()) return;
 
     // Добавляем сообщение пользователя в список
     if(!msg)
@@ -107,7 +109,7 @@
       text: userInput, 
       tr:"", 
       cor:"",
-      isTranslated:false 
+      isTranslate:false 
     }]);
 
     if (messagesContainer) {
@@ -120,16 +122,14 @@
     userInput = '';
     loading.set(true);
 
-    const prompt_type = {quiz:'chat',type:type,lang:$llang};
-
     // Вызываем AI
-    await callChat(prompt_type,userMessage);
+    await callChat();
 
     resetReminderTimer(); // Сбрасываем таймер при активности пользователя
   }
 
   // Вызов ChatGPT
-  async function callChat(prompt_type: {}, text: string) {
+  async function callChat() {
    
     if (to) clearTimeout(to);
 
@@ -138,7 +138,10 @@
       .slice(-20) // Берем последние 10 сообщений (5 от пользователя и 5 от AI)
       .map(msg => ({
         role: msg.role === "assistant" ? "assistant" : "user",
-        content: msg.text
+        content: msg.text,
+        tip: msg.role ==='user'? isTip:'',
+        translated: msg.role ==='user'? isTranslate:'',
+        stt: msg.role ==='user'?stt_text:''
       }));
 
       const params = {
@@ -147,29 +150,32 @@
         type: quiz?.quiz,
         name:quiz?.name,
         owner: operator.abonent,
-        prompt: prompt_type,
+        prompt: `chat.${prompt_type}.${$llang}`,
         conversationHistory,
         context: context,
         words:words,
         langs: $langs,
         llang: $llang || 'nl',
         level: "2.1",
-        ulvl:operator.level,
-        stt:stt_text
+        ulvl:operator.level,       
       };
 
-      console.log('SendMessage',params)
+      console.log('SendMessage',params);
+
+      isTranslate = false;
+      isTip = false; 
 
       $signal.SendMessage(params,async (res) => {    
          console.log('handleData',res)
         handleData(res);
-      });  ;    
+       
+      });  
 
       async function handleData(data){
         try{
 
           if(data.response.tokens_limit){
-              const msg= await Translate("Вы достигли суточного лимита сообщений.",'ru',$langs,'chat')
+              const msg= await Transloc("Вы достигли суточного лимита сообщений.",'ru',$langs,'chat')
               messages.update( msgs =>  
               [...msgs, 
                 { 
@@ -178,7 +184,7 @@
                   text: `<alert>${msg}</alert>`, 
                   tr: '', 
                   cor: '',
-                  isTranslated:false
+                  isTranslate:false
                 }
               ]);
 
@@ -256,7 +262,7 @@
                   text:'',
                   tr:dataAr[$langs]?.cor,
                   cor: dataAr[$llang]?.cor,
-                  isTranslated:false}
+                  isTranslate:false}
               ]);
         
             // Добавляем ответ AI в список
@@ -268,7 +274,7 @@
                   text: dataAr[$llang]?.msg, 
                   tr: dataAr[$langs]?.msg , 
                   cor:'',
-                  isTranslated:false}
+                  isTranslate:false}
               ]);  
               
               if(dataAr[$llang]?.words)
@@ -281,7 +287,7 @@
 
             setTimeout(() => {
               messagesContainer?.lastElementChild?.scrollIntoView({ behavior: "smooth", block: "end" });
-            }, 100);
+            }, 500);
             
             // Обновляем время последнего сообщения
             lastMessageTime = Date.now();
@@ -308,7 +314,7 @@
 
         } catch (error) {
           console.error("Произошла ошибка при обращении к серверу:", error);
-          messages.update((msgs) => [...msgs, { id: crypto.randomUUID(), role: "assistant", text: "Ошибка при обработке запроса. Попробуйте снова.", tr:"", isTranslated:false }]);
+          messages.update((msgs) => [...msgs, { id: crypto.randomUUID(), role: "assistant", text: "Ошибка при обработке запроса. Попробуйте снова.", tr:"", isTranslate:false }]);
          
         } finally {
           loading.set(false);
@@ -322,6 +328,7 @@
 
   function SttResult(text:string) {
     userInput = text[$llang];
+    stt_text = text[$llang];
     // sendMessage();
   }
 
@@ -342,12 +349,12 @@
 
   async function toggleTranslation(message:Message) {
     if (!message.tr) 
-      message.tr = await Translate(message.text, $llang, $langs, '');
+      message.tr = await Transloc(message.text, $llang, $langs, '');
 
     if(message.role!=='user')  
       translatedMessages.set(message.text, message.tr);
 
-    message.isTranslated = !message.isTranslated;
+    message.isTranslate = !message.isTranslate;
     $messages = $messages; // Принудительное обновление  
 
     
@@ -366,6 +373,9 @@
     setTimeout(() => {
       messagesContainer?.lastElementChild?.scrollIntoView({ behavior: "smooth", block: "end" });
     }, 100);
+
+    if(isTranslate)
+      isTip = true;
   }
 
   function startReminderTimer() {
@@ -373,7 +383,7 @@
     reminderTimeout = setTimeout(() => {
       const currentTime = Date.now();
       if (currentTime - lastMessageTime >= 1 * 60 * 1000) { // 5 минут неактивности
-        sendMessage(`Blijf praten.`, type); // Отправляем напоминание
+        sendMessage(`Blijf praten.`, 'greeting'); // Отправляем напоминание
         stopReminderTimer(); // Останавливаем таймер после отправки
       }
     }, 1 * 60 * 1000); // Проверка через 5 минут
@@ -404,6 +414,7 @@
   function SetInput(text:string){
     userInput = text;
     elInput.scrollIntoView({ behavior: "smooth", block: "end" });
+    isTip = true;
   }
 
     // Очистка таймера при размонтировании
@@ -429,14 +440,14 @@
       bind:this={lastMessage} >
       <!--strong>{message.role === 'user' ? 'Вы' : 'AI'}:</strong--> 
       {#if message.cor}
-        {#if message.isTranslated} 
+        {#if message.isTranslate} 
           {#if translatedMessages.has(message.cor)}
             <cor> {@html translatedMessages.get(message.cor)}</cor>
             {:else}
             {#if dataAr[$langs].cor}
               <cor>{@html dataAr[$langs].cor}</cor>
             {:else}
-              {#await Translate(message.cor, $llang, $langs, 'chat') then data}
+              {#await Transloc(message.cor, $llang, $langs, 'chat') then data}
                 <cor> {@html data}</cor>
               {/await}
             {/if}
@@ -446,7 +457,7 @@
         {/if}
       {/if}
       
-      {#if message.isTranslated && translatedMessages.has(message.text)}
+      {#if message.isTranslate && translatedMessages.has(message.text)}
         {@html translatedMessages.get(message.text)}
       {:else}
         {@html message.text}
@@ -456,13 +467,13 @@
           {#if selectedReplyId === message.id}
             <div class="reply_container">
               {#each dataAr[$llang]?.replies as reply,i}
-                {#if message.isTranslated} 
+                {#if message.isTranslate} 
                   <reply on:click={()=>{SetInput(dataAr[$llang]?.replies[i]) }}>{reply}</reply>
                 {:else}
                 {#if dataAr[$langs]?.replies[i]}
                   <reply on:click={()=>{SetInput(reply)}}>{dataAr[$langs]?.replies[i]}</reply>
                 {:else}
-                  {#await Translate(reply,$llang, $langs,'chat') then data}
+                  {#await Transloc(reply,$llang, $langs,'chat') then data}
                     <reply on:click={()=>{SetInput(reply)}}>{data}</reply>
                   {/await}
                   {/if} 
@@ -486,10 +497,10 @@
             <div on:click={() => toggleTranslation(message )}>
               <IconButton>
                 <Icon tag="svg" viewBox="0 0 24 24">
-                  {#if message.isTranslated}
+                  {#if message.isTranslate}
                     <path fill={message.role === 'user'?'red':"currentColor"} d={mdiTranslate} />
                   {:else}
-                    <path fill={message.role === 'user'?'red':"currentColor"} d={mdiTranslateOff} />
+                    <path fill={message.role === 'user'?'red':"currentColor"} d={ mdiTranslateOff} />
                   {/if}
                 </Icon>
               </IconButton>
@@ -528,7 +539,7 @@
       </IconButton>
     </div>
     {#if $loading}
-      {#await Translate('AI печатает...', 'ru', $langs, 'chat') then data}
+      {#await Transloc('AI печатает...', 'ru', $langs, 'chat') then data}
       <input disabled
         bind:value={userInput}
         bind:this = {elInput}
@@ -538,7 +549,7 @@
       />
       {/await}
     {:else}
-    {#await Translate('Введите сообщение...', 'ru', $langs, 'chat') then data}
+    {#await Transloc('Введите сообщение...', 'ru', $langs, 'chat') then data}
       <input
         bind:value={userInput}
         bind:this = {elInput}

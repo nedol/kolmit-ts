@@ -84,7 +84,7 @@
 
         // Выделение текста завершено
         const selectedText = selection.toString().trim();
-        trans = await Translate(selectedText);
+        trans = await Transloc(selectedText);
         x = rect.x;
         y = rect.y - 28 + window.scrollY;
 

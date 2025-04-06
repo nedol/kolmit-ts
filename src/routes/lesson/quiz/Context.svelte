@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount, getContext, onDestroy } from 'svelte';
-  import { Translate } from '../../translate/Transloc';
+  import { Transloc } from '../../translate/Transloc';
 
   import IconButton, { Icon } from '@smui/icon-button';
   import Paper, { Title, Subtitle } from '@smui/paper';
@@ -98,7 +98,7 @@ let iframe;
 
         // Выделение текста завершено
         const selectedText = selection.toString().trim();
-        trans = await Translate(selectedText);
+        trans = await Transloc(selectedText);
         x = rect.x;
         y = rect.y - 22 + window.scrollY;
 
@@ -135,7 +135,7 @@ let iframe;
       if (!isPlayAuto || ind >= textAr.length) return;
 
       let originalSentence = htmlToText(textAr[ind]).split(/(?<=[.!?])\s+/)[0];
-      let translatedSentence = await Translate(
+      let translatedSentence = await Transloc(
         originalSentence,
         $llang,
         $langs,
@@ -147,10 +147,10 @@ let iframe;
         $langs,
         translatedSentence.replace(/['"<>]/g, ''),
         data.name,
-        onEndSpeakTranslated
+        onEndSpeakTranslocd
       );
 
-      async function onEndSpeakTranslated() {
+      async function onEndSpeakTranslocd() {
         // Озвучить оригинал после перевода
         tts.Speak_server(
           $llang,

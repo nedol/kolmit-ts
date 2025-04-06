@@ -4,7 +4,7 @@
   import moment from 'moment';
   moment.locale('nl-be');
 
-  import { Translate } from '../translate/Transloc.js';
+  import { Transloc } from '../translate/Transloc.js';
 
   // import Assistant from '../operator/chat/Assistant.svelte';
 
@@ -103,7 +103,7 @@
     if ($lesson.data.quiz === '' && data.quiz) {
       // Define an async function inside the reactive block
       const updateMessage = async () => {
-        const msg = await Translate('Собеседник вышел из упражнения', 'ru', $langs, 'module');
+        const msg = await Transloc('Собеседник вышел из упражнения', 'ru', $langs, 'module');
         SendDataDC({ msg: msg });
         data = $lesson.data;  // Ensure data is updated with new lesson data
       };
@@ -322,7 +322,7 @@
   });
 
   async function OnThemeNameInput(theme) {
-    theme.name = await Translate(theme.name[$llang], $llang, $langs, 'module');
+    theme.name = await Transloc(theme.name[$llang], $llang, $langs, 'module');
     module = module;
   }
 
@@ -349,7 +349,7 @@
         <div class="accordion-container">
           <Accordion multiple>
             <Panel class="panel" disabled={disabled[parseInt(t)]}>
-              {#await Translate(theme.name[$llang], $llang, $langs,'module') then data}
+              {#await Transloc(theme.name[$llang], $llang, $langs,'module') then data}
                 <Header
                   :use={theme.name[$llang]
                     ? theme.name[$llang]
@@ -403,7 +403,7 @@
                                         <div class="icon-wrapper">
                                           <div>
                                             {#if isNew(quiz.published, theme)}
-                                            {#await Translate('новый', 'ru', $llang,'module') then data}
+                                            {#await Transloc('новый', 'ru', $llang,'module') then data}
                                               <span  class="new-badge">{data}</span>
                                               {/await}
                                             {/if}
@@ -534,7 +534,7 @@
                                       <div class="icon-wrapper">
                                         <div>
                                           {#if isNew(quiz.published, theme)}
-                                          {#await Translate('новый', 'ru', $llang,'module') then data}
+                                          {#await Transloc('новый', 'ru', $llang,'module') then data}
                                             <span  class="new-badge">{data}</span>
                                             {/await}
                                           {/if}
@@ -672,7 +672,7 @@
                             <div class="icon-wrapper">
                               <div>
                                 {#if isNew(quiz.published, theme)}
-                                {#await Translate('новый', 'ru', $llang,'module') then data}
+                                {#await Transloc('новый', 'ru', $llang,'module') then data}
                                   <span  class="new-badge">{data}</span>
                                   {/await}
                                 {/if}
@@ -801,7 +801,7 @@
                             <div class="icon-wrapper">
                               <div>
                                 {#if isNew(quiz.published, theme)}
-                                {#await Translate('новый', 'ru', $llang,'module') then data}
+                                {#await Transloc('новый', 'ru', $llang,'module') then data}
                                   <span  class="new-badge">{data}</span>
                                   {/await}
                                 {/if}
@@ -940,7 +940,7 @@
                                   <div class="icon-wrapper">
                                     <div>
                                       {#if isNew(quiz.published, theme)}
-                                      {#await Translate('новый', 'ru', $llang,'module') then data}
+                                      {#await Transloc('новый', 'ru', $llang,'module') then data}
                                         <span  class="new-badge">{data}</span>
                                         {/await}
                                       {/if}
@@ -1074,7 +1074,7 @@
                                 <div class="icon-wrapper">
                                   <div>
                                     {#if isNew(quiz.published, theme)}
-                                    {#await Translate('новый', 'ru', $llang,'module') then data}
+                                    {#await Transloc('новый', 'ru', $llang,'module') then data}
                                       <span  class="new-badge">{data}</span>
                                       {/await}
                                     {/if}

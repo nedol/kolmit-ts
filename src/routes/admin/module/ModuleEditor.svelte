@@ -1,7 +1,7 @@
 <script lang="ts">
   import { setContext, onMount, onDestroy } from 'svelte';
 
-  import { Translate } from '../../translate/Transloc';
+  import { Transloc } from '../../translate/Transloc';
 
   import pkg from 'lodash'; 
   const { find, isObject, mapValues, indexOf } = pkg;
@@ -384,7 +384,7 @@
   //     Object.keys(theme.name).forEach(async (key) => {
   //       console.log(key);
   //       if (key !== $llang) {
-  //         // theme.name[$llang] = await Translate(theme.name[key], key, $llang);
+  //         // theme.name[$llang] = await Transloc(theme.name[key], key, $llang);
   //         // lesson_data = lesson_data;
   //         return;
   //       }
@@ -406,7 +406,7 @@
 
     <div style="height:1500px; margin-top:20px">
       <div class="level_container" style="">
-        {#await Translate('Save', 'en', $langs, 'module') then data}
+        {#await Transloc('Save', 'en', $langs, 'module') then data}
           <button class="save" on:click={saveLessonData}>
             {data}
           </button>
@@ -414,7 +414,7 @@
 
         <div>
           <div class="add_module" style="display:inline-flex">
-            {#await Translate('Добавить модуль', 'ru', $langs, 'module') then data}
+            {#await Transloc('Добавить модуль', 'ru', $langs, 'module') then data}
               <IconButton
                 class="material-icons"
                 on:click={OnAddModule}
@@ -440,7 +440,7 @@
           ></Textfield>
 
           <div class="rem_module" style="display:inline-flex">
-            {#await Translate('Удалить модуль', 'ru', $langs, 'module') then data}
+            {#await Transloc('Удалить модуль', 'ru', $langs, 'module') then data}
               <IconButton
                 class="material-icons rem_module"
                 on:click={OnRemModule}
@@ -476,7 +476,7 @@
                     <!-- <Textfield bind:value={theme.name[$langs]} style="width: 368px;">
 									<HelperText slot="helper">Helper Text</HelperText>
 								</Textfield> -->
-                    {#await Translate('Input Theme Name', 'en', $langs, 'module') then data}
+                    {#await Transloc('Input Theme Name', 'en', $langs, 'module') then data}
                       <input
                         placeholder={data}
                         bind:value={theme.name[$llang]}
@@ -485,7 +485,7 @@
                       <!-- {@debug theme, $llang} -->
                     {/await}
                     <div class="rem_theme">
-                      {#await Translate('Remove theme', 'en', $langs, 'module') then data}
+                      {#await Transloc('Remove theme', 'en', $langs, 'module') then data}
                         <IconButton
                           class="material-icons"
                           title={data}
@@ -608,7 +608,7 @@
                                   </div>
                                   <!-- svelte-ignore a11y-invalid-attribute -->
                                   {#if quiz.type === 'quiz'}
-                                    {#await Translate('Quiz Name', $llang, $langs, 'module') then data}
+                                    {#await Transloc('Quiz Name', $llang, $langs, 'module') then data}
                                       <input
                                         class="quiz_name"
                                         on:click={OnClickQuizName}
@@ -623,7 +623,7 @@
                                       />
                                     {/await}
                                   {:else}
-                                    {#await Translate('Quiz Name', $llang, $langs, 'module') then data}
+                                    {#await Transloc('Quiz Name', $llang, $langs, 'module') then data}
                                       <input
                                         on:click={OnClickQuizName}
                                         style="width:80%"
@@ -639,7 +639,7 @@
                                   {/if}
 
                                   <div class="rem_quiz">
-                                    {#await Translate('Remove quiz', 'en', $langs) then data}
+                                    {#await Transloc('Remove quiz', 'en', $langs) then data}
                                       <IconButton
                                         class="material-icons"
                                         title={data}
@@ -657,7 +657,7 @@
                         {/if}
                       {/each}
                       <div class="add_quiz" style="left:10px;top:20px">
-                        {#await Translate('Add quiz', 'en', $langs, 'module') then data}
+                        {#await Transloc('Add quiz', 'en', $langs, 'module') then data}
                           <IconButton
                             class="material-icons"
                             title={data}
@@ -677,7 +677,7 @@
  
         {#if lesson_data.level && $llang !== ' '}
           <div class="add_theme">
-            {#await Translate('Add theme', 'en', $langs, 'module') then data}
+            {#await Transloc('Add theme', 'en', $langs, 'module') then data}
               <IconButton
                 class="material-icons"
                 on:click={() => OnAddTheme()}

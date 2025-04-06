@@ -1,4 +1,4 @@
-import { WriteTranslate, ReadSpeech } from '$lib/server/db.ts'; //src\lib\server\server.db.ts
+import { WriteTranslate, ReadSpeech } from '$lib/server/db.ts'; 
 import md5 from 'md5'; // Импортируем библиотеку для генерации md5
 import { HttpsProxyAgent } from 'https-proxy-agent';
 import translatex from 'google-translate-api-x';

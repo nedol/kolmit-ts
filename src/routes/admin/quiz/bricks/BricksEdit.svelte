@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Translate } from '../../../translate/Transloc.js';
+  import { Transloc } from '../../../translate/Transloc.js';
 
   import { getContext, onMount } from 'svelte';
 
@@ -45,11 +45,11 @@
 
   $: if (false && $langs) {
     (async () => {
-      grammar_title = await Translate('Grammar', 'en', $langs);
-      context_title = await Translate('Context', 'en', $langs);
+      grammar_title = await Transloc('Grammar', 'en', $langs);
+      context_title = await Transloc('Context', 'en', $langs);
       // prompt_title = await translate('Prompt', $langs);
-      words_title = await Translate('Words', 'en', $langs);
-      content_title = await Translate('Content', 'en', $langs);
+      words_title = await Transloc('Words', 'en', $langs);
+      content_title = await Transloc('Content', 'en', $langs);
     })();
   }
 
@@ -64,7 +64,7 @@
   }
 
   $: if (bricks_data && $langs) {
-    TranslateContentToCurrentLang();
+    TranslocContentToCurrentLang();
   }
 
   $: if (bricks_data.content.length > 0 && prompt) {
@@ -183,7 +183,7 @@
     return result;
   }
 
-  async function TranslateContentToCurrentLang() {
+  async function TranslocContentToCurrentLang() {
     try {
       await Promise.all(
         bricks_data.content.map(async (item: any) => {
@@ -191,7 +191,7 @@
             Object.keys(item).map(async (key: string) => {
               // console.log(key, item);
               if (item[key][$llang] && !item[key][$langs]) {
-                let tr = await Translate(item[key][$llang], $llang, $langs, bricks_data.name);
+                let tr = await Transloc(item[key][$llang], $llang, $langs, bricks_data.name);
                 item[key][$langs] = tr;
                 bricks_data = bricks_data;
               }
@@ -391,7 +391,7 @@
 <main>
   <div class="container">
     <div class="dialog-field">
-      {#await Translate('Title', 'en', $langs,bricks_data.name) then data}
+      {#await Transloc('Title', 'en', $langs,bricks_data.name) then data}
         <label for="dialog_name">{data}</label>
       {/await}
 
@@ -404,7 +404,7 @@
     </div>
     {#if data.level}
       <div class="dialog-field">
-        {#await Translate('Level', 'en', $langs,bricks_data.name) then data}
+        {#await Transloc('Level', 'en', $langs,bricks_data.name) then data}
           <label for="dialog_level">{data}</label>
         {/await}
 
@@ -414,7 +414,7 @@
 
     {#if $llang}
       <div class="dialog-field">
-        {#await Translate('Language', 'en', $langs,bricks_data.name) then data}
+        {#await Transloc('Language', 'en', $langs,bricks_data.name) then data}
           <label for="dialog_lang">{data}</label>
         {/await}
 
@@ -431,7 +431,7 @@
     <Panel>
       <Header
         ><b>
-          {#await Translate('Content Builder', 'en', $langs,bricks_data.name) then data}
+          {#await Transloc('Content Builder', 'en', $langs,bricks_data.name) then data}
             {data}
           {/await}
         </b></Header
@@ -554,7 +554,7 @@
                 {@html prompt}
               </div> -->
                   <button class="copy_prompt" on:click={CopyPrompt}>
-                    {#await Translate('Copy', 'en', $langs) then data}
+                    {#await Transloc('Copy', 'en', $langs) then data}
                       {data}
                     {/await}
                   </button>
@@ -563,7 +563,7 @@
             {:else if active === content_title}
               <Paper variant="unelevated">
                 <Content>
-                  {#await Translate('Use chatGPT to run the copied prompt and paste result here', 'en', $langs,bricks_data.name) then data}
+                  {#await Transloc('Use chatGPT to run the copied prompt and paste result here', 'en', $langs,bricks_data.name) then data}
                     <!-- <textarea
                       id="dialog_content"
                       rows="20"
@@ -582,7 +582,7 @@
                     ></div> -->
                   {/await}
                   <button class="paste_content" on:click={PasteContent}>
-                    {#await Translate('Paste Content', 'en', $langs,bricks_data.name) then data}
+                    {#await Transloc('Paste Content', 'en', $langs,bricks_data.name) then data}
                       {data}
                     {/await}
                   </button> 
@@ -593,7 +593,7 @@
 
           <div class="container">
             <button class="save" disabled on:click={CreateContent}>
-              {#await Translate('Create content', 'en', $langs,bricks_data.name) then data}
+              {#await Transloc('Create content', 'en', $langs,bricks_data.name) then data}
                 {data}
               {/await}
             </button>
@@ -606,10 +606,10 @@
   <table>
     <thead>
       <tr>
-        {#await Translate('User 1', 'en', $langs,bricks_data.name) then data}
+        {#await Transloc('User 1', 'en', $langs,bricks_data.name) then data}
           <th>{data}</th>{/await}
 
-        {#await Translate('User 2', 'en', $langs,bricks_data.name) then data}
+        {#await Transloc('User 2', 'en', $langs,bricks_data.name) then data}
           <th>{data}</th>{/await}
       </tr>
     </thead>
@@ -653,10 +653,10 @@
       >add</IconButton
     >
     <div class="container">
-      {#await Translate('Copy data', 'en', $langs,bricks_data.name) then data}
+      {#await Transloc('Copy data', 'en', $langs,bricks_data.name) then data}
         <button class="copy_content" on:click={() => OnCopyContent()}>{data}</button>
       {/await}
-      {#await Translate('Save', 'en', $langs,bricks_data.name) then data}
+      {#await Transloc('Save', 'en', $langs,bricks_data.name) then data}
         <button class="save_content" on:click={() => OnSave()}>{data}</button>
       {/await}
     </div>

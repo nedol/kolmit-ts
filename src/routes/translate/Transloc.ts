@@ -1,6 +1,6 @@
 
 
-export async function Translate(text: string, from_lang: string, to_lang: string, quiz: string) {
+export async function Transloc(text: string, from_lang: string, to_lang: string, quiz: string) {
   try {
     text = text?.trim(); // сначала обрезаем пробелы
 

@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount, onDestroy } from 'svelte';
-  import {Translate} from "../../../translate/Transloc"
+  import {Transloc} from "../../../translate/Transloc"
   import Speak from './Speak.svelte';
   //  import { Speak } from '/src/routes/speech/tts/VoiceRSS';
   import moment from 'moment';
@@ -501,15 +501,15 @@
 <main>
   {#if data.quiz == 'listen'}
 
-      <p>{#await Translate('Послушай и напиши','ru', $langs) then data} {data}: {/await}</p>
+      <p>{#await Transloc('Послушай и напиши','ru', $langs) then data} {data}: {/await}</p>
 
 
     <div class="button-group">
       {#if !isFirst}
-        <button on:click={Generate} class="btn action-btn">{#await Translate('Старт','ru', $langs) then data}  {data} {/await}</button>
+        <button on:click={Generate} class="btn action-btn">{#await Transloc('Старт','ru', $langs) then data}  {data} {/await}</button>
       {:else}
-        <button on:click={repeat} class="btn repeat-btn">{#await Translate('Повторить','ru', $langs) then data} {data} {/await}</button>
-        <button on:click={checkInput} class="btn check-btn">{#await Translate('Проверить','ru', $langs) then data} {data} {/await}</button>
+        <button on:click={repeat} class="btn repeat-btn">{#await Transloc('Повторить','ru', $langs) then data} {data} {/await}</button>
+        <button on:click={checkInput} class="btn check-btn">{#await Transloc('Проверить','ru', $langs) then data} {data} {/await}</button>
       {/if}
     </div>
 

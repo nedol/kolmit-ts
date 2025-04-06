@@ -3,7 +3,7 @@
 
   // import { SortableList } from '@rodrigodagostino/svelte-sortable-list';
 
-  import { Translate } from '../../../translate/Transloc';
+  import { Transloc } from '../../../translate/Transloc';
 
   import { langs, llang } from '$lib/stores.ts';
 
@@ -79,11 +79,11 @@
   $: if (false && $langs) {
     //не работает
     (async () => {
-      grammar_title = await Translate('Grammar', 'en', $langs);
-      context_title = await Translate('Context', 'en', $langs);
+      grammar_title = await Transloc('Grammar', 'en', $langs);
+      context_title = await Transloc('Context', 'en', $langs);
       // prompt_title = await translate('Prompt', $langs);
-      words_title = await Translate('Words', 'en', $langs);
-      content_title = await Translate('Content', 'en', $langs);
+      words_title = await Transloc('Words', 'en', $langs);
+      content_title = await Transloc('Content', 'en', $langs);
     })();
   }
 
@@ -250,7 +250,7 @@
         if (sentence.match(regex)) {
           const sent = sentence.replace(regex, '<<$1>>');
 
-          const translation = await Translate(sent, $llang, $langs); // Дожидаемся перевода
+          const translation = await Transloc(sent, $llang, $langs); // Дожидаемся перевода
 
           result.push({
             example: {
@@ -326,7 +326,7 @@
 <div class="word_container">
   <div class="container">
     <div class="word_field">
-      {#await Translate('Название', 'ru', $langs) then data}
+      {#await Transloc('Название', 'ru', $langs) then data}
         <label for="dialog_name">{data}:</label>
       {/await}
       <input
@@ -338,7 +338,7 @@
     </div>
     {#if data.level}
       <div class="word_field">
-        {#await Translate('Уровень', 'ru', $langs) then data}
+        {#await Transloc('Уровень', 'ru', $langs) then data}
           <label for="dialog_level">{data}:</label>
         {/await}
         <input
@@ -352,7 +352,7 @@
 
     {#if $llang}
       <div class="word_field">
-        {#await Translate('Язык', 'ru', $langs) then data}
+        {#await Transloc('Язык', 'ru', $langs) then data}
           <label for="dialog_lang">{data}:</label>
         {/await}
         <input
@@ -365,7 +365,7 @@
     {/if}
   </div>
 
-  {#await Translate('Контент-генератор', 'ru', $langs) then data}
+  {#await Transloc('Контент-генератор', 'ru', $langs) then data}
     <button
       class="content_generator"
       on:click={() => (isCollapsed = !isCollapsed)}
@@ -464,7 +464,7 @@
               </div>
               <textarea rows="20" name="dialog_task" bind:value={prompt}
               ></textarea>
-              {#await Translate('Копировать промпт', 'ru', $langs) then data}
+              {#await Transloc('Копировать промпт', 'ru', $langs) then data}
                 <button class="copy_prompt" on:click={CopyPrompt}>{data}</button
                 >
               {/await}
@@ -473,7 +473,7 @@
         {:else if active === 'Content'}
           <Paper variant="unelevated">
             <Content>
-              {#await Translate('Use chatGPT to run copied prompt and paste result here', 'en', $langs) then data}
+              {#await Transloc('Use chatGPT to run copied prompt and paste result here', 'en', $langs) then data}
                 <textarea
                   id="dialog_content"
                   rows="20"
@@ -489,7 +489,7 @@
                   PasteContent();
                 }}
               >
-                {#await Translate('Paste Content', 'en', $langs) then data}
+                {#await Transloc('Paste Content', 'en', $langs) then data}
                   {data}
                 {/await}
               </button>
@@ -499,7 +499,7 @@
       </div>
 
       <div class="container">
-        {#await Translate('Создать', 'ru', $langs) then data}
+        {#await Transloc('Создать', 'ru', $langs) then data}
           <button class="save" on:click={() => CreateContent()} disabled
             >{data}</button
           >
@@ -539,13 +539,13 @@
   <div class="container">
     <button class="add-record" on:click={addEmptyRecord}>+</button>
     <div class="save_container">
-      {#await Translate('Копировать контент', 'ru', $langs) then data}
+      {#await Transloc('Копировать контент', 'ru', $langs) then data}
         <button class="copy" on:click={() => OnCopyContent()}>{data}</button>
       {/await}
-      {#await Translate('Заменить контент', 'ru', $langs) then data}
+      {#await Transloc('Заменить контент', 'ru', $langs) then data}
         <button class="copy" on:click={() => OnReplaceContent()}>{data}</button>
       {/await}
-      {#await Translate('Сохранить', 'ru', $langs) then data}
+      {#await Transloc('Сохранить', 'ru', $langs) then data}
         <button class="save" on:click={() => OnSave()}>{data}</button>
       {/await}
     </div>

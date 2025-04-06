@@ -48,7 +48,7 @@ module.exports = class Dict {
     }
 
 
-    Translate(sel_lang, admin, cb) {
+    Transloc(sel_lang, admin, cb) {
 
         let lang = $('.selectpicker option:selected').val().toLowerCase().substring(0, 2);
         let dict = this.getDict();

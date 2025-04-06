@@ -13,7 +13,7 @@
   import Badge from '@smui-extra/badge';
   import IconButton, { Icon } from '@smui/icon-button';
 
-  import { Translate } from '../../../translate/Transloc';
+  import { Transloc } from '../../../translate/Transloc';
 
   import { slide } from 'svelte/transition';
 
@@ -793,7 +793,7 @@
       {#if !isFlipped}
       <div class="container question">
 
-          {#await Translate('Послушай вопрос', 'ru', $langs, dialog_data?.name) then data}
+          {#await Transloc('Послушай вопрос', 'ru', $langs, dialog_data?.name) then data}
             <div class="title" class:active_title={isActiveTitle[0]}>{data}:</div>
           {/await}
 
@@ -807,7 +807,7 @@
           {#if visibility[1]==='visible'}
             <div class="user1" style="visibility:{visibility[1]}">
               <span>
-                  {#await Translate(q[$llang], $llang, $langs, dialog_data?.name) then data}
+                  {#await Transloc(q[$llang], $llang, $langs, dialog_data?.name) then data}
                     {@html data}
                   {/await}
               </span>
@@ -879,7 +879,7 @@
         {#if isRepeat}
           <div class="repeat_alert" style="margin-top: 10px;">
             <Button>
-              {#await Translate('Repeat','en', $langs) then data}
+              {#await Transloc('Repeat','en', $langs) then data}
                 <Label>{data}</Label>
               {/await}              
             </Button>
@@ -891,10 +891,10 @@
 
       <div class="container answer">
 
-        {#await Translate('Переведи и ответь', 'ru', $langs, dialog_data?.name) then data_1}
+        {#await Transloc('Переведи и ответь', 'ru', $langs, dialog_data?.name) then data_1}
           <div class="title"  class:active_title={isActiveTitle[1]}>{data_1}:</div>
         {/await}
-        <!-- {#await Translate('(используй подсказки слов в случае необходимости)', 'ru', $langs) then data_2}
+        <!-- {#await Transloc('(используй подсказки слов в случае необходимости)', 'ru', $langs) then data_2}
           <div class="title title2">{data_2}:</div>
         {/await} -->
 
@@ -906,7 +906,7 @@
 
         <div class="user2_tr">
           {#if a && visibility[0] === 'visible'}
-              {#await Translate(a[$llang], $llang, $langs, dialog_data?.name) then data}
+              {#await Transloc(a[$llang], $llang, $langs, dialog_data?.name) then data}
                 {data}
               {/await}    
           {/if}  
@@ -972,7 +972,7 @@
 
                   </IconButton>
                   {#if isListening}
-                    {#await Translate('говори', 'ru', $llang, dialog_data?.name) then data}
+                    {#await Transloc('говори', 'ru', $llang, dialog_data?.name) then data}
                       <span>{data}</span>
                     {/await}
                   {/if}
@@ -1034,10 +1034,10 @@
             </div>
           {/if}
 
-          {#await Translate('Переведи и спроси', 'ru', $langs, dialog_data?.name) then data}
+          {#await Transloc('Переведи и спроси', 'ru', $langs, dialog_data?.name) then data}
             <div class="title" class:active_title={isActiveTitle[0]}>{data}:</div>
           {/await}
-          <!-- {#await Translate('(используй подсказки слов в случае необходимости)', 'ru', $langs) then data_2}
+          <!-- {#await Transloc('(используй подсказки слов в случае необходимости)', 'ru', $langs) then data_2}
             <div class="title title2">{data_2}:</div>
           {/await} -->
 
@@ -1050,7 +1050,7 @@
 
           <div class="user2_tr">
             {#if a}
-                {#await Translate(a[$llang], $llang, $langs, dialog_data?.name) then data}
+                {#await Transloc(a[$llang], $llang, $langs, dialog_data?.name) then data}
                   {data}
                 {/await}
             {/if}
@@ -1163,14 +1163,14 @@
             </button>
           {/if}
 
-            {#await Translate('Послушай ответ', 'ru', $langs, dialog_data?.name) then data}
+            {#await Transloc('Послушай ответ', 'ru', $langs, dialog_data?.name) then data}
               <div class="title" class:active_title={isActiveTitle[1]}>{data}:</div>
             {/await}
 
            <div style="text-align: center;">
             <div class="user1" style="visibility:{visibility[2]}">
               {#if !dialog_data.content[cur_qa].user1[$langs]}
-                {#await Translate(q[$llang], $llang, $langs, dialog_data?.name) then data}
+                {#await Transloc(q[$llang], $llang, $langs, dialog_data?.name) then data}
                   {data}
                 {/await}
               {:else}

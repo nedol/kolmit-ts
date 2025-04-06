@@ -13,7 +13,7 @@
   // let langs_list = JSON.parse(localStorage.getItem('langs_list'));
   //ISO6391.getAllNames();
 
-  import { Translate } from './translate/Transloc.ts';
+  import { Transloc } from './translate/Transloc.ts';
 
   import List, { Item, Graphic, Separator, Text } from '@smui/list';
 
@@ -105,7 +105,7 @@
                 }}
               >
             
-              {#await Translate('КЛАСС', 'ru', $langs) then data}
+              {#await Transloc('КЛАСС', 'ru', $langs) then data}
                 <span>{data.toUpperCase()}</span>
               {/await}
                 
@@ -118,7 +118,7 @@
           <Section>
             
             <div class={$view === 'lesson' ? 'active' : ''}>
-              {#await Translate('Quit the exercise?', 'en', $langs) then data}
+              {#await Transloc('Quit the exercise?', 'en', $langs) then data}
               <Title
                 on:click={async () => {
                   if ($lesson.data?.quiz) {
@@ -136,7 +136,7 @@
                   }
                 }}
               >
-                {#await Translate('УРОК', 'ru', $langs) then data}
+                {#await Transloc('УРОК', 'ru', $langs) then data}
                     <span>{data.toUpperCase()}</span>
                 {/await}
               </Title>

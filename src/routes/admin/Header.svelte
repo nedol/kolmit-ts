@@ -7,7 +7,7 @@
   import { dicts, langs, view, lesson } from '$lib/stores.ts';
   import google_langs_list from '$lib/dict/google_lang_list.json';
   import ISO6391 from 'iso-google-locales';
-  import { Translate } from '../translate/Transloc';
+  import { Transloc } from '../translate/Transloc';
 
   let topAppBar;
   let abonent;
@@ -45,14 +45,14 @@
         <div class="sec_items">
           {#if $view !== 'login'}
             <Section>
-              {#await Translate('GROUP', 'en', $langs) then data}
+              {#await Transloc('GROUP', 'en', $langs) then data}
                 <Title
                   on:click={() => {
                     $view = 'group';
                   }}>{data}</Title
                 >
               {/await}
-              {#await Translate('LESSON', 'en', $langs) then data}
+              {#await Transloc('LESSON', 'en', $langs) then data}
                 <Title
                   on:click={async () => {
                     console.log();

@@ -19,7 +19,7 @@
     mdiTranslateOff
   } from '@mdi/js';
 
-  import { Translate } from '../../../translate/Transloc';
+  import { Transloc } from '../../../translate/Transloc';
   import {
     llang,
     langs,
@@ -87,7 +87,7 @@
       // if (currentWord?.example[example_lang]) {
       //   example = await currentWord.example[example_lang];
       // } else if (currentWord.example[$llang]) {
-      //   example = await Translate(currentWord.example[$llang], $llang, $langs);
+      //   example = await Transloc(currentWord.example[$llang], $llang, $langs);
       // }
 
       // currentWord.example[$langs] = example;
@@ -106,7 +106,7 @@
       resultElement = replaceWordWithInput(
         (speak_text = currentWord?.example[$llang]
           ? currentWord?.example[$llang]
-          : (currentWord.example[$llang] = await Translate(
+          : (currentWord.example[$llang] = await Transloc(
               currentWord.example['ru'],
               'ru',
               $llang,
@@ -270,7 +270,7 @@
     result = '&nbsp;';
   }
 
-  function ToggleTranslate(){
+  function ToggleTransloc(){
     translate = !translate
   }
 
@@ -575,7 +575,7 @@
               tag="svg"
               viewBox="0 0 24 24"
               style="margin:10px 5px 10px 5px; scale:1.2; width:20px"
-              on:click={ToggleTranslate}
+              on:click={ToggleTransloc}
             >
             {#if translate}
               <path fill="white" d={mdiTranslateOff}/>
@@ -616,13 +616,13 @@
 
     <div style="border:1px solid lightgrey;border-radius:5px;padding:-10px">
 
-      {#await Translate('Заполнить пропуски', 'ru', $langs,data.name) then data}
+      {#await Transloc('Заполнить пропуски', 'ru', $langs,data.name) then data}
         <div class="title">{data}:</div>
       {/await}
 
       {#if translate}
         <div class="word">
-          {#await Translate(currentWord?.example[$llang], $llang, $langs,data.name) then data}
+          {#await Transloc(currentWord?.example[$llang], $llang, $langs,data.name) then data}
             {@html data}
           {/await}       
         </div>
@@ -682,7 +682,7 @@
                   '&nbsp;'}
               </span>
             {:else}
-              {#await Translate(hint?.example['ru'], 'ru', $llang) then data}
+              {#await Transloc(hint?.example['ru'], 'ru', $llang) then data}
                 <span
                   class="hint_button"
                   on:click={() => {

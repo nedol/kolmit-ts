@@ -4,7 +4,7 @@
 	import Button from '@smui/button';
 	import Textfield from '@smui/textfield';
 	import loadImage from 'blueimp-load-image/js/load-image.js';
-	import { Translate } from '../translate/Transloc.ts';
+	import { Transloc } from '../translate/Transloc.ts';
 	import { langs } from '$lib/stores.ts';
   
 	let formData = {
@@ -30,10 +30,10 @@
 	  formData.email = url.searchParams.get('user');
   
 	  // Fetch translations once
-	  translated.nameLabel = await Translate('Имя', 'ru', $langs, 'login');
-	  translated.passwordLabel = await Translate('Пароль', 'ru', $langs, 'login');
-	  translated.confirmPasswordLabel = await Translate('Повторить пароль', 'ru', $langs, 'login');
-	  translated.registrationLabel = await Translate('Зарегистрироваться', 'ru', $langs, 'login');
+	  translated.nameLabel = await Transloc('Имя', 'ru', $langs, 'login');
+	  translated.passwordLabel = await Transloc('Пароль', 'ru', $langs, 'login');
+	  translated.confirmPasswordLabel = await Transloc('Повторить пароль', 'ru', $langs, 'login');
+	  translated.registrationLabel = await Transloc('Зарегистрироваться', 'ru', $langs, 'login');
 	});
   
 	function uploadImage(event) {
@@ -103,7 +103,7 @@
 		required
 	  />
 	  {#if !passwordMatch}
-	  	{#await Translate('Пароли не совпадают','ru',$langs)  then data }
+	  	{#await Transloc('Пароли не совпадают','ru',$langs)  then data }
 		  <p style="color: red;">{data}</p>
 		{/await}
 

@@ -10,7 +10,7 @@ import { exec } from "child_process";
 
 import ISO6391 from 'iso-google-locales';
 
-import { Translate } from '../../translate/Translate';
+import { Transloc } from '../../translate/Transloc';
 
 import { Client } from '@gradio/client';
 
@@ -79,7 +79,7 @@ export async function POST({ url, fetch, cookies, request }) {
     if (resp) {
       resp = {
         [from_lang]: resp.text,
-        [to_lang]: await Translate(resp.text, from_lang, to_lang),
+        [to_lang]: await Transloc(resp.text, from_lang, to_lang),
       };
     }
   } else if (from_lang == 'nl') {
@@ -98,7 +98,7 @@ export async function POST({ url, fetch, cookies, request }) {
     if (result) {
       resp = {
         [from_lang]: result,
-        // [to_lang]: await Translate(result, from_lang, to_lang),
+        // [to_lang]: await Transloc(result, from_lang, to_lang),
       };
 
       SaveSTT(operator,result,from_lang, original);
@@ -109,7 +109,7 @@ export async function POST({ url, fetch, cookies, request }) {
     if (result) {
       resp = {
         [from_lang]: result,
-        [to_lang]: await Translate(result, from_lang, to_lang),
+        [to_lang]: await Transloc(result, from_lang, to_lang),
       };
     }
   }
