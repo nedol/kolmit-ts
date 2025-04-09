@@ -29,7 +29,8 @@
   import CircularProgress from '@smui/circular-progress';
 
   import Group from './Group.svelte';
-  let group_data = getContext('group_data');
+
+  let operator =  getContext('operator');
 
   import { RTCOperator } from './rtc/RTCOperator';
 
@@ -96,7 +97,6 @@
     edited_display = $editable;
   }
 
-  let operator = getContext('operator');
   operator.type = 'operator';
 
   const abonent = operator.abonent;
@@ -173,7 +173,7 @@
       if (detectDevice())
         document.addEventListener('visibilitychange', handleVisibilityChange);
 
-      if(group_data.length<=1)
+      if(operator.length<=1)
         $view = 'lesson'
 
 
@@ -493,7 +493,6 @@
   }
 
   onDestroy(() => {
-    group_data = '';
     document.removeEventListener('visibilitychange', handleVisibilityChange);
   });
 </script>
@@ -503,13 +502,13 @@
 
 
 {#if $view === 'lesson'}
-  <Module data={group_data} bind:group={group_data}/>
+  <Module data={operator}/>
 
 {:else if $view==='chat'}
   <Chat prompt_type={operator.level?"greeting":'basic'}></Chat>   
 
 {:else if  $view === 'group'}
-  <Group  {rtc} bind:group={group_data}/>
+  <Group  {rtc} />
 {/if}
 
 

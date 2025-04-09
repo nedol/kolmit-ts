@@ -88,7 +88,7 @@ export async function load({ fetch, cookies, route, url }) {
 	};
 
 	// let { operators, admin } = await GetUsers(params); //cc[0]; //
-	let { group, oper } = await GetGroup(params);
+	let { oper, group } = await GetGroup(params);
 	
 	// global.rtcPool['user'][abonent][kolmit.operator]
 
@@ -97,11 +97,10 @@ export async function load({ fetch, cookies, route, url }) {
 		check: true,
 		host: host,
 		// url: decodeURIComponent(url.toString()),
-		cookies:res,
-		operator: oper,
-		abonent: abonent,
-		dict: dict,
 		group: group,
+		cookies:res,
+		abonent: abonent,
+		operator: oper,
 		ice_conf: ice_conf
 	};
 }

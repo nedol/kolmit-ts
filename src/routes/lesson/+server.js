@@ -27,7 +27,7 @@ export async function GET({ url, fetch, cookies }) {
   const dialog = url.searchParams.get('dialog');
   const bricks = url.searchParams.get('bricks');
   const lesson = url.searchParams.get('lesson');
-  const lvl = url.searchParams.get('level');
+  const level = url.searchParams.get('level');
   let data;
 
   function delay(ms) {
@@ -43,7 +43,7 @@ export async function GET({ url, fetch, cookies }) {
 
     data = await GetText({
       owner: abonent,
-      level: lvl,
+      level: level,
       theme: theme,
       title: title,
     });
@@ -53,7 +53,7 @@ export async function GET({ url, fetch, cookies }) {
     data = await GetDict({
       owner: abonent,
       type: dict,
-      level: lvl,
+      level: level,
       theme: theme,
     });
     // let data = await resp.text();
@@ -106,7 +106,7 @@ export async function GET({ url, fetch, cookies }) {
     const obj = await GetLesson({
       owner: owner,
       operator: operator,
-      level: lvl
+      level: level
     });
     // console.log(data)
     let response = new Response(JSON.stringify(obj));

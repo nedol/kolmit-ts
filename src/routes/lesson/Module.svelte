@@ -59,6 +59,8 @@
   let gr_field = '';
   const operator = getContext('operator');
 
+  const level = getContext('level');
+
   function findPic(operator: any) {
     const oper = find(group, { operator: operator });
     return oper.picture || '/assets/operator.svg';
@@ -136,10 +138,10 @@
     } catch (ex) {}
   }
 
-  export async function fetchLesson(owner, operator) {
+  export async function fetchLesson(owner, operator, level) {
     try {
       const response = await fetch(
-        `./lesson?lesson=${operator}&owner=${owner}`
+        `./lesson?lesson=${operator}&owner=${owner}&level=${level}`
       );
       if (!response.ok) {
         throw new Error('Failed to fetch data');
@@ -156,7 +158,7 @@
 
 
   onMount(async () => {
-    const lessonData = await fetchLesson(operator.abonent, operator.operator);
+    const lessonData = await fetchLesson(operator.abonent, operator.operator, level);
     lesson_data = lessonData.data;
     module = lesson_data. module;
     $llang = lesson_data.lang;

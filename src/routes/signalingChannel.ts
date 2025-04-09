@@ -1,5 +1,6 @@
 import { msg } from '$lib/stores.ts';
 
+
 export class SignalingChannel {
   constructor(operator) {
     this.msg = msg;
@@ -14,7 +15,7 @@ export class SignalingChannel {
     if(window.location.hostname.includes('192.168.'))
       this.socketUrl = `wss://192.168.0.6:3000`;
     
-    // if(window.location.hostname.includes('onrender'))
+    if(window.location.hostname.includes('onrender'))
       this.socketUrl = 'wss://kolmit-server.onrender.com';//!! работает на render
 
 
@@ -81,56 +82,45 @@ export class SignalingChannel {
 
   SendMessage(par, cb) {
     this.callback = cb;
-
     this.status = par.status;
 
     try {
-      if (this.socket && this.socket.readyState === WebSocket.OPEN) {
-        this.socket.send(JSON.stringify({ par }));
-      } else {
-        console.log('Соединение с WebSocket не установлено, добавление сообщения в очередь');
-        this.messageQueue.push(par);
-        if (!this.socket || this.socket.readyState >= WebSocket.CLOSING) {
-          this.initializeWebSocket();
+        // Если соединение открыто, отправляем сразу
+        if (this.isSocketReady()) {
+            this.socket.send(JSON.stringify({ par }));
+            return;
         }
-      }
 
-      if (par.status === 'close') {
-        this.closeConnection();
-      } else if (par.status === 'open' && !this.isOpen) {
-        this.initializeWebSocket();
-      }
+        // Добавляем в очередь, если не удалось отправить
+        console.log('Соединение не готово, добавление в очередь');
+        this.messageQueue.push(par);
+        
+        // Пытаемся переподключиться, если соединение закрыто или в процессе закрытия
+        if (!this.isSocketConnecting()) {
+            console.log('Попытка переподключения...');
+            this.initializeWebSocket();
+        }
+        
+        // Обработка специальных статусов
+        if (par.status === 'close') {
+            this.closeConnection();
+        } else if (par.status === 'open') {
+            this.initializeWebSocket();
+        }
     } catch (error) {
-      console.error('Ошибка при отправке сообщения:', error);
+        console.error('Ошибка при отправке сообщения:', error);
+        // При ошибке также пытаемся переподключиться
+        this.initializeWebSocket();
     }
   }
 
-  
-  SendPrompt(par) {
+  // Вспомогательные методы для проверки состояния сокета
+  isSocketReady() {
+      return this.socket && this.socket.readyState === WebSocket.OPEN && this.isOpen;
+  }
 
-    this.callback = cb;
-
-    this.status = par.status;
-
-    try {
-      if (this.socket && this.socket.readyState === WebSocket.OPEN) {
-        this.socket.send(JSON.stringify({ par }));
-      } else {
-        console.log('Соединение с WebSocket не установлено, добавление сообщения в очередь');
-        this.messageQueue.push(par);
-        if (!this.socket || this.socket.readyState >= WebSocket.CLOSING) {
-          this.initializeWebSocket();
-        }
-      }
-
-      if (par.status === 'close') {
-        this.closeConnection();
-      } else if (par.status === 'open' && !this.isOpen) {
-        this.initializeWebSocket();
-      }
-    } catch (error) {
-      console.error('Ошибка при отправке сообщения:', error);
-    }
+  isSocketConnecting() {
+      return this.socket && this.socket.readyState === WebSocket.CONNECTING;
   }
 
   closeConnection() {

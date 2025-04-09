@@ -52,6 +52,7 @@
   import Stt from '../../../speech/stt/Stt.svelte';
 
   const operator = getContext('operator');
+  const level = getContext('level');
 
   let stt: any, tts: any;
 
@@ -212,7 +213,7 @@
     }
 
     fetch(
-      `./lesson?dialog=${data.name}&owner=${operator.abonent}&level=${data.level}`
+      `./lesson?dialog=${data.name}&owner=${operator.abonent}&level=${level}`
     )
       .then((response) => response.json())
       .then(async(dlg_data) => {

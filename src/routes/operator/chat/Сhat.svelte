@@ -54,6 +54,7 @@
   let dataAr:{}
 
   let operator = getContext('operator');
+  let level = getContext('level');
   let lastMessage:string; // переменная для последнего сообщения
 
   // Время последнего сообщения (можно сохранять в localStorage для сохранения между перезагрузками)
@@ -156,7 +157,7 @@
         words:words,
         langs: $langs,
         llang: $llang || 'nl',
-        level: "2.1",
+        level: level,
         ulvl:operator.level,       
       };
 

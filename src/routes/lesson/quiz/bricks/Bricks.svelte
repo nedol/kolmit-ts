@@ -111,6 +111,7 @@ let keys: string[] = [];
   export let data: string = '';
 
   const operator = getContext('operator');
+  const level = getContext('level');
   // Исходное предложение
   let sentence = "";
 
@@ -139,7 +140,7 @@ let keys: string[] = [];
 
 
   fetch(
-    `./lesson?bricks=${data.name}&theme=${data.theme}&owner=${operator.abonent}&level=${data.level}`
+    `./lesson?bricks=${data.name}&theme=${data.theme}&owner=${operator.abonent}&level=${level}`
   )
     .then((response) => response.json())
     .then(async (data) => {
@@ -754,7 +755,7 @@ let keys: string[] = [];
       const par = {
         func: 'set_rate',
         operator:operator.operator,
-        level:data.level,
+        level:level,
         name:data.name,
         rate:rate.cnt,
         total:rate.total,

@@ -36,23 +36,45 @@ export async function GET({ url, fetch, cookies }) {
       });
   } else if (func === 'cookie') {
     if (lang) {
-      try {
-        const oper = admin ? 'admin' : 'operator';
-        let cookie = cookies.get((lvl?`${lvl}.`:'')+`kolmit.${oper}.${abonent}`);
+      if(abonent==='public'){
+        try {
+          const oper = admin ? 'admin' : 'operator';
+          let cookie = cookies.get(`kolmit.${oper}.${abonent}`);
 
-        if(cookie){
-          cookie = JSON.parse(cookie);
-          cookie.lang = lang;
-          
-          cookies.set((lvl?`${lvl}.`:'')+`kolmit.${oper}.${abonent}`, JSON.stringify(cookie), {
-            path: '/',
-            maxAge: 60 * 60 * 24 * 400,
-          });
+          if(cookie){
+            cookie = JSON.parse(cookie);
+            cookie.lang = lang;
+            
+            cookies.set(`kolmit.${oper}.${abonent}`, JSON.stringify(cookie), {
+              path: '/',
+              maxAge: 60 * 60 * 24 * 400,
+            });
+          }
+
+        } catch (ex) {
+          console.log(ex);
         }
+      }else{
 
-      } catch (ex) {
-        console.log(ex);
-      }
+            try {
+              const oper = admin ? 'admin' : 'operator';
+              const cookie_str = (lvl?`${lvl.toLowerCase()}.`:'')+`kolmit.${oper}.${abonent}`
+              let cookie = cookies.get(cookie_str);
+      
+              if(cookie){
+                cookie = JSON.parse(cookie);
+                cookie.lang = lang;
+                
+                cookies.set((lvl?`${lvl.toLowerCase()}.`:'')+`kolmit.${oper}.${abonent}`, JSON.stringify(cookie), {
+                  path: '/',
+                  maxAge: 60 * 60 * 24 * 400,
+                });
+              }
+      
+            } catch (ex) {
+              console.log(ex);
+            }        
+        }
     }
   } else if (func === 'set_lang') {
     if (lang) {

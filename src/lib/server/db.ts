@@ -248,37 +248,42 @@ async function updateUsers(users: any[], q: any): Promise<string> {
 }
 
 
-export async function GetGroup(par: {
+export async function GetGroup(params: {
   abonent: string;
   operator: string;
   psw: string;
 }): Promise<{ group: any; oper: any }> {
-  const group = await sql`
-    SELECT "group", abonent, role, operator, picture, lang, name, level
-    FROM operators
-    WHERE operators.abonent=${par.abonent} 
-    AND operators.operator=${par.operator}
-    AND operators.group=(
-      SELECT "group" FROM operators
-      WHERE operators.abonent=${par.abonent} 
-      AND operator=${par.operator} AND psw=${par.psw}
-    )`;
-    
-
-    if (group) {
-      const timestamp = new Date().toISOString(); // Получаем текущую метку времени
-      CreateSession(par.operator, md5(par.operator+timestamp));
-    }
-
+  // Fetch operator information
   const oper = await sql`
     SELECT "group", abonent, role, operator, picture, lang, name, level
     FROM operators
-    WHERE operators.abonent=${par.abonent} AND operator=${par.operator}
+    WHERE operators.abonent=${params.abonent} 
+      AND operator=${params.operator}
   `;
+
+  if (!oper || oper.length === 0) {
+    throw new Error("Operator not found");
+  }
+
+  // Calculate level group (rounding down to nearest 10)
+  const levelGroup = (params.abonent==='public'?Math.floor(oper[0].level / 10) * 10: oper[0].level);
+
+  // Fetch group information
+  const group = await sql`
+    SELECT *
+    FROM groups
+    WHERE name=${oper[0].group} 
+      AND level=${levelGroup}
+  `;
+
+  if (group && group.length > 0) {
+    const timestamp = new Date().toISOString();
+    // Note: md5 should not be used for security-sensitive operations
+    CreateSession(params.operator, md5(params.operator + timestamp));
+  }
 
   return { group, oper };
 }
-
 
 interface Query {
   psw?: string;
@@ -968,7 +973,7 @@ export async function GetLesson(q: { operator: string; owner: string; level?: st
           SELECT lessons.data, lessons.lang 
           FROM lessons
           JOIN groups ON (groups.name = ${operatorGroup} AND groups.name = lessons.group)
-          WHERE groups.owner = ${q.owner} AND lessons.owner = ${q.owner}
+          WHERE groups.owner = ${q.owner} AND lessons.owner = ${q.owner} AND lessons.level = ${q.level}
         `;
       } else {
         res = await sql<Lesson[]>`

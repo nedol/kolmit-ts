@@ -36,14 +36,15 @@
   let name: string | undefined;
   let user_pic: string | undefined;
 
-  $dicts = data.dict[0];
+  // $dicts = data.dict[0];
 
   // Initialize necessary values and set context
   function Init() {
     localStorage.clear();
 
-    setContext('group_data', data.group);
-    setContext('lvl', data.lvl);
+    if(data.group[0])
+      setContext('level', data.group[0].level);
+
     setContext('operator', data.operator[0]);
     setContext('abonent', data.abonent);
 
@@ -61,13 +62,13 @@
   }
 
   // Initialize the data if available
-  if (data.operator && data.group.length > 0) {
+  if (data.operator) {
     Init();
   }
 
   // Manage view on mount
   onMount(() => {
-    if (!operator || data?.group?.length === 0) {
+    if (!operator) {
       $view = 'login';
     }
   });
@@ -75,7 +76,7 @@
 
 <Header></Header>
 
-{#if operator && data?.group?.length > 0}
+{#if operator}
   <Operator {operator} {abonent} {name} />
 {:else if $view === 'login'}
   <Login {operator} {abonent} {user_pic} />
