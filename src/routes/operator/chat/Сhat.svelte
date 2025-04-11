@@ -15,7 +15,8 @@
       mdiTranslate,
       mdiTranslateOff,
       mdiMicrophoneMessage,
-      mdiSendOutline
+      mdiSendOutline,
+      mdiPlay
   } from '@mdi/js';
 
   export let prompt_type="basic", quiz = {quiz:''}, context:string[] = [];
@@ -66,6 +67,16 @@
   let selectedReplyId: string | null = null; // ID сообщения, для которого показаны ответы
 
   let isReminderSent = false; // Флаг для отслеживания отправки напоминания
+
+  interface FormattedSentence {
+    gr: string;
+    placeholder: string;
+    value: string;
+    word:string;
+    class:string;
+  }
+
+  let formattedSentence: FormattedSentence[] = [];
 
 
   onMount(async() => {
@@ -365,6 +376,17 @@
   } 
 
 
+  const SpeakText = async (text:string) => {
+
+    const output = text.replace(/<[^>]*>/g, '');
+
+    if (text) {
+      tts.Speak_server($llang, output, '', '');
+    }
+
+}
+
+
   function toggleReply(messageId: string) {
     if (selectedReplyId === messageId) {
       selectedReplyId = null; // Скрыть ответы, если они уже показаны для этого сообщения
@@ -492,7 +514,17 @@
                 </Icon>
               </IconButton>
             </div>
-          {/if}          
+          {/if}    
+          
+          {#if message.role === 'system' || message.role === 'assistant' && quiz.quiz!=='dialog'  }  
+            <div on:click={() => SpeakText(message.text)} >
+              <IconButton>
+                <Icon tag="svg" viewBox="0 0 24 24" style="scale:1">
+                  <path fill="#007bff" d={mdiPlay} />
+                </Icon>
+              </IconButton>
+            </div>
+          {/if}
     
           {#if message.role === 'assistant' || (message.role === 'user' && message.cor)}
             <div on:click={() => toggleTranslation(message )}>

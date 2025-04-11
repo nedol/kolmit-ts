@@ -179,7 +179,7 @@
 
 
     setTimeout(()=>{
-      if(!operator.level){  
+      if(!operator.level && abonent==='public'){  
         $view = 'chat'
       }
     },1000)

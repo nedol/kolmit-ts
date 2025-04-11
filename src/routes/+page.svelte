@@ -18,7 +18,6 @@
   interface GroupData {
     group: string[];
   }
-
   interface Data {
     dict: Array<any>;  // Adjust based on the actual structure of the dict
     operator: Array<OperatorData>;
