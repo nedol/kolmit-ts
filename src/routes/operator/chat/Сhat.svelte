@@ -32,7 +32,16 @@
 
   let words = 'undefined'
 
-  type Message = { role: 'user' | 'assistant' | 'system'; text: string; tr: string; cor:string | ''; id: string; isTranslate: boolean; };
+  type Message = {
+    role: 'user' | 'assistant' | 'system';
+    text: string;
+    tr: string;
+    cor: string | '';
+    id: string;
+    isTranslate: boolean;
+    replies?: string[]; // <- добавляем replies
+  };
+
   type Messages = Message[];
 
   let userInput = '';
@@ -280,14 +289,19 @@
             // Добавляем ответ AI в список
             if(dataAr[$llang]?.msg){
               messages.update(msgs =>  
-              [...msgs, 
-                { id: crypto.randomUUID(), 
-                  role: "assistant", 
-                  text: dataAr[$llang]?.msg, 
-                  tr: dataAr[$langs]?.msg , 
-                  cor:'',
-                  isTranslate:false}
-              ]);  
+                [...msgs, 
+                  {
+                    id: crypto.randomUUID(), 
+                    role: "assistant", 
+                    text: dataAr[$llang]?.msg, 
+                    tr: dataAr[$langs]?.msg, 
+                    cor: '', 
+                    isTranslate: false,
+                    replies: dataAr[$llang]?.replies || [],
+                    repliesTranslated: dataAr[$langs]?.replies || [],
+                  }
+                ]);
+
               
               if(dataAr[$llang]?.words)
                   words = dataAr[$llang]?.words
@@ -387,19 +401,18 @@
 }
 
 
-  function toggleReply(messageId: string) {
-    if (selectedReplyId === messageId) {
-      selectedReplyId = null; // Скрыть ответы, если они уже показаны для этого сообщения
-    } else {
-      selectedReplyId = messageId; // Показать ответы для выбранного сообщения
-    }
-    setTimeout(() => {
-      messagesContainer?.lastElementChild?.scrollIntoView({ behavior: "smooth", block: "end" });
-    }, 100);
-
-    if(isTranslate)
-      isTip = true;
+function toggleReply(messageId: string) {
+  if (selectedReplyId === messageId) {
+    selectedReplyId = null;
+  } else {
+    selectedReplyId = messageId;
   }
+
+  setTimeout(() => {
+    messagesContainer?.lastElementChild?.scrollIntoView({ behavior: "smooth", block: "end" });
+  }, 100);
+}
+
 
   function startReminderTimer() {
 
@@ -490,24 +503,28 @@
       {#if message.role === 'assistant' }
           {#if selectedReplyId === message.id}
             <div class="reply_container">
-              {#each dataAr[$llang]?.replies as reply,i}
-                {#if message.isTranslate} 
-                  <reply on:click={()=>{SetInput(dataAr[$llang]?.replies[i]) }}>{reply}</reply>
-                {:else}
-                {#if dataAr[$langs]?.replies[i]}
-                  <reply on:click={()=>{SetInput(reply)}}>{dataAr[$langs]?.replies[i]}</reply>
-                {:else}
-                  {#await Transloc(reply,$llang, $langs,'chat') then data}
-                    <reply on:click={()=>{SetInput(reply)}}>{data}</reply>
-                  {/await}
-                  {/if} 
-                {/if}
-              {/each}
+              {#each message.replies as reply, i}
+              {#if !message.isTranslate}
+                <reply on:click={() => SetInput(reply)}>
+                  {#if message.repliesTranslated?.[i]}
+                    {message.repliesTranslated[i]}
+                  {:else}
+                    {#await Transloc(reply, $llang, $langs, 'chat') then data}
+                      {data}
+                    {/await}
+                  {/if}
+                </reply>
+              {:else}
+                <reply on:click={() => SetInput(reply)}>{reply}</reply>
+              {/if}
+            {/each}
+            
             </div>
           {/if}
         {/if}
+        
         <div style="display:flex;justify-content: space-between;">  
-          {#if isReply && message.role === 'assistant' && quiz.quiz!=='dialog' }        
+          {#if isReply && message.role === 'assistant' && quiz.quiz!=='dialog'}        
             <div on:click={() => toggleReply(message.id)} >
               <IconButton>
                 <Icon tag="svg" viewBox="0 0 24 24" style="scale:1">
@@ -517,7 +534,7 @@
             </div>
           {/if}    
           
-          {#if message.role === 'system' || message.role === 'assistant' && quiz.quiz!=='dialog'  }  
+          {#if ((message.role === 'system'  && message.text.length>0) || message.role === 'assistant') && quiz.quiz!=='dialog'   }  
             <div on:click={() => SpeakText(message.text)} >
               <IconButton>
                 <Icon tag="svg" viewBox="0 0 24 24" style="scale:1">

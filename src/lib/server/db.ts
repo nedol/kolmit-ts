@@ -267,14 +267,24 @@ export async function GetGroup(params: {
 
   // Calculate level group (rounding down to nearest 10)
   const levelGroup = (params.abonent==='public'?Math.floor(oper[0].level / 10) * 10: oper[0].level);
+  let group = []
 
-  // Fetch group information
-  const group = await sql`
-    SELECT *
-    FROM groups
-    WHERE name=${oper[0].group} 
-      AND level=${levelGroup}
-  `;
+  if(oper[0].abonent!=='public'){
+    // Fetch group information
+    group = await sql`
+      SELECT *
+      FROM groups
+      WHERE name=${oper[0].group} 
+        AND level=${levelGroup}
+    `;
+  }else{
+    group = [{
+      owner: oper[0].abonent,
+      level: Math.floor(oper[0].level / 10)*10 ,
+      lang: oper[0].lang,
+      name: oper[0].group
+    }]
+  }
 
   if (group && group.length > 0) {
     const timestamp = new Date().toISOString();
@@ -969,12 +979,19 @@ export async function GetLesson(q: { operator: string; owner: string; level?: st
 
       // Query based on operator and owner relationship
       if (operatorGroup) {
-        res = await sql<Lesson[]>`
-          SELECT lessons.data, lessons.lang 
-          FROM lessons
-          JOIN groups ON (groups.name = ${operatorGroup} AND groups.name = lessons.group)
-          WHERE groups.owner = ${q.owner} AND lessons.owner = ${q.owner} AND lessons.level = ${q.level}
-        `;
+        if(q.owner==='public')
+          res = await sql<Lesson[]>`
+            SELECT lessons.data, lessons.lang 
+            FROM lessons
+            WHERE lessons.owner = ${q.owner} AND lessons.level = ${q.level}
+          `;
+          else
+            res = await sql<Lesson[]>`
+            SELECT lessons.data, lessons.lang 
+            FROM lessons
+            JOIN groups ON (groups.name = ${operatorGroup} AND groups.name = lessons.group)
+            WHERE groups.owner = ${q.owner} AND lessons.owner = ${q.owner} AND lessons.level = ${q.level}
+          `;
       } else {
         res = await sql<Lesson[]>`
           SELECT data,  lang 
