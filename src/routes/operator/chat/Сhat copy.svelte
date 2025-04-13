@@ -185,7 +185,7 @@
         langs: $langs,
         llang: $llang || 'nl',
         level: "2.1",
-        ulvl: operator.level,
+        lvl: operator.level,
       };
 
       console.log('SendMessage', params);

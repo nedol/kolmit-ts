@@ -19,7 +19,7 @@
         quiz: quiz
       };
 
-      const response = await fetch('/speech/tts', {
+      const response = await fetch('./speech/tts', {
         method: 'POST',
         body: JSON.stringify({ par }),
         // header: { 'Content-Type': 'audio/ogg' }

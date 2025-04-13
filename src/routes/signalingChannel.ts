@@ -37,6 +37,7 @@ export class SignalingChannel {
     this.socket = new WebSocket(this.socketUrl);
     this.isOpen = false;
 
+
     this.socket.onopen = () => {
       console.log('WebSocket соединение установлено');
       this.isOpen = true;
@@ -55,7 +56,7 @@ export class SignalingChannel {
       console.log('WebSocket соединение закрыто');
       this.isOpen = false;
       const delay = Math.min(1000 * reconnectAttempt, 30000);
-      setTimeout(() => this.initializeWebSocket(reconnectAttempt + 1), delay);
+      setTimeout(() => this.initializeWebSocket(reconnectAttempt + 1), 30000);
     };
 
     this.socket.onerror = (error) => {

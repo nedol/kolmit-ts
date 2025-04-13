@@ -169,7 +169,7 @@
         langs: $langs,
         llang: $llang || 'nl',
         level: level,
-        ulvl:operator.level,       
+        lvl:operator.level,       
       };
 
       console.log('SendMessage',params);
@@ -404,6 +404,7 @@
   function startReminderTimer() {
 
     reminderTimeout = setTimeout(() => {
+      loading.set(false)
       const currentTime = Date.now();
       if (currentTime - lastMessageTime >= 1 * 60 * 1000) { // 5 минут неактивности
         sendMessage(`Blijf praten.`); // Отправляем напоминание

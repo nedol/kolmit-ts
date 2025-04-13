@@ -1259,6 +1259,9 @@ let keys: string[] = [];
       align-items: center;
       text-align: center;
       line-height: 1.2 !important;
+      margin-left: 10px;
+      margin-right: 10px;
+    
   }
 
   .placeholder {
