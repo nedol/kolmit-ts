@@ -964,63 +964,70 @@ export async function GetLesson(q: { operator: string; owner: string; level?: st
   try {
     let res: Lesson[] = [];
     let levels: string[] = [];
-    let news: NewsItem[] = [];
+    let news: News[] = []; // Тип исправлен под интерфейс
+    let context_news: ContextNews[] = [];
     let operatorGroup: string | null = null;
 
     // Начинаем транзакцию
     await sql.begin(async (sql) => {
-      // First get the operator's group
-      const operatorInfo = await sql<{group: string}[]>`
+      const operatorInfo = await sql<{ group: string }[]>`
         SELECT "group" FROM operators 
         WHERE operator = ${q.operator} AND abonent = ${q.owner}
         LIMIT 1
       `;
       operatorGroup = operatorInfo[0]?.group || null;
 
-      // Query based on operator and owner relationship
       if (operatorGroup) {
-        if(q.owner==='public')
+        if (q.owner === 'public') {
           res = await sql<Lesson[]>`
-            SELECT lessons.data, lessons.lang 
+            SELECT lessons.data, lessons.lang, lessons.level
             FROM lessons
             WHERE lessons.owner = ${q.owner} AND lessons.level = ${q.level}
           `;
-          else
-            res = await sql<Lesson[]>`
-            SELECT lessons.data, lessons.lang 
+        } else {
+          res = await sql<Lesson[]>`
+            SELECT lessons.data, lessons.lang, lessons.level
             FROM lessons
             JOIN groups ON (groups.name = ${operatorGroup} AND groups.name = lessons.group)
             WHERE groups.owner = ${q.owner} AND lessons.owner = ${q.owner} AND lessons.level = ${q.level}
           `;
+        }
       } else {
         res = await sql<Lesson[]>`
-          SELECT data,  lang 
-          FROM lessons 
-          WHERE owner = ${q.owner}  
+          SELECT data, lang, level
+          FROM lessons
+          WHERE owner = ${q.owner}
         `;
       }
 
+      levels = [...new Set(res.map(r => r.level))]; // Соберём уникальные уровни
+
+      // Здесь можно добавить загрузку news и context_news, если нужно
     });
 
-    // Find lesson for the specific level
     const les = res.find((lesson) => lesson.level === q.level);
 
-    // Return structured response
     return {
-      data: les?.data || res[0]?.data || '', // Default to first lesson's data if not found
-      lang: les?.lang || res[0]?.lang || 'en', // Default to 'en' if not found
-      operatorGroup: operatorGroup // Include the found group in response if needed
+      data: les?.data || res[0]?.data || '',
+      lang: les?.lang || res[0]?.lang || 'en',
+      level: les?.level || res[0]?.level || '',
+      levels,
+      news,
+      context_news,
     };
   } catch (ex) {
     console.error('Error in GetLesson:', ex);
-    return { 
-      data: '', 
-      lang: 'en', 
-      operatorGroup: null, 
-      news: [], 
-    }; // Return empty/default values on error
+    return {
+      data: '',
+      lang: 'en',
+      level: '',
+      levels: [],
+      news: [],
+      context_news: [],
+    };
   }
 }
+
 interface NewsItem {
   name: string;
   published: number;

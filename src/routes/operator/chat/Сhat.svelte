@@ -524,15 +524,7 @@ function toggleReply(messageId: string) {
         {/if}
         
         <div style="display:flex;justify-content: space-between;">  
-          {#if isReply && message.role === 'assistant' && quiz.quiz!=='dialog'}        
-            <div on:click={() => toggleReply(message.id)} >
-              <IconButton>
-                <Icon tag="svg" viewBox="0 0 24 24" style="scale:1">
-                  <path fill="green" d={mdiMicrophoneMessage} />
-                </Icon>
-              </IconButton>
-            </div>
-          {/if}    
+
           
           {#if ((message.role === 'system'  && message.text.length>0) || message.role === 'assistant') && quiz.quiz!=='dialog'   }  
             <div on:click={() => SpeakText(message.text)} >
@@ -543,6 +535,16 @@ function toggleReply(messageId: string) {
               </IconButton>
             </div>
           {/if}
+
+          {#if isReply && message.role === 'assistant' && quiz.quiz!=='dialog'}        
+            <div on:click={() => toggleReply(message.id)} >
+              <IconButton>
+                <Icon tag="svg" viewBox="0 0 24 24" style="scale:1">
+                  <path fill="green" d={mdiMicrophoneMessage} />
+                </Icon>
+              </IconButton>
+            </div>
+          {/if}    
     
           {#if message.role === 'assistant' || (message.role === 'user' && message.cor)}
             <div on:click={() => toggleTranslation(message )}>
