@@ -19,6 +19,9 @@
       mdiPlay
   } from '@mdi/js';
 
+  let blink_arrow = writable(false);
+  let blink_mic = writable(false);
+
   export let prompt_type="basic", quiz = {quiz:''}, context:string[] = [];
 
   let stt: Stt | null = null; // Если `Stt` — это класс или компонент Svelte
@@ -45,6 +48,13 @@
   type Messages = Message[];
 
   let userInput = '';
+
+  $:if(userInput){
+    $blink_arrow = true;
+    $blink_mic = false
+  }else{
+    $blink_arrow = false;
+  }
   
   let elInput:HTMLInputElement ;
   let messages = writable<Messages>([]);
@@ -104,6 +114,8 @@
           cor: '',
           isTranslate:false}
       ]);
+
+      $blink_mic = true;
 
   });
 
@@ -187,9 +199,8 @@
       isTip = false; 
 
       $signal.SendMessage(params,async (res) => {    
-         console.log('handleData',res)
-        handleData(res);
-       
+        console.log('handleData',res)
+        handleData(res);       
       });  
 
       async function handleData(data){
@@ -210,10 +221,10 @@
               ]);
 
               if (messagesContainer) {
-              setTimeout(() => {
-                messagesContainer.lastElementChild.scrollIntoView({ behavior: "smooth", block: "end" });
-              }, 100);
-            }
+                setTimeout(() => {
+                  messagesContainer.lastElementChild.scrollIntoView({ behavior: "smooth", block: "end" });
+                }, 100);
+              }
               return;
             }
 
@@ -335,8 +346,10 @@
             if(dataAr[$llang]){
 
               tts?.Speak_server($llang, dataAr[$llang].msg , '', '');
-              isReply = dataAr[$llang].replies?true:false;
+              isReply = dataAr[$llang].replies.length>0?true:false;
             }
+
+            $blink_mic = true;
 
         } catch (error) {
           console.error("Произошла ошибка при обращении к серверу:", error);
@@ -367,6 +380,8 @@
     }
 
     stt_text = ''
+
+    $blink_mic = false;
 
     stt.startAudioMonitoring($llang, $langs);
 
@@ -504,21 +519,20 @@ function toggleReply(messageId: string) {
           {#if selectedReplyId === message.id}
             <div class="reply_container">
               {#each message.replies as reply, i}
-              {#if !message.isTranslate}
-                <reply on:click={() => SetInput(reply)}>
-                  {#if message.repliesTranslated?.[i]}
-                    {message.repliesTranslated[i]}
-                  {:else}
-                    {#await Transloc(reply, $llang, $langs, 'chat') then data}
-                      {data}
-                    {/await}
-                  {/if}
-                </reply>
-              {:else}
-                <reply on:click={() => SetInput(reply)}>{reply}</reply>
-              {/if}
-            {/each}
-            
+                {#if !message.isTranslate}
+                  <reply  on:click={() => SetInput(reply)}>
+                    {#if message.repliesTranslated?.[i]}
+                      {message.repliesTranslated[i]}
+                    {:else}
+                      {#await Transloc(reply, $llang, $langs, 'chat') then data}
+                        {data}
+                      {/await}
+                    {/if}
+                  </reply>
+                {:else}
+                  <reply on:click={() => SetInput(reply)}>{reply}</reply>
+                {/if}
+              {/each}            
             </div>
           {/if}
         {/if}
@@ -568,14 +582,14 @@ function toggleReply(messageId: string) {
 
   </div>
 
-  <div class="input-container">
-    <div style="margin-right:10px">
-      <IconButton
+  <div class="input-container" >
+    <div class:blink={$blink_mic} style="margin-right:10px; ">
+      <IconButton 
         class="material-icons"
         aria-label="Back"
         on:click={onClickMicrophone}
       >
-        <Icon tag="svg" viewBox="0 0 24 24">
+        <Icon tag="svg" viewBox="0 0 24 24" >
           {#if isListening}
             <path fill="currentColor" d={mdiMicrophone} />
           {:else}
@@ -584,10 +598,10 @@ function toggleReply(messageId: string) {
         </Icon>
         
         <Badge
-        position="middle"
-        align="bottom-end - bottom-middle"
-        aria-label="unread count"
-        style="position:absolute;top:2px;right:-1px;color:black;background-color:lightgrey;scale:.8;letter-spacing: 1.5px;">{$llang}</Badge>
+          position="middle"
+          align="bottom-end - bottom-middle"
+          aria-label="unread count"
+          style="position:absolute;top:2px;right:-1px;color:black;background-color:lightgrey;scale:.8;letter-spacing: 1.5px;">{$llang}</Badge>
 
       </IconButton>
     </div>
@@ -612,13 +626,13 @@ function toggleReply(messageId: string) {
       />
     {/await}
     {/if}
-    <button on:click={()=>{sendMessage()}} disabled={$loading} aria-label="Отправить сообщение">
+    <button class:blink={$blink_arrow}  on:click={()=>{sendMessage()}} disabled={$loading} aria-label="Отправить сообщение" >
        <IconButton
         class="material-icons">
         <Icon tag="svg" viewBox="0 0 24 24">
           <path fill="white" d={mdiSendOutline} />
         </Icon>
-    </IconButton>
+      </IconButton>
     </button>
   </div>
 </div>
@@ -748,6 +762,23 @@ function toggleReply(messageId: string) {
     color: white;
     border-radius: 5px;
     cursor: pointer;
+
+  }
+
+  .blink{
+    animation: blink 1s infinite;
+  }
+
+  @keyframes blink {
+    0%, 100% {
+      opacity: .2;
+      visibility: hidden;
+
+    }
+    50% {
+      opacity: 1;
+      visibility: visible;
+    }
   }
 
   button:disabled {
