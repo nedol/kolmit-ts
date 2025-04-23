@@ -283,6 +283,8 @@
               };
             }
 
+            stt_text = ''
+
             dataAr =  splitText(data.response);
 
             // Добавляем cor в список
@@ -469,6 +471,14 @@ function toggleReply(messageId: string) {
     isTip = true;
   }
 
+
+  // Функция авторазмера
+  function autoResize(event) {
+    const textarea = event.target;
+    textarea.style.height = 'auto'; // сброс
+    textarea.style.height = textarea.scrollHeight + 'px'; // установка
+  }
+
     // Очистка таймера при размонтировании
   onDestroy(() => {
     if (to) clearTimeout(to);
@@ -496,7 +506,7 @@ function toggleReply(messageId: string) {
           {#if translatedMessages.has(message.cor)}
             <cor> {@html translatedMessages.get(message.cor)}</cor>
             {:else}
-            {#if dataAr[$langs].cor}
+            {#if dataAr[$langs] && dataAr[$langs].cor}
               <cor>{@html dataAr[$langs].cor}</cor>
             {:else}
               {#await Transloc(message.cor, $llang, $langs, 'chat') then data}
@@ -607,22 +617,47 @@ function toggleReply(messageId: string) {
     </div>
     {#if $loading}
       {#await Transloc('AI печатает...', 'ru', $langs, 'chat') then data}
-      <input disabled
+      <textarea disabled
+       rows="1"
         bind:value={userInput}
         bind:this = {elInput}
+        on:input={autoResize}
         placeholder={data}
         on:keydown={(e) => {onKeydown(e.key)}}
         aria-label="Введите сообщение"
+        style="
+        width: 100%;
+        padding: 10px;
+        font-size: 16px;
+        line-height: 1.4;
+        border: 1px solid #ccc;
+        resize: none;
+        overflow: hidden;
+        box-sizing: border-box;
+      "
       />
       {/await}
     {:else}
     {#await Transloc('Введите сообщение...', 'ru', $langs, 'chat') then data}
-      <input
+      <textarea
+        rows="1"
         bind:value={userInput}
         bind:this = {elInput}
+        on:input={autoResize}
         placeholder={data}
         on:keydown={(e) => {onKeydown(e.key)}}
         aria-label="Введите сообщение"
+        style="
+        width: 100%;
+        padding: 10px;
+        font-size: 16px;
+        line-height: 1.4;
+        border: 1px solid #ccc;
+        resize: none;
+        overflow: hidden;
+        box-sizing: border-box;
+      "
+
       />
     {/await}
     {/if}
@@ -662,6 +697,10 @@ function toggleReply(messageId: string) {
     font-size:small;
     font-weight: bold;
   }
+
+  textarea::placeholder {
+      direction: ltr;
+    }
 
 
   .chat-container {
