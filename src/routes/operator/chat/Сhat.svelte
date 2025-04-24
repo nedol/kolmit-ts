@@ -478,8 +478,8 @@ function toggleReply(messageId: string) {
     elInput.style.height = elInput.scrollHeight + 'px';
 
     // Прокрутка вниз и курсор в конец
-    elInput.selectionStart = elInput.selectionEnd = userInput.length;
-    elInput.scrollTop = elInput.scrollHeight;
+    // elInput.selectionStart = elInput.selectionEnd = userInput.length;
+    // elInput.scrollTop = elInput.scrollHeight;
   }
 
     // Очистка таймера при размонтировании
