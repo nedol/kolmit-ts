@@ -43,6 +43,7 @@ export class SignalingChannel {
       this.isOpen = true;
       reconnectAttempt = 1; 
       this.processQueue();
+      this.startHeartbeat();
     };
 
     this.socket.onmessage = (event) => {

@@ -180,7 +180,7 @@
       const params = {
         func:"chat",
         user_id: operator.operator,
-        type: quiz?.quiz,
+        type: quiz?.quiz || 'chat',
         name:quiz?.name,
         owner: operator.abonent,
         prompt: `chat.${prompt_type}.${$llang}`,
@@ -467,16 +467,19 @@ function toggleReply(messageId: string) {
 
   function SetInput(text:string){
     userInput = text;
+    autoResize();
     elInput.scrollIntoView({ behavior: "smooth", block: "end" });
     isTip = true;
   }
 
-
   // Функция авторазмера
-  function autoResize(event) {
-    const textarea = event.target;
-    textarea.style.height = 'auto'; // сброс
-    textarea.style.height = textarea.scrollHeight + 'px'; // установка
+  function autoResize() {
+    elInput.style.height = 'auto';
+    elInput.style.height = elInput.scrollHeight + 'px';
+
+    // Прокрутка вниз и курсор в конец
+    elInput.selectionStart = elInput.selectionEnd = userInput.length;
+    elInput.scrollTop = elInput.scrollHeight;
   }
 
     // Очистка таймера при размонтировании
@@ -619,6 +622,7 @@ function toggleReply(messageId: string) {
       {#await Transloc('AI печатает...', 'ru', $langs, 'chat') then data}
       <textarea disabled
        rows="1"
+
         bind:value={userInput}
         bind:this = {elInput}
         on:input={autoResize}
