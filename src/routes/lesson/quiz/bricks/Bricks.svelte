@@ -148,7 +148,7 @@ let keys: string[] = [];
       bricks_data = data.data
       // Преобразуем HTML в текст и разбиваем на массив предложений
       // bricks_data.text = htmlToText(bricks_data.html).replaceAll('"','').split(/(?<=[.?!])\s+/);
-      bricks_data.text = splitHtmlIntoSentencesWithInnerTags(data.data.data.replaceAll('"',''));//.replaceAll('"','').split(/(?<=[.?!])\s+/);
+      bricks_data.text = splitHtmlIntoSentencesWithInnerTags(data.data.data.replaceAll('"','').replaceAll('.','. '));//.replaceAll('"','').split(/(?<=[.?!])\s+/);
 
       bricks_data.html = data.data.data;
 

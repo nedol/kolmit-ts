@@ -467,15 +467,16 @@ function toggleReply(messageId: string) {
 
   function SetInput(text:string){
     userInput = text;
-    autoResize();
+   
     elInput.scrollIntoView({ behavior: "smooth", block: "end" });
     isTip = true;
+    autoResize();
   }
 
   // Функция авторазмера
   function autoResize() {
     elInput.style.height = 'auto';
-    elInput.style.height = elInput.scrollHeight + 'px';
+    elInput.style.height = elInput.scrollHeight + 40 + 'px';
 
     // Прокрутка вниз и курсор в конец
     // elInput.selectionStart = elInput.selectionEnd = userInput.length;
