@@ -32,7 +32,7 @@ async function deeplx_query(text, to, from) {
 
   const res = await query(
     params,
-    {proxyEndpoint: "https://ideepl.vercel.app/jsonrpc"}
+    // {proxyEndpoint: "https://ideepl.vercel.app/jsonrpc"}
   );
   // res.data = revertProtectedText(res.data);
   return res.data;
@@ -134,7 +134,10 @@ async function translateChunk(
     if (langs.includes(to)) {
       // Try DeepL first for supported languages
       result = await deeplx_query(modifiedString, to.toUpperCase(), from.toUpperCase())
-      // result = await translate(modifiedString, to.toUpperCase(), from.toUpperCase());
+      //  result = await translate(modifiedString, to.toUpperCase(), from.toUpperCase());
+      if (!result)
+        throw new Error("Текст не может быть пустым.")
+     
       provider = 'deepl';
     } else {
       // Fallback to Google Translate via English pivot
