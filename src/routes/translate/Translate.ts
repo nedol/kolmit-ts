@@ -17,11 +17,11 @@ async function deeplx_query(text, to, from) {
   
   // 🔹 Отладка: что было ДО и ПОСЛЕ замены
   // console.log("Before protection:", text);
-  text = protectQuotedText(text);
+  text = preserveQuotedText(text);
   // console.log("After protection:", text);
 
   const params = {
-    "text": text,
+    "text": text.modifiedString,
     "source_lang": from,
     "target_lang": to,
     "preserve_formatting": 1
@@ -30,8 +30,11 @@ async function deeplx_query(text, to, from) {
   // 🔹 Проверяем, что отправляется в API
   console.log("Query params:", params);
 
-  const res = await query(params);
-  res.data = revertProtectedText(res.data);
+  const res = await query(
+    params,
+    {proxyEndpoint: "https://ideepl.vercel.app/jsonrpc"}
+  );
+  // res.data = revertProtectedText(res.data);
   return res.data;
 }
 
@@ -130,7 +133,8 @@ async function translateChunk(
   try {
     if (langs.includes(to)) {
       // Try DeepL first for supported languages
-      result = await translate(modifiedString, to.toUpperCase(), from.toUpperCase());
+      result = await deeplx_query(modifiedString, to.toUpperCase(), from.toUpperCase())
+      // result = await translate(modifiedString, to.toUpperCase(), from.toUpperCase());
       provider = 'deepl';
     } else {
       // Fallback to Google Translate via English pivot

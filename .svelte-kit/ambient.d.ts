@@ -50,7 +50,7 @@ declare module '$env/static/private' {
 	export const ComSpec: string;
 	export const DriverData: string;
 	export const EDITOR: string;
-	export const EFC_3652_1592913036: string;
+	export const EFC_8740_1592913036: string;
 	export const GIT_ASKPASS: string;
 	export const HOME: string;
 	export const HOMEDRIVE: string;
@@ -58,6 +58,7 @@ declare module '$env/static/private' {
 	export const IGCCSVC_DB: string;
 	export const INIT_CWD: string;
 	export const LANG: string;
+	export const LEVEL_ZERO_V1_SDK_PATH: string;
 	export const LOCALAPPDATA: string;
 	export const LOGONSERVER: string;
 	export const NODE: string;
@@ -178,7 +179,7 @@ declare module '$env/dynamic/private' {
 		ComSpec: string;
 		DriverData: string;
 		EDITOR: string;
-		EFC_3652_1592913036: string;
+		EFC_8740_1592913036: string;
 		GIT_ASKPASS: string;
 		HOME: string;
 		HOMEDRIVE: string;
@@ -186,6 +187,7 @@ declare module '$env/dynamic/private' {
 		IGCCSVC_DB: string;
 		INIT_CWD: string;
 		LANG: string;
+		LEVEL_ZERO_V1_SDK_PATH: string;
 		LOCALAPPDATA: string;
 		LOGONSERVER: string;
 		NODE: string;
