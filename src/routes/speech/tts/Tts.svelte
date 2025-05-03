@@ -37,7 +37,14 @@
 
   export async function Speak_server(lang, text, quiz, cb_end) {
     try {
-        const key = `tts_${lang}_${btoa(text)}`; // Уникальный ключ
+      function base64EncodeUnicode(str) {
+          return btoa(
+              Array.from(new TextEncoder().encode(str))
+                  .map(b => String.fromCharCode(b))
+                  .join('')
+          );
+      }
+        const key = `tts_${lang}_${base64EncodeUnicode(text)}`; // Уникальный ключ
         let audioSrc = localStorage.getItem(key);
         let keys = JSON.parse(localStorage.getItem("tts_keys")) || [];
 

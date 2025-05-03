@@ -48,7 +48,9 @@ export async function POST({ url, fetch, cookies, request, response }) {
 
   switch (q.func) {
     case 'tts':
-      resp = await tts_google(q.text, q.lang, abonent, q.quiz)
+      // resp = await tts_google(q.text, q.lang, abonent, q.quiz)
+
+      resp = {audio:`data:audio/mpeg;base64,`+await speak(q.text, {to:  q.lang})}
 
       break;
   }
@@ -92,9 +94,10 @@ async function tts_google(text, lang, abonent, quiz) {
         let url_b64 = await googleTTS.getAllAudioBase64(text, {
           //getAudioUrl(text, {
           lang: lang,
-          slow: false,
+          slow: true,
           host: 'https://translate.google.com',
           timeout: 10000,
+          splitPunct: ',.?!:;-'
         });
 
        

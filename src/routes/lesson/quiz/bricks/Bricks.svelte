@@ -693,36 +693,34 @@ let keys: string[] = [];
   }
 
   const toNextArticle = () => {
-    const arr = bricks_data.text; // The array with the sentences.
-
+    const arr = bricks_data.text;
     isCorrectSpanString = false;
 
-    // Check if curSentence is within the valid range.
-    if (curSentence < 0 || curSentence >= arr.length) return null;
+    // Проверка на допустимый индекс текущего предложения
+    if (curSentence < 0 || curSentence >= arr.length) return;
 
-    let currentArticle = arr[curSentence].article; // Get the current article name.
-    let foundNextArticle = false; // Flag to track if we found the next article.
+    const currentArticle = arr[curSentence].article;
+    let foundNextArticle = false;
 
-    // Start from the next sentence to find the next article.
+    // Поиск первого предложения из следующей статьи
     for (let i = curSentence + 1; i < arr.length; i++) {
-
         if (arr[i].article !== currentArticle) {
-            // Found the next article
-            MakeBricks();
-            article_name = arr[i].article;
             curSentence = i;
+            article_name = arr[i].article;
             foundNextArticle = true;
             break;
         }
     }
 
-    // If no next article is found, reset to the first sentence of the first article.
+    // Если следующая статья не найдена — перейти к первой
     if (!foundNextArticle) {
         curSentence = 0;
-        MakeBricks();
         article_name = arr[0].article;
     }
-}
+
+    MakeBricks(); // Генерация кирпичей для новой статьи
+};
+
 
 
 
