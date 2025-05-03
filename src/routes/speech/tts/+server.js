@@ -48,9 +48,7 @@ export async function POST({ url, fetch, cookies, request, response }) {
 
   switch (q.func) {
     case 'tts':
-      // resp = await tts_google(q.text, q.lang, abonent, q.quiz)
-
-      resp = {audio:`data:audio/mpeg;base64,`+await speak(q.text, {to:  q.lang})}
+      resp = await tts_google(q.text, q.lang, abonent, q.quiz)
 
       break;
   }
@@ -90,6 +88,9 @@ async function tts_google(text, lang, abonent, quiz) {
     const filePath = join(audioDir, fileName); // Полный путь к файлу
 
     try{
+      
+        // resp = {audio:`data:audio/mpeg;base64,`+await speak(q.text, {to:  q.lang})}
+        
         let base64  = '';
         let url_b64 = await googleTTS.getAllAudioBase64(text, {
           //getAudioUrl(text, {
