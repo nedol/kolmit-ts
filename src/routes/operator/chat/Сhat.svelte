@@ -166,6 +166,31 @@
    
     if (to) clearTimeout(to);
 
+    let lastUserMessage = [...$messages].reverse().find(msg => msg.role === 'user');
+
+    let text = lastUserMessage
+      ? [{ role: "user", content: lastUserMessage.text }]
+      : [];
+
+    let params = '';
+    
+    if(text.length>0){
+      params = {
+        func:"chat",
+        user_id: operator.operator,
+        prompt:`grammar.check.${$llang}`,
+        type: quiz?.quiz || 'chat',
+        owner: operator.abonent,
+        name:quiz?.name,
+        text:text   
+      }
+
+      await $signal.SendMessage(params,(res) => {    
+        console.log('grammar.check',res);   
+      });
+    }
+
+
     // Ограничиваем историю сообщений до 5 реплик с каждой стороны
     let conversationHistory = $messages
       .slice(-20) // Берем последние 10 сообщений (5 от пользователя и 5 от AI)
@@ -177,7 +202,7 @@
         stt: msg.role ==='user'?stt_text:''
       }));
 
-      const params = {
+      params = {
         func:"chat",
         user_id: operator.operator,
         type: quiz?.quiz || 'chat',
@@ -201,166 +226,167 @@
       $signal.SendMessage(params,async (res) => {    
         console.log('handleData',res)
         handleData(res);       
-      });  
+      }); 
+  }
 
-      async function handleData(data){
-        try{
+  async function handleData(data){
+    try{
 
-          if(data.response.tokens_limit){
-              const msg= await Transloc("Вы достигли суточного лимита сообщений.",'ru',$langs,'chat')
-              messages.update( msgs =>  
-              [...msgs, 
-                { 
-                  id: crypto.randomUUID(), 
-                  role: "assistant", 
-                  text: `<alert>${msg}</alert>`, 
-                  tr: '', 
-                  cor: '',
-                  isTranslate:false
-                }
-              ]);
-
-              if (messagesContainer) {
-                setTimeout(() => {
-                  messagesContainer.lastElementChild.scrollIntoView({ behavior: "smooth", block: "end" });
-                }, 100);
-              }
-              return;
+      if(data.response.tokens_limit){
+          const msg= await Transloc("Вы достигли суточного лимита сообщений.",'ru',$langs,'chat')
+          messages.update( msgs =>  
+          [...msgs, 
+            { 
+              id: crypto.randomUUID(), 
+              role: "assistant", 
+              text: `<alert>${msg}</alert>`, 
+              tr: '', 
+              cor: '',
+              isTranslate:false
             }
+          ]);
 
-            function splitText(text, llang, langs) {
-              // Регулярные выражения для поиска содержимого между тегами <nl>, <ru> и <user>
-              const nlRegex = new RegExp(`<${$llang}>([\\s\\S]*?)<\/${$llang}>`);
-              const ruRegex = new RegExp(`<${$langs}>([\\s\\S]*?)<\/${$langs}>`);
-              const userRegex = /<user>([\s\S]*?)<\/user>/;
+          if (messagesContainer) {
+            setTimeout(() => {
+              messagesContainer.lastElementChild.scrollIntoView({ behavior: "smooth", block: "end" });
+            }, 100);
+          }
+          return;
+        }
 
-              // Поиск содержимого <nl>
-              const nlMatch = nlRegex.exec(text);
-              const nlContent = nlMatch ? nlMatch[1].trim() : null;
+        function splitText(text, llang, langs) {
+          // Регулярные выражения для поиска содержимого между тегами <nl>, <ru> и <user>
+          const nlRegex = new RegExp(`<${$llang}>([\\s\\S]*?)<\/${$llang}>`);
+          const ruRegex = new RegExp(`<${$langs}>([\\s\\S]*?)<\/${$langs}>`);
+          const userRegex = /<user>([\s\S]*?)<\/user>/;
 
-              // Поиск содержимого <ru>
-              const ruMatch = ruRegex.exec(text);
-              const ruContent = ruMatch ? ruMatch[1].trim() : null;
+          // Поиск содержимого <nl>
+          const nlMatch = nlRegex.exec(text);
+          const nlContent = nlMatch ? nlMatch[1].trim() : null;
 
-              // Поиск содержимого <user>
-              const uMatch = userRegex.exec(text);
-              const uContent = uMatch ? uMatch[1].trim() : null;
+          // Поиск содержимого <ru>
+          const ruMatch = ruRegex.exec(text);
+          const ruContent = ruMatch ? ruMatch[1].trim() : null;
 
-              // Функция для извлечения данных из блока (nl, ru или user)
-              const extractData = (content) => {
-                  if (!content) return null;
+          // Поиск содержимого <user>
+          const uMatch = userRegex.exec(text);
+          const uContent = uMatch ? uMatch[1].trim() : null;
 
-                  const corRegex = /<cor>([\s\S]*?)<\/cor>/g;
-                  const msgRegex = /<msg>([\s\S]*?)<\/msg>/g;
-                  const replyRegex = /<reply>([\s\S]*?)<\/reply>/g;
-                  const levelRegex = /<level>([\s\S]*?)<\/level>/g;
-                  const wordsRegex = /<words>([\s\S]*?)<\/words>/g;
+          // Функция для извлечения данных из блока (nl, ru или user)
+          const extractData = (content) => {
+              if (!content) return null;
 
-                  const corMatch = corRegex.exec(content);
-                  const msgMatch = msgRegex.exec(content);
-                  const levelMatch = levelRegex.exec(content);
-                  const wordsMatch = wordsRegex.exec(content);
+              const corRegex = /<cor>([\s\S]*?)<\/cor>/g;
+              const msgRegex = /<msg>([\s\S]*?)<\/msg>/g;
+              const replyRegex = /<reply>([\s\S]*?)<\/reply>/g;
+              const levelRegex = /<level>([\s\S]*?)<\/level>/g;
+              const wordsRegex = /<words>([\s\S]*?)<\/words>/g;
 
-                  const replies = [];
-                  let replyMatch;
-                  while ((replyMatch = replyRegex.exec(content)) !== null) {
-                      replies.push(replyMatch[1].trim());
-                  }
+              const corMatch = corRegex.exec(content);
+              const msgMatch = msgRegex.exec(content);
+              const levelMatch = levelRegex.exec(content);
+              const wordsMatch = wordsRegex.exec(content);
 
-                  return {
-                      level: levelMatch ? levelMatch[1].trim() : null,
-                      cor: corMatch ? corMatch[1].trim() : null,
-                      msg: msgMatch ? msgMatch[1].trim() : null,
-                      replies: replies,
-                      words: wordsMatch?wordsMatch[1].trim() : null
-                  };
-              };
+              const replies = [];
+              let replyMatch;
+              while ((replyMatch = replyRegex.exec(content)) !== null) {
+                  replies.push(replyMatch[1].trim());
+              }
 
               return {
-                  [$llang]: nlContent ? extractData(nlContent) : null,
-                  [$langs]: ruContent ? extractData(ruContent) : null,
-                  user: uContent ? extractData(uContent) : null,
+                  level: levelMatch ? levelMatch[1].trim() : null,
+                  cor: corMatch ? corMatch[1].trim() : null,
+                  msg: msgMatch ? msgMatch[1].trim() : null,
+                  replies: replies,
+                  words: wordsMatch?wordsMatch[1].trim() : null
               };
-            }
+          };
 
-            stt_text = ''
+          return {
+              [$llang]: nlContent ? extractData(nlContent) : null,
+              [$langs]: ruContent ? extractData(ruContent) : null,
+              user: uContent ? extractData(uContent) : null,
+          };
+        }
 
-            dataAr =  splitText(data.response);
+        stt_text = ''
 
-            // Добавляем cor в список
-            if(dataAr[$llang]?.cor)
-              messages.update(msgs =>  
-              [...msgs, 
-                { id: crypto.randomUUID(), 
-                  role: "user", 
-                  text:'',
-                  tr:dataAr[$langs]?.cor,
-                  cor: dataAr[$llang]?.cor,
-                  isTranslate:false}
-              ]);
+        dataAr =  splitText(data.response);
+
+        // Добавляем cor в список
+        if(dataAr[$llang]?.cor){
+
+          messages.update(msgs =>  
+          [...msgs, 
+            { id: crypto.randomUUID(), 
+              role: "user", 
+              text:'',
+              tr:dataAr[$langs]?.cor,
+              cor: dataAr[$llang]?.cor,
+              isTranslate:false}
+          ]);
+    
+        // Добавляем ответ AI в список
+        }else if(dataAr[$llang]?.msg){
+          messages.update(msgs =>  
+            [...msgs, 
+              {
+                id: crypto.randomUUID(), 
+                role: "assistant", 
+                text: dataAr[$llang]?.msg, 
+                tr: dataAr[$langs]?.msg, 
+                cor: '', 
+                isTranslate: false,
+                replies: dataAr[$llang]?.replies || [],
+                repliesTranslated: dataAr[$langs]?.replies || [],
+              }
+            ]);
+
+          
+          if(dataAr[$llang]?.words)
+              words = dataAr[$llang]?.words
         
-            // Добавляем ответ AI в список
-            if(dataAr[$llang]?.msg){
-              messages.update(msgs =>  
-                [...msgs, 
-                  {
-                    id: crypto.randomUUID(), 
-                    role: "assistant", 
-                    text: dataAr[$llang]?.msg, 
-                    tr: dataAr[$langs]?.msg, 
-                    cor: '', 
-                    isTranslate: false,
-                    replies: dataAr[$llang]?.replies || [],
-                    repliesTranslated: dataAr[$langs]?.replies || [],
-                  }
-                ]);
-
-              
-              if(dataAr[$llang]?.words)
-                  words = dataAr[$llang]?.words
-            
-            }else{
-              loading.set(false);
-              throw new Error("Нет ответа.");
-            }
-
-            setTimeout(() => {
-              messagesContainer?.lastElementChild?.scrollIntoView({ behavior: "smooth", block: "end" });
-            }, 500);
-            
-            // Обновляем время последнего сообщения
-            lastMessageTime = Date.now();
-            localStorage.setItem('lastMessageTime', lastMessageTime.toString()); // Сохраняем время
-            // resetReminderTimer();
-
-
-            async function removeEmojis(input: string ) {
-              const regex = emojiRegex();
-              return input.replace(regex, '');
-            }
-
-            async function extractAIContent(input: string ) {
-              const aiRegex = /<ai>([\s\S]*?)<\/ai>/;
-              const match = input.match(aiRegex);
-              return match ? match[1].trim() : null;
-            }
-
-            if(dataAr[$llang]){
-
-              tts?.Speak_server($llang, dataAr[$llang].msg , '', '');
-              isReply = dataAr[$llang].replies.length>0?true:false;
-            }
-
-            $blink_mic = true;
-
-        } catch (error) {
-          console.error("Произошла ошибка при обращении к серверу:", error);
-          messages.update((msgs) => [...msgs, { id: crypto.randomUUID(), role: "assistant", text: "Ошибка при обработке запроса. Попробуйте снова.", tr:"", isTranslate:false }]);
-         
-        } finally {
+        }else{
           loading.set(false);
-        }      
-      }
+          // throw new Error("Нет ответа.");
+        }
+
+        setTimeout(() => {
+          messagesContainer?.lastElementChild?.scrollIntoView({ behavior: "smooth", block: "end" });
+        }, 500);
+        
+        // Обновляем время последнего сообщения
+        lastMessageTime = Date.now();
+        localStorage.setItem('lastMessageTime', lastMessageTime.toString()); // Сохраняем время
+        // resetReminderTimer();
+
+
+        async function removeEmojis(input: string ) {
+          const regex = emojiRegex();
+          return input.replace(regex, '');
+        }
+
+        async function extractAIContent(input: string ) {
+          const aiRegex = /<ai>([\s\S]*?)<\/ai>/;
+          const match = input.match(aiRegex);
+          return match ? match[1].trim() : null;
+        }
+
+        if(dataAr[$llang]){
+
+          tts?.Speak_server($llang, dataAr[$llang].msg , '', '');
+          isReply = dataAr[$llang].replies.length>0?true:false;
+        }
+
+        $blink_mic = true;
+
+    } catch (error) {
+      console.error("Произошла ошибка при обращении к серверу:", error);
+      messages.update((msgs) => [...msgs, { id: crypto.randomUUID(), role: "assistant", text: "Ошибка при обработке запроса. Попробуйте снова.", tr:"", isTranslate:false }]);
+      
+    } finally {
+      loading.set(false);
+    }      
   }
 
   function StopListening() {

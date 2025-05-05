@@ -90,15 +90,15 @@ async function tts_google(text, lang, abonent, quiz) {
     try{
       
         // resp = {audio:`data:audio/mpeg;base64,`+await speak(q.text, {to:  q.lang})}
-        
+
         let base64  = '';
         let url_b64 = await googleTTS.getAllAudioBase64(text, {
           //getAudioUrl(text, {
           lang: lang,
-          slow: true,
+          slow: false,
           host: 'https://translate.google.com',
           timeout: 10000,
-          splitPunct: ',.?!:;-'
+          splitPunct: ',.?!'
         });
 
        

@@ -82,7 +82,7 @@ export class SignalingChannel {
     }
   }
 
-  SendMessage(par, cb) {
+  async SendMessage(par, cb) {
     this.callback = cb;
     this.status = par.status;
 
