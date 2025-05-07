@@ -148,7 +148,8 @@ let keys: string[] = [];
       bricks_data = data.data
       // Преобразуем HTML в текст и разбиваем на массив предложений
       // bricks_data.text = htmlToText(bricks_data.html).replaceAll('"','').split(/(?<=[.?!])\s+/);
-      bricks_data.text = splitHtmlIntoSentencesWithInnerTags(data.data.data.replaceAll('"','').replaceAll('.','. '));//.replaceAll('"','').split(/(?<=[.?!])\s+/);
+      bricks_data.text = splitHtmlIntoSentencesWithInnerTags(data.data.data.replaceAll('"',''))
+      //.replaceAll('.','. '));//.replaceAll('"','').split(/(?<=[.?!])\s+/);
 
       bricks_data.html = data.data.data;
 
@@ -253,55 +254,40 @@ let keys: string[] = [];
 
 
   function splitHtmlIntoSentencesWithInnerTags(html: string): { sentence: string, article: string }[] {
-  // Функция для удаления эмодзи
   function removeEmojis(input: string): string {
     const regex = emojiRegex();
     return input.replace(regex, '');
   }
 
-  // Функция для форматирования текста с тегами
-  function formatTaggedText(input: string): string {
-    return input.replace(/<(\w+)>(.*?)<\/\1>/g, (match, tag, content) => {
-      const words = content.match(/\S+|\s+/g) || []; // Разделяем на слова + пробелы
-      return words.map(word => {
-        if (word.trim()) return `<${tag}>${word}</${tag}>`; // Возвращаем каждое слово внутри тега
-        return word; // Оставляем пробелы
-      }).join('');
+  // Помечает точки конца предложения специальным маркером `[[SPLIT]]`
+  function markSentenceBoundaries(text: string): string {
+    return text.replace(/([.!?])(<\/\w+>)?(\s+(?=<|\w|<\/\w+>))/g, (_, punct, closeTag = '', space) => {
+      return punct + closeTag + '[[SPLIT]]';
     });
   }
 
-  // Функция, проверяющая, следует ли объединить предложения
-  function shouldNotSplit(text: string, index: number): boolean {
-    const match = text.slice(Math.max(0, index - 10), index + 10);
-    return /<(\w+)>([^<]*\b(?:[A-Z]\.[A-Z]\.)[^<]*)<\/\1>/i.test(match); // Проверка на аббревиатуры
-  }
-
-  // Разбор HTML с помощью DOMParser
   const parser = new DOMParser();
   const doc = parser.parseFromString(html, 'text/html');
-  const articles = doc.querySelectorAll('article, aticle');
+  const articles = doc.querySelectorAll('article');
 
-  // Разделяем контент на предложения и добавляем их в массив
-  const sentences = Array.from(articles).flatMap(article => {
-    const htmlContent = formatTaggedText(removeEmojis(article.innerHTML.trim()));
-    const articleName = article.getAttribute('name') || ''; // Извлекаем название статьи
+  const result: { sentence: string, article: string }[] = [];
 
-    return htmlContent
-      .split(/(?<!\b(?:Dr|Mr|Ms|Mrs|St|Jr|Sr))(?<=[.!?])\s+(?=<|\w|<\/\w+>)/g)
-      .map((sentence, index, arr) => {
-        if (index > 0 && shouldNotSplit(arr[index - 1], arr[index - 1].length)) {
-          return arr[index - 1] + ' ' + sentence; // Объединяем предложения, если их не следует разделять
-        }
-        return sentence;
-      })
-      .filter(sentence => sentence.length > 0)
-      .map(sentence => ({
+  articles.forEach(article => {
+    const articleName = article.getAttribute('name') || '';
+    const rawHtml = removeEmojis(article.innerHTML.trim());
+
+    const marked = markSentenceBoundaries(rawHtml);
+    const sentences = marked.split('[[SPLIT]]').map(s => s.trim()).filter(Boolean);
+
+    sentences.forEach(sentence => {
+      result.push({
         sentence,
-        article: articleName // Добавляем название статьи
-      }));
+        article: articleName
+      });
+    });
   });
 
-  return sentences;
+  return result;
 }
 
 

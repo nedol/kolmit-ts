@@ -560,7 +560,7 @@ function toggleReply(messageId: string) {
             <div class="reply_container">
               {#each message.replies as reply, i}
                 {#if !message.isTranslate}
-                  <reply  on:click={() => SetInput(reply)}>
+                  <reply>
                     {#if message.repliesTranslated?.[i]}
                       {message.repliesTranslated[i]}
                     {:else}
@@ -570,7 +570,7 @@ function toggleReply(messageId: string) {
                     {/if}
                   </reply>
                 {:else}
-                  <reply on:click={() => SetInput(reply)}>{reply}</reply>
+                  <reply>{reply}</reply>
                 {/if}
               {/each}            
             </div>
