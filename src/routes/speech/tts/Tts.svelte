@@ -10,7 +10,7 @@
 
   export async function GetGoogleTTS(lang, text, quiz){
 
-    if (!audio || (audio && text !== audio.text)) {
+    if (text && (!audio || (audio && text !== audio.text))) {
       text = text.replace(/<[^>]+>.*?<\/[^>]+>/g, '');
       const par = {
         func: 'tts',

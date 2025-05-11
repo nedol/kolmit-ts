@@ -8,6 +8,7 @@
   import Badge from '@smui-extra/badge';
   import Tts from '../../speech/tts/Tts.svelte';
   import Stt from '../../speech/stt/Stt.svelte';
+  import Word from './Word.svelte'; 
 
   import {
       mdiMicrophoneOutline ,
@@ -16,7 +17,8 @@
       mdiTranslateOff,
       mdiMicrophoneMessage,
       mdiSendOutline,
-      mdiPlay
+      mdiPlay,
+      mdiAlertCircleCheckOutline 
   } from '@mdi/js';
 
   let blink_arrow = writable(false);
@@ -68,8 +70,9 @@
 
   let messagesContainer: HTMLElement | null = null;
 
-  let isReply = false;
-  let isShowReply = false;
+  let isCorrection = false;
+
+  let cor_el;
 
   let dataAr:{}
 
@@ -193,7 +196,7 @@
 
     // Ограничиваем историю сообщений до 5 реплик с каждой стороны
     let conversationHistory = $messages
-      .slice(-20) // Берем последние 10 сообщений (5 от пользователя и 5 от AI)
+      .slice(-10) // Берем последние 10 сообщений (5 от пользователя и 5 от AI)
       .map(msg => ({
         role: msg.role === "assistant" ? "assistant" : "user",
         content: msg.text,
@@ -282,10 +285,14 @@
               const levelRegex = /<level>([\s\S]*?)<\/level>/g;
               const wordsRegex = /<words>([\s\S]*?)<\/words>/g;
 
+             
+
               const corMatch = corRegex.exec(content);
               const msgMatch = msgRegex.exec(content);
               const levelMatch = levelRegex.exec(content);
               const wordsMatch = wordsRegex.exec(content);
+
+              console.log("Correction:",corMatch?corMatch[1].trim() : null)
 
               const replies = [];
               let replyMatch;
@@ -353,6 +360,7 @@
 
         setTimeout(() => {
           messagesContainer?.lastElementChild?.scrollIntoView({ behavior: "smooth", block: "end" });
+          $messages = $messages;
         }, 500);
         
         // Обновляем время последнего сообщения
@@ -375,7 +383,6 @@
         if(dataAr[$llang]){
 
           tts?.Speak_server($llang, dataAr[$llang].msg , '', '');
-          isReply = dataAr[$llang].replies.length>0?true:false;
         }
 
         $blink_mic = true;
@@ -397,6 +404,7 @@
     userInput = text[$llang];
     stt_text = text[$llang];
     // sendMessage();
+    autoResize()
   }
 
   function onClickMicrophone() {
@@ -405,15 +413,16 @@
       stt?.MediaRecorderStop();
       isListening = false;
       return;
+    }else{
+
+      stt_text = ''
+
+      $blink_mic = false;
+
+      stt.startAudioMonitoring($llang, $langs);
+
+      isListening = true;
     }
-
-    stt_text = ''
-
-    $blink_mic = false;
-
-    stt.startAudioMonitoring($llang, $langs);
-
-    isListening = true;
   }
 
   async function toggleTranslation(message:Message) {
@@ -424,8 +433,8 @@
       translatedMessages.set(message.text, message.tr);
 
     message.isTranslate = !message.isTranslate;
-    $messages = $messages; // Принудительное обновление  
 
+    $messages = $messages; // Принудительное обновление  
     
     setTimeout(() => {
       messagesContainer?.lastElementChild?.scrollIntoView({ behavior: "smooth", block: "end" });
@@ -453,6 +462,14 @@ function toggleReply(messageId: string) {
 
   setTimeout(() => {
     messagesContainer?.lastElementChild?.scrollIntoView({ behavior: "smooth", block: "end" });
+  }, 100);
+}
+
+function toggleCorrection(){
+  isCorrection = !isCorrection;
+  if(cor_el)
+  setTimeout(() => {
+    cor_el.scrollIntoView({ behavior: "smooth", block: "end" });
   }, 100);
 }
 
@@ -502,11 +519,17 @@ function toggleReply(messageId: string) {
   // Функция авторазмера
   function autoResize() {
     elInput.style.height = 'auto';
-    elInput.style.height = elInput.scrollHeight + 40 + 'px';
+    elInput.style.height = elInput.scrollHeight + 0 + 'px';
 
     // Прокрутка вниз и курсор в конец
     // elInput.selectionStart = elInput.selectionEnd = userInput.length;
     // elInput.scrollTop = elInput.scrollHeight;
+  }
+
+  function OnClickReply(event) {
+    const clickedWord = event.target.textContent;
+    console.log(`Вы кликнули на слово: ${clickedWord}`);
+    // Здесь вы можете добавить свою логику обработки клика
   }
 
     // Очистка таймера при размонтировании
@@ -528,59 +551,81 @@ function toggleReply(messageId: string) {
   <div class="messages" bind:this={messagesContainer}>
     
     {#each $messages as message, index (message.id)}
-    <div class="message {message.role} {message.role === 'user'}"
-      bind:this={lastMessage} >
-      <!--strong>{message.role === 'user' ? 'Вы' : 'AI'}:</strong--> 
-      {#if message.cor}
-        {#if message.isTranslate} 
-          {#if translatedMessages.has(message.cor)}
-            <cor> {@html translatedMessages.get(message.cor)}</cor>
-            {:else}
-            {#if dataAr[$langs] && dataAr[$langs].cor}
-              <cor>{@html dataAr[$langs].cor}</cor>
-            {:else}
-              {#await Transloc(message.cor, $llang, $langs, 'chat') then data}
-                <cor> {@html data}</cor>
-              {/await}
-            {/if}
-          {/if}
-        {:else}
-          <cor> {@html message.cor}</cor>
-        {/if}
-      {/if}
-      
-      {#if message.isTranslate && translatedMessages.has(message.text)}
-        {@html translatedMessages.get(message.text)}
-      {:else}
-        {@html message.text}
-      {/if}
-  
-      {#if message.role === 'assistant' }
-          {#if selectedReplyId === message.id}
-            <div class="reply_container">
-              {#each message.replies as reply, i}
-                {#if !message.isTranslate}
-                  <reply>
-                    {#if message.repliesTranslated?.[i]}
-                      {message.repliesTranslated[i]}
+      <div class="message {message.role} {message.role === 'user'}"
+        bind:this={lastMessage} >
+        <!--strong>{message.role === 'user' ? 'Вы' : 'AI'}:</strong--> 
+          {#if message.cor}
+            {#if isCorrection}
+              <div class="correction_container" bind:this={cor_el}>
+                {#if message.isTranslate} 
+                  {#if translatedMessages.has(message.cor)}
+                    <cor> {@html translatedMessages.get(message.cor)}
+                      <div on:click={() => toggleTranslation(message )}>
+                        <IconButton>
+                          <Icon tag="svg" viewBox="0 0 24 24">
+                              <path fill={message.role === 'user'?'red':"currentColor"} d={mdiTranslate} />
+                          </Icon>
+                        </IconButton>
+                      </div>
+                    </cor>
+                  {:else}
+                    {#if dataAr[$langs] && dataAr[$langs].cor}
+                      <cor>{@html dataAr[$langs].cor}
+                        <div on:click={() => toggleTranslation(message )}>
+                          <IconButton>
+                            <Icon tag="svg" viewBox="0 0 24 24">
+                              <path fill={message.role === 'user'?'red':"currentColor"} d={mdiTranslate} />
+                            </Icon>
+                          </IconButton>
+                        </div>
+                      </cor>
                     {:else}
-                      {#await Transloc(reply, $llang, $langs, 'chat') then data}
-                        {data}
+                      {#await Transloc(message.cor, $llang, $langs, 'chat') then data}
+                        <cor> {@html data}
+                          <div on:click={() => toggleTranslation(message )}>
+                          <IconButton>
+                            <Icon tag="svg" viewBox="0 0 24 24">
+                              <path fill={message.role === 'user'?'red':"currentColor"} d={mdiTranslate} />             
+                            </Icon>
+                          </IconButton>
+                          </div>
+                        </cor>
                       {/await}
-                    {/if}
-                  </reply>
-                {:else}
-                  <reply>{reply}</reply>
+                  {/if}
                 {/if}
-              {/each}            
-            </div>
-          {/if}
+                {:else}
+                  <cor> 
+                    {@html message.cor}
+                    <div on:click={() => toggleTranslation(message )}>
+                      <IconButton>
+                        <Icon tag="svg" viewBox="0 0 24 24">
+                            <path fill={message.role === 'user'?'red':"currentColor"} d={mdiTranslateOff} />
+                        </Icon>
+                      </IconButton>
+                    </div>
+                  </cor>
+                {/if}
+              </div>
+            {/if}
+            <div on:click={() => toggleCorrection()} >
+              <IconButton>
+                <Icon tag="svg" viewBox="0 0 24 24">
+                    <path fill={message.role === 'user'?'red':"currentColor"} d={mdiAlertCircleCheckOutline } />
+                </Icon>
+              </IconButton> 
+            </div>  
         {/if}
+       
         
-        <div style="display:flex;justify-content: space-between;">  
-
+        {#if message.isTranslate && translatedMessages.has(message.text)}
+          {@html translatedMessages.get(message.text)}
+        {:else}
+          {@html message.text}
+        {/if}   
           
-          {#if ((message.role === 'system'  && message.text.length>0) || message.role === 'assistant') && quiz.quiz!=='dialog'   }  
+        <div style="display:flex;justify-content: space-between;">
+          
+          {#if ((message.role === 'system'  && message.text.length>0) || message.role === 'assistant') && quiz.quiz!=='dialog'}  
             <div on:click={() => SpeakText(message.text)} >
               <IconButton>
                 <Icon tag="svg" viewBox="0 0 24 24" style="scale:1">
@@ -590,7 +635,7 @@ function toggleReply(messageId: string) {
             </div>
           {/if}
 
-          {#if isReply && message.role === 'assistant' && quiz.quiz!=='dialog'}        
+          {#if message.replies && message.role === 'assistant' && quiz.quiz!=='dialog'}        
             <div on:click={() => toggleReply(message.id)} >
               <IconButton>
                 <Icon tag="svg" viewBox="0 0 24 24" style="scale:1">
@@ -600,7 +645,7 @@ function toggleReply(messageId: string) {
             </div>
           {/if}    
     
-          {#if message.role === 'assistant' || (message.role === 'user' && message.cor)}
+          {#if message.role === 'assistant' || message.role === 'system'}
             <div on:click={() => toggleTranslation(message )}>
               <IconButton>
                 <Icon tag="svg" viewBox="0 0 24 24">
@@ -612,14 +657,34 @@ function toggleReply(messageId: string) {
                 </Icon>
               </IconButton>
             </div>
-          {/if}
-      
-        </div>    
+          {/if}      
+        </div>     
      
-    </div>
-  {/each}
+        {#if message.role === 'assistant' }
+          {#if selectedReplyId === message.id}
+            <div class="reply_container">
+              {#each message.replies as reply, i}
+                {#if !message.isTranslate}
+                  <reply>
+                    {#if message.repliesTranslated?.[i]}
+                      {#each message.repliesTranslated?.[i].split(' ') as word}
+                        <Word on:click={(word) => OnClickReply(word)}>{word}</Word>
+                        <span> </span>  
+                      {/each}
+                    {:else}
+                      {@html reply}
+                    {/if}
+                  </reply>
+                {:else}
+                  <reply>{@html reply}</reply>
+                {/if}
+              {/each}            
+            </div>
+          {/if}
+        {/if}
 
-
+      </div>
+    {/each}
   </div>
 
   <div class="input-container" >
@@ -738,18 +803,19 @@ function toggleReply(messageId: string) {
     display: flex;
     position: absolute;
     top: 50px;
-    width: 100%;
+    width: 98%;
     flex-direction: column;
     /* height: 100vh; */
     /* height: calc(100vh - 42px); */
-    bottom: 0px;
+    bottom: 7px;
   }
 
   .input-container {
     display: flex;
+    position: relative;
     flex-shrink: 0; /* Фиксируем контейнер ввода внизу */
     left:10px;
-    bottom: 5px;
+    bottom: -6px;
     padding: 10px;
     background: #fff;
     border-top: 1px solid #ccc;
@@ -759,12 +825,14 @@ function toggleReply(messageId: string) {
   .messages {
     flex: 1;
     display: flex;
+    position: relative;
     flex-direction: column; /* Сообщения идут сверху вниз */
     /* justify-content: flex-end;  */
     align-items: flex-start;
     overflow-y: auto;
     padding: 10px;
     background-color: #f1f1f1;
+    bottom: 0px;
   }
 
 
@@ -864,5 +932,36 @@ function toggleReply(messageId: string) {
     bottom: 0px; /* Помещаем под последнее сообщение */
     left: 10px;
     width: calc(100% - 20px); 
+  }
+
+  cor {
+    display: block;
+    background-color: #f0f7ff;
+    border-left: 4px solid #e80f0f;
+    padding: 1em 1.5em;
+    margin: 1.5em 0;
+    font-family: sans-serif;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  }
+
+  cor p {
+    margin: 0.5em 0;
+    line-height: 1.6;
+    color: #333;
+  }
+
+  cor ul {
+    padding-left: 1.2em;
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+  }
+
+  cor li {
+    margin-bottom: 0.3em;
+  }
+
+  cor strong {
+    color: #2c89d9;
   }
 </style>
