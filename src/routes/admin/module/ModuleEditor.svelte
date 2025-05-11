@@ -35,7 +35,7 @@
   import Quiz from '../quiz/Quiz.svelte';
 
   import { view } from '$lib/stores.ts';
-    import { prompt_data } from '../../operator/chat/prompt/prompt_data';
+
 
   let menu: Menu;
 
