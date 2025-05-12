@@ -11,7 +11,7 @@ const langs = [
 ];
 
 // Map to track pending translations (caching)
-const pendingTranslations = new Map<string, Promise<string>>(); 
+// const pendingTranslations = new Map<string, Promise<string>>(); 
 
 async function deeplx_query(text, to, from) { 
   
@@ -99,11 +99,11 @@ export async function Translate(
 
 
     // Check for pending translations first
-    if (pendingTranslations.has(cacheKey)) {
-      console.log(`Waiting for existing translation: ${chunk.substring(0, 30)}...`);
-      translatedChunks.push(await pendingTranslations.get(cacheKey));
-      continue;
-    }
+    // if (pendingTranslations.has(cacheKey)) {
+    //   console.log(`Waiting for existing translation: ${chunk.substring(0, 30)}...`);
+    //   translatedChunks.push(await pendingTranslations.get(cacheKey));
+    //   continue;
+    // }
 
 
     // Check cache
@@ -115,7 +115,7 @@ export async function Translate(
 
     // Create and store translation promise
     const translationPromise = translateChunk(normalizedChunk, from, to, cacheKey, quiz || cached?.quiz);
-    pendingTranslations.set(cacheKey, translationPromise);
+    // pendingTranslations.set(cacheKey, translationPromise);
     translatedChunks.push(await translationPromise);
   }
 
@@ -179,7 +179,7 @@ async function translateChunk(
   }
 
   // Clean up
-  pendingTranslations.delete(cacheKey);
+  // pendingTranslations.delete(cacheKey);
   return result;
 }
 
