@@ -95,12 +95,16 @@ export async function Translate(
     const normalizedChunk = chunk.replace(/<</g, ' ').replace(/>>/g, ' ');
     const cacheKey = md5(normalizedChunk);
 
+    console.log('Before ReadSpeech. Cashe:'+cacheKey+", normalizedChunk:"+normalizedChunk)
+
+
     // Check for pending translations first
     if (pendingTranslations.has(cacheKey)) {
       console.log(`Waiting for existing translation: ${chunk.substring(0, 30)}...`);
       translatedChunks.push(await pendingTranslations.get(cacheKey));
       continue;
     }
+
 
     // Check cache
     const cached = await ReadSpeech({ lang: to, key: cacheKey });
