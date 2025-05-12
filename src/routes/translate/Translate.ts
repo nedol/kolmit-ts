@@ -133,35 +133,27 @@ async function translateChunk(
   try {
     if (langs.includes(to)) {
       // Try DeepL first for supported languages
+      
       result = await deeplx_query(modifiedString, to.toUpperCase(), from.toUpperCase())
+      provider = 'deepl';
       //  result = await translate(modifiedString, to.toUpperCase(), from.toUpperCase());
       if (!result)
         throw new Error("Текст не может быть пустым.")
      
-      provider = 'deepl';
+    
     } else {
-      // Fallback to Google Translate via English pivot
-      const enText = await translate(modifiedString, "EN");
-      const translated = await translatex(enText, {
-        from: "en",
-        to,
-        forceBatch: true,
-        requestOptions: { agent: new HttpsProxyAgent('https://164.132.175.159:3128') },
-      });
-      result = translated.text;
+      result  = await translate_(modifiedString, from.toUpperCase(),to.toUpperCase())
       provider = 'google';
+
+      if (!result)
+        throw new Error("Текст не может быть пустым.")
     }
+
   } catch (primaryError) {
     console.error('Primary translation failed, using fallback:', primaryError);
     try {
-      const fallbackResult = await translatex(modifiedString, {
-        from,
-        to,
-        forceBatch: true,
-        requestOptions: { agent: new HttpsProxyAgent('https://164.132.175.159:3128') },
-      });
-      result = fallbackResult.text;
-      provider = 'google-fallback';
+      result  = await translate_(modifiedString, from.toUpperCase(),to.toUpperCase())
+      provider = 'google';
     } catch (fallbackError) {
       console.error('Fallback translation failed:', fallbackError);
     }
@@ -186,3 +178,27 @@ async function translateChunk(
   pendingTranslations.delete(cacheKey);
   return result;
 }
+
+
+import { TranslationServiceClient } from '@google-cloud/translate';
+
+const client = new TranslationServiceClient();
+
+async function translate_(text, from = 'nl', to = 'ru') {
+  const projectId = process.env.GOOGLE_PROJECT_ID;  // Замените на ваш projectId
+  const location = 'global';  // Можно использовать 'global', если у вас нет специфического региона
+
+  const request = {
+    parent: `projects/${projectId}/locations/${location}`,
+    contents: [text],
+    mimeType: 'text/plain', // Тип контента
+    sourceLanguageCode: from, // Исходный язык
+    targetLanguageCode: to,   // Язык перевода
+  };
+
+  const [response] = await client.translateText(request);
+  return response.translations[0].translatedText;
+}
+
+
+  

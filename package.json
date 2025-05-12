@@ -60,7 +60,7 @@
     "@google-cloud/speech": "^6.7.1",
     "@google-cloud/storage": "^7.11.2",
     "@google-cloud/text-to-speech": "^5.5.0",
-    "@google-cloud/translate": "^8.3.0",
+    "@google-cloud/translate": "^8.5.1",
     "@google-cloud/vertexai": "^1.9.2",
     "@huggingface/agents": "^0.0.5",
     "@huggingface/hub": "^0.14.10",
