@@ -446,7 +446,7 @@
     }
   }
 
-  async function toggleTranslation(message:Message) {
+  async function toggleTranslation(message:Message, i) {
     if (!message.tr) 
       message.tr = await Transloc(message.text, $llang, $langs, '');
 
@@ -455,10 +455,11 @@
 
     message.isTranslate = !message.isTranslate;
 
-    $messages = $messages; // Принудительное обновление  
+    // $messages = $messages; // Принудительное обновление  
     
     setTimeout(() => {
-      messagesContainer?.lastElementChild?.scrollIntoView({ behavior: "smooth", block: "end" });
+      messagesContainer?.children[i].scrollIntoView({ behavior: "smooth", block: "end" });
+      $messages = $messages; // Принудительное обновление 
     }, 100);
   } 
 
@@ -486,11 +487,17 @@ function toggleReply(messageId: string) {
   }, 100);
 }
 
-function toggleCorrection(){
+function toggleCorrection(i){
+  
+  let el;
   isCorrection = !isCorrection;
-  if(cor_el)
+  if(isCorrection)
+    el = messagesContainer?.children[i];
+  else
+    el = messagesContainer?.lastElementChild;
+  if(el)
   setTimeout(() => {
-    cor_el.scrollIntoView({ behavior: "smooth", block: "end" });
+    el.scrollIntoView({ behavior: "smooth", block: "end" });
   }, 100);
 }
 
@@ -542,10 +549,6 @@ function toggleCorrection(){
     elInput.style.height = 'auto'; // сбрасываем высоту
     elInput.style.height = (elInput.scrollHeight + 2) + 'px'; // устанавливаем новую высоту
 
-    // Устанавливаем курсор в конец текста
-    // const value = elInput.value;
-    // elInput.setSelectionRange(value.length, value.length);
-
     // Прокручиваем вниз, если нужно
     elInput.scrollTop = elInput.scrollHeight;
   }
@@ -585,7 +588,7 @@ function toggleCorrection(){
                 {#if message.isTranslate} 
                   {#if translatedMessages.has(message.cor)}
                     <cor> {@html translatedMessages.get(message.cor)}
-                      <div on:click={() => toggleTranslation(message )}>
+                      <div on:click={() => toggleTranslation(message , index )}>
                         <IconButton>
                           <Icon tag="svg" viewBox="0 0 24 24">
                               <path fill={message.role === 'user'?'red':"currentColor"} d={mdiTranslate} />
@@ -596,7 +599,7 @@ function toggleCorrection(){
                   {:else}
                     {#if dataAr[$langs] && dataAr[$langs].cor}
                       <cor>{@html dataAr[$langs].cor}
-                        <div on:click={() => toggleTranslation(message )}>
+                        <div on:click={() => toggleTranslation(message, index )}>
                           <IconButton>
                             <Icon tag="svg" viewBox="0 0 24 24">
                               <path fill={message.role === 'user'?'red':"currentColor"} d={mdiTranslate} />
@@ -607,7 +610,7 @@ function toggleCorrection(){
                     {:else}
                       {#await Transloc(message.cor, $llang, $langs, 'chat') then data}
                         <cor> {@html data}
-                          <div on:click={() => toggleTranslation(message )}>
+                          <div on:click={() => toggleTranslation(message , index )}>
                           <IconButton>
                             <Icon tag="svg" viewBox="0 0 24 24">
                               <path fill={message.role === 'user'?'red':"currentColor"} d={mdiTranslate} />             
@@ -621,7 +624,7 @@ function toggleCorrection(){
                 {:else}
                   <cor> 
                     {@html message.cor}
-                    <div on:click={() => toggleTranslation(message )}>
+                    <div on:click={() => toggleTranslation(message, index  )}>
                       <IconButton>
                         <Icon tag="svg" viewBox="0 0 24 24">
                             <path fill={message.role === 'user'?'red':"currentColor"} d={mdiTranslateOff} />
@@ -632,7 +635,7 @@ function toggleCorrection(){
                 {/if}
               </div>
             {/if}
-            <div on:click={() => toggleCorrection()} >
+            <div  on:click={() => toggleCorrection(index)} >
               <IconButton>
                 <Icon tag="svg" viewBox="0 0 24 24">
                     <path fill={message.role === 'user'?'red':"currentColor"} d={mdiAlertCircleCheckOutline } />
@@ -671,7 +674,7 @@ function toggleCorrection(){
           {/if}    
     
           {#if message.role === 'assistant' || message.role === 'system'}
-            <div on:click={() => toggleTranslation(message )}>
+            <div on:click={() => toggleTranslation(message, index )}>
               <IconButton>
                 <Icon tag="svg" viewBox="0 0 24 24">
                   {#if message.isTranslate}
