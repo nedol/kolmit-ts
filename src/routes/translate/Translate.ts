@@ -132,18 +132,19 @@ async function translateChunk(
 
   try {
     if (langs.includes(to)) {
-      // Try DeepL first for supported languages
-      
-      result = await deeplx_query(modifiedString, to.toUpperCase(), from.toUpperCase())
-      provider = 'deepl';
+
+      result  = await translate_(modifiedString, from.toUpperCase(),to.toUpperCase())
+      provider = 'google';
+
       //  result = await translate(modifiedString, to.toUpperCase(), from.toUpperCase());
       if (!result)
         throw new Error("Текст не может быть пустым.")
      
     
     } else {
-      result  = await translate_(modifiedString, from.toUpperCase(),to.toUpperCase())
-      provider = 'google';
+      // Try DeepL first for supported languages
+      result = await deeplx_query(modifiedString, to.toUpperCase(), from.toUpperCase())
+      provider = 'deepl';
 
       if (!result)
         throw new Error("Текст не может быть пустым.")
@@ -152,8 +153,8 @@ async function translateChunk(
   } catch (primaryError) {
     console.error('Primary translation failed, using fallback:', primaryError);
     try {
-      result  = await translate_(modifiedString, from.toUpperCase(),to.toUpperCase())
-      provider = 'google';
+      result = await deeplx_query(modifiedString, to.toUpperCase(), from.toUpperCase())
+      provider = 'deepl';
     } catch (fallbackError) {
       console.error('Fallback translation failed:', fallbackError);
     }
