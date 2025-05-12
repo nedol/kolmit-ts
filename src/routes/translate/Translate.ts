@@ -5,6 +5,8 @@ import translatex from 'google-translate-api-x';
 import { translate } from 'deeplx';
 import { query } from '@ifyour/deeplx';
 
+import { TranslationServiceClient } from '@google-cloud/translate';
+
 // Define supported languages
 const langs = [
   "bg", "cs", "da", "de", "el", "en", "es", "et", "fi", "fr", "hu", "id", "it", "ja", "ko", "lt", "lv", "nb", "nl", "pl", "pt", "ro", "ru", "sk", "sl", "sv", "zh"
@@ -184,12 +186,11 @@ async function translateChunk(
 }
 
 
-import { TranslationServiceClient } from '@google-cloud/translate';
 
 const client = new TranslationServiceClient();
 
 async function translate_(text, from = 'nl', to = 'ru') {
-  const projectId = process.env.GOOGLE_PROJECT_ID;  // Замените на ваш projectId
+  const projectId = 'firebase-infodesk';//process.env.GOOGLE_PROJECT_ID;  // Замените на ваш projectId
   const location = 'global';  // Можно использовать 'global', если у вас нет специфического региона
 
   const request = {
