@@ -404,6 +404,7 @@
     userInput = text[$llang];
     stt_text = text[$llang];
     // sendMessage();
+    elInput.value = userInput
     autoResize()
   }
 
@@ -518,13 +519,17 @@ function toggleCorrection(){
 
   // Функция авторазмера
   function autoResize() {
-    elInput.style.height = 'auto';
-    elInput.style.height = elInput.scrollHeight + 0 + 'px';
+    elInput.style.height = 'auto'; // сбрасываем высоту
+    elInput.style.height = (elInput.scrollHeight + 2) + 'px'; // устанавливаем новую высоту
 
-    // Прокрутка вниз и курсор в конец
-    // elInput.selectionStart = elInput.selectionEnd = userInput.length;
-    // elInput.scrollTop = elInput.scrollHeight;
+    // Устанавливаем курсор в конец текста
+    const value = elInput.value;
+    elInput.setSelectionRange(value.length, value.length);
+
+    // Прокручиваем вниз, если нужно
+    elInput.scrollTop = elInput.scrollHeight;
   }
+
 
   function OnClickReply(event) {
     const clickedWord = event.target.textContent;

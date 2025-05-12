@@ -32,7 +32,7 @@ async function deeplx_query(text, to, from) {
 
   const res = await query(
     params,
-    // {proxyEndpoint: "https://ideepl.vercel.app/jsonrpc"}
+    {proxyEndpoint: "https://ideepl.vercel.app/jsonrpc"}
   );
   // res.data = revertProtectedText(res.data);
   return res.data;
@@ -132,19 +132,18 @@ async function translateChunk(
 
   try {
     if (langs.includes(to)) {
-
-      result  = await translate_(modifiedString, from.toUpperCase(),to.toUpperCase())
-      provider = 'google';
-
+      // Try DeepL first for supported languages
+      
+      result = await deeplx_query(modifiedString, to.toUpperCase(), from.toUpperCase())
+      provider = 'deepl';
       //  result = await translate(modifiedString, to.toUpperCase(), from.toUpperCase());
       if (!result)
         throw new Error("Текст не может быть пустым.")
      
     
     } else {
-      // Try DeepL first for supported languages
-      result = await deeplx_query(modifiedString, to.toUpperCase(), from.toUpperCase())
-      provider = 'deepl';
+      result  = await translate_(modifiedString, from.toUpperCase(),to.toUpperCase())
+      provider = 'google';
 
       if (!result)
         throw new Error("Текст не может быть пустым.")
@@ -153,8 +152,8 @@ async function translateChunk(
   } catch (primaryError) {
     console.error('Primary translation failed, using fallback:', primaryError);
     try {
-      result = await deeplx_query(modifiedString, to.toUpperCase(), from.toUpperCase())
-      provider = 'deepl';
+      result  = await translate_(modifiedString, from.toUpperCase(),to.toUpperCase())
+      provider = 'google';
     } catch (fallbackError) {
       console.error('Fallback translation failed:', fallbackError);
     }
