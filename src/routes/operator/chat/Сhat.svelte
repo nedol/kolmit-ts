@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onDestroy, getContext,afterUpdate, onMount } from 'svelte';
-  import { writable } from 'svelte/store';
+  import { writable, get } from 'svelte/store';
   import { Transloc } from '../../translate/Transloc';
   import { showBottomAppBar, langs, llang, signal} from '$lib/stores';
   import IconButton, { Icon } from '@smui/icon-button';
@@ -320,8 +320,28 @@
 
         dataAr =  splitText(data.response);
 
-        // Добавляем cor в список
-        if(dataAr[$llang]?.cor){
+        // Получаем текущее состояние сообщений
+        const currentMessages = get(messages);
+
+        // Проверка последнего сообщения
+        const lastMsg = currentMessages[currentMessages.length - 1];
+
+        // Если есть cor и последнее сообщение от assistant
+        if (dataAr[$llang]?.cor && lastMsg?.role === "assistant") {
+          const newMessages = [...currentMessages];
+          
+          // Вставляем cor перед последним сообщением
+          newMessages.splice(-1, 0, {
+            id: crypto.randomUUID(),
+            role: "user",
+            text: '',
+            tr: dataAr[$langs]?.cor,
+            cor: dataAr[$llang]?.cor,
+            isTranslate: false,
+          });
+
+          messages.set(newMessages);
+        }else if(dataAr[$llang]?.cor){
 
           messages.update(msgs =>  
           [...msgs, 
@@ -523,8 +543,8 @@ function toggleCorrection(){
     elInput.style.height = (elInput.scrollHeight + 2) + 'px'; // устанавливаем новую высоту
 
     // Устанавливаем курсор в конец текста
-    const value = elInput.value;
-    elInput.setSelectionRange(value.length, value.length);
+    // const value = elInput.value;
+    // elInput.setSelectionRange(value.length, value.length);
 
     // Прокручиваем вниз, если нужно
     elInput.scrollTop = elInput.scrollHeight;
