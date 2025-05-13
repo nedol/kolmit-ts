@@ -15,5 +15,6 @@ vite.config.ts.timestamp-*
 /whisper_env
 whisper.requirements.txt
 ssh.txt
-
+/src/routes/translate/service-account.json
+/src/routes/translate/encoded.txt
 .vercel

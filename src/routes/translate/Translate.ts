@@ -12,6 +12,22 @@ const GOOGLE_PROJECT_ID = process.env.GOOGLE_PROJECT_ID
 
 import { TranslationServiceClient } from '@google-cloud/translate';
 
+import fs from 'fs';
+import path from 'path';
+
+// if (process.env.GOOGLE_CREDENTIALS_BASE64) {
+//   const decoded = Buffer.from(process.env.GOOGLE_CREDENTIALS_BASE64, 'base64').toString('utf-8');
+//   const filePath = path.join('D:', 'tmp', 'service-account.json'); // Путь к файлу на Windows
+//   fs.writeFileSync(filePath, decoded);
+//   process.env.GOOGLE_APPLICATION_CREDENTIALS = filePath;
+// }
+if (process.env.GOOGLE_CREDENTIALS_BASE64) {
+  const decoded = Buffer.from(process.env.GOOGLE_CREDENTIALS_BASE64, 'base64').toString('utf-8');
+  fs.writeFileSync('/tmp/service-account.json', decoded);
+  process.env.GOOGLE_APPLICATION_CREDENTIALS = '/tmp/service-account.json';
+}
+
+
 
 // Define supported languages
 const langs = [
@@ -145,7 +161,7 @@ async function translateChunk(
   try {
     if (langs.includes(to)) {
       // Try DeepL first for supported languages
-      throw new Error("process.env.TRANSLATE_DEEPL");
+      // throw new Error("process.env.TRANSLATE_DEEPL");
       
       result = await deeplx_query(modifiedString, to.toUpperCase(), from.toUpperCase())
       provider = 'deepl';
