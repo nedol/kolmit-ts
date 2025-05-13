@@ -1,0 +1,7 @@
+{
+	"host": "http://localhost:3000",
+	"host_port": "http://localhost:5000/kolmit/server/",
+	"host_server": "http://localhost:3000/server/",
+	"host_ws": "ws://localhost:3000/server",
+	"host_wss": "wss://kolmit-server.onrender.com:3000/server"
+}

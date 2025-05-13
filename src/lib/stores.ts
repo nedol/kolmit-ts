@@ -1,0 +1,26 @@
+import { writable } from 'svelte/store';
+
+export const operatorst = writable();
+export const editable = writable(false);
+export const view = writable('group');
+export const nlang = writable('en');
+export const langs = writable('en');
+export const llang = writable('nl');
+export const posterst = writable();
+export const msg = writable();
+export const signal = writable();
+export const dicts = writable();
+export const credentials = writable();
+export const users = writable({});
+export const call_but_status = writable('inactive');
+export const ice_conf = writable();
+export const rtcPool_st = writable({});
+export const lesson = writable({ visible: true , data: '' });
+export const click_call_func = writable();
+export const dc = writable();
+export const dc_state = writable('close');
+export const con_state = writable('');
+export const sql_st = writable();
+export const muted = writable(true);
+export const showBottomAppBar = writable(true);
+export const OnCheckQU = writable();

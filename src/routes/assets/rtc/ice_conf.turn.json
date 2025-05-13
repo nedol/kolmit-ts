@@ -1,0 +1,19 @@
+{
+  "stun": {
+    "urls": [
+      "stun:stun1.l.google.com:19302",
+      "stun:stun2.l.google.com:19302",
+      "stun:stun3.l.google.com:19302",
+      "stun:stun4.l.google.com:19302"
+    ]
+  },
+  "turn": {
+    "urls": [
+      "turn:92.113.144.41:3478?transport=tcp",
+      "turn:92.113.144.41:3478?transport=udp"
+    ],
+    "username": "kolmit",
+    "credential": "nissan720"
+  },
+  "lifetimeDuration": "86400s"
+}

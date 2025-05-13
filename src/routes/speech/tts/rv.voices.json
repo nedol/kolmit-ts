@@ -1,0 +1,437 @@
+[
+    {
+        "name": "UK English Female",
+        "lang": "en-GB",
+        "sex": "female"
+    },
+    {
+        "name": "UK English Male",
+        "lang": "en-GB",
+        "sex": "male"
+    },
+    {
+        "name": "US English Female",
+        "lang": "en-US",
+        "sex": "female"
+    },
+    {
+        "name": "US English Male",
+        "lang": "en-US",
+        "sex": "male"
+    },
+    {
+        "name": "Arabic Male",
+        "lang": "ar",
+        "sex": "male"
+    },
+    {
+        "name": "Arabic Female",
+        "lang": "ar",
+        "sex": "female"
+    },
+    {
+        "name": "Armenian Male",
+        "lang": "hy",
+        "sex": "male"
+    },
+    {
+        "name": "Australian Female",
+        "lang": "en-AU",
+        "sex": "female"
+    },
+    {
+        "name": "Australian Male",
+        "lang": "en-AU",
+        "sex": "male"
+    },
+    {
+        "name": "Bangla Bangladesh Female",
+        "lang": "bn-BD",
+        "sex": "female"
+    },
+    {
+        "name": "Bangla Bangladesh Male",
+        "lang": "bn-BD",
+        "sex": "male"
+    },
+    {
+        "name": "Bangla India Female",
+        "lang": "bn-IN",
+        "sex": "female"
+    },
+    {
+        "name": "Bangla India Male",
+        "lang": "bn-IN",
+        "sex": "male"
+    },
+    {
+        "name": "Brazilian Portuguese Female",
+        "lang": "pt-BR",
+        "sex": "female"
+    },
+    {
+        "name": "Chinese Female",
+        "lang": "zh",
+        "sex": "female"
+    },
+    {
+        "name": "Chinese Male",
+        "lang": "zh",
+        "sex": "male"
+    },
+    {
+        "name": "Chinese (Hong Kong) Female",
+        "lang": "zh-HK",
+        "sex": "female"
+    },
+    {
+        "name": "Chinese (Hong Kong) Male",
+        "lang": "zh-HK",
+        "sex": "male"
+    },
+    {
+        "name": "Chinese Taiwan Female",
+        "lang": "zh-TW",
+        "sex": "female"
+    },
+    {
+        "name": "Chinese Taiwan Male",
+        "lang": "zh-TW",
+        "sex": "male"
+    },
+    {
+        "name": "Czech Female",
+        "lang": "cs",
+        "sex": "female"
+    },
+    {
+        "name": "Danish Female",
+        "lang": "da",
+        "sex": "female"
+    },
+    {
+        "name": "Deutsch Female",
+        "lang": "de",
+        "sex": "female"
+    },
+    {
+        "name": "Deutsch Male",
+        "lang": "de",
+        "sex": "male"
+    },
+    {
+        "name": "Dutch Female",
+        "lang": "nl",
+        "sex": "female"
+    },
+    {
+        "name": "Dutch Male",
+        "lang": "nl",
+        "sex": "male"
+    },
+    {
+        "name": "Estonian Male",
+        "lang": "et",
+        "sex": "male"
+    },
+    {
+        "name": "Filipino Female",
+        "lang": "fil",
+        "sex": "female"
+    },
+    {
+        "name": "Finnish Female",
+        "lang": "fi",
+        "sex": "female"
+    },
+    {
+        "name": "French Female",
+        "lang": "fr",
+        "sex": "female"
+    },
+    {
+        "name": "French Male",
+        "lang": "fr",
+        "sex": "male"
+    },
+    {
+        "name": "French Canadian Female",
+        "lang": "fr-CA",
+        "sex": "female"
+    },
+    {
+        "name": "French Canadian Male",
+        "lang": "fr-CA",
+        "sex": "male"
+    },
+    {
+        "name": "Greek Female",
+        "lang": "el",
+        "sex": "female"
+    },
+    {
+        "name": "Hindi Female",
+        "lang": "hi",
+        "sex": "female"
+    },
+    {
+        "name": "Hindi Male",
+        "lang": "hi",
+        "sex": "male"
+    },
+    {
+        "name": "Hungarian Female",
+        "lang": "hu",
+        "sex": "female"
+    },
+    {
+        "name": "Indonesian Female",
+        "lang": "id",
+        "sex": "female"
+    },
+    {
+        "name": "Indonesian Male",
+        "lang": "id",
+        "sex": "male"
+    },
+    {
+        "name": "Italian Female",
+        "lang": "it",
+        "sex": "female"
+    },
+    {
+        "name": "Italian Male",
+        "lang": "it",
+        "sex": "male"
+    },
+    {
+        "name": "Japanese Female",
+        "lang": "ja",
+        "sex": "female"
+    },
+    {
+        "name": "Japanese Male",
+        "lang": "ja",
+        "sex": "male"
+    },
+    {
+        "name": "Korean Female",
+        "lang": "ko",
+        "sex": "female"
+    },
+    {
+        "name": "Korean Male",
+        "lang": "ko",
+        "sex": "male"
+    },
+    {
+        "name": "Latin Male",
+        "lang": "la",
+        "sex": "male"
+    },
+    {
+        "name": "Nepali",
+        "lang": "ne",
+        "sex": "male"
+    },
+    {
+        "name": "Norwegian Female",
+        "lang": "no",
+        "sex": "female"
+    },
+    {
+        "name": "Norwegian Male",
+        "lang": "no",
+        "sex": "male"
+    },
+    {
+        "name": "Polish Female",
+        "lang": "pl",
+        "sex": "female"
+    },
+    {
+        "name": "Polish Male",
+        "lang": "pl",
+        "sex": "male"
+    },
+    {
+        "name": "Portuguese Female",
+        "lang": "pt",
+        "sex": "female"
+    },
+    {
+        "name": "Portuguese Male",
+        "lang": "pt",
+        "sex": "male"
+    },
+    {
+        "name": "Romanian Female",
+        "lang": "ro",
+        "sex": "female"
+    },
+    {
+        "name": "Russian Female",
+        "lang": "ru",
+        "sex": "female"
+    },
+    {
+        "name": "Sinhala",
+        "lang": "si",
+        "sex": "male"
+    },
+    {
+        "name": "Slovak Female",
+        "lang": "sk",
+        "sex": "female"
+    },
+    {
+        "name": "Spanish Female",
+        "lang": "es",
+        "sex": "female"
+    },
+    {
+        "name": "Spanish Latin American Female",
+        "lang": "es-419",
+        "sex": "female"
+    },
+    {
+        "name": "Spanish Latin American Male",
+        "lang": "es-419",
+        "sex": "male"
+    },
+    {
+        "name": "Swedish Female",
+        "lang": "sv",
+        "sex": "female"
+    },
+    {
+        "name": "Swedish Male",
+        "lang": "sv",
+        "sex": "male"
+    },
+    {
+        "name": "Tamil Female",
+        "lang": "ta",
+        "sex": "female"
+    },
+    {
+        "name": "Tamil Male",
+        "lang": "ta",
+        "sex": "male"
+    },
+    {
+        "name": "Thai Female",
+        "lang": "th",
+        "sex": "female"
+    },
+    {
+        "name": "Thai Male",
+        "lang": "th",
+        "sex": "male"
+    },
+    {
+        "name": "Turkish Female",
+        "lang": "tr",
+        "sex": "female"
+    },
+    {
+        "name": "Turkish Male",
+        "lang": "tr",
+        "sex": "male"
+    },
+    {
+        "name": "Ukrainian Female",
+        "lang": "uk",
+        "sex": "female"
+    },
+    {
+        "name": "Vietnamese Female",
+        "lang": "vi",
+        "sex": "female"
+    },
+    {
+        "name": "Vietnamese Male",
+        "lang": "vi",
+        "sex": "male"
+    },
+    {
+        "name": "Afrikaans Male",
+        "lang": "af",
+        "sex": "male"
+    },
+    {
+        "name": "Albanian Male",
+        "lang": "sq",
+        "sex": "male"
+    },
+    {
+        "name": "Bosnian Male",
+        "lang": "bs",
+        "sex": "male"
+    },
+    {
+        "name": "Catalan Male",
+        "lang": "ca",
+        "sex": "male"
+    },
+    {
+        "name": "Croatian Male",
+        "lang": "hr",
+        "sex": "male"
+    },
+    {
+        "name": "Esperanto Male",
+        "lang": "eo",
+        "sex": "male"
+    },
+    {
+        "name": "Icelandic Female",
+        "lang": "is",
+        "sex": "female"
+    },
+    {
+        "name": "Latvian Male",
+        "lang": "lv",
+        "sex": "male"
+    },
+    {
+        "name": "Macedonian Male",
+        "lang": "mk",
+        "sex": "male"
+    },
+    {
+        "name": "Moldavian Female",
+        "lang": "mo",
+        "sex": "female"
+    },
+    {
+        "name": "Montenegrin Male",
+        "lang": "sr-ME",
+        "sex": "male"
+    },
+    {
+        "name": "Serbian Male",
+        "lang": "sr",
+        "sex": "male"
+    },
+    {
+        "name": "Serbo-Croatian Male",
+        "lang": "sh",
+        "sex": "male"
+    },
+    {
+        "name": "Swahili Male",
+        "lang": "sw",
+        "sex": "male"
+    },
+    {
+        "name": "Welsh Male",
+        "lang": "cy",
+        "sex": "male"
+    },
+    {
+        "name": "Fallback UK Female",
+        "lang": "en-GB",
+        "sex": "female"
+    }
+]

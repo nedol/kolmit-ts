@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Презентация Kolmit</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f2f2f2;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .presentation {
+            width: 80%;
+            max-width: 1200px;
+            height: 80%;
+            background-color: #ffffff;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .slide {
+            display: none;
+            padding: 40px;
+            transition: opacity 0.5s ease-in-out;
+            opacity: 0;
+            height: 100%;
+        }
+
+        .slide.active {
+            display: block;
+            opacity: 1;
+        }
+
+        h1, h2 {
+            color: #2c3e50;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        p, ul {
+            font-size: 18px;
+            line-height: 1.6;
+            color: #34495e;
+        }
+
+        ul {
+            padding-left: 20px;
+        }
+
+        li {
+            margin-bottom: 10px;
+        }
+
+        .navigation-buttons {
+            position: absolute;
+            top: 50%;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            transform: translateY(-50%);
+        }
+
+        .prev, .next {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            cursor: pointer;
+            font-size: 18px;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        .prev:hover, .next:hover {
+            background-color: #45a049;
+        }
+
+        .prev:focus, .next:focus {
+            outline: none;
+        }
+
+        /* Стиль для кнопок навигации */
+        .navigation-buttons button {
+            transition: transform 0.3s ease;
+        }
+
+        .navigation-buttons button:hover {
+            transform: scale(1.1);
+        }
+
+        /* Стиль для заголовков и списка */
+        h1 {
+            font-size: 36px;
+        }
+
+        h2 {
+            font-size: 28px;
+        }
+
+        /* Мобильная версия */
+        @media (max-width: 768px) {
+            .presentation {
+                width: 90%;
+                height: 90%;
+            }
+            h1 {
+                font-size: 28px;
+            }
+            h2 {
+                font-size: 22px;
+            }
+            .prev, .next {
+                font-size: 16px;
+                padding: 10px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="presentation">
+        <div class="slide active">
+            <h1>Презентация проекта Kolmit</h1>
+            <p><strong>Заголовок:</strong> Представление проекта Kolmit</p>
+            <p><strong>Подзаголовок:</strong> Платформа для изучения иностранных языков</p>
+        </div>
+        <div class="slide">
+            <h2>Слайд 2: Введение в Kolmit</h2>
+            <p><strong>Заголовок:</strong> Введение в Kolmit</p>
+            <p><strong>Содержание:</strong> Kolmit — это приложение для изучения иностранных языков, предлагающее индивидуализированный подход к обучению. Основные цели проекта: привлечение финансирования, сотрудничество с образовательными учреждениями и помощь в трудоустройстве.</p>
+        </div>
+        <div class="slide">
+            <h2>Слайд 3: Ключевые особенности Kolmit</h2>
+            <ul>
+                <li><strong>Индивидуализированный подход к обучению:</strong> Kolmit предоставляет персонализированные учебные планы, адаптированные под уровень знаний каждого студента.</li>
+                <li><strong>Мультиязычность:</strong> Приложение поддерживает несколько языков, что позволяет использовать его в многоязычных классах.</li>
+                <li><strong>Гибкость и доступность:</strong> Kolmit работает в онлайн-режиме, что позволяет студентам учить языки в любое время и в любом месте.</li>
+                <li><strong>Система практики разговорной речи:</strong> Kolmit предлагает специально разработанные диалоги и ситуационные задания для развития разговорных навыков.</li>
+                <li><strong>Поддержка разных уровней:</strong> Приложение подходит для студентов с разным уровнем знания языка, от A1 до C1.</li>
+            </ul>
+        </div>
+        <div class="slide">
+            <h2>Слайд 4: Практическое применение в языковых курсах</h2>
+            <ul>
+                <li><strong>Интеграция в языковые курсы:</strong> Kolmit был внедрен в программы языковых курсов, где студенты могут использовать приложение для практики и дополнения традиционных методов обучения.</li>
+                <li><strong>Персонализированные планы обучения:</strong> Преподаватели разрабатывают учебные планы, адаптированные под каждого студента.</li>
+                <li><strong>Гибкость и доступность:</strong> Приложение доступно онлайн, что позволяет студентам практиковать язык в любое время.</li>
+                <li><strong>Повышение качества разговорной практики:</strong> Kolmit помогает студентам развивать разговорные навыки через специально разработанные диалоги и упражнения.</li>
+                <li><strong>Оценка и прогресс студентов:</strong> Преподаватели используют систему оценок и отчетности для отслеживания успехов студентов.</li>
+            </ul>
+        </div>
+        <div class="slide">
+            <h2>Слайд 5: Демонстрация работы приложения</h2>
+            <p>В этом разделе будет показано, как работает приложение Kolmit, как оно адаптируется к пользователю и как происходит взаимодействие с контентом.</p>
+        </div>
+        <div class="slide">
+            <h2>Слайд 6: Заключение</h2>
+            <p>В конце презентации важно подчеркнуть, как сотрудничество с учебными заведениями может привести к взаимным выгодам. Это может быть возможность расширить функционал Kolmit, улучшить продукт и привлечь новых пользователей.</p>
+        </div>
+
+        <div class="navigation-buttons">
+            <button class="prev" onclick="changeSlide(-1)">Назад</button>
+            <button class="next" onclick="changeSlide(1)">Далее</button>
+        </div>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+
+        function changeSlide(direction) {
+            slides[currentSlide].classList.remove('active');
+            currentSlide += direction;
+
+            if (currentSlide < 0) {
+                currentSlide = slides.length - 1;
+            } else if (currentSlide >= slides.length) {
+                currentSlide = 0;
+            }
+
+            slides[currentSlide].classList.add('active');
+        }
+    </script>
+
+</body>
+</html>

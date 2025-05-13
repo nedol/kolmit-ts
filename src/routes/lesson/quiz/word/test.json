@@ -1,0 +1,410 @@
+[
+    {
+      "example": {
+        "nl": "Eva is een <<ijverige>> huismoeder.",
+        "ru": "Ева — <<прилежная>> мама-домохозяйка.",
+        "lbl": "Ева — <<прилежная>> мама-домохозяйка."
+      }
+    },
+    {
+      "example": {
+        "nl": "Ze werkt hard om voor haar gezin <<te zorgen>>.",
+        "ru": "Она много работает, чтобы <<заботиться>> о своей семье.",
+        "lbl": "Она работает много, для того чтобы о своей семье <<заботиться>>"
+      }
+    },
+    {
+      "example": {
+        "nl": "Terwijl iedereen nog slaapt, maakt ze een kopje thee en <<geniet>> ze van de stilte.",
+        "ru": "Пока все еще спят, она заваривает чашку чая и <<наслаждается>> тишиной.",
+        "lbl": "Пока все еще спят, делает она одну чашку чая и наслаждается тишиной"
+      }
+    },
+    {
+      "example": {
+        "nl": "Dit is haar enige <<rustige>> moment.",
+        "ru": "Это ее единственный <<тихий>> момент."
+      }
+    },
+    {
+      "example": {
+        "nl": "Ze denkt aan alle <<taken>> van de dag: de kinderen klaarmaken voor school, schoonmaken, boodschappen doen en het avondeten koken.",
+        "ru": "Она думает обо всех <<задачах>> дня: подготовка детей к школе, уборка, покупки и приготовление ужина."
+      }
+    },
+    {
+      "example": {
+        "nl": "Eva is ook <<bescheiden>>.",
+        "ru": "Ева также <<скромная>>.",
+        "lbl": "Ева тоже <<скромна>>."
+      }
+    },
+    {
+      "example": {
+        "nl": "Ze wil geen <<complimenten>> voor haar werk.",
+        "ru": "Она не хочет <<комплиментов>> за свою работу.",
+        "lbl": "Она хочет никаких <<комплиментов>> за свою работу."
+      }
+    },
+    {
+      "example": {
+        "nl": "Eva is ook <<streng>> voor zichzelf.",
+        "ru": "Еще Ева <<строга>> к себе.",
+        "lbl": "Ева ещё <<строга>> к себе самой."
+      }
+    },
+    {
+      "example": {
+        "nl": "In haar <<weinige>> vrije tijd volgt ze een cursus Engels.",
+        "ru": "В свое <<небольшое>> свободное время она посещает курсы английского языка.",
+        "lbl": "В свое <<небольшое>> свободное время посещает она курсы английского."
+      }
+    },
+    {
+      "example": {
+        "nl": "Ze studeert hard en is niet <<tevreden>> met een 6/10.",
+        "ru": "Она усердно учится и не <<удовлетворена>> оценкой 6/10."
+      }
+    },
+    {
+      "example": {
+        "nl": "Tom is een student die altijd <<nieuwsgierig>> is naar nieuwe dingen.",
+        "ru": "Том — студент, которому всегда <<любопытно>> что-то новое."
+      }
+    },
+    {
+      "example": {
+        "nl": "Hij leest graag boeken en <<stelt>> veel vragen in de klas.",
+        "ru": "Он любит читать книги и <<задает>> много вопросов в классе."
+      }
+    },
+    {
+      "example": {
+        "nl": "Op een dag <<zag>> hij een documentaire over de ruimte en werd hij helemaal enthousiast.",
+        "ru": "Однажды он <<посмотрел>> документальный фильм о космосе и очень воодушевился."
+      }
+    },
+    {
+      "example": {
+        "nl": "Hij <<besloot>> meer te leren over sterren en planeten en schreef zich in voor een cursus astronomie.",
+        "ru": "Он <<решил>> узнать больше о звездах и планетах и ​​записался на курсы астрономии."
+      }
+    },
+    {
+      "example": {
+        "nl": "Tom is ook <<optimistisch>>.",
+        "ru": "Том также <<оптимистичен>>."
+      }
+    },
+    {
+      "example": {
+        "nl": "Zelfs als hij een laag cijfer haalt, blijft hij <<positief>>.",
+        "ru": "Даже если он получает низкую оценку, он остается <<позитивным>>.",
+        "lbl": "Даже если он получает низкую оценку, остается он <<позитивным>>."
+      }
+    },
+    {
+      "example": {
+        "nl": "Daarnaast is Tom <<voorzichtig>>.",
+        "ru": "Кроме того, Том <<осторожен>>."
+      }
+    },
+    {
+      "example": {
+        "nl": "Hij let goed op zijn <<spullen>>, doet zijn fiets altijd op slot en draagt een fietshelm.",
+        "ru": "Он внимательно следит за своими <<вещами>>, всегда запирает велосипед и носит велосипедный шлем.",
+        "lbl": "Он уделяет пристальное внимание своим <<вещам>>, делает свой велосипед всегда закрытым и носит велосипедный шлем."
+      }
+    },
+    {
+      "example": {
+        "nl": "Leah is een moeder die altijd <<grapjes>> maakt.",
+        "ru": "Лия — мать, которая всегда <<шутит>>."
+      }
+    },
+    {
+      "example": {
+        "nl": "Iedereen lacht als ze een verhaal vertelt, omdat ze zo <<grappig>> is.",
+        "ru": "Все смеются, когда она рассказывает историю, потому что она такая <<забавная>>."
+      }
+    },
+    {
+      "example": {
+        "nl": "Leah is ook <<luidruchtig>>.",
+        "ru": "Лия тоже <<громкая>>."
+      }
+    },
+    {
+      "example": {
+        "nl": "Als ze <<blij>> is, praat ze hard en zingt ze de hele tijd.",
+        "ru": "Когда она <<счастлива>>, она все время громко разговаривает и поет."
+      }
+    },
+    {
+      "example": {
+        "nl": "Op een ochtend, toen haar zoon Tim zich klaarmaakte voor school, hoorde hij zijn moeder luid <<meezingen>> met de radio.",
+        "ru": "Однажды утром, когда ее сын Тим собирался в школу, он услышал, как его мать громко <<подпевала>> по радио.",
+        "lbl": "Однажды утром, когда ее сын Тим собирался в школу, он услышал, как его мать громко <<поёт>> с радио."
+      }
+    },
+    {
+      "example": {
+        "nl": "Tim is meestal <<braaf>>.",
+        "ru": "Тим обычно <<хороший>>."
+      }
+    },
+    {
+      "example": {
+        "nl": "Hij doet altijd zijn huiswerk en helpt in het <<huishouden>>.",
+        "ru": "Он всегда делает уроки и помогает по <<домашнему хозяйству>>."
+      }
+    },
+    {
+      "example": {
+        "nl": "Maar soms kan hij <<koppig>> zijn.",
+        "ru": "Но иногда он может быть <<упрямым>>.",
+        "lbl": "Но иногда он может <<упрямым>> быть."
+      }
+    },
+    {
+      "example": {
+        "nl": "Als hij geen zin heeft om zijn kamer op te ruimen, doet hij het niet, zelfs als zijn moeder het <<verschillende>> keren vraagt.",
+        "ru": "Если ему не хочется убираться в комнате, он не будет этого делать, даже если мать попросит <<несколько>> раз.",
+         "lbl": "Если ему не хочется в своей комнате убираться, делать он этого не будет, даже если его мать <<несколько>> раз попросит."
+      }
+    },
+    {
+      "example": {
+        "nl": "Tim is soms ook een beetje <<jaloers>> op zijn vriendje, die een grote slaapkamer met een Playstation heeft.",
+        "ru": "Тим иногда также немного <<завидует>> своему парню, у которого большая спальня с игровой приставкой.",
+        "lbl": "Тим иногда также немного <<завидует>> своему парню, у которого большая спальня с игровой приставкой есть."
+      }
+    },
+    {
+      "example": {
+        "nl": "Erdal is een kruidenier die altijd <<sympathiek>> is voor zijn klanten.",
+        "ru": "Эрдал — бакалейщик, который всегда <<сочувствует>> своим покупателям.",
+        "lbl": "Эрдал это бакалейщик, который всегда <<нравится>> своим покупателям."
+      }
+    },
+    {
+      "example": {
+        "nl": "Als een oudere dame zijn winkel <<binnenkomt>>, helpt hij haar meteen met de boodschappen.",
+        "ru": "Когда пожилая женщина <<заходит>> в его магазин, он сразу же помогает ей с продуктами.",
+        "lbl": "Если пожилая женщина в его магазин <<заходит>>, помогает он ей сразу же с продуктами."
+      }
+    },
+    {
+      "example": {
+        "nl": "“Ik zal u helpen, mevrouw,\" zegt hij met een <<glimlach>>.",
+        "ru": "'Я помогу вам, мэм', — говорит он с <<улыбкой>>."
+      }
+    },
+    {
+      "example": {
+        "nl": "Mensen komen graag bij hem winkelen omdat hij zo <<vriendelijk>> is.",
+        "ru": "Людям нравится делать с ним покупки, потому что он такой <<дружелюбный>>.",
+        "lbl": "Людям нравится приходить в его магазин, потому что он такой дружелюбный есть."
+      }
+    },
+    {
+      "example": {
+        "nl": "Hij <<fluit>> vaak een liedje terwijl hij werkt.",
+        "ru": "Он часто <<насвистывает>> песню во время работы.",
+        "lbl":"Он свистит часто одну песню во время его работы."
+      }
+    },
+    {
+      "example": {
+        "nl": "Zijn goede <<humeur>> zorgt voor een fijne sfeer in de winkel.",
+        "ru": "Его хорошее <<настроение>> создает приятную атмосферу в магазине."
+      }
+    },
+    {
+      "example": {
+        "nl": "Als een klant teveel geld geeft, zegt hij meteen: 'U hebt teveel gegeven, hier is uw <<wisselgeld>>'",
+        "ru": "Если клиент дает слишком много денег, он сразу говорит: 'Вы дали слишком много, вот ваша <<сдача>>'."
+      }
+    },
+    {
+      "example": {
+        "nl": "Erik is een administratief bediende die altijd <<serieus>> is.",
+        "ru": "Эрик — помощник по административным вопросам, который всегда <<серьёзен>>."
+      }
+    },
+    {
+      "example": {
+        "nl": "Sommige mensen vinden hem <<onvriendelijk>> omdat hij niet veel lacht en altijd geconcentreerd werkt.",
+        "ru": "Некоторые считают его <<недружелюбным>>, потому что он мало улыбается и всегда работает сосредоточенно.",
+        "lbl":"Некоторые люди находят его недружелюбным, потому что он не очень много улыбается и всегда сконцентрирован на работе"
+      }
+    },
+    {
+      "example": {
+        "nl": "Eigenlijk is hij een heel <<lieve>>, vriendelijke man, maar hij is soms bang om met mensen te praten die hij niet goed kent.",
+        "ru": "На самом деле он очень <<милый>> и дружелюбный человек, но иногда боится разговаривать с людьми, которых плохо знает.",
+        "lbl":"На самом деле он очень милый и дружелюбный человекб но он иногда боится с людьми разговаривать, которых не очень хорошо знает."     
+      }
+    },
+    {
+      "example": {
+        "nl": "Hij was al <<verlegen>> als kind, vooral in een grote groep mensen.",
+        "ru": "Он уже был <<застенчивым>> в детстве, особенно в большой компании."
+      }
+    },
+    {
+      "example": {
+        "nl": "Erik is ook <<rustig>>.",
+        "ru": "Эрик тоже <<спокоен>>."
+      }
+    },
+    {
+      "example": {
+        "nl": "Als een klant twijfelt over een aankoop, blijft ze <<rustig>> wachten.",
+        "ru": "Если у покупателя есть сомнения по поводу покупки, он <<спокойно>> ждет."
+      }
+    },
+    {
+      "example": {
+        "nl": "Hij <<panikeert>> nooit, zelfs niet als er veel werk is.",
+        "ru": "Он никогда не <<паникует>>, даже когда работы много."
+      }
+    },
+    {
+      "example": {
+        "nl": "Zijn collega’s houden van zijn <<kalmte>>, vooral tijdens drukke periodes.",
+        "ru": "Его коллегам нравится его <<спокойствие>>, особенно в периоды напряженной работы."
+      }
+    },
+    {
+      "example": {
+        "nl": "Hij komt altijd op tijd, <<vergeet>> nooit mails te beantwoorden of facturen op tijd te betalen.",
+        "ru": "Он всегда приходит вовремя,  никогда не <<забывает>> отвечать на электронные письма и не оплачивает счета вовремя."
+      }
+    },
+    {
+      "example": {
+        "nl": "Sophie is een verkoopster die altijd <<geduldig>> is met haar klanten.",
+        "ru": "Софи — продавщица, которая всегда <<терпелива>> со своими покупателями."
+      }
+    },
+    {
+      "example": {
+        "nl": "Maar soms is Sophie nogal <<angstig>>.",
+        "ru": "Но иногда Софи весьма <<беспокоится>>."
+      }
+    },
+    {
+      "example": {
+        "nl": "Ze heeft <<stress>> over kleine dingen.",
+        "ru": "Она в <<стрессе>> из-за мелочей."
+      }
+    },
+    {
+      "example": {
+        "nl": "Toen ze een keer per <<ongeluk>> iets liet vallen, raakte ze in paniek.",
+        "ru": "Однажды, когда она <<случайно>> что-то уронила, она запаниковала."
+      }
+    },
+    {
+      "example": {
+        "nl": "Iedereen maakt wel eens <<fouten>>.",
+        "ru": "Каждый  иногда совершает <<ошибки>>."
+      }
+    },
+    {
+      "infinitive": "",
+      "example": {
+        "nl": "Ze is altijd heel <<lief>> tegen haar vrienden.",
+        "ru": "Она всегда очень <<мила>> с друзьями."
+      }
+    },
+    {
+      "infinitive": "",
+      "example": {
+        "nl": "Hij blijft <<beleefd>> zelfs als hij boos is.",
+        "ru": "Он остается <<вежливым>>, даже когда злится."
+      }
+    },
+    {
+      "infinitive": "",
+      "example": {
+        "nl": "Het kind was de hele dag <<vrolijk>> vanwege het feest.",
+        "ru": "Ребенок был весь день <<радостным>> из-за праздника."
+      }
+    },
+    {
+      "infinitive": "",
+      "example": {
+        "nl": "De leraar is soms te <<streng>> voor zijn studenten.",
+        "ru": "Учитель иногда слишком <<строг>> со своими учениками."
+      }
+    },
+    {
+      "infinitive": "",
+      "example": {
+        "nl": "Sommige mensen vinden hem <<arrogant>>, maar hij is gewoon zelfverzekerd.",
+        "ru": "Некоторые считают его <<высокомерным>>, но он просто уверен в себе."
+      }
+    },
+    {
+      "infinitive": "",
+      "example": {
+        "nl": "Ze is erg <<gevoelig>> voor kritiek.",
+        "ru": "Она очень <<чувствительна>> к критике."
+      }
+    },
+    {
+      "infinitive": "",
+      "example": {
+        "nl": "Hij is altijd zo <<nieuwsgierig>> naar andere culturen.",
+        "ru": "Он всегда так <<любопытен>> к другим культурам."
+      }
+    },
+    {
+      "infinitive": "",
+      "example": {
+        "nl": "Je moet heel <<geduldig>> zijn als je met kinderen werkt.",
+        "ru": "Тебе нужно быть очень <<терпеливым>>, если ты работаешь с детьми.",
+        "lbl": "Тебе нужно  очень <<терпеливым>> быть, если ты с детьми работаешь."
+      }
+    },
+    {
+      "infinitive": "",
+      "example": {
+        "nl": "Hij was een beetje <<jaloers>> toen hij mijn nieuwe fiets zag.",
+        "ru": "Он немного <<завидовал>>, когда увидел мой новый велосипед.",
+         "lbl": "Он был немного <<ревнив>>, когда мой новый велосипед увидел."
+      }
+    },
+    {
+      "infinitive": "",
+      "example": {
+        "nl": "Ze maakt altijd iedereen aan het lachen, want ze is heel <<grappig>>.",
+        "ru": "Она всегда всех смешит, потому что она очень <<смешная>>."
+      }
+    },
+    {
+      "infinitive": "",
+      "example": {
+        "nl": "De dokter was erg <<serieus>> tijdens het gesprek.",
+        "ru": "Врач был очень <<серьезен>> во время разговора."
+      }
+    },
+    {
+      "infinitive": "",
+      "example": {
+        "nl": "Het is belangrijk om <<eerlijk>> te zijn tegen je vrienden.",
+        "ru": "Важно быть <<честным>> с друзьями.",
+        "lbl": "Важно <<честным>> с друзьями быть."
+      }
+    },
+    {
+      "infinitive": "",
+      "example": {
+        "nl": "Een <<stipt>> persoon is altijd op tijd.",
+        "ru": "<<Пунктуальный>> человек всегда приходит вовремя.",
+        "lbl": "<<Пунктуальный>> человек всегда вовремя."
+      }
+    }
+  ]

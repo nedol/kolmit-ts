@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="ru">
+<link href="https://cdn.jsdelivr.net/npm/@mdi/font/css/materialdesignicons.min.css" rel="stylesheet">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Инструкция по работе с Kolmit</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f6f8;
+            color: #333;
+        }
+
+        header {
+            background-color: #0056b3;
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2.5rem;
+        }
+
+        header p {
+            margin-top: 10px;
+            font-size: 1.2rem;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .step {
+            background: #f0f4f8;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .step-text {
+            flex: 1;
+            margin-right: 20px;
+        }
+
+        h2 {
+            color: #0056b3;
+            margin-bottom: 15px;
+        }
+
+        ul, ol {
+            padding-left: 20px;
+        }
+
+        img, video {
+            max-width: 100%;
+            border-radius: 8px;
+            border: 0px solid #ddd;
+        }
+
+        .video-thumbnail {
+            width: 150px;
+            cursor: pointer;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #ccc;
+            transition: transform 0.3s;
+        }
+
+        .video-thumbnail:hover {
+            transform: scale(1.05);
+        }
+
+        .fullscreen-video {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .fullscreen-video video {
+            max-width: 90%;
+            max-height: 90%;
+        }
+
+        .fullscreen-video .close-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: #fff;
+            color: #333;
+            padding: 10px;
+            border-radius: 50%;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        footer {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        footer a {
+            color: #0056b3;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            .step {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .step-text {
+                margin-bottom: 15px;
+            }
+
+            .video-thumbnail {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>Инструкция по работе с Kolmit</h1>
+        <p>Kolmit — это удобное приложение для изучения языков, предлагающее увлекательные упражнения и практическую речь.</p>
+    </header>
+
+    <div class="container">
+        <!-- Step Content (unchanged) -->
+
+        <!-- New Download Section -->
+        <div class="step">
+            <div class="step-text">
+                <h2>📂 Скачать документацию</h2>
+                <p>Для получения дополнительной информации и справочных материалов по Kolmit, вы можете скачать нашу официальную документацию:</p>
+                <a href="/assets/docs/kolmit-guide.pdf" download class="button">Скачать PDF</a>
+            </div>
+        </div>
+        <footer>
+            <p>© 2024 Kolmit. Все права защищены. <a href="/privacy-policy">Политика конфиденциальности</a> | <a href="/terms">Условия использования</a></p>
+        </footer>
+    </div>
+
+    <script>
+        function openFullscreen(thumbnail) {
+            const fullscreenContainer = document.getElementById('fullscreenVideo');
+            const fullscreenVideo = fullscreenContainer.querySelector('video');
+            const videoSource = thumbnail.querySelector('video source').src;
+
+            fullscreenVideo.src = videoSource;
+            fullscreenContainer.style.display = 'flex';
+        }
+
+        function closeFullscreen() {
+            const fullscreenContainer = document.getElementById('fullscreenVideo');
+            const fullscreenVideo = fullscreenContainer.querySelector('video');
+
+            fullscreenVideo.pause();
+            fullscreenVideo.src = "";
+            fullscreenContainer.style.display = 'none';
+        }
+    </script>
+</body>
+
+</html>

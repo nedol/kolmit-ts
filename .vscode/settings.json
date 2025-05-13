@@ -1,0 +1,24 @@
+{
+  "liveServer.settings.port": 5502,
+  "git.ignoreLimitWarning": true,
+  "cSpell.words": [
+    "smui"
+  ],
+  "sqltools.connections": [
+    {
+      "pgOptions": {
+        "ssl": {
+          "rejectUnauthorized": true
+        }
+      },
+      "previewLimit": 50,
+      "server": "ep-polished-bush-a2n4g5y9-pooler.eu-central-1.aws.neon.tech",
+      "port": 5432,
+      "driver": "PostgreSQL",
+      "name": "kolmit",
+      "database": "neondb",
+      "username": "nedooleg",
+      "password": "nHLhfQB0WS5Y"
+    }
+  ]
+}
