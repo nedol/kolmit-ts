@@ -8,7 +8,10 @@ import { query } from '@ifyour/deeplx';
 import { config } from 'dotenv';
 config()
 
+const GOOGLE_PROJECT_ID = process.env.GOOGLE_PROJECT_ID
+
 import { TranslationServiceClient } from '@google-cloud/translate';
+import { env } from 'process';
 
 // Define supported languages
 const langs = [
@@ -200,7 +203,7 @@ async function translateChunk(
 const client = new TranslationServiceClient();
 
 async function translate_(text, from = 'nl', to = 'ru') {
-  const projectId = process.env.GOOGLE_PROJECT_ID;  // Замените на ваш projectId
+  const projectId = GOOGLE_PROJECT_ID;  // Замените на ваш projectId
   const location = 'global';  // Можно использовать 'global', если у вас нет специфического региона
 
   const request = {

@@ -39,6 +39,7 @@ declare module '$env/static/private' {
 	export const SB_CON_PSW: string;
 	export const GOOGLE_CLOUD_API: string;
 	export const GOOGLE_PROJECT_ID: string;
+	export const TRANSLATE_DEEPL: string;
 	export const ALLUSERSPROFILE: string;
 	export const APPDATA: string;
 	export const ChocolateyInstall: string;
@@ -116,6 +117,7 @@ declare module '$env/static/private' {
 	export const TERM_PROGRAM: string;
 	export const TERM_PROGRAM_VERSION: string;
 	export const TMP: string;
+	export const TRANSLATE_DEEPLE: string;
 	export const USERDOMAIN: string;
 	export const USERDOMAIN_ROAMINGPROFILE: string;
 	export const USERNAME: string;
@@ -172,6 +174,7 @@ declare module '$env/dynamic/private' {
 		SB_CON_PSW: string;
 		GOOGLE_CLOUD_API: string;
 		GOOGLE_PROJECT_ID: string;
+		TRANSLATE_DEEPL: string;
 		ALLUSERSPROFILE: string;
 		APPDATA: string;
 		ChocolateyInstall: string;
@@ -249,6 +252,7 @@ declare module '$env/dynamic/private' {
 		TERM_PROGRAM: string;
 		TERM_PROGRAM_VERSION: string;
 		TMP: string;
+		TRANSLATE_DEEPLE: string;
 		USERDOMAIN: string;
 		USERDOMAIN_ROAMINGPROFILE: string;
 		USERNAME: string;
