@@ -145,6 +145,7 @@ async function translateChunk(
   try {
     if (langs.includes(to)) {
       // Try DeepL first for supported languages
+      throw new Error("process.env.TRANSLATE_DEEPL");
       
       result = await deeplx_query(modifiedString, to.toUpperCase(), from.toUpperCase())
       provider = 'deepl';
