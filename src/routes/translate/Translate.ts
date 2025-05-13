@@ -15,12 +15,7 @@ import { TranslationServiceClient } from '@google-cloud/translate';
 import fs from 'fs';
 import path from 'path';
 
-// if (process.env.GOOGLE_CREDENTIALS_BASE64) {
-//   const decoded = Buffer.from(process.env.GOOGLE_CREDENTIALS_BASE64, 'base64').toString('utf-8');
-//   const filePath = path.join('D:', 'tmp', 'service-account.json'); // Путь к файлу на Windows
-//   fs.writeFileSync(filePath, decoded);
-//   process.env.GOOGLE_APPLICATION_CREDENTIALS = filePath;
-// }
+
 if (process.env.GOOGLE_CREDENTIALS_BASE64) {
   const decoded = Buffer.from(process.env.GOOGLE_CREDENTIALS_BASE64, 'base64').toString('utf-8');
   fs.writeFileSync('/tmp/service-account.json', decoded);
