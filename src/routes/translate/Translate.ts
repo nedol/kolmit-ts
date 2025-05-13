@@ -5,6 +5,9 @@ import translatex from 'google-translate-api-x';
 import { translate } from 'deeplx';
 import { query } from '@ifyour/deeplx';
 
+import { config } from 'dotenv';
+config()
+
 import { TranslationServiceClient } from '@google-cloud/translate';
 
 // Define supported languages
@@ -30,11 +33,11 @@ async function deeplx_query(text, to, from) {
   };
 
   // 🔹 Проверяем, что отправляется в API
-  console.log("Query params:", params);
+  // console.log("Query params:", params);
 
   const res = await query(
     params,
-    {proxyEndpoint: "https://ideepl.vercel.app/jsonrpc"}
+    // {proxyEndpoint: "https://27.68.171.103:1080"}
   );
   // res.data = revertProtectedText(res.data);
   return res.data;
@@ -142,26 +145,33 @@ async function translateChunk(
       
       result = await deeplx_query(modifiedString, to.toUpperCase(), from.toUpperCase())
       provider = 'deepl';
-      //  result = await translate(modifiedString, to.toUpperCase(), from.toUpperCase());
-      if (!result)
-        throw new Error("Текст не может быть пустым.")
+
+      if (!result){
+        console.log('deepl failed')
+        throw new Error("Текст не может быть пустым.");
+      }
      
     
     } else {
+
       result  = await translate_(modifiedString, from.toUpperCase(),to.toUpperCase())
       provider = 'google';
 
-      if (!result)
+      if (!result){
+        console.log('google failed')
         throw new Error("Текст не может быть пустым.")
+      }
     }
 
   } catch (primaryError) {
     console.error('Primary translation failed, using fallback:', primaryError);
     try {
+
       result  = await translate_(modifiedString, from.toUpperCase(),to.toUpperCase())
       provider = 'google';
+
     } catch (fallbackError) {
-      console.error('Fallback translation failed:', fallbackError);
+      console.error('Google translation failed:', fallbackError);
     }
   }
 
@@ -190,7 +200,7 @@ async function translateChunk(
 const client = new TranslationServiceClient();
 
 async function translate_(text, from = 'nl', to = 'ru') {
-  const projectId = 'firebase-infodesk';//process.env.GOOGLE_PROJECT_ID;  // Замените на ваш projectId
+  const projectId = process.env.GOOGLE_PROJECT_ID;  // Замените на ваш projectId
   const location = 'global';  // Можно использовать 'global', если у вас нет специфического региона
 
   const request = {
