@@ -11,7 +11,7 @@ config()
 const GOOGLE_PROJECT_ID = process.env.GOOGLE_PROJECT_ID
 
 import { TranslationServiceClient } from '@google-cloud/translate';
-import { env } from 'process';
+
 
 // Define supported languages
 const langs = [
@@ -205,6 +205,7 @@ const client = new TranslationServiceClient();
 
 async function translate_(text, from = 'nl', to = 'ru') {
   const projectId = GOOGLE_PROJECT_ID;  // Замените на ваш projectId
+  console.log('projectId:',projectId)
   const location = 'global';  // Можно использовать 'global', если у вас нет специфического региона
 
   const request = {
