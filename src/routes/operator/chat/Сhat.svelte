@@ -196,7 +196,7 @@
 
     // Ограничиваем историю сообщений до 5 реплик с каждой стороны
     let conversationHistory = $messages
-      .slice(-10) // Берем последние 10 сообщений (5 от пользователя и 5 от AI)
+      .slice(-4) // Берем последние 4 сообщений (2 от пользователя и 2 от AI)
       .map(msg => ({
         role: msg.role === "assistant" ? "assistant" : "user",
         content: msg.text,
@@ -223,12 +223,13 @@
 
       console.log('SendMessage',params);
 
-      isTranslate = false;
-      isTip = false; 
+
 
       $signal.SendMessage(params,async (res) => {    
         console.log('handleData',res)
         handleData(res);       
+        isTranslate = false;
+        isTip = false; 
       }); 
   }
 
@@ -454,7 +455,7 @@
       translatedMessages.set(message.text, message.tr);
 
     message.isTranslate = !message.isTranslate;
-
+    isTranslate = !isTranslate
     // $messages = $messages; // Принудительное обновление  
     
     setTimeout(() => {
@@ -537,7 +538,6 @@ function toggleCorrection(i){
   }
 
   function SetInput(text:string){
-    userInput = text;
    
     elInput.scrollIntoView({ behavior: "smooth", block: "end" });
     isTip = true;
@@ -745,7 +745,7 @@ function toggleCorrection(i){
 
         bind:value={userInput}
         bind:this = {elInput}
-        on:input={autoResize}
+        on:input={()=>SetInput(userInput)}
         placeholder={data}
         on:keydown={(e) => {onKeydown(e.key)}}
         aria-label="Введите сообщение"
@@ -767,7 +767,7 @@ function toggleCorrection(i){
         rows="1"
         bind:value={userInput}
         bind:this = {elInput}
-        on:input={autoResize}
+        on:input={()=>SetInput(userInput)}
         placeholder={data}
         on:keydown={(e) => {onKeydown(e.key)}}
         aria-label="Введите сообщение"

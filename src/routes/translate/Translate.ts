@@ -157,9 +157,21 @@ async function translateChunk(
     if (langs.includes(to)) {
       // Try DeepL first for supported languages
       // throw new Error("process.env.TRANSLATE_DEEPL");
+
+     if(modifiedString.split(' ').length<4){
       
+      result = await translatex(modifiedString, { from: from , to: to, forceBatch: true ,
+        requestOptions: {
+          agent: new HttpsProxyAgent('https://164.132.175.159:3128')
+        }
+      });  
+      result = result.text;
+      provider = 'google-x';
+
+     }else{
       result = await deeplx_query(modifiedString, to.toUpperCase(), from.toUpperCase())
       provider = 'deepl';
+     }
 
       if (!result){
         console.log('deepl failed')
