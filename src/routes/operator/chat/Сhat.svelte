@@ -597,8 +597,8 @@ function toggleCorrection(i){
                       </div>
                     </cor>
                   {:else}
-                    {#if dataAr[$langs] && dataAr[$langs].cor}
-                      <cor>{@html dataAr[$langs].cor}
+                    {#if message.tr}
+                      <cor>{@html message.tr}
                         <div on:click={() => toggleTranslation(message, index )}>
                           <IconButton>
                             <Icon tag="svg" viewBox="0 0 24 24">
