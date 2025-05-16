@@ -1108,7 +1108,7 @@ let keys: string[] = [];
 {/if}
 
 {#if isChat}
-  <Chat quiz={data} context={getCurrentArticle()} prompt_type='greeting'></Chat>
+  <Chat quiz={data} context={getCurrentArticle()} prompt_type='basic'></Chat>
 {/if}
 
 <div style="height:100px"></div>

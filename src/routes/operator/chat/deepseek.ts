@@ -40,7 +40,7 @@ let total_tokens: number | null = 0;
 export default async function generate_from_text_input(params: GenerateParams): Promise<GenerateResponse> {
 
   // return generateFromTextInput(params);
-  if (params.prompt.type === 'greeting') {
+  if (params.prompt.type === 'basic') {
     const apiKey = process.env.DEEPSEEK_API_KEY;
     if (!apiKey) {
       throw new Error('DeepSeek API key is missing in environment variables');
@@ -55,7 +55,7 @@ export default async function generate_from_text_input(params: GenerateParams): 
 
     console.log('propmt req:',`${params.prompt.quiz}.${params.prompt.type}.${params.prompt.lang}`)
 
-    const result = await GetPrompt(`chat.greeting.${params.prompt.lang}`);
+    const result = await GetPrompt(`chat.basic.${params.prompt.lang}`);
 
     if (result.error) {
       throw new Error(result.error);
@@ -154,7 +154,7 @@ export async function generateFromTextInput(params: GenerateParams): Promise<Gen
     apiKey: apiKey,
   });
 
-  if (params.prompt.type === 'greeting') {
+  if (params.prompt.type === 'basic') {
     // Проверка наличия обязательных параметров
     if (!params.prompt.quiz || !params.prompt.type || !params.prompt.lang) {
       throw new Error('Missing required properties in params.prompt');

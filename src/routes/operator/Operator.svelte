@@ -505,7 +505,7 @@
   <Module data={operator}/>
 
 {:else if $view==='chat'}
-  <Chat prompt_type={operator.level?"greeting":'basic'}></Chat>   
+  <Chat prompt_type={operator.level?"basic":'greeting'}></Chat>   
 
 {:else if  $view === 'group'}
   <Group  {rtc} />

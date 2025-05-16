@@ -24,7 +24,7 @@
   let blink_arrow = writable(false);
   let blink_mic = writable(false);
 
-  export let prompt_type="basic", quiz = {quiz:''}, context:string[] = [];
+  export let prompt_type="greeting", quiz = {quiz:''}, context:string[] = [];
 
   let stt: Stt | null = null; // Если `Stt` — это класс или компонент Svelte
 
@@ -329,8 +329,7 @@
 
         // Если есть cor и последнее сообщение от assistant
         if (dataAr[$llang]?.cor && lastMsg?.role === "assistant") {
-          const newMessages = [...currentMessages];
-          
+          const newMessages = [...currentMessages];          
           // Вставляем cor перед последним сообщением
           newMessages.splice(-1, 0, {
             id: crypto.randomUUID(),
@@ -342,7 +341,8 @@
           });
 
           messages.set(newMessages);
-        }else if(dataAr[$llang]?.cor){
+
+        } else if(dataAr[$llang]?.cor){
 
           messages.update(msgs =>  
           [...msgs, 
@@ -356,6 +356,7 @@
     
         // Добавляем ответ AI в список
         }else if(dataAr[$llang]?.msg){
+
           messages.update(msgs =>  
             [...msgs, 
               {
@@ -472,7 +473,6 @@
     if (text) {
       tts.Speak_server($llang, output, '', '');
     }
-
 }
 
 

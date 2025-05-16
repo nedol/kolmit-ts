@@ -60,7 +60,7 @@ async function translate(params){
   
   const prompt = await GetPrompt(params.prompt);
   if (prompt.error) return prompt.error;
-  if (params.conversationHistory.length === 0 && params.prompt.includes('chat.basic')) {
+  if (params.conversationHistory.length === 0 && params.prompt.includes('chat.greeting')) {
     return prompt.prompt.user;
   }
   if (!prompt.prompt?.system) {

@@ -13,7 +13,11 @@ export async function POST(event) {
 	
 		case 'set_rate':
 	
-			SetRate(par);
+			try{
+				SetRate(par);
+			}catch(ex){
+				console.error('Error in SetRate:', ex); // More detailed error logging
+			}
 		
 		break;
 	}

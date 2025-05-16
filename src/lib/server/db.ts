@@ -1492,7 +1492,6 @@ export async function SetRate(par) {
 
     return result; // Return the result of the query
   } catch (ex) {
-    console.error('Error in SetRate:', ex); // More detailed error logging
     throw ex; // Rethrow the error to handle it elsewhere
   }
 }
