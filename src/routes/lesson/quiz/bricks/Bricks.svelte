@@ -12,6 +12,7 @@
   import CircularProgress from '@smui/circular-progress';
   import Chat from '../../../operator/chat/Сhat.svelte'
   import Assistant from '../../../operator/chat/Assistant.svelte';
+  import Container from './Container.svelte';
 
   import pkg from 'lodash';
   const { find } = pkg;
@@ -966,6 +967,9 @@ let keys: string[] = [];
 {/if}
 
   <span class='article' on:click={toNextArticle}>{article_name}</span>
+
+ 
+  
   <div>
     {#if isTransloc}
     <div class="trans">
@@ -977,8 +981,9 @@ let keys: string[] = [];
     </div>
 
     {/if}
+  </div>  
 
-    <div class="container">
+<Container>
       <!-- Предложение с замененными словами -->
       {#await Transloc('Составить предложение', 'ru', $langs,data.name) then data}
         <div class="title">{data}:</div>
@@ -1015,22 +1020,22 @@ let keys: string[] = [];
         </div> 
       {/if}
     </div>
-  </div>
-</div>
-<div class="container">
-  <div>
-    <!-- Горизонтальный список слов -->
-    {#await Transloc('используя набор слов', 'ru', $langs,data.name) then data}
-        <div class="title">{data}:</div>
-    {/await}
+</Container>  
 
-    <div class="word-list">
-      {#each words as word, index}
-        <span class={word.gr} on:click={() => handleClick(words[index])}>{@html word.value}</span>
-      {/each}
+<Container>
+    <div>
+      <!-- Горизонтальный список слов -->
+      {#await Transloc('используя набор слов', 'ru', $langs,data.name) then data}
+          <div class="title">{data}:</div>
+      {/await}
+
+      <div class="word-list">
+        {#each words as word, index}
+          <span class={word.gr} on:click={() => handleClick(words[index])}>{@html word.value}</span>
+        {/each}
+      </div>
     </div>
-  </div>
-</div>
+</Container>
 
 {#if isSTT}
   <div class="container">

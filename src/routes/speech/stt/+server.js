@@ -283,8 +283,8 @@ async function stt_mms(arrayBuffer, from_lang, to_lang) {
 
 
 async function stt_karim_space(arrayBuffer,  from_lang, to_lang) {
-  // const client = await Client.connect("karim23657/Persian_Automatic_Speech_Recognition-asr");
-  const client = await Client.connect("MelikaNLP/Persian_Automatic_Speech_Recognition-asr");
+  const client = await Client.connect("karim23657/Persian_Automatic_Speech_Recognition-asr");
+  // const client = await Client.connect("MelikaNLP/Persian_Automatic_Speech_Recognition-asr");
 
   const result = await client.predict("/g_rec", { 
       audio_File: arrayBuffer, 		

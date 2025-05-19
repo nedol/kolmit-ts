@@ -223,8 +223,6 @@
 
       console.log('SendMessage',params);
 
-
-
       $signal.SendMessage(params,async (res) => {    
         console.log('handleData',res)
         handleData(res);       
@@ -280,11 +278,17 @@
           const extractData = (content) => {
               if (!content) return null;
 
-              const corRegex = /<cor>([\s\S]*?)<\/cor>/g;
-              const msgRegex = /<msg>([\s\S]*?)<\/msg>/g;
-              const replyRegex = /<reply>([\s\S]*?)<\/reply>/g;
+              const corRegex = /<cor(?:\s+\w+="[^"]*")*>([\s\S]*?)<\/cor>/g;
+              const msgRegex = /<msg(?:\s+\w+="[^"]*")*>([\s\S]*?)<\/msg>/g;
+              // const replyRegex = /<reply>([\s\S]*?)<\/reply>/g;
               const levelRegex = /<level>([\s\S]*?)<\/level>/g;
               const wordsRegex = /<words>([\s\S]*?)<\/words>/g;
+
+              // const corRegex = /<cor(?:\s+\w+="[^"]*")*>[\s\S]*?<\/cor>/g;
+              // const msgRegex = /<msg(?:\s+\w+="[^"]*")*>[\s\S]*?<\/msg>/g;
+              const replyRegex = /<reply(?:\s+\w+="[^"]*")*>([\s\S]*?)<\/reply>/g;
+              // const levelRegex = /<level(?:\s+\w+="[^"]*")*>[\s\S]*?<\/level>/g;
+              // const wordsRegex = /<words(?:\s+\w+="[^"]*")*>[\s\S]*?<\/words>/g;
 
              
 
@@ -298,7 +302,7 @@
               const replies = [];
               let replyMatch;
               while ((replyMatch = replyRegex.exec(content)) !== null) {
-                  replies.push(replyMatch[1].trim());
+                  replies.push(replyMatch[0].trim());
               }
 
               return {
@@ -649,7 +653,11 @@ function toggleCorrection(i){
           {@html translatedMessages.get(message.text)}
         {:else}
           {@html message.text}
-        {/if}   
+          
+          <!-- <iframe src="/html/html/bricks.html" width="100%" height="200" style="border: none;"></iframe> -->
+
+        {/if}  
+    
           
         <div style="display:flex;justify-content: space-between;">
           
@@ -695,10 +703,11 @@ function toggleCorrection(i){
                 {#if !message.isTranslate}
                   <reply>
                     {#if message.repliesTranslated?.[i]}
-                      {#each message.repliesTranslated?.[i].split(' ') as word}
-                        <Word on:click={(word) => OnClickReply(word)}>{word}</Word>
+                      {@html message.repliesTranslated?.[i]}
+                      <!-- {#each message.repliesTranslated?.[i].split(' ') as word}
+                        <Word on:click={(word) => OnClickReply(word)}>{@html word}</Word>
                         <span> </span>  
-                      {/each}
+                      {/each} -->
                     {:else}
                       {@html reply}
                     {/if}
@@ -823,8 +832,8 @@ function toggleCorrection(i){
   }
 
   textarea::placeholder {
-      direction: ltr;
-    }
+    direction: ltr;
+  }
 
 
   .chat-container {
@@ -885,7 +894,7 @@ function toggleCorrection(i){
 
   .message.user {
     position: relative;
-    max-width: 85%;
+    width: 85%;
     top:74vh;
     align-self: flex-end;
     text-align: end;
@@ -894,7 +903,7 @@ function toggleCorrection(i){
 
   .message.assistant {
     position: relative;
-    max-width: 85%;
+    width: 85%;
     top:74vh;
     align-self: flex-start;
     text-align: start;
