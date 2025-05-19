@@ -281,17 +281,29 @@ async function stt_mms(arrayBuffer, from_lang, to_lang) {
   }
 }
 
+// const client = await Client.connect("rafaaa2105/crisper-whisper");
+const client = await Client.connect("karim23657/Persian_Automatic_Speech_Recognition-asr");
 
 async function stt_karim_space(arrayBuffer,  from_lang, to_lang) {
-  const client = await Client.connect("karim23657/Persian_Automatic_Speech_Recognition-asr");
-  // const client = await Client.connect("MelikaNLP/Persian_Automatic_Speech_Recognition-asr");
 
-  const result = await client.predict("/g_rec", { 
-      audio_File: arrayBuffer, 		
-      language: "nl-BE", 
-  });
-  if(!result.data[0].includes('Exception:'))
-    return result.data[0].replace("Text:", '').trim();
+  try{
+    
+    const result = await client.predict("/g_rec", { 
+        audio_File: arrayBuffer, 		
+        language: "nl-BE", 
+    });
+
+    // const result = await client.predict("/predict", { 
+    //     inputs: arrayBuffer,
+    //     yt_url:'', 		
+    //     task: "transcribe", 
+    // });
+    
+    if(!result.data[0].includes('Exception:'))
+      return result.data[0].replace("Text:", '').trim();
+  }catch(ex){
+    console.log(ex)
+  }
 }
 
 
