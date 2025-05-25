@@ -378,7 +378,7 @@ let keys: string[] = [];
     
     article_name = bricks_data.text[curSentence].article || '\u00a0\u00a0\u00a0\u00a0\u00a0'
 
-    words = sentence.trim().split(/[\s,:\.]+/)
+    words = sentence.trim().split(/[\s:\.]+/)
       .filter(word => word) // Оставляем только существующие слова
       .map((word) => ({
           gr: extractTagName(word),
@@ -386,7 +386,7 @@ let keys: string[] = [];
           value: word.trim()
       })); 
     // Создаём массив для предложения с placeholder'ами
-    formattedSentence = sentence.trim().split(/[\s,:\.]+/)
+    formattedSentence = sentence.trim().split(/[\s:\.]+/)
         .filter(word => word) // Оставляем только существующие слова
         .map((word) => ({
           gr: extractTagName(word),
@@ -395,6 +395,28 @@ let keys: string[] = [];
         }));
 
     MakeBricks();
+  }
+
+  function splitSentenceWithTags(input) {
+    const result = [];
+    const regex = /<(\w+)>(.*?)<\/\1>|[^\s<>\.:\,]+/g;
+    let match;
+
+    while ((match = regex.exec(input)) !== null) {
+      if (match[1]) {
+        // Тег и его содержимое
+        const tag = match[1];
+        const innerWords = match[2].trim().split(/\s+/);
+        for (const word of innerWords) {
+          result.push(`<${tag}>${word}</${tag}>`);
+        }
+      } else {
+        // Обычное слово
+        result.push(match[0]);
+      }
+    }
+
+    return result;
   }
 
   function  getCorrectSpanString(isCorrect){
@@ -486,7 +508,8 @@ let keys: string[] = [];
         // isTip=true;;
         isColorised = true;
 
-        formattedSentence = sentence.split(/[\s:\.]+/)
+        formattedSentence = splitSentenceWithTags(sentence)
+        formattedSentence = formattedSentence
           .filter(word => word) // Оставляем только существующие слова
           .map((word) => ({
             gr: extractTagName(word),
@@ -499,8 +522,9 @@ let keys: string[] = [];
             item.class = "invisible"
         });
 
-       // Разбиваем на слова
-        words =  sentence.trim().split(/[\s:\.]+/) 
+        // Разбиваем на слова
+        words =  splitSentenceWithTags(sentence);
+        words = words
         .filter(word => word) // Оставляем только существующие слова
         .map((word) => ({
             gr: extractTagName(word),
@@ -800,7 +824,6 @@ let keys: string[] = [];
         <Icon
           tag="svg"
           viewBox="0 0 24 24"
-
           style="margin:10px 5px 10px 5px; scale:1.3; width:20px; visibility: hidden;"
         />
       {/if}
@@ -967,8 +990,6 @@ let keys: string[] = [];
 {/if}
 
   <span class='article' on:click={toNextArticle}>{article_name}</span>
-
- 
   
   <div>
     {#if isTransloc}
@@ -983,7 +1004,7 @@ let keys: string[] = [];
     {/if}
   </div>  
 
-<Container>
+  <Container>
       <!-- Предложение с замененными словами -->
       {#await Transloc('Составить предложение', 'ru', $langs,data.name) then data}
         <div class="title">{data}:</div>
@@ -1020,9 +1041,9 @@ let keys: string[] = [];
         </div> 
       {/if}
     </div>
-</Container>  
+  </Container>  
 
-<Container>
+  <Container>
     <div>
       <!-- Горизонтальный список слов -->
       {#await Transloc('используя набор слов', 'ru', $langs,data.name) then data}
@@ -1035,7 +1056,7 @@ let keys: string[] = [];
         {/each}
       </div>
     </div>
-</Container>
+  </Container>
 
 {#if isSTT}
   <div class="container">
@@ -1045,28 +1066,26 @@ let keys: string[] = [];
         
     <div class="margins"
       style="text-align: center; display: flex; align-items: center; justify-content: space-between;">
-      <div>
- 
-          <IconButton   disabled={!isCorrectSpanString}
-            class="material-icons"
-            aria-label="Back"
-            on:click={onClickMicrophone}>
-            <Icon tag="svg" viewBox="0 0 24 24">
-              {#if isListening}
-                <path fill="currentColor" d={mdiMicrophone} />
-              {:else}
-                <path fill="currentColor" d={mdiMicrophoneOutline} />
-              {/if}
-            </Icon>
+      <div> 
+        <IconButton   disabled={!isCorrectSpanString}
+          class="material-icons"
+          aria-label="Back"
+          on:click={onClickMicrophone}>
+          <Icon tag="svg" viewBox="0 0 24 24">
+            {#if isListening}
+              <path fill="currentColor" d={mdiMicrophone} />
+            {:else}
+              <path fill="currentColor" d={mdiMicrophoneOutline} />
+            {/if}
+          </Icon>
 
-            <Badge
-              position="middle"
-              align="bottom-end - bottom-middle"
-              aria-label="unread count"
-              style="position:absolute;top:2px;right:-1px;color:black;background-color:lightgrey;scale:.8;letter-spacing: 1.5px;">{$llang}
-            </Badge>
-          </IconButton>
-
+          <Badge
+            position="middle"
+            align="bottom-end - bottom-middle"
+            aria-label="unread count"
+            style="position:absolute;top:2px;right:-1px;color:black;background-color:lightgrey;scale:.8;letter-spacing: 1.5px;">{$llang}
+          </Badge>
+        </IconButton>
       </div>
       <Stt
         bind:this={stt}
@@ -1170,14 +1189,12 @@ let keys: string[] = [];
       border-radius: 3px;
       padding: 8px 10px;
   }
-
   .bricks-header {
     display: flex;
     align-items: center;
     gap: 10px; /* Отступ между элементами */
-    margin-top: 5px;
+    margin: 10px;
   }
-
 
   .bricks_name{
     position:relative;

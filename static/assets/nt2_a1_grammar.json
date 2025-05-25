@@ -1,0 +1,143 @@
+{
+  "title": "NT2 A1 Grammatica-overzicht",
+  "rules": [
+    {
+      "group": "Порядок слов",
+      "items": [
+        {
+          "id": 1,
+          "title": "Глагол на втором месте (V2-regel)",
+          "description": "В главных утвердительных предложениях сказуемое стоит на втором месте.",
+          "example_nl": "Ik woon in Nederland.",
+          "example_ru": "Я живу в Нидерландах."
+        },
+        {
+          "id": 2,
+          "title": "Инверсия после обстоятельства",
+          "description": "Если предложение начинается не с подлежащего, глагол всё равно на втором месте, а подлежащее уходит после него.",
+          "example_nl": "Vandaag ga ik naar school.",
+          "example_ru": "Сегодня я иду в школу."
+        },
+        {
+          "id": 3,
+          "title": "Вопросы с глаголом на первом месте",
+          "description": "В вопросах без вопросительного слова глагол идёт перед подлежащим.",
+          "example_nl": "Kom je morgen?",
+          "example_ru": "Ты придёшь завтра?"
+        },
+        {
+          "id": 4,
+          "title": "Bijzin – глагол в конце",
+          "description": "В подчинённых предложениях (omdat, als, dat) глагол уходит в конец.",
+          "example_nl": "Ik blijf thuis omdat ik ziek ben.",
+          "example_ru": "Я остаюсь дома, потому что я болен."
+        }
+      ]
+    },
+    {
+      "group": "Артикли и существительные",
+      "items": [
+        {
+          "id": 5,
+          "title": "Определённый и неопределённый артикль (de, het, een)",
+          "description": "Использование артиклей перед существительными.",
+          "example_nl": "Een man zit op de stoel.",
+          "example_ru": "Мужчина сидит на стуле."
+        },
+        {
+          "id": 6,
+          "title": "Множественное число",
+          "description": "Образование множественного числа существительных.",
+          "example_nl": "De kinderen spelen buiten.",
+          "example_ru": "Дети играют на улице."
+        }
+      ]
+    },
+    {
+      "group": "Местоимения",
+      "items": [
+        {
+          "id": 7,
+          "title": "Личные местоимения",
+          "description": "Использование я, ты, он, она и т. д.",
+          "example_nl": "Hij werkt in een winkel.",
+          "example_ru": "Он работает в магазине."
+        },
+        {
+          "id": 8,
+          "title": "Притяжательные местоимения",
+          "description": "Моё, твоё, его и т. д.",
+          "example_nl": "Mijn huis is groot.",
+          "example_ru": "Мой дом большой."
+        }
+      ]
+    },
+    {
+      "group": "Времена глаголов",
+      "items": [
+        {
+          "id": 9,
+          "title": "Обычное настоящее время (tegenwoordige tijd)",
+          "description": "Настоящее время правильных и неправильных глаголов.",
+          "example_nl": "Wij lopen naar huis.",
+          "example_ru": "Мы идём домой."
+        },
+        {
+          "id": 10,
+          "title": "Perfektум с hebben / zijn",
+          "description": "Прошедшее время с вспомогательными глаголами hebben или zijn.",
+          "example_nl": "Ik heb een boek gelezen.",
+          "example_ru": "Я прочитал книгу."
+        }
+      ]
+    },
+    {
+      "group": "Модальные конструкции и выражения",
+      "items": [
+        {
+          "id": 11,
+          "title": "Модальные глаголы: kunnen, moeten, willen",
+          "description": "Использование модальных глаголов в простых предложениях.",
+          "example_nl": "Ik moet werken.",
+          "example_ru": "Я должен работать."
+        }
+      ]
+    },
+    {
+      "group": "Вопросительные слова",
+      "items": [
+        {
+          "id": 12,
+          "title": "Vraagwoorden: wie, wat, waar, wanneer, waarom",
+          "description": "Строим вопросы с вопросительными словами.",
+          "example_nl": "Waar woon je?",
+          "example_ru": "Где ты живёшь?"
+        }
+      ]
+    },
+    {
+      "group": "Отрицания",
+      "items": [
+        {
+          "id": 13,
+          "title": "Ontkenning met 'niet' en 'geen'",
+          "description": "Как правильно отрицать: gebruik van 'niet' en 'geen'.",
+          "example_nl": "Ik heb geen auto.",
+          "example_ru": "У меня нет машины."
+        }
+      ]
+    },
+    {
+      "group": "Предлоги",
+      "items": [
+        {
+          "id": 14,
+          "title": "Простые предлоги места и времени",
+          "description": "in, op, bij, om, naar и т. д.",
+          "example_nl": "Ik ben op school.",
+          "example_ru": "Я в школе."
+        }
+      ]
+    }
+  ]
+}
