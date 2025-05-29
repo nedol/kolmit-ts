@@ -992,6 +992,7 @@ export async function GetLesson(q: { operator: string; owner: string; level?: st
 
     // Начинаем транзакцию
     await sql.begin(async (sql) => {
+      
       const operatorInfo = await sql<{ group: string }[]>`
         SELECT "group" FROM operators 
         WHERE operator = ${q.operator} AND abonent = ${q.owner}
