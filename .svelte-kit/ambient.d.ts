@@ -31,6 +31,11 @@ declare module '$env/static/private' {
 	export const PGUSER: string;
 	export const PGPASSWORD: string;
 	export const ENDPOINT_ID: string;
+	export const RNDRHOST: string;
+	export const RNDRDATABASE: string;
+	export const RNDRUSER: string;
+	export const RNDRPASSWORD: string;
+	export const RNDRURL: string;
 	export const HF_TOKEN: string;
 	export const VITE_TURN_USER: string;
 	export const VITE_TURN_CREDENTIAL: string;
@@ -166,6 +171,11 @@ declare module '$env/dynamic/private' {
 		PGUSER: string;
 		PGPASSWORD: string;
 		ENDPOINT_ID: string;
+		RNDRHOST: string;
+		RNDRDATABASE: string;
+		RNDRUSER: string;
+		RNDRPASSWORD: string;
+		RNDRURL: string;
 		HF_TOKEN: string;
 		VITE_TURN_USER: string;
 		VITE_TURN_CREDENTIAL: string;

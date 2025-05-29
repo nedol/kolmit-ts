@@ -19,7 +19,7 @@ import { config } from 'dotenv';
 config();
 
 let { PGHOST, PGDATABASE, PGUSER, PGPASSWORD, ENDPOINT_ID } = process.env;
-
+let { RNDRHOST, RNDRDATABASE, RNDRUSER, RNDRPASSWORD, RNDRURL } = process.env;
 
 const conStrNeon = {
   connectionString:ENDPOINT_ID,
@@ -33,6 +33,18 @@ export async function CreatePool_neon(): Promise<void> {
     username: PGUSER,
     password: PGPASSWORD,
     ssl: 'require', // для Neon, если нужно
+  });
+  sql_st.set(sql);
+}
+
+export async function CreatePool_render(): Promise<void> {
+  const sql = postgres({
+    host: RNDRHOST,
+    port: 5432,
+    database: RNDRDATABASE,
+    username: RNDRUSER,
+    password: RNDRPASSWORD,
+    ssl: 'require', // 
   });
   sql_st.set(sql);
 }
