@@ -23,7 +23,7 @@ export async function load({ fetch, cookies, route, url }) {
 	let prom = new Promise((resolve, reject) => {
 		console.log(url.hostname )
 		// url.hostname === 'localhost'
-        CreatePool_render(resolve)
+        // CreatePool_render(resolve)
         // CreatePool_neon(resolve);
 	}) 
 	.catch(error => console.error("Ошибка:", error));

@@ -18,24 +18,24 @@ sql_st.subscribe((data) => {
 import { config } from 'dotenv';
 config();
 
-let { PGHOST, PGDATABASE, PGUSER, PGPASSWORD, ENDPOINT_ID } = process.env;
+// let { PGHOST, PGDATABASE, PGUSER, PGPASSWORD, ENDPOINT_ID } = process.env;
 let { RNDRHOST, RNDRDATABASE, RNDRUSER, RNDRPASSWORD, RNDRURL } = process.env;
 
-const conStrNeon = {
-  connectionString:ENDPOINT_ID,
-};
+// const conStrNeon = {
+//   connectionString:ENDPOINT_ID,
+// };
 
-export async function CreatePool_neon(): Promise<void> {
-  const sql = postgres({
-    host: PGHOST,
-    port: 5432,
-    database: PGDATABASE,
-    username: PGUSER,
-    password: PGPASSWORD,
-    ssl: 'require', // для Neon, если нужно
-  });
-  sql_st.set(sql);
-}
+// export async function CreatePool_neon(): Promise<void> {
+//   const sql = postgres({
+//     host: PGHOST,
+//     port: 5432,
+//     database: PGDATABASE,
+//     username: PGUSER,
+//     password: PGPASSWORD,
+//     ssl: 'require', // для Neon, если нужно
+//   });
+//   sql_st.set(sql);
+// }
 
 export async function CreatePool_render(): Promise<void> {
   const sql = postgres({
@@ -51,11 +51,11 @@ export async function CreatePool_render(): Promise<void> {
 
 export async function safeQuery(strings: TemplateStringsArray, ...params: any[]) {
   const sql: Sql = postgres({
-    host: PGHOST,
+    host: RNDRHOST,
     port: 5432,
-    database: PGDATABASE,
-    username: PGUSER,
-    password: PGPASSWORD,
+    database: RNDRDATABASE,
+    username: RNDRUSER,
+    password: RNDRPASSWORD,
     ssl: 'require' // <--- обязательно
   });
 
