@@ -190,7 +190,7 @@ let keys: string[] = [];
       }
 
       // Текущее предложение
-      const sentence = bricks_data.text[curSentence].sentence;
+      const sentence = bricks_data.text[curSentence].sentence.replaceAll('.','') ;
 
       article_name = bricks_data.text[curSentence].article || '\u00a0\u00a0\u00a0\u00a0\u00a0'
 
@@ -266,8 +266,6 @@ function markSentenceBoundaries(text: string): string {
     return punct + '[[SPLIT]]' + space;
   });
 }
-
-
 
   const parser = new DOMParser();
   const doc = parser.parseFromString(html, 'text/html');
@@ -501,68 +499,68 @@ function markSentenceBoundaries(text: string): string {
 
     focusedIndex = 0;
 
-    const sent_obj = bricks_data.text[curSentence];
+    sentence = bricks_data.text[curSentence].sentence.trim();
 
-    sentence = sent_obj.sentence.trim();
+    const sent_obj = bricks_data.text[curSentence].sentence.trim() + bricks_data.text[curSentence+1].sentence.trim()//!!! 
 
-      if(!span_equal){   
-        
-        // isTip=true;;
-        isColorised = true;
+    if(!span_equal){
+      
+      // isTip=true;;
+      isColorised = true;
 
-        formattedSentence = splitSentenceWithTags(sentence)
-        formattedSentence = formattedSentence
-          .filter(word => word) // Оставляем только существующие слова
-          .map((word) => ({
-            gr: extractTagName(word),
-            placeholder: "\u00a0\u00a0\u00a0\u00a0\u00a0", 
-            value: word.trim()
-          }));
-
-        formattedSentence.forEach((item)=>{
-            item.placeholder = item.value;
-            item.class = "invisible"
-        });
-
-        // Разбиваем на слова
-        words =  splitSentenceWithTags(sentence);
-        words = words
-        .filter(word => word) // Оставляем только существующие слова
-        .map((word) => ({
-            gr: extractTagName(word),
-            placeholder: "\u00a0\u00a0\u00a0\u00a0\u00a0", 
-            value: word.trim()
-        }));
-
-      }else{
-
-        isColorised = false;
-
-        formattedSentence = sentence.replace(/<[^>]*>/g, '').split(/[\s,:\.]+/)
-          .filter(word => word) // Оставляем только существующие слова
-          .map((word) => ({
-            gr: extractTagName(word),
-            placeholder: "\u00a0\u00a0\u00a0\u00a0\u00a0", 
-            value: word.trim()
-          }));
-        formattedSentence.forEach((item)=>{
-            item.placeholder = "\u00a0\u00a0\u00a0\u00a0\u00a0";
-            item.class = ""
-        });     
-        
-        // Разбиваем на слова
-        words =  sentence.replace(/<[^>]*>/g, '').trim().split(/[\s,:\.]+/) 
-        .filter(word => word) // Оставляем только существующие слова
-        .map((word) => ({
-            gr: extractTagName(word),
-            placeholder: "\u00a0\u00a0\u00a0\u00a0\u00a0", 
-            value: word.trim()
-        }));
-      }
-
-      words = shuffleArray(words);
-
+      formattedSentence = splitSentenceWithTags(sentence)
       formattedSentence = formattedSentence
+        .filter(word => word) // Оставляем только существующие слова
+        .map((word) => ({
+          gr: extractTagName(word),
+          placeholder: "\u00a0\u00a0\u00a0\u00a0\u00a0", 
+          value: word.trim()
+        }));
+
+      formattedSentence.forEach((item)=>{
+          item.placeholder = item.value;
+          item.class = "invisible"
+      });
+
+      // Разбиваем на слова
+      words =  splitSentenceWithTags(sent_obj);
+      words = words
+      .filter(word => word) // Оставляем только существующие слова
+      .map((word) => ({
+          gr: extractTagName(word),
+          placeholder: "\u00a0\u00a0\u00a0\u00a0\u00a0", 
+          value: word.trim()
+      }));
+
+    }else{
+
+      isColorised = false;
+
+      formattedSentence = sentence.replace(/<[^>]*>/g, '').split(/[\s,:\.]+/)
+        .filter(word => word) // Оставляем только существующие слова
+        .map((word) => ({
+          gr: extractTagName(word),
+          placeholder: "\u00a0\u00a0\u00a0\u00a0\u00a0", 
+          value: word.trim()
+        }));
+      formattedSentence.forEach((item)=>{
+          item.placeholder = "\u00a0\u00a0\u00a0\u00a0\u00a0";
+          item.class = ""
+      });     
+      
+      // Разбиваем на слова
+      words =  sent_obj.replace(/<[^>]*>/g, '').trim().split(/[\s,:\.]+/) 
+      .filter(word => word) // Оставляем только существующие слова
+      .map((word) => ({
+          gr: extractTagName(word),
+          placeholder: "\u00a0\u00a0\u00a0\u00a0\u00a0", 
+          value: word.trim()
+      }));
+    }
+
+    words = shuffleArray(words);
+
+    formattedSentence = formattedSentence
   }
 
   function ToggleTransloc(){
@@ -597,6 +595,8 @@ function markSentenceBoundaries(text: string): string {
     stt_text = text[$llang];
     const correct_str = getCorrectSpanString(true);
     sent_compare = correct_str;
+
+    // formattedSentence = correct_str;
 
     const numbers = sent_compare.match(/\d+/g);
     if (numbers)
@@ -1053,7 +1053,9 @@ function markSentenceBoundaries(text: string): string {
       {/await}
 
       <div class="word-list">
+        <!-- {@debug words} -->
         {#each words as word, index}
+        <!-- {@debug word} -->
           <span class={word.gr} on:click={() => handleClick(words[index])}>{@html word.value}</span>
         {/each}
       </div>
@@ -1444,7 +1446,20 @@ function markSentenceBoundaries(text: string): string {
   }
 
   .word-list .adv,.formatted-list .adv:not(.invisible){
-    color:  darkmagenta
+    color:  darkmagenta;
+  }
+
+  .comp{
+    position: relative;
+    border:2px solid; 
+    border-color: rgb(40, 100, 184);
+    --border-color: rgb(40, 100, 184);
+    border-radius: 5px;
+    padding: 0px 6px;
+  }
+
+  .word-list .comp,.formatted-list .comp:not(.invisible){
+    color:  rgb(40, 100, 184);
   }
 
 

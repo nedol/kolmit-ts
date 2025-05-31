@@ -175,10 +175,9 @@
       ? [{ role: "user", content: lastUserMessage.text }]
       : [];
 
-    let params = '';
     
     if(text.length>0){
-      params = {
+      const params = {
         func:"chat",
         user_id: operator.operator,
         prompt:`grammar.check.${$llang}`,
@@ -188,7 +187,7 @@
         text:text   
       }
 
-      await $signal.SendMessage(params,(res) => {    
+      $signal.SendMessage(params,(res) => {    
         console.log('grammar.check',res);   
       });
     }
@@ -205,7 +204,7 @@
         stt: msg.role ==='user'?stt_text:''
       }));
 
-      params = {
+      const params = {
         func:"chat",
         user_id: operator.operator,
         type: quiz?.quiz || 'chat',
@@ -820,7 +819,7 @@ function toggleCorrection(i){
   :global(reply){
     display: block;
     color:green;
-    font-size:small;
+    font-size:medium;
     font-weight: bold;
   }
 
@@ -1001,4 +1000,13 @@ function toggleCorrection(i){
   cor strong {
     color: #2c89d9;
   }
+  .tijd{
+    position: relative;
+    border:2px solid; 
+    border-color: rgb(119, 201, 119); 
+    --border-color: rgb(119, 201, 119); 
+    border-radius: 5px;
+    /* background-color: lightgreen; */
+    padding: 0px 6px;
+  } 
 </style>

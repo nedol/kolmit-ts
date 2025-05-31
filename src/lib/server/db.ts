@@ -1026,7 +1026,7 @@ export async function GetLesson(q: { operator: string; owner: string; level?: st
       levels = [...new Set(res.map(r => r.level))]; // Соберём уникальные уровни
 
       // Здесь можно добавить загрузку news и context_news, если нужно
-    });
+    } );
 
     const les = res.find((lesson) => lesson.level === q.level);
 

@@ -23,6 +23,7 @@
   import Accordion, { Panel, Header, Content } from '@smui-extra/accordion';
   // import FormField from '@smui/form-field';
   import Textfield from '@smui/textfield';
+  import CircularProgress from '@smui/circular-progress';
   import Autocomplete from '@smui-extra/autocomplete';
   import Checkbox from '@smui/checkbox';
   import Quiz from './quiz/Quiz.svelte';
@@ -58,6 +59,8 @@
   export let group;
   let gr_field = '';
   const operator = getContext('operator');
+
+  let isProgress = true;
 
   const level = getContext('level');
 
@@ -113,8 +116,10 @@
       // Call the async function
       updateMessage();
     } else {
-      data = $lesson.data;  // Update data if no condition is met
+      data = $lesson.data;  // Update data if no condition is met     
+       
     }
+
   }
 
   let module, main;
@@ -178,8 +183,9 @@
       // Сортировка по убыванию (DESC) по published
     news = tmp.sort((a, b) => b.published - a.published);
     archive_news = archive_news.sort((a, b) => b.published - a.published);
-
     news = tmp;
+
+    isProgress = false;
   })
   
 
@@ -1212,6 +1218,20 @@
     <div style="height:50px"></div>
   {/if}
 </main>
+
+{#if isProgress}
+  <div style="text-align:center">
+    <span
+      class="material-symbols-outlined"
+      style="font-size: 20px; color: blue; scale:1.5;"
+    >
+      <CircularProgress
+        style="top: 200px;height: 50px; width: 50px;"
+        indeterminate
+      />
+    </span>
+  </div>
+{/if}
 
 <style>
   :root {
