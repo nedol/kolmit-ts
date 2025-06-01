@@ -254,18 +254,19 @@ let keys: string[] = [];
   }
 
 
-  function splitHtmlIntoSentencesWithInnerTags(html: string): { sentence: string, article: string }[] {
+function splitHtmlIntoSentencesWithInnerTags(html: string): { sentence: string, article: string }[] {
+  
   function removeEmojis(input: string): string {
     const regex = emojiRegex();
     return input.replace(regex, '');
   }
 
   // Помечает точки конца предложения специальным маркером `[[SPLIT]]`
-function markSentenceBoundaries(text: string): string {
-  return text.replace(/([.!?])(\s*)(?=<|\w|<\/\w+>)/g, (_, punct, space) => {
-    return punct + '[[SPLIT]]' + space;
-  });
-}
+  function markSentenceBoundaries(text: string): string {
+    return text.replace(/(?<!\d)([.!?])(?!\d)(\s*)(?=<|\p{Lu}|<\/\w+>)/gu, (_, punct, space) => {
+      return punct + '[[SPLIT]]' + space;
+    });
+  }
 
   const parser = new DOMParser();
   const doc = parser.parseFromString(html, 'text/html');
