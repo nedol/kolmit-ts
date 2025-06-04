@@ -33,6 +33,27 @@ export async function CreatePool_render(): Promise<void> {
   sql_st.set(sql);
 }
 
+export async function safeQuery(strings: TemplateStringsArray, ...params: any[]) {
+  const sql: Sql = postgres({
+    host: RNDRHOST,
+    port: 5432,
+    database: RNDRDATABASE,
+    username: RNDRUSER,
+    password: RNDRPASSWORD,
+    ssl: 'require' // <--- обязательно
+  });
+
+  try {
+    const result = await sql(strings, ...params);
+    return result;
+  } catch (error) {
+    console.error('❌ Query failed:', error);
+    throw error;
+  } finally {
+    await sql.end({ timeout: 5 }); // мягкое закрытие соединения
+  }
+}
+
 function getHash(par: string): string {
   return md5(par + par);
 }
@@ -134,7 +155,7 @@ interface OperatorParams {
 
 export async function CreateOperator(  par: OperatorParams): Promise<OperatorParams | undefined> {
   try {
-    let res = await sql`
+    let res = await safeQuery`
       UPDATE operators 
       SET
       name = ${par.name},
@@ -160,14 +181,14 @@ export async function CreateSession(
   oper: string,
   suid: string
 ): Promise<void> {
-  await sql`
+  await safeQuery`
     SELECT create_session(${oper}, ${suid})
   `;
 }
 
 export async function GetLastSession(user_id:string) {
   try {
-    const latestSession = await sql`
+    const latestSession = await safeQuery`
       SELECT *
       FROM public.sessions
       WHERE user_id=${user_id}
@@ -193,7 +214,7 @@ export async function GetTodayTotalTokens(user_id:string) {
     const today = new Date().toISOString().split('T')[0];
 
     // Выполняем SQL-запрос для суммирования total_tokens за сегодня
-    const result = await sql`
+    const result = await safeQuery`
       SELECT COALESCE(SUM(total_tokens), 0) AS total
       FROM public.sessions
       WHERE user_id=${user_id} AND DATE(created_at) = ${today}
@@ -216,7 +237,7 @@ export async function UpdateLastSession(user_id:string, newTotalTokens:number) {
       return;
     }
 
-    const result = await sql`
+    const result = await safeQuery`
       UPDATE public.sessions
       SET total_tokens = ${newTotalTokens}
       WHERE user_id=${user_id} AND id = ${lastSession.id}
@@ -230,7 +251,7 @@ export async function UpdateLastSession(user_id:string, newTotalTokens:number) {
 
 async function updateUsers(users: any[], q: any): Promise<string> {
   try {
-    await sql`
+    await safeQuery`
       UPDATE users SET
       users=${users}, 
       last=CURRENT_TIMESTAMP, 
@@ -248,7 +269,7 @@ export async function GetGroup(params: {
   psw: string;
 }): Promise<{ group: any; oper: any }> {
   // Fetch operator information
-  const oper = await sql`
+  const oper = await safeQuery`
     SELECT "group", abonent, role, operator, picture, lang, name, level
     FROM operators
     WHERE operators.abonent=${params.abonent} 
@@ -265,7 +286,7 @@ export async function GetGroup(params: {
 
   if(oper[0].abonent!=='public'){
     // Fetch group information
-    group = await sql`
+    group = await safeQuery`
       SELECT *
       FROM groups
       WHERE name=${oper[0].group} 
@@ -310,7 +331,7 @@ export async function CheckOperator(q: Query) {
 
   if (q.psw && q.operator) {
     try {
-      await sql`INSERT INTO operators (psw, operator, abonent, name) VALUES(${q.psw}, ${q.operator}, ${q.abonent || null}, ${q.name || null})`;
+      await safeQuery`INSERT INTO operators (psw, operator, abonent, name) VALUES(${q.psw}, ${q.operator}, ${q.abonent || null}, ${q.name || null})`;
     } catch (ex) {
       console.error('Error in CheckOperator INSERT:', ex);
     }
@@ -318,9 +339,9 @@ export async function CheckOperator(q: Query) {
 
   if (q.operator) {
     if (q.abonent) {
-      result = await sql`SELECT * FROM operators WHERE operator=${q.operator} AND abonent=${q.abonent} AND psw=${q.psw}`;
+      result = await safeQuery`SELECT * FROM operators WHERE operator=${q.operator} AND abonent=${q.abonent} AND psw=${q.psw}`;
     } else {
-      result = await sql`SELECT * FROM operators WHERE operator=${q.operator}`;
+      result = await safeQuery`SELECT * FROM operators WHERE operator=${q.operator}`;
     }
 
     if (result?.length > 0) {
@@ -718,46 +739,37 @@ interface Context {
   data: string;
 }
 
+
+
 export async function GetBricks(q: GetBricksQuery): Promise<Brick | Brick[] | string> {
   try {
+    // Получаем контекст (если нужно)
+    const contextResult = q.name
+      ? await safeQuery`SELECT name, data FROM context WHERE name = ${q.name}`
+      : [];
 
-    let res;
-    // Fetch context data if name is provided
-    const contextResult = await sql<Context[]>`
-      SELECT c.name, c.data
-      FROM context c
-      ${q.name ? sql`WHERE c.name = ${q.name}` : sql``}
+    // Формируем основной запрос через SQL шаблон:
+    const bricksResult = await safeQuery`
+      SELECT *
+      FROM bricks
+      WHERE owner = ${q.owner}
+        AND level = ${q.level}
+        AND theme = ${q.theme}
+        ${q.name ? sql`AND name = ${q.name}` : sql``}
     `;
 
-    // Fetch brick data based on provided filters
-    let bricksResult = await sql<Brick[]>`
-      SELECT b.*
-      FROM bricks b
-      WHERE b.owner = ${q.owner} 
-        AND b.level = ${q.level} 
-        AND b.theme = ${q.theme}
-        ${q.name ? sql`AND b.name = ${q.name}` : sql``}
-    `;
+    const res = bricksResult[0] || {};
 
-    res = bricksResult[0]||{}
-
-    // If contextResult and bricksResult exist, add context to the first brick
     if (contextResult[0]) {
       res.context = contextResult[0].data;
     }
 
-    // Return either a single brick or an array of bricks
     return res;
   } catch (ex) {
-    console.error('Error in GetBricks:', ex); // Log error for debugging
-    return JSON.stringify({ func: q.func, res: ex }); // Return structured error response
+    console.error('Error in GetBricks:', ex);
+    return JSON.stringify({ func: q.func, res: ex });
   }
 }
-
-
-
-
-
 
 interface GetDialogQuery {
   name: string;
@@ -964,6 +976,7 @@ export async function GetLesson(q: { operator: string; owner: string; level?: st
 
     // Начинаем транзакцию
     await sql.begin(async (sql) => {
+      
       const operatorInfo = await sql<{ group: string }[]>`
         SELECT "group" FROM operators 
         WHERE operator = ${q.operator} AND abonent = ${q.owner}
@@ -997,7 +1010,7 @@ export async function GetLesson(q: { operator: string; owner: string; level?: st
       levels = [...new Set(res.map(r => r.level))]; // Соберём уникальные уровни
 
       // Здесь можно добавить загрузку news и context_news, если нужно
-    });
+    } );
 
     const les = res.find((lesson) => lesson.level === q.level);
 
@@ -1101,9 +1114,9 @@ export async function UpdateQuizUsers(q: UpdateQuizUsersRequest): Promise<string
     // Function to fetch the subscription from the appropriate table
     const getSubscriptions = async () => {
       if (q.type === 'dialog') {
-        return await sql`SELECT subscribe FROM dialogs WHERE name = ${q.quiz} AND owner = ${q.abonent}`;
+        return await safeQuery`SELECT subscribe FROM dialogs WHERE name = ${q.quiz} AND owner = ${q.abonent}`;
       } else if (q.type === 'word') {
-        return await sql`SELECT subscribe FROM word WHERE name = ${q.quiz} AND owner = ${q.abonent}`;
+        return await safeQuery`SELECT subscribe FROM word WHERE name = ${q.quiz} AND owner = ${q.abonent}`;
       }
     };
 
@@ -1123,9 +1136,9 @@ export async function UpdateQuizUsers(q: UpdateQuizUsersRequest): Promise<string
     // Функция для обновления подписок в базе данных
     const updateSubscriptions = async () => {
       if (q.type === 'dialog') {
-        return await sql`UPDATE dialogs SET subscribe = ${sql.json(qu)} WHERE name = ${q.quiz} AND owner = ${q.abonent}`;
+        return await safeQuery`UPDATE dialogs SET subscribe = ${sql.json(qu)} WHERE name = ${q.quiz} AND owner = ${q.abonent}`;
       } else if (q.type === 'word') {
-        return await sql`UPDATE word SET subscribe = ${sql.json(qu)} WHERE name = ${q.quiz} AND owner = ${q.abonent}`;
+        return await safeQuery`UPDATE word SET subscribe = ${sql.json(qu)} WHERE name = ${q.quiz} AND owner = ${q.abonent}`;
       }
     };
 
@@ -1148,7 +1161,7 @@ interface GetDictRequest {
 
 export async function GetDict(q: GetDictRequest): Promise<any> {
   try {
-    const res = await sql`
+    const res = await safeQuery`
       SELECT words 
       FROM dicts
       WHERE type = ${q.type} 
@@ -1182,7 +1195,7 @@ interface WriteTranslateResponse {
 
 export async function WriteTranslate(q: WriteTranslateRequest): Promise<WriteTranslateResponse> {
   try {
-    await sql`
+    await safeQuery`
         INSERT INTO translate (lang, key, text, translate, provider, quiz)
         VALUES (
           ${q.lang ?? null}, 
@@ -1225,7 +1238,7 @@ interface ReadSpeechResponse {
 export async function ReadSpeech(q: ReadSpeechRequest): Promise<ReadSpeechResponse> {
   try {
     // Perform the database query to retrieve the translation
-    let res = await sql`SELECT translate, quiz FROM translate
+    let res = await safeQuery`SELECT translate, quiz FROM translate
                         WHERE key = ${q.key} AND lang = ${q.lang}`;
 
     // If a result is found, return the translation
@@ -1244,14 +1257,14 @@ export async function ReadSpeech(q: ReadSpeechRequest): Promise<ReadSpeechRespon
 
 
 export async function GetUsersEmail(owner, level) {
-  const group = await sql`
+  const group = await safeQuery`
     SELECT 
     name
     FROM groups
     WHERE owner=${owner} AND level=${level}
   `;
   
-  const emails = await sql`
+  const emails = await safeQuery`
     SELECT 
     email, name, lang
     FROM operators
@@ -1266,12 +1279,12 @@ export async function GetUsers(par) {
 
   try {
     if (par.abonent) {
-      operators = await sql`
-      SELECT 
-      *,
-      operator as email
-      FROM operators
-      WHERE role<>'admin' AND operators.abonent=${par.abonent} AND
+      operators = await safeQuery`
+			SELECT 
+			*,
+			operator as email
+			FROM operators
+			WHERE role<>'admin' AND operators.abonent=${par.abonent} AND
       operators.group = (
           SELECT operators.group
           FROM operators
@@ -1279,7 +1292,7 @@ export async function GetUsers(par) {
       )
       `;
 
-      admin = await sql`
+      admin = await safeQuery`
         SELECT 
         *,
         operator as email
@@ -1379,7 +1392,7 @@ export async function UpdateUserLevel(text, operator) {
 
   try {
     // Получаем текущий уровень оператора из базы данных
-    const currentLevelResult = await sql`
+    const currentLevelResult = await safeQuery`
       SELECT level FROM operators WHERE "operator" = ${operator}
     `;
 
@@ -1398,7 +1411,7 @@ export async function UpdateUserLevel(text, operator) {
     // Сравниваем уровни
     if (compareLevels(currentLevel, newLevel)) {
       // Если новый уровень выше, обновляем
-      const result = await sql`
+      const result = await safeQuery`
         UPDATE operators
         SET level = ${newLevel}
         WHERE "operator" = ${operator}
@@ -1432,13 +1445,13 @@ export async function SaveSTT(operator, text='', lang='nl', original=null){
     } 
 
       // Вставляем данные в таблицу stt (предположим, что такая таблица существует)
-      const result = await sql`
+      const result = await safeQuery`
       INSERT INTO stt (operator, data, lang, original)
       VALUES (
       ${operator}, 
       ${text}, 
       ${lang}, 
-      ${original !== null && original !== undefined && original !== 'undefined' ? original : sql`NULL`}
+      ${original !== null && original !== undefined && original !== 'undefined' ? original : safeQuery`NULL`}
       )
       ON CONFLICT (original,operator, lang, data) 
       DO UPDATE SET
@@ -1467,7 +1480,7 @@ export async function SetRate(par) {
   console.log(par); // Debugging purposes
 
   try {
-    const result = await sql`
+    const result = await safeQuery`
       INSERT INTO rate (operator, name, level, rate, type, total)
       VALUES (
         ${par.operator},
