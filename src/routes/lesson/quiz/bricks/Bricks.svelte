@@ -1,5 +1,11 @@
 <script lang="ts">
   import { onMount , getContext, onDestroy} from 'svelte';
+  import {
+      langs,
+      llang,
+      showBottomAppBar,
+      signal      
+  } from '$lib/stores.ts';
   import { slide } from 'svelte/transition';
   import ConText from '../Context.svelte';
   import { Transloc } from '../../../translate/Transloc';
@@ -16,7 +22,6 @@
 
   import pkg from 'lodash';
   const { find } = pkg;
-
 
   import Stt from '../../../speech/stt/Stt.svelte';
   
@@ -55,6 +60,8 @@
   let stt: Stt | null = null; // Если `Stt` — это класс или компонент Svelte
 
   let tts: Tts | null = null; // Если `Tts` — это класс или компонент Svelte
+
+  let synt = ''
 
   interface Word {
     gr: string;
@@ -123,12 +130,6 @@ let keys: string[] = [];
   }
 
   import {
-      langs,
-      llang,
-      showBottomAppBar
-  } from '$lib/stores.ts';
-
-  import {
       mdiArrowRight,
       mdiArrowLeft,
       mdiMicrophoneOutline ,
@@ -190,7 +191,7 @@ let keys: string[] = [];
       }
 
       // Текущее предложение
-      const sentence = bricks_data.text[curSentence].sentence.replaceAll('.','') ;
+      sentence = bricks_data.text[curSentence].sentence.replaceAll('.','') ;
 
       article_name = bricks_data.text[curSentence].article || '\u00a0\u00a0\u00a0\u00a0\u00a0'
 
@@ -214,6 +215,37 @@ let keys: string[] = [];
     }
   };
 
+const parseSentence = (text) => {
+  // Удалить Markdown-обёртку
+  text = text.replace(/^```json\s*/i, '').replace(/```$/, '');
+
+  // Преобразовать в объект
+  const json = JSON.parse(text);
+
+  // Собрать элементы из всех клауз
+  const elements = json.structure.flatMap(clause => clause.elements);
+
+  // Разбить по словам и преобразовать
+  return elements.flatMap(el => {
+    const words = el.text.split(/\s+/);
+    return words.map(word => ({
+      value: word,
+      gr: el.type,
+      placeholder: "\u00a0\u00a0\u00a0\u00a0\u00a0"
+    }));
+  });
+};
+
+const parseSentenceSynt = (text) => {
+  // Удалить Markdown-обёртку
+  text = text.replace(/^```json\s*/i, '').replace(/```$/, '');
+
+  // Преобразовать в объект
+  const json = JSON.parse(text);
+
+  return json.synt;
+};
+
   const formatWords = (sentence) =>
     sentence
     .trim()
@@ -227,9 +259,7 @@ let keys: string[] = [];
 
   onMount(() => {
     setTimeout(() => {
-
         $showBottomAppBar = false; //test
-
     }, 3000);
   });
 
@@ -237,11 +267,13 @@ let keys: string[] = [];
   function MakeBricks(){
       // Перемешиваем formattedSentence
 
+      words = shuffleArray(words)
+
       const firstElement = document.querySelector('.formatted-list span');
       if (firstElement) {
           firstElement.focus();
       }
-      onToggleWord()
+      // onToggleWord()
   }
 
   // Функция для перемешивания массива
@@ -496,7 +528,7 @@ function splitHtmlIntoSentencesWithInnerTags(html: string): { sentence: string, 
     });        
   }
 
-  const onToggleWord = ()=>{
+  const onToggleWord_old = ()=>{
 
     focusedIndex = 0;
 
@@ -562,6 +594,25 @@ function splitHtmlIntoSentencesWithInnerTags(html: string): { sentence: string, 
     words = shuffleArray(words);
 
     formattedSentence = formattedSentence
+  }
+
+  const onToggleWord = ()=>{
+
+      const params = {
+        func:"synt",
+        type: 'bricks',
+        lang: $llang,
+        context:bricks_data.text[curSentence].sentence     
+      };
+
+      $signal.SendMessage(params,async (res) => {    
+        console.log('handleData',res)
+        let sentence = res.response;
+        words = parseSentence(sentence)
+        formattedSentence = parseSentence(sentence);
+        MakeBricks();
+      }); 
+   
   }
 
   function ToggleTransloc(){
@@ -997,13 +1048,18 @@ function splitHtmlIntoSentencesWithInnerTags(html: string): { sentence: string, 
   <div>
     {#if isTransloc}
     <div class="trans">
-      <!-- Исходное предложение -->
-      <!-- <p>{bricks_data.isTransloc[curSentence]}</p> -->
-      {#await Transloc(sentence.replace(/<[^>]*>/g, ''), $llang, $langs,data.name) then data}
+      {#await Transloc(sentence.replace(/<[^>]*>/g, ''), $llang, $langs, data.name)}              
+          <p >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
+      {:then data}
         <p>{data}</p>
+      {:catch error}
+        <p>Ошибка</p>
       {/await}
     </div>
-
+    {:else}
+      <div class="trans">
+        <p  style="white-space: pre;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
+      </div>
     {/if}
   </div>  
 
@@ -1265,7 +1321,7 @@ function splitHtmlIntoSentencesWithInnerTags(html: string): { sentence: string, 
   }
 
   .trans {
-      font-size: 0.8em;
+      font-size: 1em;
       flex-direction: column;
       align-items: center;
       text-align: center;
@@ -1311,8 +1367,8 @@ function splitHtmlIntoSentencesWithInnerTags(html: string): { sentence: string, 
     color: #2196f3;
   }
 
-  .word-list span:not(.ver):not(.subj):not(.tijd):not(.plaats):not(.adv), 
-  .formatted-list span:not(.ver):not(.subj):not(.tijd):not(.plaats):not(.adv) {
+  .word-list span:not(.verb):not(.subj):not(.tijd):not(.plaats):not(.adv), 
+  .formatted-list span:not(.verb):not(.subj):not(.tijd):not(.plaats):not(.adv) {
     padding: 0px 6px;
     border: 1px solid #ddd;
     border-radius: 5px;
@@ -1381,7 +1437,7 @@ function splitHtmlIntoSentencesWithInnerTags(html: string): { sentence: string, 
   }
 
 
- .ver {
+ .verb  {
     position: relative;
     border:2px solid; 
     border-color: rgb(225, 111, 111);
@@ -1391,7 +1447,7 @@ function splitHtmlIntoSentencesWithInnerTags(html: string): { sentence: string, 
     padding: 0px 6px;
   } 
 
-  .word-list .ver,.formatted-list .ver:not(.invisible){
+  .word-list .verb,.formatted-list .verb:not(.invisible){
     color: rgb(225, 111, 111); 
   }
 
@@ -1450,17 +1506,40 @@ function splitHtmlIntoSentencesWithInnerTags(html: string): { sentence: string, 
     color:  darkmagenta;
   }
 
-  .comp{
+  .obj{
     position: relative;
     border:2px solid; 
-    border-color: rgb(40, 100, 184);
-    --border-color: rgb(40, 100, 184);
     border-radius: 5px;
     padding: 0px 6px;
   }
 
-  .word-list .comp,.formatted-list .comp:not(.invisible){
+  .word-list .obj,.formatted-list .obj:not(.invisible){
     color:  rgb(40, 100, 184);
+  }
+
+  
+  .ptcl{
+    position: relative;
+    border:2px solid; 
+    border-color:  rgb(184, 162, 40);
+    border-radius: 5px;
+    padding: 0px 6px;
+  }
+
+  .word-list .ptcl,.formatted-list .ptcl:not(.invisible){
+    color:  rgb(184, 162, 40);
+  }
+
+  .conj {
+    position: relative;
+    border:2px solid; 
+    border-color:  rgb(184, 162, 40);
+    border-radius: 5px;
+    padding: 0px 6px;
+  }
+
+  .word-list .conj ,.formatted-list .conj :not(.invisible){
+    color:  rgb(184, 162, 40);
   }
 
 
@@ -1496,7 +1575,7 @@ function splitHtmlIntoSentencesWithInnerTags(html: string): { sentence: string, 
       /* Стили для мобильных устройств */
   @media screen and (max-width: 767px) {
       .trans {
-          font-size: 0.7em;
+          font-size: 0.8em;
       }
       .word-list, .formatted-list {
           font-size: 0.9em;
