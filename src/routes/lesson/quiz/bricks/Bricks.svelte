@@ -150,7 +150,7 @@ let keys: string[] = [];
       bricks_data = data.data
       // Преобразуем HTML в текст и разбиваем на массив предложений
       // bricks_data.text = htmlToText(bricks_data.html).replaceAll('"','').split(/(?<=[.?!])\s+/);
-      bricks_data.text = splitHtmlIntoSentencesWithInnerTags(data.data.data.replaceAll('"',''))
+      bricks_data.text = splitIntoSentencesWithInnerTags(data.data.data.replaceAll('"',''))
       //.replaceAll('.','. '));//.replaceAll('"','').split(/(?<=[.?!])\s+/);
 
       bricks_data.html = data.data.data;
@@ -286,7 +286,7 @@ const parseSentenceSynt = (text) => {
   }
 
 
-function splitHtmlIntoSentencesWithInnerTags(html: string): { sentence: string, article: string }[] {
+function splitIntoSentencesWithInnerTags(html: string): { sentence: string, article: string }[] {
   
   function removeEmojis(input: string): string {
     const regex = emojiRegex();
@@ -326,7 +326,7 @@ function splitHtmlIntoSentencesWithInnerTags(html: string): { sentence: string, 
 
 
   // Обработчик клика на слово
-  const handleClick = (word:Word) => {
+const handleClick = (word:Word) => {
 
     rate.total++;
     // Присваиваем выбранное слово фокусируемому элементу
@@ -430,28 +430,6 @@ function splitHtmlIntoSentencesWithInnerTags(html: string): { sentence: string, 
     MakeBricks();
   }
 
-  function splitSentenceWithTags(input) {
-    const result = [];
-    const regex = /<(\w+)>(.*?)<\/\1>|[^\s<>\.:\,]+/g;
-    let match;
-
-    while ((match = regex.exec(input)) !== null) {
-      if (match[1]) {
-        // Тег и его содержимое
-        const tag = match[1];
-        const innerWords = match[2].trim().split(/\s+/);
-        for (const word of innerWords) {
-          result.push(`<${tag}>${word}</${tag}>`);
-        }
-      } else {
-        // Обычное слово
-        result.push(match[0]);
-      }
-    }
-
-    return result;
-  }
-
   function  getCorrectSpanString(isCorrect){
     const elements = document.querySelectorAll(isCorrect?".formatted-list > .correct":".formatted-list > span:not(.correct)");
     return Array.from(elements)
@@ -526,74 +504,6 @@ function splitHtmlIntoSentencesWithInnerTags(html: string): { sentence: string, 
           nextElement.focus();
         }
     });        
-  }
-
-  const onToggleWord_old = ()=>{
-
-    focusedIndex = 0;
-
-    sentence = bricks_data.text[curSentence].sentence.trim();
-
-    const sent_obj = bricks_data.text[curSentence].sentence.trim() + bricks_data.text[curSentence+1].sentence.trim()//!!! 
-
-    if(!span_equal){
-      
-      // isTip=true;;
-      isColorised = true;
-
-      formattedSentence = splitSentenceWithTags(sentence)
-      formattedSentence = formattedSentence
-        .filter(word => word) // Оставляем только существующие слова
-        .map((word) => ({
-          gr: extractTagName(word),
-          placeholder: "\u00a0\u00a0\u00a0\u00a0\u00a0", 
-          value: word.trim()
-        }));
-
-      formattedSentence.forEach((item)=>{
-          item.placeholder = item.value;
-          item.class = "invisible"
-      });
-
-      // Разбиваем на слова
-      words =  splitSentenceWithTags(sent_obj);
-      words = words
-      .filter(word => word) // Оставляем только существующие слова
-      .map((word) => ({
-          gr: extractTagName(word),
-          placeholder: "\u00a0\u00a0\u00a0\u00a0\u00a0", 
-          value: word.trim()
-      }));
-
-    }else{
-
-      isColorised = false;
-
-      formattedSentence = sentence.replace(/<[^>]*>/g, '').split(/[\s,:\.]+/)
-        .filter(word => word) // Оставляем только существующие слова
-        .map((word) => ({
-          gr: extractTagName(word),
-          placeholder: "\u00a0\u00a0\u00a0\u00a0\u00a0", 
-          value: word.trim()
-        }));
-      formattedSentence.forEach((item)=>{
-          item.placeholder = "\u00a0\u00a0\u00a0\u00a0\u00a0";
-          item.class = ""
-      });     
-      
-      // Разбиваем на слова
-      words =  sent_obj.replace(/<[^>]*>/g, '').trim().split(/[\s,:\.]+/) 
-      .filter(word => word) // Оставляем только существующие слова
-      .map((word) => ({
-          gr: extractTagName(word),
-          placeholder: "\u00a0\u00a0\u00a0\u00a0\u00a0", 
-          value: word.trim()
-      }));
-    }
-
-    words = shuffleArray(words);
-
-    formattedSentence = formattedSentence
   }
 
   const onToggleWord = ()=>{
@@ -783,11 +693,10 @@ function splitHtmlIntoSentencesWithInnerTags(html: string): { sentence: string, 
         article_name = arr[0].article;
     }
 
+    sentence = bricks_data.text[curSentence].sentence;
+
     MakeBricks(); // Генерация кирпичей для новой статьи
 };
-
-
-
 
   const getCurrentArticle = ()=>{
     

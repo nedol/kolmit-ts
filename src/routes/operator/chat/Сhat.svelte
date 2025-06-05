@@ -255,74 +255,11 @@
           return;
         }
 
-        function splitText(text, llang, langs) {
-          // Регулярные выражения для поиска содержимого между тегами <nl>, <ru> и <user>
-          const nlRegex = new RegExp(`<${$llang}>([\\s\\S]*?)<\/${$llang}>`);
-          const ruRegex = new RegExp(`<${$langs}>([\\s\\S]*?)<\/${$langs}>`);
-          const userRegex = /<user>([\s\S]*?)<\/user>/;
-
-          // Поиск содержимого <nl>
-          const nlMatch = nlRegex.exec(text);
-          const nlContent = nlMatch ? nlMatch[1].trim() : null;
-
-          // Поиск содержимого <ru>
-          const ruMatch = ruRegex.exec(text);
-          const ruContent = ruMatch ? ruMatch[1].trim() : null;
-
-          // Поиск содержимого <user>
-          const uMatch = userRegex.exec(text);
-          const uContent = uMatch ? uMatch[1].trim() : null;
-
-          // Функция для извлечения данных из блока (nl, ru или user)
-          const extractData = (content) => {
-              if (!content) return null;
-
-              const corRegex = /<cor(?:\s+\w+="[^"]*")*>([\s\S]*?)<\/cor>/g;
-              const msgRegex = /<msg(?:\s+\w+="[^"]*")*>([\s\S]*?)<\/msg>/g;
-              // const replyRegex = /<reply>([\s\S]*?)<\/reply>/g;
-              const levelRegex = /<level>([\s\S]*?)<\/level>/g;
-              const wordsRegex = /<words>([\s\S]*?)<\/words>/g;
-
-              // const corRegex = /<cor(?:\s+\w+="[^"]*")*>[\s\S]*?<\/cor>/g;
-              // const msgRegex = /<msg(?:\s+\w+="[^"]*")*>[\s\S]*?<\/msg>/g;
-              const replyRegex = /<reply(?:\s+\w+="[^"]*")*>([\s\S]*?)<\/reply>/g;
-              // const levelRegex = /<level(?:\s+\w+="[^"]*")*>[\s\S]*?<\/level>/g;
-              // const wordsRegex = /<words(?:\s+\w+="[^"]*")*>[\s\S]*?<\/words>/g;
-
-             
-
-              const corMatch = corRegex.exec(content);
-              const msgMatch = msgRegex.exec(content);
-              const levelMatch = levelRegex.exec(content);
-              const wordsMatch = wordsRegex.exec(content);
-
-              console.log("Correction:",corMatch?corMatch[1].trim() : null)
-
-              const replies = [];
-              let replyMatch;
-              while ((replyMatch = replyRegex.exec(content)) !== null) {
-                  replies.push(replyMatch[0].trim());
-              }
-
-              return {
-                  level: levelMatch ? levelMatch[1].trim() : null,
-                  cor: corMatch ? corMatch[1].trim() : null,
-                  msg: msgMatch ? msgMatch[1].trim() : null,
-                  replies: replies,
-                  words: wordsMatch?wordsMatch[1].trim() : null
-              };
-          };
-
-          return {
-              [$llang]: nlContent ? extractData(nlContent) : null,
-              [$langs]: ruContent ? extractData(ruContent) : null,
-              user: uContent ? extractData(uContent) : null,
-          };
-        }
-
         stt_text = ''
 
-        dataAr =  splitText(data.response);
+        data.response = data.response.replace(/^```json\s*/i, '').replace(/```$/, '');
+
+        dataAr =  JSON.parse(data.response);
 
         // Получаем текущее состояние сообщений
         const currentMessages = get(messages);
@@ -331,46 +268,46 @@
         const lastMsg = currentMessages[currentMessages.length - 1];
 
         // Если есть cor и последнее сообщение от assistant
-        if (dataAr[$llang]?.cor && lastMsg?.role === "assistant") {
+        if (dataAr.result[$llang]?.cor && lastMsg?.role === "assistant") {
           const newMessages = [...currentMessages];          
           // Вставляем cor перед последним сообщением
           newMessages.splice(-1, 0, {
             id: crypto.randomUUID(),
             role: "user",
             text: '',
-            tr: dataAr[$langs]?.cor,
-            cor: dataAr[$llang]?.cor,
+            tr: dataAr.result[$langs]?.cor,
+            cor: dataAr.result[$llang]?.cor,
             isTranslate: false,
           });
 
           messages.set(newMessages);
 
-        } else if(dataAr[$llang]?.cor){
+        } else if(dataAr.result[$llang]?.cor){
 
           messages.update(msgs =>  
           [...msgs, 
             { id: crypto.randomUUID(), 
               role: "user", 
               text:'',
-              tr:dataAr[$langs]?.cor,
-              cor: dataAr[$llang]?.cor,
+              tr:dataAr.result[$langs]?.cor,
+              cor: dataAr.result[$llang]?.cor,
               isTranslate:false}
           ]);
     
         // Добавляем ответ AI в список
-        }else if(dataAr[$llang]?.msg){
+        }else if(dataAr.result[$llang]?.msg){
 
           messages.update(msgs =>  
             [...msgs, 
               {
                 id: crypto.randomUUID(), 
                 role: "assistant", 
-                text: dataAr[$llang]?.msg, 
-                tr: dataAr[$langs]?.msg, 
+                text: dataAr.result[$llang]?.msg, 
+                tr: dataAr.result[$langs]?.msg, 
                 cor: '', 
                 isTranslate: false,
-                replies: dataAr[$llang]?.replies || [],
-                repliesTranslated: dataAr[$langs]?.replies || [],
+                replies: dataAr.result[$llang]?.reply || [],
+                repliesTranslated: dataAr.result[$langs]?.reply || [],
               }
             ]);
 
@@ -698,7 +635,9 @@ function toggleCorrection(i){
         {#if message.role === 'assistant' }
           {#if selectedReplyId === message.id}
             <div class="reply_container">
+              <ul>
               {#each message.replies as reply, i}
+              <li>
                 {#if !message.isTranslate}
                   <reply>
                     {#if message.repliesTranslated?.[i]}
@@ -714,7 +653,9 @@ function toggleCorrection(i){
                 {:else}
                   <reply>{@html reply}</reply>
                 {/if}
-              {/each}            
+                </li> 
+              {/each}              
+              </ul>         
             </div>
           {/if}
         {/if}
@@ -1009,4 +950,8 @@ function toggleCorrection(i){
     /* background-color: lightgreen; */
     padding: 0px 6px;
   } 
+
+  li{
+    color:green
+  }
 </style>
