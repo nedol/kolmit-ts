@@ -47,7 +47,7 @@
 
   import Module from '../lesson/Module.svelte';
 
-  import Chat from './chat/Сhat.svelte';
+  
 
   import pkg from 'lodash';
   const { find } = pkg;
@@ -502,10 +502,7 @@
 
 
 {#if $view === 'lesson'}
-  <Module data={operator}/>
-
-{:else if $view==='chat'}
-  <Chat prompt_type={operator.level?"basic":'greeting'}></Chat>   
+  <Module data={operator}/>  
 
 {:else if  $view === 'group'}
   <Group  {rtc} />

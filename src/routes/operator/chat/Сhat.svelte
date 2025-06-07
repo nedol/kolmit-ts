@@ -297,6 +297,8 @@
         // Добавляем ответ AI в список
         }else if(dataAr.result[$llang]?.msg){
 
+          SpeakText(dataAr.result[$llang]?.msg)
+
           messages.update(msgs =>  
             [...msgs, 
               {

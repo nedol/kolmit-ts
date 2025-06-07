@@ -59,12 +59,32 @@
     audioAnalyser = audioContext.createAnalyser();
     audioAnalyser.fftSize = 256;
     mediaStreamSource.connect(audioAnalyser);
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
     
   } catch (error) {
     console.error("Ошибка доступа к микрофону:", error);
     alert("Пожалуйста, разрешите доступ к микрофону в настройках браузера.");
   }
 });
+
+  function handleVisibilityChange() {
+    if (document.hidden) {
+      stopMicrophone(); // освобождаем микрофон при уходе в фон
+    } else {
+      // 👉 только по запросу пользователя или, если разрешено, можно перезапустить
+      // startMicrophone(); // использовать только если auto-start допустим
+      console.log("👀 Возвращение в активный режим");
+    }
+  }
+
+ function stopMicrophone() {
+    if (mediaStream) {
+      mediaStream.getTracks().forEach(track => track.stop());
+      console.log("⛔ Микрофон остановлен");
+      mediaStream = null;
+    }
+  }
 
 
 

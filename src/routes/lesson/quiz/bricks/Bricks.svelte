@@ -694,6 +694,7 @@ const handleClick = (word:Word) => {
     }
 
     sentence = bricks_data.text[curSentence].sentence;
+    words = formatWords(sentence);
 
     MakeBricks(); // Генерация кирпичей для новой статьи
 };
