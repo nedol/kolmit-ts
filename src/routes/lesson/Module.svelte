@@ -28,18 +28,19 @@
   import Checkbox from '@smui/checkbox';
   import Quiz from './quiz/Quiz.svelte';
 
-  const bricks_icon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-  <rect x="3" y="3" width="8" height="3" />
-  <rect x="13" y="3" width="8" height="3" />
-  <rect x="3" y="8" width="4" height="3" />
-  <rect x="9" y="8" width="6" height="3" />
-  <rect x="17" y="8" width="4" height="3" />
-  <rect x="3" y="13" width="8" height="3" />
-  <rect x="13" y="13" width="8" height="3" />
-  <rect x="3" y="18" width="4" height="3" />
-  <rect x="9" y="18" width="6" height="3" />
-  <rect x="17" y="18" width="4" height="3" />
-</svg>`
+  const bricks_icon = `
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+    <rect x="3" y="3" width="8" height="3" />
+    <rect x="13" y="3" width="8" height="3" />
+    <rect x="3" y="8" width="4" height="3" />
+    <rect x="9" y="8" width="6" height="3" />
+    <rect x="17" y="8" width="4" height="3" />
+    <rect x="3" y="13" width="8" height="3" />
+    <rect x="13" y="13" width="8" height="3" />
+    <rect x="3" y="18" width="4" height="3" />
+    <rect x="9" y="18" width="6" height="3" />
+    <rect x="17" y="18" width="4" height="3" />
+  </svg>`
 
   import {
     signal,

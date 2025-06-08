@@ -4,7 +4,8 @@
       langs,
       llang,
       showBottomAppBar,
-      signal      
+      signal,
+      lesson      
   } from '$lib/stores.ts';
   import { slide } from 'svelte/transition';
   import ConText from '../Context.svelte';
@@ -266,7 +267,6 @@ const parseSentenceSynt = (text) => {
 
   function MakeBricks(){
       // Перемешиваем formattedSentence
-
       words = shuffleArray(words)
 
       const firstElement = document.querySelector('.formatted-list span');
@@ -402,6 +402,8 @@ const handleClick = (word:Word) => {
     similarity = '';
     isCorrectSpanString = false;
     isTip = false;
+    isSynt = false;
+    span_equal = true;
 
     if(curSentence >= bricks_data.text.length){
       curSentence = 0;
@@ -493,6 +495,7 @@ const handleClick = (word:Word) => {
           // После того как слово присвоено, ищем следующий элемент для фокуса
       focusedIndex = Math.min(index + 1, formattedSentence.length - 1);
     }
+
     setTimeout(()=>{
       checkCompletion();
     },100)
@@ -506,6 +509,8 @@ const handleClick = (word:Word) => {
     });        
   }
 
+  let isSynt = false;
+
   const onToggleWord = ()=>{
 
       const params = {
@@ -515,12 +520,16 @@ const handleClick = (word:Word) => {
         context:bricks_data.text[curSentence].sentence     
       };
 
+      isSynt = false;
+
       $signal.SendMessage(params,async (res) => {    
         console.log('handleData',res)
         let sentence = res.response;
         words = parseSentence(sentence)
         formattedSentence = parseSentence(sentence);
+        focusedIndex = 0;
         MakeBricks();
+        isSynt = true;
       }); 
    
   }
@@ -837,6 +846,7 @@ const handleClick = (word:Word) => {
             <rect x="12" y="20" width="10" height="2" fill="magenta" />
             <rect x="2" y="20" width="8" height="2" />
           </Icon>
+
     
           {:else}
           <Icon tag="svg" viewBox="0 0 24 24" width="30px" height="30px"  fill="white"  
@@ -857,7 +867,19 @@ const handleClick = (word:Word) => {
               <rect x="2" y="20" width="8" height="2" />
           </Icon>
 
+          
+          {#if isSynt === false}
+            <div style="position:absolute; display: flex; justify-content: center;pointer-events: none;">
+              <CircularProgress
+                class="my-four-colors"
+                style="height: 32px; width: 32px;"
+                indeterminate
+                fourColor
+              />
+            </div>
           {/if}
+
+        {/if}
 
       </Section>
 
@@ -927,23 +949,20 @@ const handleClick = (word:Word) => {
 
 {#if bricks_data?.data}
   <div class="bricks-header">
-    <Icon tag="svg" viewBox="0 0 24 24" width="30px" height="30px" fill="grey"> 
-      <svg aria-hidden="true" viewBox="0 0 24 24" width="20px" height="20px">
-        <rect x="3" y="3" width="8" height="3"></rect>
-        <rect x="13" y="3" width="8" height="3"></rect>
-        <rect x="3" y="8" width="4" height="3"></rect>
-        <rect x="9" y="8" width="6" height="3"></rect>
-        <rect x="17" y="8" width="4" height="3"></rect>
-        <rect x="3" y="13" width="8" height="3"></rect>
-        <rect x="13" y="13" width="8" height="3"></rect>
-        <rect x="3" y="18" width="4" height="3"></rect>
-        <rect x="9" y="18" width="6" height="3"></rect>
-        <rect x="17" y="18" width="4" height="3"></rect>
-      </svg>
-    </Icon>
+    <span class="bricks_name" on:click={()=>{$lesson.data = { quiz: '' };}}>
+      {#await Transloc('Урок', 'ru', $langs, 'bricks') then data}  
+        {data}
+      {/await}
+    </span>
+    <span class="bricks_name">></span>
+
     <span class="bricks_name" on:click={() => {isCollapsed = !isCollapsed; isTip=true}}>
       {bricks_data?.name}
     </span>
+    <span class="bricks_name">></span>
+    
+    <span class='article' on:click={toNextArticle}>{article_name}</span>
+  
   </div>
 
   {#if !isCollapsed}
@@ -953,8 +972,7 @@ const handleClick = (word:Word) => {
   {/if} 
 {/if}
 
-  <span class='article' on:click={toNextArticle}>{article_name}</span>
-  
+
   <div>
     {#if isTransloc}
     <div class="trans">
@@ -1162,18 +1180,21 @@ const handleClick = (word:Word) => {
   }
   .bricks-header {
     display: flex;
-    align-items: center;
-    gap: 10px; /* Отступ между элементами */
+    align-items: end;
+    gap: 5px; /* Отступ между элементами */
     margin: 10px;
   }
 
   .bricks_name{
     position:relative;
-    width:80%;
     color: black;
     font-style: italic;
     font-size: small;
     font-family: serif;
+  }
+
+  span{
+    white-space: nowrap;
   }
 
   .invisible{
@@ -1181,14 +1202,16 @@ const handleClick = (word:Word) => {
   }
 
   .article{
-    display: flex;;
-    justify-content: center;
-    align-items: center;
+    /* white-space:nowrap; */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: inline-block; /* или block/flex, если нужно */
+    max-width: 100%; /* ограничивает по ширине родителя */
     color: #2196f3;
     font-style: italic;
     font-size: small;
-    margin-left: 10px;
-    margin-right: 10px;
+    margin-left: 5px;
+    margin-right: 0px;
   }
   .speaker-button {
     display: inline-flex;

@@ -755,10 +755,6 @@ export async function GetBricks(q: GetBricksQuery): Promise<Brick | Brick[] | st
 }
 
 
-
-
-
-
 interface GetDialogQuery {
   name: string;
   owner: string;
@@ -1487,5 +1483,18 @@ export async function SetRate(par) {
     return result; // Return the result of the query
   } catch (ex) {
     throw ex; // Rethrow the error to handle it elsewhere
+  }
+}
+
+export async function GetGrammar(data) {
+  try {
+    const res = await sql`
+      SELECT rule_text FROM grammar_nt2_1 WHERE level = ${data.level}
+    `
+    return res;
+  } catch (ex) {
+    console.error('Error in GetGrammar:', ex);
+    return [];
+
   }
 }

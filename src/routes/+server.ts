@@ -1,4 +1,4 @@
-import { CreateOperator, CheckOperator, GetUsers, GetDict } from '$lib/server/db.ts'; //src\lib\server\server.db.ts
+import { CreateOperator, CheckOperator, GetUsers, GetGrammar} from '$lib/server/db.ts'; //src\lib\server\server.db.ts
 
 import pkg from 'nodemailer';
 const { Email } = pkg;
@@ -109,24 +109,12 @@ export async function GET({ url, fetch, cookies }) {
     let response = new Response(JSON.stringify({ obj }));
     response.headers.append('Access-Control-Allow-Origin', `*`);
     return response;
-  } else if (dict) {
+  } else if (func === 'lvl_desc') {
     const level = url.searchParams.get('level');
-    const theme = url.searchParams.get('theme');
-    // let resp = await fetch('/src/routes/operator/lesson/' + path);
-    let data = await GetDict({
-      owner: abonent,
-      type: dict,
-      level: level,
-      theme: theme,
-    });
-    // let data = await resp.text();
-    // let items = text.split('\r\n');
-    //debugger;
-    if (data) {
-      let response = new Response(JSON.stringify({ data }));
-      response.headers.append('Access-Control-Allow-Origin', `*`);
-      return response;
-    }
+    let obj  = await GetGrammar({level:level })
+    let response = new Response(JSON.stringify({ obj }));
+    response.headers.append('Access-Control-Allow-Origin', `*`);
+    return response;
   }
 
   let response = new Response();

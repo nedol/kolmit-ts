@@ -7,24 +7,27 @@
   import { signal, langs, ice_conf, view, lesson } from '$lib/stores.ts';
 
   import ISO6391 from 'iso-google-locales';
-
+ 
+  import { Transloc } from './translate/Transloc';
 
   import Tab  from '@smui/tab';
   import TabBar from '@smui/tab-bar';
 
- import { Label } from '@smui/button';
+  import Button, { Label } from '@smui/button';
  import{ Icon } from '@smui/icon-button';
+
+  import Badge from '@smui-extra/badge';
 
  import langs_list from '$lib/dict/google_lang_list.json';
 
  import Module from './lesson/Module.svelte';
 
-const tabs=[
-  'Класс',
-  'Урок',
-]
+ import Level from './Level.svelte';
 
-  let active = 'Класс';
+ let tabs=[]
+
+  let active = 'УРОК';
+  $view = 'lesson'
   let lang_menu = false;
   interface OperatorData {
     operator: string;
@@ -56,11 +59,24 @@ const tabs=[
 
   let lvl  = '';// = new URL(window.location.href).searchParams.get('lvl')||''
 
-  onMount(() => {
+  onMount(async() => {
     if (!operator) {
       view.set('login');
     }
+    //  active = await Transloc('УРОК', 'ru', $langs, '');
   });
+
+  $:if($langs){
+    loadTabs();
+  }
+
+  async function loadTabs() {
+  tabs = [
+      await Transloc('УРОК', 'ru', $langs, ''),
+      await Transloc('КЛАСС', 'ru', $langs, ''),
+      await Transloc('УРОВЕНЬ', 'ru', $langs, '')
+    ];
+  }
 
   function Init() {
     // Не очищаем весь localStorage, а только нужное
@@ -109,13 +125,20 @@ const tabs=[
       });
   }
 
-  function OnClickTab(tab){
-    if(tab==='Класс'){
+ async function OnClickTab(tab){
+    if(tab===tabs[1]){
       $view = 'group';
       $lesson.data = { quiz: '' };
-    }else if(tab==='Урок'){
+      
+     
+    }else if(tab===tabs[0]){
       $view = 'lesson'
       $lesson.data = { quiz: '' };
+      
+    }else if(tab===tabs[2]){
+      $view = 'level'
+      $lesson.data = { quiz: '' };
+      
     }
   }
 </script>
@@ -130,33 +153,48 @@ const tabs=[
     let:tab
     bind:active
   >
-    <Tab {tab} minWidth on:click={()=>{OnClickTab(tab)}}>
-      <Label>{tab}</Label>
+    <Tab {tab} minWidth on:click={()=>{OnClickTab(tab)}}  >
+      <div  style=" text-align: center;">
+      <Button class='lvl_span' style="position: relative;"  color="secondary">
+          <Label >
+              {tab} 
+          </Label>
+          {#if tab===tabs[2]}  
+            <Badge aria-label="unread count"  
+             position="outset"
+             align="middle-end">{lvl}
+            </Badge>    
+          {/if}
+      </Button>
+      </div>
     </Tab>
   </TabBar>
 
     {#if $view === 'group'}
-        {#if operator}
-          <Operator {operator} {abonent} {name} />
-        {/if}
+      {#if operator}
+        <Operator {operator} {abonent} {name} />
+      {/if}
 
     {:else if $view==='chat'}
       <Chat prompt_type={operator.level?"basic":'greeting'}></Chat>     
 
     {:else if $view === 'lesson'}
       <Module data={operator}/>   
+
+    {:else if $view === 'level'}
+      <Level {lvl}/>   
     {/if}
 
-    <span class="lvl_span">{lvl}</span>
-    <span
-      class="lang_span"
+    <span  class="lang_span" 
       on:click={() => {
         lang_menu = !lang_menu;
-      }}
-      >{(() => {
-        return $langs;
-      })()}</span
-    >
+      }}>
+      {#await Transloc('Язык', 'ru', $langs,'') then data}
+        {data}
+      {/await}      
+      <Badge aria-label="unread count"  >{$langs}</Badge>
+    </span>
+
     {#if lang_menu}
       <div class="lang_list">
         {#each langs_list as lang}
@@ -172,30 +210,32 @@ const tabs=[
   {/if}
 
 <style>
+  :global(.mdc-tab){
+   padding-right: 28px;
+  }
+  :global(.lvl_span .smui-badge){
+    color: black;
+    background-color: transparent;
+    border: 1px solid grey;
+  }
+  :global(.lang_span .smui-badge){
+    color: black;
+    background-color: transparent;
+    border: 1px solid grey;
+  }
   .active {
     color: #007bff; /* Выбранный цвет */
     font-weight: bold;
   }
-  .lvl_span{
-    font-size: large;
-    position: absolute;
-    top: 11px;
-    right: 80px;
-    border: 0px solid aliceblue;
-    padding: 5px;
-    font-size: .6em;
-    color: rgb(148, 35, 35);
-  
-  }
 
   .lang_span {
-    font-size: medium;
     position: absolute;
-    top: 10px;
+    top: 20px;
     right: 20px;
     border: 0px solid aliceblue;
     padding: 5px;
     border-radius: 2px;
+    font-size: .8em;
   }
 
   .lang_list {
