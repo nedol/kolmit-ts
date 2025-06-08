@@ -23,6 +23,7 @@
  import Module from './lesson/Module.svelte';
 
  import Level from './Level.svelte';
+ import TopAppBar, { Row, Title, Section } from '@smui/top-app-bar';
 
  let tabs=[]
 
@@ -52,6 +53,8 @@
 
   export let data: Data;
 
+  let topAppBar
+
   let operator: OperatorData | undefined;
   let abonent: string | undefined;
   let name: string | undefined;
@@ -74,7 +77,8 @@
   tabs = [
       await Transloc('УРОК', 'ru', $langs, ''),
       await Transloc('КЛАСС', 'ru', $langs, ''),
-      await Transloc('УРОВЕНЬ', 'ru', $langs, '')
+      await Transloc('УРОВЕНЬ', 'ru', $langs, ''),
+
     ];
   }
 
@@ -148,52 +152,52 @@
   <Login {operator} {abonent} {user_pic} />
 {:else}
 
-  <TabBar
-    {tabs}
-    let:tab
-    bind:active
-  >
-    <Tab {tab} minWidth on:click={()=>{OnClickTab(tab)}}  >
-      <div  style=" text-align: center;">
-      <Button class='lvl_span' style="position: relative;"  color="secondary">
-          <Label >
-              {tab} 
-          </Label>
-          {#if tab===tabs[2]}  
-            <Badge aria-label="unread count"  
-             position="outset"
-             align="middle-end">{lvl}
-            </Badge>    
-          {/if}
-      </Button>
-      </div>
-    </Tab>
-  </TabBar>
+    <TabBar
+      {tabs}
+      let:tab
+      bind:active
+    >
+      <Tab {tab} minWidth on:click={()=>{OnClickTab(tab)}}  >
+        <div  style=" text-align: left;">
+        <Button class='lvl_span' style="position: relative;"  color="secondary">
+            <Label >
+                {tab} 
+            </Label>
+            {#if tab===tabs[2]}  
+              <Badge aria-label="unread count"  
+                position="outset"
+                align="middle-end">{lvl}
+              </Badge>    
+            {/if}
+        </Button>
+        </div>
+      </Tab>
+    </TabBar>
 
-    {#if $view === 'group'}
-      {#if operator}
-        <Operator {operator} {abonent} {name} />
+      {#if $view === 'group'}
+        {#if operator}
+          <Operator {operator} {abonent} {name} />
+        {/if}
+
+      {:else if $view==='chat'}
+        <Chat prompt_type={operator.level?"basic":'greeting'}></Chat>     
+
+      {:else if $view === 'lesson'}
+        <Module data={operator}/>   
+
+      {:else if $view === 'level'}
+        <Level {lvl}/>   
       {/if}
 
-    {:else if $view==='chat'}
-      <Chat prompt_type={operator.level?"basic":'greeting'}></Chat>     
-
-    {:else if $view === 'lesson'}
-      <Module data={operator}/>   
-
-    {:else if $view === 'level'}
-      <Level {lvl}/>   
-    {/if}
-
-    <span  class="lang_span" 
-      on:click={() => {
-        lang_menu = !lang_menu;
-      }}>
-      {#await Transloc('Язык', 'ru', $langs,'') then data}
-        {data}
-      {/await}      
-      <Badge aria-label="unread count"  >{$langs}</Badge>
-    </span>
+      <span  class="lang_span" 
+        on:click={() => {
+          lang_menu = !lang_menu;
+        }}>{$langs}
+        <!-- {#await Transloc('Язык', 'ru', $langs,'') then data}
+          {data}
+        {/await}       -->
+        <!-- <Badge aria-label="unread count"  >{$langs}</Badge> -->
+      </span>
 
     {#if lang_menu}
       <div class="lang_list">
@@ -207,11 +211,17 @@
         {/each}
       </div>
     {/if}
+  
   {/if}
 
 <style>
   :global(.mdc-tab){
-   padding-right: 28px;
+   min-width: 0px;
+   padding-right: 30px;
+   padding-left: 0px;
+  }
+  :global(.mdc-tab__ripple){
+    width: 100%;
   }
   :global(.lvl_span .smui-badge){
     color: black;
@@ -219,6 +229,7 @@
     border: 1px solid grey;
   }
   :global(.lang_span .smui-badge){
+    position: absolute;
     color: black;
     background-color: transparent;
     border: 1px solid grey;
@@ -228,15 +239,20 @@
     font-weight: bold;
   }
 
-  .lang_span {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    border: 0px solid aliceblue;
-    padding: 5px;
-    border-radius: 2px;
-    font-size: .8em;
-  }
+.lang_span {
+  position: absolute;
+  top: 12px;
+  width: 25px;
+  right: 20px;
+  border: 1px solid ;
+  color:gray;
+  border-radius: 50%;
+  padding: 0px;
+  font-size: 1em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
   .lang_list {
     position: absolute;
