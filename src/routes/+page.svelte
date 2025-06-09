@@ -106,7 +106,7 @@
 
     ice_conf.set(data.ice_conf);
 
-    lvl =  operator?.level||'';
+    lvl =  operator?.lvl||'';
   }
 
   if (data.operator) {
@@ -180,7 +180,7 @@
         {/if}
 
       {:else if $view==='chat'}
-        <Chat prompt_type={operator.level?"basic":'greeting'}></Chat>     
+        <Chat prompt_type={operator.lvl?"basic":'greeting'}></Chat>     
 
       {:else if $view === 'lesson'}
         <Module data={operator}/>   

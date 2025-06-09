@@ -413,21 +413,9 @@ const handleClick = (word:Word) => {
     
     article_name = bricks_data.text[curSentence].article || '\u00a0\u00a0\u00a0\u00a0\u00a0'
 
-    words = sentence.trim().split(/[\s:\.]+/)
-      .filter(word => word) // Оставляем только существующие слова
-      .map((word) => ({
-          gr: extractTagName(word),
-          placeholder: "\u00a0\u00a0\u00a0\u00a0\u00a0", 
-          value: word.trim()
-      })); 
+    words = formatWords(sentence); 
     // Создаём массив для предложения с placeholder'ами
-    formattedSentence = sentence.trim().split(/[\s:\.]+/)
-        .filter(word => word) // Оставляем только существующие слова
-        .map((word) => ({
-          gr: extractTagName(word),
-          placeholder: "\u00a0\u00a0\u00a0\u00a0\u00a0", 
-          value: word.trim()
-        }));
+    formattedSentence = formatWords(sentence);
 
     MakeBricks();
   }
@@ -704,6 +692,7 @@ const handleClick = (word:Word) => {
 
     sentence = bricks_data.text[curSentence].sentence;
     words = formatWords(sentence);
+    formattedSentence = formatWords(sentence);
 
     MakeBricks(); // Генерация кирпичей для новой статьи
 };
@@ -1049,7 +1038,7 @@ const handleClick = (word:Word) => {
 
 {#if isSTT}
   <div class="container">
-    {#await Transloc('Check a pronanciation', 'en', $langs) then data}
+    {#await Transloc('Проверить произношение', 'ru', $langs) then data}
       <div class="title">{data}:</div>
     {/await}
         
@@ -1085,7 +1074,11 @@ const handleClick = (word:Word) => {
       ></Stt>
     </div>
 
-    <div style="text-align: center;  margin-top: 30px;">
+    <div style="
+      text-align: center;  
+      margin-top: 30px;
+      max-width: 100%;
+    ">
       <span style="color: darkgreen;">
         {@html stt_text}
       </span>
@@ -1104,7 +1097,6 @@ const handleClick = (word:Word) => {
 {/if}
 
 <br />
-
 
 {#if isProgress}
   <div style="text-align:center">
@@ -1193,7 +1185,7 @@ const handleClick = (word:Word) => {
     font-family: serif;
   }
 
-  span{
+  .bricks-header span{
     white-space: nowrap;
   }
 

@@ -249,7 +249,7 @@ export async function GetGroup(params: {
 }): Promise<{ group: any; oper: any }> {
   // Fetch operator information
   const oper = await sql`
-    SELECT "group", abonent, role, operator, picture, lang, name, level
+    SELECT "group", abonent, role, operator, picture, lang, name, level as lvl
     FROM operators
     WHERE operators.abonent=${params.abonent} 
       AND operator=${params.operator}
@@ -260,7 +260,7 @@ export async function GetGroup(params: {
   }
 
   // Calculate level group (rounding down to nearest 10)
-  const levelGroup = (params.abonent==='public'?Math.floor(oper[0].level / 10) * 10: oper[0].level);
+  const levelGroup = (params.abonent==='public'?Math.floor(oper[0].lvl / 10) * 10: oper[0].lvl);
   let group = []
 
   if(oper[0].abonent!=='public'){
@@ -274,7 +274,7 @@ export async function GetGroup(params: {
   }else{
     group = [{
       owner: oper[0].abonent,
-      level: Math.floor(oper[0].level / 10)*10 ,
+      level: Math.floor(oper[0].lvl / 10)*10 ,
       lang: oper[0].lang,
       name: oper[0].group
     }]

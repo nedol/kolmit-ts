@@ -217,7 +217,7 @@
         langs: $langs,
         llang: $llang || 'nl',
         level: level,
-        lvl:operator.level,       
+        lvl:operator.lvl,       
       };
 
       console.log('SendMessage',params);
@@ -640,7 +640,7 @@ function toggleCorrection(i){
               <ul>
               {#each message.replies as reply, i}
               <li>
-                {#if !message.isTranslate}
+                {#if false && !message.isTranslate}
                   <reply>
                     {#if message.repliesTranslated?.[i]}
                       {@html message.repliesTranslated?.[i]}
@@ -653,7 +653,7 @@ function toggleCorrection(i){
                     {/if}
                   </reply>
                 {:else}
-                  <reply>{@html reply}</reply>
+                  <reply>{@html  message.repliesTranslated?.[i]}</reply>
                 {/if}
                 </li> 
               {/each}              
