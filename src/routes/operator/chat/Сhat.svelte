@@ -90,6 +90,8 @@
 
   let isReminderSent = false; // Флаг для отслеживания отправки напоминания
 
+   let shownReplyTranslations = [];
+
   interface FormattedSentence {
     gr: string;
     placeholder: string;
@@ -108,6 +110,7 @@
     // Запускаем таймер для проверки неактивности
     startReminderTimer();
 
+
     messages.update(msgs =>  
       [...msgs, 
         { id: crypto.randomUUID(), 
@@ -117,6 +120,11 @@
           cor: '',
           isTranslate:false}
       ]);
+
+      // messages.map((message)=>{
+      //   message.shownReplyTranslations = message.replies.map(() => true);
+      // });
+
 
       $blink_mic = true;
 
@@ -496,10 +504,8 @@ function toggleCorrection(i){
   }
 
 
-  function OnClickReply(event) {
-    const clickedWord = event.target.textContent;
-    console.log(`Вы кликнули на слово: ${clickedWord}`);
-    // Здесь вы можете добавить свою логику обработки клика
+ function toggleReplyTranslation(i) {
+    shownReplyTranslations[i] = !shownReplyTranslations[i];
   }
 
     // Очистка таймера при размонтировании
@@ -636,29 +642,39 @@ function toggleCorrection(i){
      
         {#if message.role === 'assistant' }
           {#if selectedReplyId === message.id}
-            <div class="reply_container">
-              <ul>
+          <div class="reply_container">
+            <ul>
               {#each message.replies as reply, i}
-              <li>
-                {#if false && !message.isTranslate}
+                <li>
                   <reply>
-                    {#if message.repliesTranslated?.[i]}
-                      {@html message.repliesTranslated?.[i]}
-                      <!-- {#each message.repliesTranslated?.[i].split(' ') as word}
-                        <Word on:click={(word) => OnClickReply(word)}>{@html word}</Word>
-                        <span> </span>  
-                      {/each} -->
+                    {#if shownReplyTranslations[i]}
+                      {@html reply} 
                     {:else}
-                      {@html reply}
+                     {@html message.repliesTranslated[i]}
                     {/if}
                   </reply>
-                {:else}
-                  <reply>{@html  message.repliesTranslated?.[i]}</reply>
-                {/if}
-                </li> 
-              {/each}              
-              </ul>         
-            </div>
+
+                  <div style="display: flex; justify-content: flex-end;">
+                    <div on:click={() => toggleReplyTranslation(i)}>
+                      {#if  shownReplyTranslations[i]}
+                      <IconButton>
+                        <Icon tag="svg" viewBox="0 0 24 24">
+                          <path fill="currentColor" d={mdiTranslate} />
+                        </Icon>
+                      </IconButton>
+                      {:else}
+                      <IconButton>
+                        <Icon tag="svg" viewBox="0 0 24 24">
+                          <path fill="currentColor" d={mdiTranslateOff} />
+                        </Icon>
+                      </IconButton>
+                      {/if}
+                    </div>
+                  </div>
+                </li>
+              {/each}
+            </ul>
+          </div>
           {/if}
         {/if}
 
@@ -772,6 +788,8 @@ function toggleCorrection(i){
     font-size:small;
     font-weight: bold;
   }
+
+
 
   textarea::placeholder {
     direction: ltr;
