@@ -1,26 +1,29 @@
 <script lang="ts">
-    import CircularProgress from '@smui/circular-progress';
+  import CircularProgress from "@smui/circular-progress";
 
-  import Dialog from './dialog/Dialog.svelte';
-  import Bricks from './bricks/Bricks.svelte';
-  import Listen from './listen/Listen.svelte';
-  import Numbers from './listen/Numbers.svelte';
-  import Time from './listen/Time.svelte';
-  import Word from './word/Word.svelte';
-  import WordGame from './word/WordGame.svelte';
-  import { call_but_status } from '$lib/stores.ts';
+  import Dialog from "./dialog/Dialog.svelte";
+  import Bricks from "./bricks/Bricks.svelte";
+  import Listen from "./listen/Listen.svelte";
+  import Numbers from "./listen/Numbers.svelte";
+  import Time from "./listen/Time.svelte";
+  import Word from "./word/Word.svelte";
+  import WordGame from "./word/WordGame.svelte";
+  import { call_but_status } from "$lib/stores.ts";
 
   export let data;
-  let quiz = data.quiz;
-
+  let quiz = data.quiz || "bricks";
 </script>
 
 <div />
 <!-- {@debug quiz} -->
 {#if quiz}
-  {#if quiz.includes('dialogs')}
+  <div style="display: {quiz.includes('bricks') ? 'block' : 'none'}">
+    <Bricks {data} />
+  </div>
+{/if}
+<!-- {#if quiz.includes('dialogs')}
     <Dialog {data} />
-  {:else if quiz.includes('bricks')}
+  {:else if quiz.includes('bricks') style="display: {quiz.includes('bricks') ? 'block' : 'none'}"}
     <Bricks {data} />
   {:else if quiz.includes('listen')}
     {#if data.name === 'Nummers'}
@@ -45,5 +48,5 @@
           </span>
         </div>
     {/if}
-  {/if}
-{/if}
+  {/if} -->
+<!-- {/if} -->

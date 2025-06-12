@@ -1,16 +1,16 @@
 <script lang="ts">
-  import { onMount, onDestroy, getContext, setContext } from 'svelte';
-  import { createEventDispatcher } from 'svelte';
-  import '../assets/icofont/icofont.min.css';
+  import { onMount, onDestroy, getContext, setContext } from "svelte";
+  import { createEventDispatcher } from "svelte";
+  import "../assets/icofont/icofont.min.css";
   import BottomAppBar, {
     Section,
     AutoAdjust,
-  } from '@smui-extra/bottom-app-bar';
-  import IconButton, { Icon } from '@smui/icon-button';
+  } from "@smui-extra/bottom-app-bar";
+  import IconButton, { Icon } from "@smui/icon-button";
 
-  import TopAppBar, { Row, Title } from '@smui/top-app-bar';
+  import TopAppBar, { Row, Title } from "@smui/top-app-bar";
 
-  import { mdiAccountBox, mdiVolumeHigh, mdiVolumeOff } from '@mdi/js';
+  import { mdiAccountBox, mdiVolumeHigh, mdiVolumeOff } from "@mdi/js";
 
   import {
     users,
@@ -24,55 +24,51 @@
     call_but_status,
     langs,
     showBottomAppBar,
-  } from '$lib/stores.ts';
+  } from "$lib/stores.ts";
 
-  import CircularProgress from '@smui/circular-progress';
+  import CircularProgress from "@smui/circular-progress";
 
-  import Group from './Group.svelte';
+  import Group from "./Group.svelte";
 
-  let operator =  getContext('operator');
+  let operator = getContext("operator");
 
-  import { RTCOperator } from './rtc/RTCOperator';
+  import { RTCOperator } from "./rtc/RTCOperator";
 
-  import CallButton from './callbutton/CallButtonOperator.svelte';
+  import CallButton from "./callbutton/CallButtonOperator.svelte";
   // import BurgerMenu from './menu/BurgerMenu.svelte';
-  import VideoLocal from './Video.local.svelte';
-  import VideoRemote from './Video.remote.svelte';
+  import VideoLocal from "./Video.local.svelte";
+  import VideoRemote from "./Video.remote.svelte";
 
-  import Download from './Download.svelte';
-  import AudioLocal from './Audio.local.svelte';
-  import AudioRemote from './Audio.remote.svelte';
+  import Download from "./Download.svelte";
+  import AudioLocal from "./Audio.local.svelte";
+  import AudioRemote from "./Audio.remote.svelte";
 
-  import RecordedVideo from './RecordedVideo.svelte';
+  import RecordedVideo from "./RecordedVideo.svelte";
 
-  import Module from '../lesson/Module.svelte';
+  // import Module from '../lesson/Module.svelte';
 
-  
-
-  import pkg from 'lodash';
+  import pkg from "lodash";
   const { find } = pkg;
 
-
-  import { msg } from '$lib/stores.ts';
+  import { msg } from "$lib/stores.ts";
   $: if ($msg) {
     OnMessage($msg, null);
     // $msg = ''
   }
 
-  let dlg_display = 'none';
+  let dlg_display = "";
 
   function SetDlgDisplay() {
-    $view = 'chat';
+    // $view = "chat";
   }
 
-  setContext('SetDlgDisplay', SetDlgDisplay);
- 
+  setContext("SetDlgDisplay", SetDlgDisplay);
 
-  $: if ($view === 'chat'){
-     dlg_display = 'none';
-  } else dlg_display = 'none';
+  // $: if ($view === "chat") {
+  //   dlg_display = "none";
+  // } else dlg_display = "none";
 
-  $posterst = 'assets/operator.svg';
+  $posterst = "assets/operator.svg";
 
   let rtc: any;
 
@@ -86,18 +82,18 @@
   let synthesis;
   let isRemoteAudioMute = false;
   let commandsList;
-  let rtcSupportText = '';
+  let rtcSupportText = "";
   let debug_div: any;
 
-  $call_but_status = 'inactive';
+  $call_but_status = "inactive";
 
-  import { editable } from '$lib/stores.ts';
-  import { Transloc } from '../translate/Transloc';
+  import { editable } from "$lib/stores.ts";
+  import { Transloc } from "../translate/Transloc";
   $: if ($editable) {
     edited_display = $editable;
   }
 
-  operator.type = 'operator';
+  operator.type = "operator";
 
   const abonent = operator.abonent;
   const name = operator.name;
@@ -105,7 +101,7 @@
   let container;
 
   const headers = {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
   };
 
   let isHidden = false;
@@ -113,10 +109,10 @@
   function handleVisibilityChange() {
     isHidden = document.hidden;
     if (isHidden) {
-      console.log('Страница ушла в фоновый режим');
+      console.log("Страница ушла в фоновый режим");
       location.reload(); // Перезагрузка страницы
     } else {
-      console.log('Страница активна');
+      console.log("Страница активна");
     }
   }
 
@@ -142,13 +138,11 @@
       window.RTCDataChannel
     );
     if (!isWebRTCSupported) {
-      rtcSupportText = 'WebRTC не поддерживается вашим браузером';
+      rtcSupportText = "WebRTC не поддерживается вашим браузером";
     } else {
-      rtcSupportText = ' ';
+      rtcSupportText = " ";
     }
   }
-
-
 
   onMount(async () => {
     checkWebRTCSupport();
@@ -156,84 +150,77 @@
     try {
       rtc = new RTCOperator(operator, name, $signal);
       initRTC();
-
     } catch (ex) {
-        console.log();
+      console.log();
     }
 
     try {
-
     } catch (ex) {
-      console.log('Web Audio API is not supported in this browser');
+      console.log("Web Audio API is not supported in this browser");
     }
 
+    // Добавьте слушателя событий для скрытия списка команд при клике за его пределами
+    // document.addEventListener('click', handleOutsideClick);
+    if (detectDevice())
+      document.addEventListener("visibilitychange", handleVisibilityChange);
 
-      // Добавьте слушателя событий для скрытия списка команд при клике за его пределами
-      // document.addEventListener('click', handleOutsideClick);
-      if (detectDevice())
-        document.addEventListener('visibilitychange', handleVisibilityChange);
+    if (operator.length <= 1) $view = "module";
 
-      if(operator.length<=1)
-        $view = 'lesson'
-
-
-
-    setTimeout(()=>{
-      if(!operator.lvl && abonent==='public'){  
-        $view = 'chat'
+    setTimeout(() => {
+      if (!operator.lvl && abonent === "public") {
+        $view = "chat";
       }
-    },1000)
-
+    }, 1000);
   });
 
   let progress = {
-    display: 'block',
+    display: "block",
     value: 0,
   };
 
   let local = {
     video: {
-      display: 'none',
-      srcObject: '',
-      poster: '',
+      display: "none",
+      srcObject: "",
+      poster: "",
     },
     audio: {
       paused: true,
-      src: '',
+      src: "",
     },
   };
 
   let remote = {
     text: {
-      display: 'none',
-      msg: '',
-      name: '',
-      email: '',
+      display: "none",
+      msg: "",
+      name: "",
+      email: "",
     },
     video: {
-      display: 'none',
-      srcObject: '',
-      poster: '/assets/operator.svg',
+      display: "none",
+      srcObject: "",
+      poster: "/assets/operator.svg",
     },
   };
 
   let profile = {
-    display: 'none',
+    display: "none",
   };
 
   if (operator.operator === abonent) {
-    operator.role = 'admin';
+    operator.role = "admin";
   } else {
-    operator.role = 'user';
+    operator.role = "user";
   }
 
   function onTransFile(params: any) {
-    let event = new MouseEvent('click', {
+    let event = new MouseEvent("click", {
       bubbles: true,
       cancelable: true,
       view: window,
     });
-    document.getElementById('files').dispatchEvent(event);
+    document.getElementById("files").dispatchEvent(event);
   }
 
   $: if (selected)
@@ -285,7 +272,7 @@
       remote.video.poster = $posterst;
       // local.audio.paused = true;
       remote.video.srcObject = src;
-      remote.video.display = 'block';
+      remote.video.display = "block";
 
       // }
     };
@@ -295,17 +282,16 @@
     selected.display = true;
   }
 
-
   function OnClickCallButton() {
-    console.log('OnClickCallButton')
+    console.log("OnClickCallButton");
     switch ($call_but_status) {
-      case 'inactive':
+      case "inactive":
         try {
           // Добавьте слушателя событий для скрытия списка команд при клике за его пределами
           // document.addEventListener('click', handleOutsideClick);
           if (detectDevice())
             document.addEventListener(
-              'visibilitychange',
+              "visibilitychange",
               handleVisibilityChange
             );
         } catch (ex) {
@@ -332,33 +318,32 @@
 
         //   // Сохранение источника (если необходимо)
         //   rtc.localSoundSrc = localSoundSrc;
-          
+
         // } else {
         //   console.log('No local sound element found.');
         // }
 
         rtc.Offer();
 
-        $call_but_status = 'active';
+        $call_but_status = "active";
         break;
 
-      case 'active':
-
-        $call_but_status = 'inactive';
+      case "active":
+        $call_but_status = "inactive";
         rtc.OnInactive();
 
         break;
-      case 'call':
+      case "call":
         if ($dc_state && !$click_call_func) {
-          $call_but_status = 'talk';         
+          $call_but_status = "talk";
           isRemoteAudioMute = false;
           rtc.OnTalk();
           video_button_display = true;
-          remote.text.display = 'none';
+          remote.text.display = "none";
         } else {
-          $call_but_status = 'inactive';
+          $call_but_status = "inactive";
         }
-         
+
         local.audio.paused = true;
         clearInterval(inter);
         call_cnt = 10;
@@ -369,24 +354,24 @@
         // document.getElementsByTagName('body')[0].dispatchEvent(event);
 
         break;
-      case 'talk':
-        local.video.display = 'none';
+      case "talk":
+        local.video.display = "none";
         local.audio.paused = true;
         video_button_display = false;
-        remote.video.display = 'none';
-        remote.video.srcObject = '';
-        remote.video.poster = '';
-        remote.text.display = 'none';
-        remote.text.name = '';
-        remote.text.email = '';
+        remote.video.display = "none";
+        remote.video.srcObject = "";
+        remote.video.poster = "";
+        remote.text.display = "none";
+        remote.text.name = "";
+        remote.text.email = "";
 
-        $call_but_status = 'inactive';
+        $call_but_status = "inactive";
         rtc.DC.SendDCClose();
 
         rtc.DC.CloseDC();
 
         rtc.OnInactive();
-        
+
         $users = $users;
 
         break;
@@ -395,8 +380,8 @@
     }
   }
 
-  $: if($click_call_func){
-    console.log()
+  $: if ($click_call_func) {
+    console.log();
   }
 
   $: if ($call_but_status) {
@@ -404,17 +389,17 @@
   }
 
   function openProfile(id) {
-    profile.display = 'block';
+    profile.display = "block";
   }
 
   function OnClickVideoButton() {
-    $call_but_status = 'talk';
+    $call_but_status = "talk";
     local.audio.paused = true;
-    local.video.display = 'block';
+    local.video.display = "block";
     video_button_display = false;
     video_progress = true;
 
-    if (rtc.DC.dc.readyState === 'open') {
+    if (rtc.DC.dc.readyState === "open") {
       rtc.GetUserMedia({ audio: 1, video: 1 }, function () {
         rtc.SendVideoOffer(rtc.main_pc);
       });
@@ -425,57 +410,55 @@
     video_progress = false;
   }
 
-  $:switch($con_state){
-    case 'disconnected':
+  $: switch ($con_state) {
+    case "disconnected":
       // $call_but_status = 'inactive';
-    break;
+      break;
   }
 
-    /*TODO: дает*/
+  /*TODO: дает*/
   $: switch ($dc_state) {
-      case 'open':
-        $call_but_status = 'call';//дубль
-        local.audio.paused = false;
-        break;
-      case 'close':
-        $call_but_status = 'inactive';
-        remote.video.display = 'none'
-        local.audio.paused = true;
-        break;
-    }
+    case "open":
+      $call_but_status = "call"; //дубль
+      local.audio.paused = false;
+      break;
+    case "close":
+      $call_but_status = "inactive";
+      remote.video.display = "none";
+      local.audio.paused = true;
+      break;
+  }
 
   function OnMessage(data: any, resolve: any) {
-    if (data.func === 'close') {
-      $call_but_status = 'inactive';
+    if (data.func === "close") {
+      $call_but_status = "inactive";
       rtc.DC.CloseDC();
       local.audio.paused = true;
     }
 
-    if (data.call || data.func === 'call') {
-   
+    if (data.call || data.func === "call") {
       $showBottomAppBar = true;
       // $call_but_status = 'call';//дубль
-      remote.text.display = 'block';
+      remote.text.display = "block";
       video_button_display = false;
       local.audio.paused = false;
 
       if (data.profile) {
         // remote.video.poster = data.profile.img;
-        if (data.profile.img) remote.video.display = 'block';
+        if (data.profile.img) remote.video.display = "block";
 
         remote.text.name = data.profile.name;
         remote.text.email = data.profile.email;
       }
 
-      if($click_call_func)
-        rtc.OnCall()
+      if ($click_call_func) rtc.OnCall();
     }
 
-    if (data.func === 'talk') {
-      $call_but_status = 'talk';
+    if (data.func === "talk") {
+      $call_but_status = "talk";
       local.audio.paused = true;
       video_button_display = true;
-      remote.text.display = 'none';
+      remote.text.display = "none";
     }
 
     if (data.camera) {
@@ -483,7 +466,7 @@
     }
 
     if (data.lesson) {
-      $view = 'lesson';
+      $view = "module";
       $lesson.data = data.lesson;
     }
   }
@@ -493,24 +476,18 @@
   }
 
   onDestroy(() => {
-    document.removeEventListener('visibilitychange', handleVisibilityChange);
+    document.removeEventListener("visibilitychange", handleVisibilityChange);
   });
 </script>
 
 <!-- {@debug $view} -->
 
-
-
-{#if $view === 'lesson'}
-  <Module data={operator}/>  
-
-{:else if  $view === 'group'}
-  <Group  {rtc} />
-{/if}
-
-
-
-
+<!-- {#if $view === 'module'}
+  <Module data={operator}/> 
+-->
+<!-- <div style="display: {$view === 'group' ? 'block' : 'none'}"> -->
+<Group {rtc} />
+<!-- </div> -->
 
 <div class="bottom-app-bar-wrapper" class:hide={!$showBottomAppBar}>
   <BottomAppBar variant="static" slot="oper" bind:this={bottomAppBar}>
@@ -526,7 +503,7 @@
           on:mute
           bind:isRemoteAudioMute
         ></VideoRemote>
-        {#if $call_but_status === 'talk'}
+        {#if $call_but_status === "talk"}
           <div class="speaker-button">
             <IconButton on:click={toggle_remote_audio}>
               <Icon tag="svg" viewBox="0 0 24 24">
@@ -544,7 +521,7 @@
     <Section>
       {#if remote.text.display && remote.text.name}
         <div class="remote_text_display" style="display:{remote.text.display};">
-          {#await Transloc('Тебя вызывает - ', 'ru', $langs,remote.text.name) then data}
+          {#await Transloc("Тебя вызывает - ", "ru", $langs, remote.text.name) then data}
             <p class="remote_msg">
               {data}
               {remote.text.name}
@@ -553,11 +530,11 @@
         </div>
       {/if}
     </Section>
-    <Section>
-
-    </Section>
+    <Section></Section>
     <Section align="end">
-      <div style="position: relative; top:-17px;right: 10px;z-index: 1; scale:1">
+      <div
+        style="position: relative; top:-17px;right: 10px;z-index: 1; scale:1"
+      >
         <CallButton on:click={OnClickCallButton}>
           <b
             class="call_cnt"
@@ -604,7 +581,7 @@
     </Section>
   </BottomAppBar>
 
-  {#await Transloc(rtcSupportText, 'ru', $langs,'operator') then data}
+  {#await Transloc(rtcSupportText, "ru", $langs, "operator") then data}
     <span style="position:fixed;bottom:0;font-size:smaller;color:red"
       >{data}</span
     >
@@ -614,8 +591,6 @@
   <AudioLocal {...local.audio} bind:paused={local.audio.paused} />
   <!-- {@debug $call_but_status} -->
 </div>
-
-
 
 <style lang="scss">
   /* Hide everything above this component. */
@@ -690,13 +665,12 @@
   }
 
   @media screen and (min-width: 768px) {
-		/* Ваши стили для более крупных экранов здесь */
+    /* Ваши стили для более крупных экранов здесь */
     main {
       // transform: scale(1.0);
-        // transform-origin: center; /* Масштабирование от центра элемента */
-        // max-width: 100%; /* Ограничение ширины */
-        // max-height: 100%; /* Ограничение высоты */
+      // transform-origin: center; /* Масштабирование от центра элемента */
+      // max-width: 100%; /* Ограничение ширины */
+      // max-height: 100%; /* Ограничение высоты */
     }
-	}
-
+  }
 </style>

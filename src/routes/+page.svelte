@@ -1,34 +1,36 @@
 <script lang="ts">
-  import { onMount, setContext } from 'svelte';
-  import Operator from './operator/Operator.svelte';
-  import Login from './site/Login.svelte';
-  import Chat from './operator/chat/Сhat.svelte';
-  import { SignalingChannel } from './signalingChannel.ts';
-  import { signal, langs, ice_conf, view, lesson } from '$lib/stores.ts';
+  import { onMount, setContext } from "svelte";
+  import Operator from "./operator/Operator.svelte";
+  import Login from "./site/Login.svelte";
+  import Chat from "./operator/chat/Сhat.svelte";
+  import { SignalingChannel } from "./signalingChannel.ts";
+  import { signal, langs, ice_conf, view, lesson } from "$lib/stores.ts";
 
-  import ISO6391 from 'iso-google-locales';
- 
-  import { Transloc } from './translate/Transloc';
+  import ISO6391 from "iso-google-locales";
 
-  import Tab  from '@smui/tab';
-  import TabBar from '@smui/tab-bar';
+  import { Transloc } from "./translate/Transloc";
 
-  import Button, { Label } from '@smui/button';
- import{ Icon } from '@smui/icon-button';
+  import Tab from "@smui/tab";
+  import TabBar from "@smui/tab-bar";
 
-  import Badge from '@smui-extra/badge';
+  import Button, { Label } from "@smui/button";
+  import { Icon } from "@smui/icon-button";
 
- import langs_list from '$lib/dict/google_lang_list.json';
+  import Badge from "@smui-extra/badge";
 
- import Module from './lesson/Module.svelte';
+  import langs_list from "$lib/dict/google_lang_list.json";
 
- import Level from './Level.svelte';
- import TopAppBar, { Row, Title, Section } from '@smui/top-app-bar';
+  import Module from "./lesson/Module.svelte";
 
- let tabs=[]
+  import Level from "./Level.svelte";
+  import TopAppBar, { Row, Title, Section } from "@smui/top-app-bar";
 
-  let active = 'УРОК';
-  $view = 'lesson'
+  let tabs = [];
+
+  let chatComponent;
+
+  let active = "УРОК";
+  $view = "module";
   let lang_menu = false;
   interface OperatorData {
     operator: string;
@@ -53,60 +55,62 @@
 
   export let data: Data;
 
-  let topAppBar
+  let topAppBar;
 
   let operator: OperatorData | undefined;
   let abonent: string | undefined;
   let name: string | undefined;
   let user_pic: string | undefined;
 
-  let lvl  = '';// = new URL(window.location.href).searchParams.get('lvl')||''
+  let lvl = ""; // = new URL(window.location.href).searchParams.get('lvl')||''
 
-  onMount(async() => {
+  onMount(async () => {
     if (!operator) {
-      view.set('login');
+      view.set("login");
     }
     //  active = await Transloc('УРОК', 'ru', $langs, '');
   });
 
-  $:if($langs){
+  $: if ($langs) {
     loadTabs();
   }
 
   async function loadTabs() {
-  tabs = [
-      await Transloc('УРОК', 'ru', $langs, ''),
-      await Transloc('КЛАСС', 'ru', $langs, ''),
-      await Transloc('УРОВЕНЬ', 'ru', $langs, ''),
-
+    tabs = [
+      await Transloc("УРОК", "ru", $langs, ""),
+      await Transloc("КЛАСС", "ru", $langs, ""),
+      await Transloc("ЧАТ", "ru", $langs, ""),
     ];
   }
 
   function Init() {
     // Не очищаем весь localStorage, а только нужное
-    localStorage.removeItem('kolmit_user');
+    localStorage.removeItem("kolmit_user");
 
     const firstOperator = data.operator[0];
 
     if (data.group[0]?.level) {
-      setContext('level', data.group[0].level);
+      setContext("level", data.group[0].level);
     }
 
-    setContext('operator', firstOperator);
-    setContext('abonent', data.abonent);
+    setContext("operator", firstOperator);
+    setContext("abonent", data.abonent);
 
     operator = firstOperator;
+    operator.level = data.group[0].level;
     abonent = firstOperator.abonent;
     name = firstOperator.name;
     user_pic = firstOperator.picture;
 
     signal.set(new SignalingChannel(firstOperator.operator));
 
-    langs.set(data.cookies ? JSON.parse(data.cookies).lang : firstOperator.lang);
+    langs.set(
+      data.cookies ? JSON.parse(data.cookies).lang : firstOperator.lang
+    );
 
     ice_conf.set(data.ice_conf);
 
-    lvl =  operator?.lvl||'';
+    lvl = operator?.lvl || "";
   }
 
   if (data.operator) {
@@ -116,7 +120,7 @@
   function setLang(ev) {
     let lang = ev.currentTarget.outerText;
     let code = ISO6391.getCode(lang);
-    if (code !== 'English') {
+    if (code !== "English") {
       $langs = code;
     }
     // console.log($langs);
@@ -129,106 +133,108 @@
       });
   }
 
- async function OnClickTab(tab){
-    if(tab===tabs[1]){
-      $view = 'group';
-      $lesson.data = { quiz: '' };
-      
-     
-    }else if(tab===tabs[0]){
-      $view = 'lesson'
-      $lesson.data = { quiz: '' };
-      
-    }else if(tab===tabs[2]){
-      $view = 'level'
-      $lesson.data = { quiz: '' };
-      
+  async function OnClickTab(tab) {
+    if (tab === tabs[1]) {
+      $view = "group";
+      // $lesson.data = { quiz: "" };
+    } else if (tab === tabs[0]) {
+      $view = "module";
+      // $lesson.data = { quiz: "" };
+    } else if (tab === tabs[2]) {
+      chatComponent.Init();
+      $view = "chat";
+      // $lesson.data = { quiz: "" };
     }
   }
 </script>
 
-
-{#if $view === 'login'}
+{#if $view === "login"}
   <Login {operator} {abonent} {user_pic} />
 {:else}
-
-    <TabBar
-      {tabs}
-      let:tab
-      bind:active
+  <TabBar {tabs} let:tab bind:active>
+    <Tab
+      {tab}
+      minWidth
+      on:click={() => {
+        OnClickTab(tab);
+      }}
     >
-      <Tab {tab} minWidth on:click={()=>{OnClickTab(tab)}}  >
-        <div  style=" text-align: left;">
-        <Button class='lvl_span' style="position: relative;"  color="secondary">
-            <Label >
-                {tab} 
-            </Label>
-            {#if tab===tabs[2]}  
-              <Badge aria-label="unread count"  
-                position="outset"
-                align="middle-end">{lvl}
-              </Badge>    
-            {/if}
+      <div style=" text-align: left;">
+        <Button class="lvl_span" style="position: relative;" color="secondary">
+          <Label>
+            {tab}
+          </Label>
+          {#if tab === tabs[2]}
+            <Badge
+              aria-label="unread count"
+              position="outset"
+              align="middle-end"
+              >{lvl}
+            </Badge>
+          {/if}
         </Button>
-        </div>
-      </Tab>
-    </TabBar>
+      </div>
+    </Tab>
+  </TabBar>
 
-      {#if $view === 'group'}
-        {#if operator}
-          <Operator {operator} {abonent} {name} />
-        {/if}
+  <div style="display: {$view === 'group' ? 'block' : 'none'}">
+    <Operator {operator} {abonent} {name} />
+  </div>
 
-      {:else if $view==='chat'}
-        <Chat prompt_type={operator.lvl?"basic":'greeting'}></Chat>     
+  <div style="display: {$view === 'chat' ? 'block' : 'none'}">
+    <Chat
+      prompt_type={operator?.lvl ? "basic" : "greeting"}
+      bind:this={chatComponent}
+    />
+  </div>
 
-      {:else if $view === 'lesson'}
-        <Module data={operator}/>   
+  <div style="display: {$view === 'module' ? 'block' : 'none'}">
+    <Module data={operator} />
+  </div>
 
-      {:else if $view === 'level'}
-        <Level {lvl}/>   
-      {/if}
+  <!-- <Level {lvl} /> -->
 
-      <span  class="lang_span" 
-        on:click={() => {
-          lang_menu = !lang_menu;
-        }}>{$langs}
-        <!-- {#await Transloc('Язык', 'ru', $langs,'') then data}
+  <span
+    class="lang_span"
+    on:click={() => {
+      lang_menu = !lang_menu;
+    }}
+    >{$langs}
+    <!-- {#await Transloc('Язык', 'ru', $langs,'') then data}
           {data}
         {/await}       -->
-        <!-- <Badge aria-label="unread count"  >{$langs}</Badge> -->
-      </span>
+    <!-- <Badge aria-label="unread count"  >{$langs}</Badge> -->
+  </span>
 
-    {#if lang_menu}
-      <div class="lang_list">
-        {#each langs_list as lang}
-          <div
-            style="color:black;width:min-content; margin:10px;font-size:smaller"
-            on:click={setLang}
-          >
-            {lang}
-          </div>
-        {/each}
-      </div>
-    {/if}
-  
+  {#if lang_menu}
+    <div class="lang_list">
+      {#each langs_list as lang}
+        <div
+          style="color:black;width:min-content; margin:10px;font-size:smaller"
+          on:click={setLang}
+        >
+          {lang}
+        </div>
+      {/each}
+    </div>
   {/if}
+{/if}
 
 <style>
-  :global(.mdc-tab){
-   min-width: 0px;
-   padding-right: 30px;
-   padding-left: 0px;
+  :global(.mdc-tab) {
+    min-width: 0px;
+    padding-right: 30px;
+    padding-left: 0px;
   }
-  :global(.mdc-tab__ripple){
+  :global(.mdc-tab__ripple) {
     width: 100%;
   }
-  :global(.lvl_span .smui-badge){
+  :global(.lvl_span .smui-badge) {
     color: black;
     background-color: transparent;
     border: 1px solid grey;
   }
-  :global(.lang_span .smui-badge){
+  :global(.lang_span .smui-badge) {
     position: absolute;
     color: black;
     background-color: transparent;
@@ -239,20 +245,20 @@
     font-weight: bold;
   }
 
-.lang_span {
-  position: absolute;
-  top: 12px;
-  width: 25px;
-  right: 20px;
-  border: 1px solid ;
-  color:gray;
-  border-radius: 50%;
-  padding: 0px;
-  font-size: 1em;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
+  .lang_span {
+    position: absolute;
+    top: 12px;
+    width: 25px;
+    right: 20px;
+    border: 1px solid;
+    color: gray;
+    border-radius: 50%;
+    padding: 0px;
+    font-size: 1em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 
   .lang_list {
     position: absolute;

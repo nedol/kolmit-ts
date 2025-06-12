@@ -1,17 +1,16 @@
 <script lang="ts">
-  import { onMount, setContext } from 'svelte';
-  import Header from './Header.svelte';
-  import Login from './login/Login.svelte';
-  import { langs, nlang } from '$lib/stores.ts';
-  import { view } from '$lib/stores.ts';
+  import { onMount, setContext } from "svelte";
+  import Header from "./Header.svelte";
+  import Login from "./login/Login.svelte";
+  import { langs, nlang } from "$lib/stores.ts";
+  import { view } from "$lib/stores.ts";
 
-  import GroupEditor from './group/GroupEditor.svelte';
+  import GroupEditor from "./group/GroupEditor.svelte";
 
-  import { dicts } from '$lib/stores.ts';
-  import ModuleEditor from './module/ModuleEditor.svelte';
+  import { dicts } from "$lib/stores.ts";
+  import ModuleEditor from "./module/ModuleEditor.svelte";
 
   export let data;
-
 
   let operator = data.operator,
     abonent = data.abonent,
@@ -26,9 +25,9 @@
 
 {#if operator}
   <Header></Header>
-  {#if $view === 'group'}
+  {#if $view === "group"}
     <GroupEditor {data} />
-  {:else if $view === 'lesson' || $view === 'quiz'}
+  {:else if $view === "module" || $view === "quiz"}
     <!-- <Admin {email} {abonent} {name} /> -->
     <ModuleEditor {abonent}></ModuleEditor>
   {/if}
