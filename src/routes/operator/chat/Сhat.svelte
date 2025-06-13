@@ -15,10 +15,14 @@
     mdiMicrophone,
     mdiTranslate,
     mdiTranslateOff,
+    mdiCommentTextOutline,
+    mdiEarHearingOff,
+    mdiEarHearing,
     mdiMicrophoneMessage,
     mdiSendOutline,
     mdiPlay,
     mdiAlertCircleCheckOutline,
+    mdiCommentEditOutline,
   } from "@mdi/js";
 
   let blink_arrow = writable(false);
@@ -37,7 +41,8 @@
   let isListening = false;
   let display_audio = "none";
   let stt_text = "";
-  let isSTT = false;
+
+  let isEdit = true;
 
   let words = "undefined";
 
@@ -66,6 +71,10 @@
   let messages = writable<Messages>([]);
   let loading = writable(false);
   let to: NodeJS.Timeout;
+
+  let isHearing = true;
+
+  let isText = true;
 
   let isTranslate = false;
   let isTip = false;
@@ -218,7 +227,7 @@
         prompt: `grammar.check.${$llang}`,
         type: quiz?.quiz || "chat",
         owner: operator.abonent,
-        name: quiz?.name,
+        name: quiz?.name || "chat",
         text: text,
       };
 
@@ -242,7 +251,7 @@
       func: "chat",
       user_id: operator.operator,
       type: quiz?.quiz || "chat",
-      name: quiz?.name,
+      name: quiz?.name || "chat",
       owner: operator.abonent,
       prompt: `chat.${prompt_type}.${$llang}`,
       conversationHistory,
@@ -418,9 +427,14 @@
   function SttResult(text: string) {
     userInput = text[$llang];
     stt_text = text[$llang];
-    // sendMessage();
-    elInput.value = userInput;
-    autoResize();
+
+    if (isEdit) {
+      elInput.value = userInput;
+      autoResize();
+    } else {
+      userInput = text[$llang];
+      sendMessage();
+    }
   }
 
   function onClickMicrophone() {
@@ -463,7 +477,7 @@
   const SpeakText = async (text: string) => {
     const output = text.replace(/<[^>]*>/g, "");
 
-    if (text) {
+    if (text && isHearing) {
       tts.Speak_server($llang, output, "", "");
     }
   };
@@ -551,6 +565,10 @@
     }, 10);
   }
 
+  function onHearing() {
+    isHearing = !isHearing;
+  }
+
   // Очистка таймера при размонтировании
   onDestroy(() => {
     if (to) clearTimeout(to);
@@ -563,12 +581,73 @@
   <TopAppBar bind:this={topAppBar} variant="fixed">
     <Row>
       <Section align="start"></Section>
-      <Section align="start"></Section>
-      <Section align="start"></Section>
-
-      <Section align="end"></Section>
-      <Section align="end"></Section>
-      <Section align="end"></Section>
+      <Section align="start">
+        <div>
+          <IconButton
+            class="material-icons"
+            aria-label="Back"
+            on:click={onHearing}
+          >
+            <Icon
+              tag="svg"
+              viewBox="0 0 24 24"
+              style="position:absolute; margin:10px 5px 10px 5px; scale:1.1;width:30px"
+            >
+              {#if isHearing}
+                <path fill="white" d={mdiEarHearing} />
+              {:else}
+                <path fill="grey" d={mdiEarHearingOff} />
+              {/if}
+            </Icon>
+          </IconButton>
+        </div>
+      </Section>
+      <Section align="end">
+        <div>
+          <IconButton
+            class="material-icons"
+            aria-label="Back"
+            on:click={() => {
+              isEdit = !isEdit;
+            }}
+          >
+            <Icon
+              tag="svg"
+              viewBox="0 0 24 24"
+              style="position:absolute; margin:10px 5px 10px 5px; scale:1.1;width:30px"
+            >
+              {#if isEdit}
+                <path fill="grey" d={mdiCommentEditOutline} />
+              {:else}
+                <path fill="white" d={mdiCommentEditOutline} />
+              {/if}
+            </Icon>
+          </IconButton>
+        </div>
+      </Section>
+      <Section align="end">
+        <div>
+          <IconButton
+            class="material-icons"
+            aria-label="Back"
+            on:click={() => {
+              isText = !isText;
+            }}
+          >
+            <Icon
+              tag="svg"
+              viewBox="0 0 24 24"
+              style="position:absolute; margin:10px 5px 10px 5px; scale:1.1;width:30px"
+            >
+              {#if isText}
+                <path fill="grey" d={mdiCommentTextOutline} />
+              {:else}
+                <path fill="white" d={mdiCommentTextOutline} />
+              {/if}
+            </Icon>
+          </IconButton>
+        </div>
+      </Section>
 
       <Section align="end"></Section>
     </Row>
@@ -674,8 +753,15 @@
         {#if message.isTranslate && translatedMessages.has(message.text)}
           {@html translatedMessages.get(message.text)}
         {:else}
-          {@html message.text}
-
+          <div
+            style="visibility:{message.role === 'assistant'
+              ? isText
+                ? 'visible'
+                : 'hidden'
+              : 'visible'}"
+          >
+            {@html message.text}
+          </div>
           <!-- <iframe src="/html/html/bricks.html" width="100%" height="200" style="border: none;"></iframe> -->
         {/if}
 
@@ -786,62 +872,37 @@
         >
       </IconButton>
     </div>
-    {#if $loading}
-      {#await Transloc("AI печатает...", "ru", $langs, "chat") then data}
-        <textarea
-          disabled
-          rows="1"
-          bind:value={userInput}
-          bind:this={elInput}
-          on:input={() => SetInput(userInput)}
-          placeholder={data}
-          on:keydown={(e) => {
-            onKeydown(e.key);
-          }}
-          aria-label="Введите сообщение"
-          style="
-        width: 100%;
-        padding: 10px;
-        font-size: 16px;
-        line-height: 1.4;
-        border: 1px solid #ccc;
-        resize: none;
-        overflow: hidden;
-        box-sizing: border-box;
-      "
-        />
-      {/await}
-    {:else}
-      {#await Transloc("Введите сообщение...", "ru", $langs, "chat") then data}
-        <textarea
-          rows="1"
-          bind:value={userInput}
-          bind:this={elInput}
-          on:input={() => SetInput(userInput)}
-          placeholder={data}
-          on:keydown={(e) => {
-            onKeydown(e.key);
-          }}
-          aria-label="Введите сообщение"
-          style="
-        width: 100%;
-        padding: 10px;
-        font-size: 16px;
-        line-height: 1.4;
-        border: 1px solid #ccc;
-        resize: none;
-        overflow: hidden;
-        box-sizing: border-box;
-      "
-        />
-      {/await}
-    {/if}
+
+    {#await Transloc("Введите сообщение...", "ru", $langs, "chat") then data}
+      <textarea
+        rows="1"
+        bind:value={userInput}
+        bind:this={elInput}
+        on:input={() => SetInput(userInput)}
+        placeholder={isEdit ? data : ""}
+        on:keydown={(e) => {
+          onKeydown(e.key);
+        }}
+        disabled={!isEdit || $loading}
+        style="
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            line-height: 1.4;
+            border: 1px solid #ccc;
+            resize: none;
+            overflow: hidden;
+            box-sizing: border-box;
+          "
+      />
+    {/await}
+
     <button
       class:blink={$blink_arrow}
       on:click={() => {
         sendMessage();
       }}
-      disabled={$loading}
+      disabled={!isEdit || $loading}
       aria-label="Отправить сообщение"
     >
       <IconButton class="material-icons">
@@ -945,7 +1006,7 @@
     top: 74vh;
     align-self: flex-end;
     text-align: end;
-    background: #ecf7c5;
+    background: #ddbb56;
   }
 
   .message.assistant {

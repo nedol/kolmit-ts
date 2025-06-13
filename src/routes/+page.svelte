@@ -4,7 +4,13 @@
   import Login from "./site/Login.svelte";
   import Chat from "./operator/chat/Сhat.svelte";
   import { SignalingChannel } from "./signalingChannel.ts";
-  import { signal, langs, ice_conf, view, lesson } from "$lib/stores.ts";
+  import {
+    signal,
+    langs,
+    ice_conf,
+    view,
+    showBottomAppBar,
+  } from "$lib/stores.ts";
 
   import ISO6391 from "iso-google-locales";
 
@@ -78,8 +84,8 @@
   async function loadTabs() {
     tabs = [
       await Transloc("УРОК", "ru", $langs, ""),
-      await Transloc("КЛАСС", "ru", $langs, ""),
       await Transloc("ЧАТ", "ru", $langs, ""),
+      await Transloc("АССИСТЕНТ", "ru", $langs, ""),
     ];
   }
 
@@ -136,7 +142,7 @@
   async function OnClickTab(tab) {
     if (tab === tabs[1]) {
       $view = "group";
-      // $lesson.data = { quiz: "" };
+      $showBottomAppBar = true;
     } else if (tab === tabs[0]) {
       $view = "module";
       // $lesson.data = { quiz: "" };
@@ -164,14 +170,6 @@
           <Label>
             {tab}
           </Label>
-          {#if tab === tabs[2]}
-            <Badge
-              aria-label="unread count"
-              position="outset"
-              align="middle-end"
-              >{lvl}
-            </Badge>
-          {/if}
         </Button>
       </div>
     </Tab>
@@ -192,7 +190,9 @@
     <Module data={operator} />
   </div>
 
-  <!-- <Level {lvl} /> -->
+  <span class="lvl_span">
+    {lvl}
+  </span>
 
   <span
     class="lang_span"
@@ -223,8 +223,8 @@
 <style>
   :global(.mdc-tab) {
     min-width: 0px;
-    padding-right: 30px;
-    padding-left: 0px;
+    padding-right: 5px;
+    padding-left: 5px;
   }
   :global(.mdc-tab__ripple) {
     width: 100%;
@@ -249,6 +249,7 @@
     position: absolute;
     top: 12px;
     width: 25px;
+    height: 25px;
     right: 20px;
     border: 1px solid;
     color: gray;
@@ -256,6 +257,23 @@
     padding: 0px;
     font-size: 1em;
     display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .lvl_span {
+    display: flex;
+    position: absolute;
+    top: 12px;
+    width: 25px;
+    height: 25px;
+    right: 70px;
+    border: 1px solid;
+    color: white;
+    background-color: red;
+    border-radius: 50%;
+    padding: 0px;
+    font-size: 1em;
     align-items: center;
     justify-content: center;
   }
@@ -270,5 +288,17 @@
     align-items: center; /* Выравниваем содержимое по центру горизонтально */
     background-color: white;
     /* opacity: 50%; */
+  }
+
+  @media screen and (min-width: 768px) {
+    /* Ваши стили для более крупных экранов здесь */
+    :global(.mdc-tab) {
+      padding-right: 15px;
+      padding-left: 15px;
+    }
+
+    .lvl_span {
+      right: 100px;
+    }
   }
 </style>

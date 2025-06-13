@@ -45,8 +45,6 @@
 
   import RecordedVideo from "./RecordedVideo.svelte";
 
-  // import Module from '../lesson/Module.svelte';
-
   import pkg from "lodash";
   const { find } = pkg;
 
@@ -482,9 +480,6 @@
 
 <!-- {@debug $view} -->
 
-<!-- {#if $view === 'module'}
-  <Module data={operator}/> 
--->
 <!-- <div style="display: {$view === 'group' ? 'block' : 'none'}"> -->
 <Group {rtc} />
 <!-- </div> -->

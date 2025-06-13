@@ -920,20 +920,18 @@
 
         <Section align="end">
           <div class="counter">
-            <p>
-              <span
-                class="mdc-typography--overline"
-                style="position:relative;letter-spacing: -1.5px;"
-                >{1 + curSentence}
-                <Badge
-                  position="middle"
-                  align="bottom-end - bottom-middle"
-                  aria-label="unread count"
-                  style="position:relative;top:-32px;right:-10px;scale:.8;letter-spacing: -1.5px;"
-                  >{bricks_data?.text?.length}</Badge
-                >
-              </span>
-            </p>
+            <span
+              class="mdc-typography--overline"
+              style="position:relative;top:4px"
+              >{1 + curSentence}
+              <Badge
+                position="middle"
+                align="bottom-end - bottom-middle"
+                aria-label="unread count"
+                style="position:relative;right:-10px;scale:.8;top:-24px"
+                >{bricks_data?.text?.length}</Badge
+              >
+            </span>
           </div>
         </Section>
         <Section align="end">
@@ -1454,13 +1452,11 @@
   .similarity,
   .rate span {
     font-weight: 700;
-    font-size: 15px;
+    font-size: 1em;
     color: #2ca838; /* цвет счетчика */
     text-align: center;
-  }
-
-  .rate span {
-    font-size: 10px;
+    top: 7px;
+    position: relative;
   }
 
   .verb {

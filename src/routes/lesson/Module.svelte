@@ -27,7 +27,6 @@
   import CircularProgress from "@smui/circular-progress";
   import Autocomplete from "@smui-extra/autocomplete";
   import Checkbox from "@smui/checkbox";
-  import Quiz from "./quiz/Quiz.svelte";
 
   const bricks_icon = `
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
