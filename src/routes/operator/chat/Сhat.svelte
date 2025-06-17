@@ -15,11 +15,14 @@
     mdiMicrophone,
     mdiTranslate,
     mdiTranslateOff,
+    mdiCommentOutline,
     mdiCommentTextOutline,
     mdiEarHearingOff,
     mdiEarHearing,
     mdiMicrophoneMessage,
     mdiSendOutline,
+    mdiMessageOutline,
+    mdiMessageTextOutline,
     mdiPlay,
     mdiAlertCircleCheckOutline,
     mdiCommentEditOutline,
@@ -231,9 +234,9 @@
         text: text,
       };
 
-      $signal.SendMessage(params, (res) => {
-        console.log("grammar.check", res);
-      });
+      // $signal.SendMessage(params, (res) => {
+      //   console.log("grammar.check", res);
+      // });
     }
 
     // Ограничиваем историю сообщений до 5 реплик с каждой стороны
@@ -337,21 +340,8 @@
         });
 
         messages.set(newMessages);
-      } else if (dataAr.result[$llang]?.cor) {
-        messages.update((msgs) => [
-          ...msgs,
-          {
-            id: crypto.randomUUID(),
-            role: "user",
-            text: "",
-            tr: dataAr.result[$langs]?.cor,
-            cor: dataAr.result[$llang]?.cor,
-            isTranslate: false,
-          },
-        ]);
-
         // Добавляем ответ AI в список
-      } else if (dataAr.result[$llang]?.msg) {
+      } else if (!dataAr.result[$llang]?.cor && dataAr.result[$llang]?.msg) {
         SpeakText(dataAr.result[$llang]?.msg);
 
         messages.update((msgs) => [
@@ -367,8 +357,18 @@
             repliesTranslated: dataAr.result[$langs]?.reply || [],
           },
         ]);
-
-        if (dataAr[$llang]?.words) words = dataAr[$llang]?.words;
+      } else if (dataAr.result[$llang]?.cor && dataAr.result[$llang]?.msg) {
+        messages.update((msgs) => [
+          ...msgs,
+          {
+            id: crypto.randomUUID(),
+            role: "user",
+            text: "",
+            tr: dataAr.result[$langs]?.cor,
+            cor: dataAr.result[$llang]?.cor,
+            isTranslate: false,
+          },
+        ]);
       } else {
         loading.set(false);
         // throw new Error("Нет ответа.");
@@ -580,7 +580,9 @@
 <div class="top-app-bar-container flexor">
   <TopAppBar bind:this={topAppBar} variant="fixed">
     <Row>
-      <Section align="start"></Section>
+      <Section align="start">
+        <div></div>
+      </Section>
       <Section align="start">
         <div>
           <IconButton
@@ -617,7 +619,7 @@
               style="position:absolute; margin:10px 5px 10px 5px; scale:1.1;width:30px"
             >
               {#if isEdit}
-                <path fill="grey" d={mdiCommentEditOutline} />
+                <path fill="white" d={mdiCommentOutline} />
               {:else}
                 <path fill="white" d={mdiCommentEditOutline} />
               {/if}
@@ -640,9 +642,9 @@
               style="position:absolute; margin:10px 5px 10px 5px; scale:1.1;width:30px"
             >
               {#if isText}
-                <path fill="grey" d={mdiCommentTextOutline} />
+                <path fill="white" d={mdiMessageOutline} />
               {:else}
-                <path fill="white" d={mdiCommentTextOutline} />
+                <path fill="white" d={mdiMessageTextOutline} />
               {/if}
             </Icon>
           </IconButton>
