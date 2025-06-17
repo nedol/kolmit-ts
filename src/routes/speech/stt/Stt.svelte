@@ -1,12 +1,15 @@
 <script lang="ts">
-  import { onMount, onDestroy, getContext } from 'svelte';
-  import { MediaRecorder } from 'extendable-media-recorder';
-  import type { IBlobEvent, IMediaRecorder } from 'extendable-media-recorder';
+  import { onMount, onDestroy, getContext } from "svelte";
+  import { MediaRecorder } from "extendable-media-recorder";
+  import type { IBlobEvent, IMediaRecorder } from "extendable-media-recorder";
   // import { CreateMLCEngine } from '@mlc-ai/web-llm';
 
-  export let SttResult:string, StopListening, display_audio:string, original:string;
+  export let SttResult: string,
+    StopListening,
+    display_audio: string,
+    original: string;
 
-  let operator = getContext('operator');
+  let operator = getContext("operator");
 
   // let MediaRecorder;
 
@@ -23,70 +26,73 @@
   const threshold = 10;
   const silenceDelay = 2000; //  секунды тишины
   let checkLoop = true;
-  let from_lang = 'en';
-  let to_lang = 'en';
+  let from_lang = "en";
+  let to_lang = "en";
 
   onMount(async () => {
-  try {
-    mediaStream = await navigator.mediaDevices.getUserMedia({
-      audio: {
-        echoCancellation: true,
-        noiseSuppression: true,
-        autoGainControl: true,
-        channelCount: 1,
-        sampleRate: 48000,
-        sampleSize: 16
-      }
-    });
+    startMicrophone();
+  });
 
-    if (!mediaStream) throw new Error("Не удалось получить MediaStream");
+  async function startMicrophone() {
+    try {
+      mediaStream = await navigator.mediaDevices.getUserMedia({
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true,
+          channelCount: 1,
+          sampleRate: 48000,
+          sampleSize: 16,
+        },
+      });
 
-    mediaRecorder = new MediaRecorder(mediaStream, { bitsPerSecond: 44100 });
+      if (!mediaStream) throw new Error("Не удалось получить MediaStream");
 
-    mediaRecorder.ondataavailable = (e) => {
-      audioChunks.push(e.data);
-    };
+      mediaRecorder = new MediaRecorder(mediaStream, { bitsPerSecond: 44100 });
 
-    mediaRecorder.onstop = () => {
-      stopRecording();
-      StopListening();
-    };
+      mediaRecorder.ondataavailable = (e) => {
+        audioChunks.push(e.data);
+      };
 
-    // **Добавляем инициализацию audioAnalyser**
-    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    const mediaStreamSource = audioContext.createMediaStreamSource(mediaStream);
-    
-    audioAnalyser = audioContext.createAnalyser();
-    audioAnalyser.fftSize = 256;
-    mediaStreamSource.connect(audioAnalyser);
+      mediaRecorder.onstop = () => {
+        stopRecording();
+        StopListening();
+      };
 
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    
-  } catch (error) {
-    console.error("Ошибка доступа к микрофону:", error);
-    alert("Пожалуйста, разрешите доступ к микрофону в настройках браузера.");
+      // **Добавляем инициализацию audioAnalyser**
+      const audioContext = new (window.AudioContext ||
+        window.webkitAudioContext)();
+      const mediaStreamSource =
+        audioContext.createMediaStreamSource(mediaStream);
+
+      audioAnalyser = audioContext.createAnalyser();
+      audioAnalyser.fftSize = 256;
+      mediaStreamSource.connect(audioAnalyser);
+
+      document.addEventListener("visibilitychange", handleVisibilityChange);
+    } catch (error) {
+      console.error("Ошибка доступа к микрофону:", error);
+      alert("Пожалуйста, разрешите доступ к микрофону в настройках браузера.");
+    }
   }
-});
 
   function handleVisibilityChange() {
     if (document.hidden) {
       stopMicrophone(); // освобождаем микрофон при уходе в фон
     } else {
       // 👉 только по запросу пользователя или, если разрешено, можно перезапустить
-      // startMicrophone(); // использовать только если auto-start допустим
+      startMicrophone(); // использовать только если auto-start допустим
       console.log("👀 Возвращение в активный режим");
     }
   }
 
- function stopMicrophone() {
+  function stopMicrophone() {
     if (mediaStream) {
-      mediaStream.getTracks().forEach(track => track.stop());
+      mediaStream.getTracks().forEach((track) => track.stop());
       console.log("⛔ Микрофон остановлен");
       mediaStream = null;
     }
   }
-
-
 
   export async function startAudioMonitoring(from, to) {
     from_lang = from;
@@ -99,29 +105,29 @@
       // 	mediaRecorder.stop();
       // }, 4000);
     } catch (error) {
-      console.error('Ошибка доступа к микрофону:', error);
+      console.error("Ошибка доступа к микрофону:", error);
     }
   }
 
   // Функция для проверки уровня аудио и управления записью
   function checkAudio() {
-    console.log('startRecording');
+    console.log("startRecording");
     const dataArray = new Uint8Array(audioAnalyser.frequencyBinCount);
     const checkSilence = () => {
       audioAnalyser.getByteFrequencyData(dataArray);
       const sum = dataArray.reduce((a, b) => a + b, 0);
       const average = sum / dataArray.length;
-      console.log('average:', average);
+      console.log("average:", average);
       if (average > threshold) {
-        console.log('threshold:', average);
+        console.log("threshold:", average);
         clearTimeout(silenceTimer);
-        silenceTimer = '';
-        console.log('silenceTimer after:', silenceTimer);
+        silenceTimer = "";
+        console.log("silenceTimer after:", silenceTimer);
       } else if (average <= threshold && isRecording) {
         if (!silenceTimer)
           silenceTimer = setTimeout(() => {
             MediaRecorderStop();
-            console.log('stopRecording:', average);
+            console.log("stopRecording:", average);
           }, silenceDelay);
       }
       if (checkLoop) {
@@ -138,7 +144,7 @@
 
   export function MediaRecorderStop() {
     isRecording = false;
-    silenceTimer = '';
+    silenceTimer = "";
     checkLoop = false;
     clearTimeout(silenceTimer);
     mediaRecorder.stop();
@@ -162,8 +168,7 @@
     if (audioChunks[len - 1]?.size > 0) {
       sendAudioToRecognition(audioChunks[len - 1]);
       audioUrl = URL.createObjectURL(audioChunks[len - 1]);
-      if(display_audio!=='none')
-        display_audio = 'block';
+      if (display_audio !== "none") display_audio = "block";
     }
 
     // mediaStream.getTracks().forEach(function (el) {
@@ -172,14 +177,14 @@
   }
 
   export async function sendLoadModel() {
-    fetch('/speech/stt', {
-      method: 'POST',
+    fetch("/speech/stt", {
+      method: "POST",
       // mode: 'no-cors',
       body: JSON.stringify({
-        load: 'model',
+        load: "model",
       }),
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
         // Authorization: `Bearer ${token}`
       },
     });
@@ -189,19 +194,19 @@
     //
     try {
       const headers = {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
         // Authorization: `Bearer ${token}`
       };
 
       const formData = new FormData();
-      formData.append('file', blob, 'audio.wav');
-      formData.append('from_lang', from_lang);
-      formData.append('to_lang', to_lang);
-      formData.append('operator', operator.operator);
-      formData.append('original', original);
+      formData.append("file", blob, "audio.wav");
+      formData.append("from_lang", from_lang);
+      formData.append("to_lang", to_lang);
+      formData.append("operator", operator.operator);
+      formData.append("original", original);
 
-      fetch('/speech/stt', {
-        method: 'POST',
+      fetch("/speech/stt", {
+        method: "POST",
         // mode: 'no-cors',
         body: formData,
         headers: { headers },
@@ -216,7 +221,7 @@
           return [];
         });
     } catch (error) {
-      console.log('Ошибка отправки аудио:', error);
+      console.log("Ошибка отправки аудио:", error);
     }
   }
 
@@ -227,34 +232,29 @@
   }
 
   onDestroy(() => {
-    mediaRecorder = '';
-    mediaStream = '';
-    audioAnalyser = '';
-    audioUrl = '';
-    audioPlayer = '';
-    audioChunks = '';
+    mediaRecorder = "";
+    mediaStream = "";
+    audioAnalyser = "";
+    audioUrl = "";
+    audioPlayer = "";
+    audioChunks = "";
     clearTimeout(silenceTimer);
   });
 </script>
 
-<div class="audio_container"  style="display:{display_audio}">
-<audio
-  bind:this={audioPlayer}
-  src={audioUrl}
-  controls
-
-></audio>
+<div class="audio_container" style="display:{display_audio}">
+  <audio bind:this={audioPlayer} src={audioUrl} controls></audio>
 </div>
 
 <!-- <button on:click={playAudio}>Воспроизвести</button> -->
 
 <style>
-  .audio_container{
+  .audio_container {
     position: relative;
-    height: 50px; 
+    height: 50px;
     margin: 0 auto;
   }
-  audio{
-    height:inherit
+  audio {
+    height: inherit;
   }
 </style>

@@ -5,6 +5,7 @@
   import Chat from "./operator/chat/Сhat.svelte";
   import { SignalingChannel } from "./signalingChannel.ts";
   import {
+    lesson,
     signal,
     langs,
     ice_conf,
@@ -144,8 +145,8 @@
       $view = "group";
       $showBottomAppBar = true;
     } else if (tab === tabs[0]) {
+      if ($view === "module") $lesson.data = { quiz: "" };
       $view = "module";
-      // $lesson.data = { quiz: "" };
     } else if (tab === tabs[2]) {
       chatComponent.Init();
       $view = "chat";

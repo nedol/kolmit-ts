@@ -157,6 +157,7 @@
   }
 
   export const Init = async (input) => {
+    isChat = false;
     fetch(
       `./lesson?bricks=${input.name}&theme=${input.theme}&owner=${input.abonent}&level=${input.level}`
     )
