@@ -294,7 +294,7 @@
     // Помечает точки конца предложения специальным маркером `[[SPLIT]]`
     function markSentenceBoundaries(text: string): string {
       return text.replace(
-        /(?<!\d)([.!?])(?!\d)(\s*)(?=<|\p{Lu}|<\/\w+>)/gu,
+        /([.!?])(\s*)(?=(<|\p{Lu}|<\/\w+>|$))/gu,
         (_, punct, space) => {
           return punct + "[[SPLIT]]" + space;
         }
