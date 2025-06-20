@@ -328,16 +328,18 @@
     return result;
   }
 
+  let to_word_speak: string;
+
   // Обработчик клика на слово
   const handleClick = (word: Word) => {
     rate.total++;
+
+    const cor_word = formattedSentence[focusedIndex].value
+      .toLowerCase()
+      .replace(/<[^>]*>/g, "");
+
     // Присваиваем выбранное слово фокусируемому элементу
-    if (
-      formattedSentence[focusedIndex].value
-        .toLowerCase()
-        .replace(/<[^>]*>/g, "") ===
-      word.value.toLowerCase().replace(/<[^>]*>/g, "")
-    ) {
+    if (cor_word === word.value.toLowerCase().replace(/<[^>]*>/g, "")) {
       let timeBonus = 0;
       if (responseTime <= 3) timeBonus = 10;
       else if (responseTime <= 5) timeBonus = 8;
@@ -349,6 +351,8 @@
         (isError ? 0 : isTip ? 0 : isTransloc ? 1 : 3) + // Перевод даёт меньше баллов
         (isColorised ? 1 : 2) + // Схема анализа даёт меньше баллов
         timeBonus; // Баллы за скорость
+
+      clearTimeout(to_word_speak);
 
       isCorrectSpanString = true;
 
@@ -369,6 +373,14 @@
         ];
         if (nextElement) {
           nextElement.focus();
+
+          to_word_speak = setTimeout(() => {
+            tts?.Speak_server(
+              $llang,
+              formattedSentence[focusedIndex].value,
+              ""
+            );
+          }, 7000);
         }
       });
 
@@ -379,6 +391,7 @@
     } else {
       formattedSentence[focusedIndex].word = word.value;
       formattedSentence[focusedIndex].class = "incorrect";
+
       isError = true;
     }
   };
@@ -387,6 +400,7 @@
   const checkCompletion = () => {
     // Если все элементы имеют класс "correct", вызываем функцию Speak
     if (formattedSentence.every((item) => item.class === "correct")) {
+      clearTimeout(to_word_speak);
       SpeakText();
     }
   };
