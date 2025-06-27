@@ -1,26 +1,43 @@
 <script lang="ts">
-  import { onMount, getContext, onDestroy } from 'svelte';
-  import { Transloc } from '../../translate/Transloc';
+  import { onMount, getContext, onDestroy } from "svelte";
+  import { Transloc } from "../../translate/Transloc";
 
-  import IconButton, { Icon } from '@smui/icon-button';
-  import Paper, { Title, Subtitle } from '@smui/paper';
-  import Accordion, { Panel, Header, Content } from '@smui-extra/accordion';
+  import IconButton, { Icon } from "@smui/icon-button";
+  import Paper, { Title, Subtitle } from "@smui/paper";
+  import Accordion, { Panel, Header, Content } from "@smui-extra/accordion";
 
-  import { langs, llang, dicts, dc_state } from '$lib/stores.ts';
+  import { langs, llang, dicts, dc_state } from "$lib/stores.ts";
 
-  import { mdiEarHearing } from '@mdi/js';
+  import { mdiEarHearing } from "@mdi/js";
 
   export let data, quiz, tts, onToggleWord;
 
-  let trans = '';
+  function newsToHTML(newsArray) {
+    return newsArray
+      .map((newsItem) => {
+        const contentText = newsItem.content.join(" ");
+
+        return `
+        <article>
+          <h4>${newsItem.title}</h4>
+          <p>${contentText}</p>
+        </article>
+      `;
+      })
+      .join("\n");
+  }
+
+  data.html = newsToHTML(data);
+
+  let trans = "";
 
   let touchStartTime = 0;
-  let playAutoColor = 'currentColor';
+  let playAutoColor = "currentColor";
 
   $: if (isPlayAuto) {
-    playAutoColor = 'green';
+    playAutoColor = "green";
   } else {
-    playAutoColor = 'currentColor';
+    playAutoColor = "currentColor";
   }
   let isPlayAuto = false;
 
@@ -67,8 +84,7 @@ article:hover {
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
   transition: all 0.3s ease-in-out;
 }`;
-let iframe;
-    
+  let iframe;
 
   function onTouchStart(event) {
     // Запомните время начала касания
@@ -84,14 +100,14 @@ let iframe;
     const touchEndTime = new Date().getTime();
     const touchDuration = touchEndTime - touchStartTime;
     if (touchDuration >= 500) {
-      if (selection && selection.toString().trim() !== '') {
-        if (event.target.attributes['trans']) {
+      if (selection && selection.toString().trim() !== "") {
+        if (event.target.attributes["trans"]) {
           x = rect.x;
           y = rect.y - 22 + window.scrollY;
           trans_div.style.top = `${y}px`;
           trans_div.style.left = `${x}px`;
-          trans_div.style.visibility = 'visible';
-          trans = event.target.attributes['trans'].nodeValue;
+          trans_div.style.visibility = "visible";
+          trans = event.target.attributes["trans"].nodeValue;
           await TTSSpeak(event.target.innerText);
           return;
         }
@@ -104,7 +120,7 @@ let iframe;
 
         trans_div.style.top = `${y}px`;
         trans_div.style.left = `${x}px`;
-        trans_div.style.visibility = 'visible';
+        trans_div.style.visibility = "visible";
       }
     }
   }
@@ -112,7 +128,6 @@ let iframe;
   function PlayAutoText(text) {
     isPlayAuto = !isPlayAuto;
     if (!isPlayAuto) return;
-
 
     const textAr = htmlToText(text).split(/(?<=[.!?])\s+/);
     let ind = 0;
@@ -122,13 +137,13 @@ let iframe;
 
     // Функция для преобразования HTML в текст
     function htmlToText(html) {
-      let tempDiv = document.createElement('div');
+      let tempDiv = document.createElement("div");
       tempDiv.innerHTML = html;
-      
-      const styles = tempDiv.querySelectorAll('style');
-      styles.forEach(style => style.remove());
 
-      return tempDiv.textContent || tempDiv.innerText || '';
+      const styles = tempDiv.querySelectorAll("style");
+      styles.forEach((style) => style.remove());
+
+      return tempDiv.textContent || tempDiv.innerText || "";
     }
 
     async function playNext() {
@@ -139,13 +154,13 @@ let iframe;
         originalSentence,
         $llang,
         $langs,
-        'context'
+        "context"
       ); // Вызов функции перевода
 
       // Озвучить перевод
       tts.Speak_server(
         $langs,
-        translatedSentence.replace(/['"<>]/g, ''),
+        translatedSentence.replace(/['"<>]/g, ""),
         data.name,
         onEndSpeakTranslocd
       );
@@ -169,27 +184,29 @@ let iframe;
     }
   }
 
-  function OnLoad(){
+  function OnLoad() {
     const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
 
     if (iframeDoc) {
-            // Проверяем, есть ли <head>
-        if (!iframeDoc.head) {
-            iframeDoc.documentElement.insertAdjacentHTML("afterbegin", "<head></head>");
-        }
-        const styleTag = iframeDoc.createElement("style");
-        styleTag.textContent  = style_color;
-        iframeDoc.head.appendChild(styleTag); // Вставляем стили в <head>
-        console.log("🎨 Стили успешно добавлены!");
-
+      // Проверяем, есть ли <head>
+      if (!iframeDoc.head) {
+        iframeDoc.documentElement.insertAdjacentHTML(
+          "afterbegin",
+          "<head></head>"
+        );
+      }
+      const styleTag = iframeDoc.createElement("style");
+      styleTag.textContent = style_color;
+      iframeDoc.head.appendChild(styleTag); // Вставляем стили в <head>
+      console.log("🎨 Стили успешно добавлены!");
     } else {
-        console.error("Не удалось получить contentDocument у iframe.");
+      console.error("Не удалось получить contentDocument у iframe.");
     }
   }
 </script>
 
 <div>
-  {#if $dc_state === 'close'}
+  {#if $dc_state === "close"}
     <div class="speaker-button">
       <IconButton
         on:click={() => {
@@ -201,7 +218,12 @@ let iframe;
         </Icon>
       </IconButton>
     </div>
-    <iframe bind:this={iframe} class="context" srcdoc={data.html} on:load={OnLoad}></iframe>
+    <iframe
+      bind:this={iframe}
+      class="context"
+      srcdoc={data.html}
+      on:load={OnLoad}
+    ></iframe>
   {/if}
 </div>
 
@@ -221,21 +243,19 @@ let iframe;
     z-index: 2;
   }
 
-  iframe.context{
-    position:absolute; 
+  iframe.context {
+    position: absolute;
     z-index: 2;
     width: 100vw;
-    height: calc(100vh - 56px - 45px - 50px); 
-    border:0;
-    overflow-y:auto;
+    height: calc(100vh - 56px - 45px - 50px);
+    border: 0;
+    overflow-y: auto;
     background-color: aliceblue;
     scrollbar-width: none; /* Firefox */
     -ms-overflow-style: none; /* IE и Edge */
   }
 
-
   .context::-webkit-scrollbar {
     display: none; /* Для Chrome, Safari и Opera */
   }
-
 </style>

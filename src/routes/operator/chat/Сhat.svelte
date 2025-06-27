@@ -32,6 +32,7 @@
   let blink_mic = writable(false);
 
   export let prompt_type = "greeting",
+    data,
     quiz = { quiz: "" },
     context: string[] = [];
 
@@ -121,7 +122,6 @@
 
   onMount(async () => {
     // Отправляем reminder при входе в компонент
-
     if (context[0]) sendMessage(`Begin een gesprek in het Nederlands.`);
     messages.update((msgs) => [
       ...msgs,
@@ -145,8 +145,8 @@
     $blink_mic = true;
   });
 
-  export function Init() {
-    console.log();
+  export function Init(data) {
+    console.log(data);
     if ($messages.length <= 1) {
       sendMessage(`Begin een gesprek in het Nederlands.`);
     }
@@ -223,25 +223,9 @@
       ? [{ role: "user", content: lastUserMessage.text }]
       : [];
 
-    if (text.length > 0) {
-      const params = {
-        func: "chat",
-        user_id: operator.operator,
-        prompt: `grammar.check.${$llang}`,
-        type: quiz?.quiz || "chat",
-        owner: operator.abonent,
-        name: quiz?.name || "chat",
-        text: text,
-      };
-
-      // $signal.SendMessage(params, (res) => {
-      //   console.log("grammar.check", res);
-      // });
-    }
-
     // Ограничиваем историю сообщений до 5 реплик с каждой стороны
     let conversationHistory = $messages
-      .slice(-20) // Берем последние 4 сообщений (2 от пользователя и 2 от AI)
+      .slice(-4) // Берем последние 4 сообщений (2 от пользователя и 2 от AI)
       .map((msg) => ({
         role: msg.role === "assistant" ? "assistant" : "user",
         content: msg.text,
@@ -310,9 +294,7 @@
 
       stt_text = "";
 
-      shownReplyTranslations = shownReplyTranslations.map((item) => {
-        item = false;
-      });
+      shownReplyTranslations = shownReplyTranslations.map(() => false);
 
       data.response = data.response
         .replace(/^```json\s*/i, "")
@@ -322,6 +304,8 @@
 
       // Получаем текущее состояние сообщений
       const currentMessages = get(messages);
+
+      elInput.style.height = "50px";
 
       // Проверка последнего сообщения
       const lastMsg = currentMessages[currentMessages.length - 1];
@@ -895,6 +879,7 @@
             resize: none;
             overflow: hidden;
             box-sizing: border-box;
+            height: 50px;
           "
       />
     {/await}

@@ -9,6 +9,8 @@
   // import Assistant from '../operator/chat/Assistant.svelte';
   import Bricks from "./quiz/bricks/Bricks.svelte";
 
+  import Chat from "../operator/chat/Сhat.svelte";
+
   import pkg from "lodash";
   const { find, findIndex, remove } = pkg;
   import IconButton, { Icon } from "@smui/icon-button";
@@ -62,6 +64,7 @@
   const operator = getContext("operator");
 
   let isProgress = true;
+  let isChat = false;
 
   const level = getContext("level");
 
@@ -124,7 +127,7 @@
   let module = "",
     main;
 
-  let bricksComponent;
+  let bricksComponent, chatComponent;
 
   let checked = { dialogs: {}, word: {} };
   let quiz_users = { dialogs: {}, word: {} };
@@ -192,8 +195,9 @@
     }
   });
 
-  function onClickQuiz(type, theme, name) {
+  function onClickQuiz(type, theme, name, level) {
     try {
+      console.log();
       data.theme = theme.name[$llang];
       lesson_data?.module.themes.map((theme) => {
         theme.new_cnt = 0;
@@ -207,7 +211,8 @@
       // main.scrollIntoView();
       main.scrollTo(0, -200);
 
-      bricksComponent.Init(data);
+      if (data.quiz === "bricks") bricksComponent.Init(data);
+      else if (data.quiz === "dialogs") chatComponent.Init(data);
 
       // if (ev.currentTarget.attributes['highlight'])
       //   data.highlight = ev.currentTarget.attributes['highlight'].value;
@@ -348,9 +353,13 @@
 
 <main bind:this={main}>
   <!-- {@debug data} -->
-  <div style="display: {data.quiz ? 'block' : 'none'}">
+  <div style="display: {data.quiz === 'bricks' ? 'block' : 'none'}">
     <Bricks bind:this={bricksComponent} {data} />
   </div>
+  <div style="display: {data.quiz === 'dialogs' ? 'block' : 'none'}">
+    <Chat quiz={data} bind:this={chatComponent} prompt_type="basic"></Chat>
+  </div>
+
   {#if module}
     <div style="display: {!module || data.quiz ? 'none' : 'block'}">
       {#each module.themes as theme, t}
@@ -509,7 +518,8 @@
                                           onClickQuiz(
                                             quiz.type,
                                             theme,
-                                            quiz.name[$llang]
+                                            quiz.name[$llang],
+                                            level
                                           );
                                         }}
                                         style="width:100%;font-size:medium;"
@@ -698,7 +708,8 @@
                                         onClickQuiz(
                                           quiz.type,
                                           theme,
-                                          quiz.name[$llang]
+                                          quiz.name[$llang],
+                                          level
                                         );
                                       }}
                                       style="width:100%;font-size:medium;"
@@ -849,7 +860,8 @@
                                     onClickQuiz(
                                       quiz.type,
                                       theme,
-                                      quiz.name[$llang]
+                                      quiz.name[$llang],
+                                      level
                                     );
                                   }}
                                   style="width:100%;font-size:medium;"
@@ -982,7 +994,8 @@
                                   onClickQuiz(
                                     quiz.type,
                                     theme,
-                                    quiz.name[$llang]
+                                    quiz.name[$llang],
+                                    level
                                   );
                                 }}
                                 style="width:100%;font-size:medium;"
@@ -1175,7 +1188,8 @@
                                       onClickQuiz(
                                         quiz.type,
                                         theme,
-                                        quiz.name[$llang]
+                                        quiz.name[$llang],
+                                        level
                                       );
                                     }}
                                     style="width:100%;font-size:medium;"
@@ -1363,9 +1377,9 @@
                                     on:click={() => {
                                       onClickQuiz(
                                         quiz.type,
-                                        level,
                                         theme,
-                                        quiz.name[$llang]
+                                        quiz.name[$llang],
+                                        level
                                       );
                                     }}
                                     style="width:100%;font-size:medium;"

@@ -110,7 +110,11 @@
 
   let curSentence = 0;
 
-  let cleanedSentences;
+  let curArticle = 0;
+
+  let globalSentenceIndex = 1;
+
+  let cleanedSentences: [string];
 
   // let speechData = '';
   let current_word = 0;
@@ -162,45 +166,20 @@
       `./lesson?bricks=${input.name}&theme=${input.theme}&owner=${input.abonent}&level=${input.level}`
     )
       .then((response) => response.json())
-      .then(async (data) => {
-        bricks_data = data.data;
-        // Преобразуем HTML в текст и разбиваем на массив предложений
-        // bricks_data.text = htmlToText(bricks_data.html).replaceAll('"','').split(/(?<=[.?!])\s+/);
-        bricks_data.text = splitIntoSentencesWithInnerTags(
-          data.data.data.replaceAll('"', "")
-        );
-        //.replaceAll('.','. '));//.replaceAll('"','').split(/(?<=[.?!])\s+/);
-
-        bricks_data.html = data.data.data;
-
-        // Собираем все предложения
-        const sentences = bricks_data.text;
-
-        // Убираем HTML-теги
-        cleanedSentences = sentences.map((sent_obj) =>
-          sent_obj.sentence.replace(/<[^>]*>/g, "")
-        );
-
-        // Функция для разделения массива на пакеты по 5 предложений
-        const chunkArray = (arr, size) =>
-          arr.reduce(
-            (chunks, _, i) =>
-              i % size === 0 ? [...chunks, arr.slice(i, i + size)] : chunks,
-            []
-          );
+      .then(async (resp) => {
+        bricks_data = resp.data;
 
         // Проверяем наличие curSentence
         if (typeof curSentence === "undefined" || !keys[curSentence]) {
           curSentence = 0;
         }
 
+        cleanedSentences = bricks_data[curArticle].content;
+
         // Текущее предложение
-        sentence = bricks_data.text[curSentence].sentence.replaceAll(".", "");
+        sentence = cleanedSentences[curSentence];
 
-        article_name =
-          bricks_data.text[curSentence].article ||
-          "\u00a0\u00a0\u00a0\u00a0\u00a0";
-
+        article_name = bricks_data[curArticle].title;
         // Получение озвучки через TTS
         // const { resp } = await tts.GetGoogleTTS($llang, sentence.replace(/<[^>]*>/g, ''), data?.name);
         // speechData = resp;
@@ -220,6 +199,13 @@
         return [];
       });
   };
+
+  function countTotalSentences(newsItems) {
+    if (newsItems)
+      return newsItems.reduce((total, item) => {
+        return total + item.content.length;
+      }, 0);
+  }
 
   const parseSentence = (text) => {
     // Удалить Markdown-обёртку
@@ -283,52 +269,7 @@
     return array;
   }
 
-  function splitIntoSentencesWithInnerTags(
-    html: string
-  ): { sentence: string; article: string }[] {
-    function removeEmojis(input: string): string {
-      const regex = emojiRegex();
-      return input.replace(regex, "");
-    }
-
-    // Помечает точки конца предложения специальным маркером `[[SPLIT]]`
-    function markSentenceBoundaries(text: string): string {
-      return text.replace(
-        /([.!?])(\s*)(?=(<|\p{Lu}|<\/\w+>|$))/gu,
-        (_, punct, space) => {
-          return punct + "[[SPLIT]]" + space;
-        }
-      );
-    }
-
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(html, "text/html");
-    const articles = doc.querySelectorAll("article");
-
-    const result: { sentence: string; article: string }[] = [];
-
-    articles.forEach((article) => {
-      const articleName = article.getAttribute("name") || "";
-      const rawHtml = removeEmojis(article.innerHTML.trim());
-
-      const marked = markSentenceBoundaries(rawHtml);
-      const sentences = marked
-        .split("[[SPLIT]]")
-        .map((s) => s.trim())
-        .filter(Boolean);
-
-      sentences.forEach((sentence) => {
-        result.push({
-          sentence,
-          article: articleName,
-        });
-      });
-    });
-
-    return result;
-  }
-
-  let to_word_speak: string;
+  let to_word_speak: number;
 
   // Обработчик клика на слово
   const handleClick = (word: Word) => {
@@ -380,7 +321,7 @@
               formattedSentence[focusedIndex].value,
               ""
             );
-          }, 7000);
+          }, words.length * 1000);
         }
       });
 
@@ -423,18 +364,22 @@
     isSynt = false;
     span_equal = true;
 
-    if (curSentence >= bricks_data.text.length) {
+    if (!cleanedSentences[curSentence]) {
       curSentence = 0;
+      curArticle++;
+      cleanedSentences = bricks_data[curArticle].content;
     }
 
-    sentence = bricks_data.text[curSentence].sentence;
+    sentence = cleanedSentences[curSentence];
 
     article_name =
-      bricks_data.text[curSentence].article || "\u00a0\u00a0\u00a0\u00a0\u00a0";
+      bricks_data[curArticle].title || "\u00a0\u00a0\u00a0\u00a0\u00a0";
 
     words = formatWords(sentence);
     // Создаём массив для предложения с placeholder'ами
     formattedSentence = formatWords(sentence);
+
+    globalSentenceIndex = getGlobalSentenceIndex();
 
     MakeBricks();
   };
@@ -524,7 +469,7 @@
       func: "synt",
       type: "bricks",
       lang: $llang,
-      context: bricks_data.text[curSentence].sentence,
+      context: bricks_data[curArticle].content[curSentence],
     };
 
     isSynt = false;
@@ -687,54 +632,50 @@
   }
 
   const toNextArticle = () => {
-    const arr = bricks_data.text;
+    const arr = bricks_data;
     isCorrectSpanString = false;
 
-    // Проверка на допустимый индекс текущего предложения
-    if (curSentence < 0 || curSentence >= arr.length) return;
+    curArticle++;
+    curSentence = 0;
 
-    const currentArticle = arr[curSentence].article;
-    let foundNextArticle = false;
-
-    // Поиск первого предложения из следующей статьи
-    for (let i = curSentence + 1; i < arr.length; i++) {
-      if (arr[i].article !== currentArticle) {
-        curSentence = i;
-        article_name = arr[i].article;
-        foundNextArticle = true;
-        break;
-      }
-    }
+    // // Проверка на допустимый индекс текущего предложения
+    // if (curSentence < 0 || curSentence >= arr.length) return;
 
     // Если следующая статья не найдена — перейти к первой
-    if (!foundNextArticle) {
-      curSentence = 0;
-      article_name = arr[0].article;
+    if (!bricks_data[curArticle].content) {
+      curArticle = 0;
     }
 
-    sentence = bricks_data.text[curSentence].sentence;
+    cleanedSentences = bricks_data[curArticle].content;
+    sentence = cleanedSentences[curArticle];
     words = formatWords(sentence);
     formattedSentence = formatWords(sentence);
+    article_name =
+      bricks_data[curArticle].title || "\u00a0\u00a0\u00a0\u00a0\u00a0";
 
     span_equal = true;
+
+    globalSentenceIndex = getGlobalSentenceIndex();
 
     MakeBricks(); // Генерация кирпичей для новой статьи
   };
 
   const getCurrentArticle = () => {
-    const arr = bricks_data.text;
-    if (curSentence < 0 || curSentence >= arr.length) return null;
+    if (curSentence < 0 || curSentence >= globalSentenceIndex) return null;
 
-    let currentArticle = arr[curSentence].article;
-
-    const article = arr
-      .filter((item) => item.article === currentArticle)
-      .map((item) => item.sentence);
-    return article;
+    return bricks_data[curArticle].content;
   };
 
+  function getGlobalSentenceIndex() {
+    let count = 0;
+    for (let i = 0; i < curArticle; i++) {
+      count += bricks_data[i].content.length;
+    }
+    return count + curSentence + 1;
+  }
+
   function saveRate() {
-    const validData = bricks_data.text.filter(
+    const validData = bricks_data.filter(
       (sentence) => sentence.cnt !== undefined && sentence.total > 0
     );
 
@@ -806,7 +747,7 @@
     <TopAppBar bind:this={topAppBar} variant="fixed">
       <Row>
         <Section align="start">
-          {#if curSentence > 0}
+          {#if globalSentenceIndex >= 0}
             <Icon
               tag="svg"
               on:click={() => {
@@ -938,13 +879,13 @@
             <span
               class="mdc-typography--overline"
               style="position:relative;top:4px"
-              >{1 + curSentence}
+              >{globalSentenceIndex}
               <Badge
                 position="middle"
                 align="bottom-end - bottom-middle"
                 aria-label="unread count"
                 style="position:relative;right:-10px;scale:.8;top:-24px"
-                >{bricks_data?.text?.length}</Badge
+                >{countTotalSentences(bricks_data)}</Badge
               >
             </span>
           </div>
@@ -1024,7 +965,7 @@
 
   <!-- <div class="card"> -->
 
-  {#if bricks_data?.data}
+  {#if bricks_data && bricks_data[curArticle].theme}
     <div class="bricks-header">
       <span
         class="bricks_name"
@@ -1045,7 +986,7 @@
           isTip = true;
         }}
       >
-        {bricks_data?.name}
+        {bricks_data[curArticle].theme}
       </span>
       <span class="bricks_name">></span>
 

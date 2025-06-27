@@ -706,11 +706,11 @@ interface GetBricksQuery {
 
 interface Brick {
   id: string;
-  name: string;
+  title: string;
   owner: string;
   level: string;
   theme: string;
-  context?: string; // Context data to be added if available
+  content?: string; // Context data to be added if available
 }
 
 interface Context {
@@ -731,19 +731,28 @@ export async function GetBricks(q: GetBricksQuery): Promise<Brick | Brick[] | st
 
     // Fetch brick data based on provided filters
     let bricksResult = await sql<Brick[]>`
-      SELECT b.*
-      FROM bricks b
-      WHERE b.owner = ${q.owner} 
-        AND b.level = ${q.level} 
-        AND b.theme = ${q.theme}
-        ${q.name ? sql`AND b.name = ${q.name}` : sql``}
+      SELECT title, content, theme
+      FROM articles 
+      WHERE owner = ${q.owner} 
+        AND level = ${q.level} 
+        ${q.name ? sql`AND theme = ${q.name}` : sql``}
     `;
 
-    res = bricksResult[0]||{}
+    // // Fetch brick data based on provided filters
+    // let bricksResult = await sql<Brick[]>`
+    //   SELECT b.*
+    //   FROM bricks b
+    //   WHERE b.owner = ${q.owner} 
+    //     AND b.level = ${q.level} 
+    //     AND b.theme = ${q.theme}
+    //     ${q.name ? sql`AND b.name = ${q.name}` : sql``}
+    // `;
+
+    res = bricksResult||{}
 
     // If contextResult and bricksResult exist, add context to the first brick
     if (contextResult[0]) {
-      res.context = contextResult[0].data;
+      res.content = contextResult[0].data;
     }
 
     // Return either a single brick or an array of bricks
