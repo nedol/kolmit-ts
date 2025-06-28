@@ -181,8 +181,7 @@
 
         article_name = bricks_data[curArticle].title;
         // Получение озвучки через TTS
-        // const { resp } = await tts.GetGoogleTTS($llang, sentence.replace(/<[^>]*>/g, ''), data?.name);
-        // speechData = resp;
+        tts.Speak_server($llang, sentence, "", "");
 
         // Разбиваем на слова
         words = formatWords(sentence);
@@ -372,6 +371,8 @@
 
     sentence = cleanedSentences[curSentence];
 
+    tts.Speak_server($llang, sentence, "", "");
+
     article_name =
       bricks_data[curArticle].title || "\u00a0\u00a0\u00a0\u00a0\u00a0";
 
@@ -395,7 +396,7 @@
       .join(" ");
   }
 
-  const SpeakText = async () => {
+  const SpeakText = async (text = "") => {
     async function onEndSpeak() {
       endSpeak();
       audio = "";
@@ -414,7 +415,7 @@
     );
 
     if (textToSpeak) {
-      tts.Speak_server($llang, textToSpeak, "", onEndSpeak);
+      tts.Speak_server($llang, textToSpeak, "", text ? "" : onEndSpeak);
 
       // const speechData = resp.resp;
       // audio = new Audio(speechData.audio);
