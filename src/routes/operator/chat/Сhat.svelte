@@ -237,10 +237,9 @@
     const params = {
       func: "chat",
       user_id: operator.operator,
-      type: quiz?.quiz || "chat",
+      type: quiz?.quiz || "basic",
       name: quiz?.name || "chat",
       owner: operator.abonent,
-      prompt: `chat.${prompt_type}.${$llang}`,
       conversationHistory,
       context: context,
       words: words,
@@ -262,7 +261,7 @@
 
   async function handleData(data) {
     try {
-      if (data.response.tokens_limit) {
+      if (data?.response?.tokens_limit) {
         const msg = await Transloc(
           "Вы достигли суточного лимита сообщений.",
           "ru",
