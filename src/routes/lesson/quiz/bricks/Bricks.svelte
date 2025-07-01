@@ -648,7 +648,7 @@
     }
 
     cleanedSentences = bricks_data[curArticle].content;
-    sentence = cleanedSentences[curArticle];
+    sentence = cleanedSentences[curSentence];
     words = formatWords(sentence);
     formattedSentence = formatWords(sentence);
     article_name =

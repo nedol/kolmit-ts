@@ -148,8 +148,8 @@
       if ($view === "module") $lesson.data = { quiz: "" };
       $view = "module";
     } else if (tab === tabs[2]) {
-      chatComponent.Init();
       $view = "chat";
+      chatComponent.Init();
       // $lesson.data = { quiz: "" };
     }
   }

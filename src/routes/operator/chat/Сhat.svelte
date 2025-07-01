@@ -123,6 +123,7 @@
   onMount(async () => {
     // Отправляем reminder при входе в компонент
     if (context[0]) sendMessage(`Begin een gesprek in het Nederlands.`);
+
     messages.update((msgs) => [
       ...msgs,
       {
@@ -225,7 +226,7 @@
 
     // Ограничиваем историю сообщений до 5 реплик с каждой стороны
     let conversationHistory = $messages
-      .slice(-4) // Берем последние 4 сообщений (2 от пользователя и 2 от AI)
+      .slice(-10) // Берем последние 10 сообщений (2 от пользователя и 2 от AI)
       .map((msg) => ({
         role: msg.role === "assistant" ? "assistant" : "user",
         content: msg.text,
@@ -771,7 +772,7 @@
             </div>
           {/if}
 
-          {#if message.role === "assistant" || message.role === "system"}
+          {#if message.role === "assistant"}
             <div on:click={() => toggleTranslation(message, index)}>
               <IconButton>
                 <Icon tag="svg" viewBox="0 0 24 24">
