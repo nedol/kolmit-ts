@@ -112,7 +112,7 @@
 
   let curArticle = 0;
 
-  let globalSentenceIndex = 1;
+  let globalSentenceIndex = 0;
 
   let cleanedSentences: [string];
 
@@ -347,9 +347,20 @@
 
   const navSentence = async (nav) => {
     if (nav === "prev") {
-      --curSentence;
+      if (curSentence > 0) --curSentence;
+      else {
+        curArticle--;
+        curSentence = bricks_data[curArticle].content.length - 1;
+        cleanedSentences = bricks_data[curArticle].content;
+      }
     } else if (nav === "next") {
-      ++curSentence;
+      if (bricks_data[curArticle].content.length - 1 > curSentence) {
+        ++curSentence;
+      } else {
+        curArticle++;
+        cleanedSentences = bricks_data[curArticle].content;
+        curSentence = 0;
+      }
     }
 
     saveRate();
@@ -362,12 +373,6 @@
     isTip = false;
     isSynt = false;
     span_equal = true;
-
-    if (!cleanedSentences[curSentence]) {
-      curSentence = 0;
-      curArticle++;
-      cleanedSentences = bricks_data[curArticle].content;
-    }
 
     sentence = cleanedSentences[curSentence];
 
@@ -672,7 +677,7 @@
     for (let i = 0; i < curArticle; i++) {
       count += bricks_data[i].content.length;
     }
-    return count + curSentence + 1;
+    return count + curSentence;
   }
 
   function saveRate() {
@@ -748,33 +753,25 @@
     <TopAppBar bind:this={topAppBar} variant="fixed">
       <Row>
         <Section align="start">
-          {#if globalSentenceIndex >= 0}
-            <Icon
-              tag="svg"
-              on:click={() => {
-                navSentence("prev");
-              }}
-              viewBox="0 0 24 24"
-              style="margin:10px 5px 10px 5px; scale:1.3; width:20px; visibility: {curSentence >
-              0
-                ? 'visible'
-                : 'hidden'}"
-            >
-              <path
-                fill="white"
-                stroke="white"
-                stroke-width="1.5"
-                stroke-linejoin="round"
-                d={mdiArrowLeft}
-              />
-            </Icon>
-          {:else}
-            <Icon
-              tag="svg"
-              viewBox="0 0 24 24"
-              style="margin:10px 5px 10px 5px; scale:1.3; width:20px; visibility: hidden;"
+          <Icon
+            tag="svg"
+            on:click={() => {
+              navSentence("prev");
+            }}
+            viewBox="0 0 24 24"
+            style="margin:10px 5px 10px 5px; scale:1.3; width:20px; visibility: {globalSentenceIndex ===
+            0
+              ? 'hidden'
+              : 'visible'}"
+          >
+            <path
+              fill="white"
+              stroke="white"
+              stroke-width="1.5"
+              stroke-linejoin="round"
+              d={mdiArrowLeft}
             />
-          {/if}
+          </Icon>
         </Section>
         <Section align="start">
           <div>
@@ -880,7 +877,7 @@
             <span
               class="mdc-typography--overline"
               style="position:relative;top:4px"
-              >{globalSentenceIndex}
+              >{globalSentenceIndex + 1}
               <Badge
                 position="middle"
                 align="bottom-end - bottom-middle"
