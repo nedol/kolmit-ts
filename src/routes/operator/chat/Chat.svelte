@@ -148,9 +148,10 @@
 
   export function Init(data) {
     console.log(data);
-    if ($messages.length <= 1) {
-      sendMessage(`Begin een gesprek in het Nederlands.`);
-    }
+    $messages = [];
+    // if ($messages.length <= 1) {
+    sendMessage(`Begin een gesprek in het Nederlands.`);
+    // }
 
     if (context[0])
       messages.update((msgs) => [
@@ -757,6 +758,25 @@
               <IconButton>
                 <Icon tag="svg" viewBox="0 0 24 24" style="scale:1">
                   <path fill="#007bff" d={mdiPlay} />
+                </Icon>
+              </IconButton>
+            </div>
+          {/if}
+          {#if message.role === "system" && message.text.length > 0}
+            <div on:click={() => toggleTranslation(message, index)}>
+              <IconButton>
+                <Icon tag="svg" viewBox="0 0 24 24">
+                  {#if message.isTranslate}
+                    <path
+                      fill={message.role === "user" ? "red" : "currentColor"}
+                      d={mdiTranslate}
+                    />
+                  {:else}
+                    <path
+                      fill={message.role === "user" ? "red" : "currentColor"}
+                      d={mdiTranslateOff}
+                    />
+                  {/if}
                 </Icon>
               </IconButton>
             </div>

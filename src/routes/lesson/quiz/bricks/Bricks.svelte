@@ -20,7 +20,7 @@
   import IconButton, { Icon } from "@smui/icon-button";
   import Badge from "@smui-extra/badge";
   import CircularProgress from "@smui/circular-progress";
-  import Chat from "../../../operator/chat/Сhat.svelte";
+  import Chat from "../../../operator/chat/Chat.svelte";
   import Assistant from "../../../operator/chat/Assistant.svelte";
   import Container from "./Container.svelte";
 
@@ -667,9 +667,7 @@
   };
 
   const getCurrentArticle = () => {
-    if (curSentence < 0 || curSentence >= globalSentenceIndex) return null;
-
-    return bricks_data[curArticle].content;
+    return bricks_data[curArticle].content || "";
   };
 
   function getGlobalSentenceIndex() {

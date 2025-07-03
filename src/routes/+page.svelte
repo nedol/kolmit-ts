@@ -2,7 +2,7 @@
   import { onMount, setContext } from "svelte";
   import Operator from "./operator/Operator.svelte";
   import Login from "./site/Login.svelte";
-  import Chat from "./operator/chat/Сhat.svelte";
+  import Chat from "./operator/chat/Chat.svelte";
   import { SignalingChannel } from "./signalingChannel.ts";
   import {
     lesson,
@@ -84,9 +84,9 @@
 
   async function loadTabs() {
     tabs = [
+      await Transloc("АССИСТЕНТ", "ru", $langs, ""),
       await Transloc("УРОК", "ru", $langs, ""),
       await Transloc("ЧАТ", "ru", $langs, ""),
-      await Transloc("АССИСТЕНТ", "ru", $langs, ""),
     ];
   }
 
@@ -144,10 +144,10 @@
     if (tab === tabs[1]) {
       $view = "group";
       $showBottomAppBar = true;
-    } else if (tab === tabs[0]) {
+    } else if (tab === tabs[2]) {
       if ($view === "module") $lesson.data = { quiz: "" };
       $view = "module";
-    } else if (tab === tabs[2]) {
+    } else if (tab === tabs[0]) {
       $view = "chat";
       chatComponent.Init();
       // $lesson.data = { quiz: "" };

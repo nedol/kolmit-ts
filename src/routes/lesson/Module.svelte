@@ -9,7 +9,7 @@
   // import Assistant from '../operator/chat/Assistant.svelte';
   import Bricks from "./quiz/bricks/Bricks.svelte";
 
-  import Chat from "../operator/chat/Сhat.svelte";
+  import Chat from "../operator/chat/Chat.svelte";
 
   import pkg from "lodash";
   const { find, findIndex, remove } = pkg;
