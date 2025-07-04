@@ -141,10 +141,10 @@
   }
 
   async function OnClickTab(tab) {
-    if (tab === tabs[1]) {
+    if (tab === tabs[2]) {
       $view = "group";
       $showBottomAppBar = true;
-    } else if (tab === tabs[2]) {
+    } else if (tab === tabs[1]) {
       if ($view === "module") $lesson.data = { quiz: "" };
       $view = "module";
     } else if (tab === tabs[0]) {

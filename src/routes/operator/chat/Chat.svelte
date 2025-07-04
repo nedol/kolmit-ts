@@ -297,11 +297,7 @@
 
       shownReplyTranslations = shownReplyTranslations.map(() => false);
 
-      data.response = data.response
-        .replace(/^```json\s*/i, "")
-        .replace(/```$/, "");
-
-      dataAr = JSON.parse(data.response);
+      dataAr = data.response;
 
       // Получаем текущее состояние сообщений
       const currentMessages = get(messages);
@@ -460,10 +456,16 @@
   }
 
   const SpeakText = async (text: string) => {
-    const output = text.replace(/<[^>]*>/g, "");
-
     if (text && isHearing) {
-      tts.Speak_server($llang, output, "", "");
+      if (dataAr.result[$llang].audio) {
+        const audio = new Audio(dataAr.result[$llang].audio);
+        audio.playbackRate = 0.9;
+        audio.load();
+        audio.play();
+      } else {
+        const output = text.replace(/<[^>]*>/g, "");
+        tts?.Speak_server($llang, output, "", "");
+      }
     }
   };
 

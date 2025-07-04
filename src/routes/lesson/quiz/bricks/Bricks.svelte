@@ -345,49 +345,63 @@
     }
   };
 
+  // Навигация по предложениям
   const navSentence = async (nav) => {
-    if (nav === "prev") {
-      if (curSentence > 0) --curSentence;
-      else {
-        curArticle--;
-        curSentence = bricks_data[curArticle].content.length - 1;
-        cleanedSentences = bricks_data[curArticle].content;
+    try {
+      if (nav === "prev") {
+        if (curSentence > 0) --curSentence;
+        else {
+          curArticle--;
+
+          if (bricks_data[curArticle] === undefined) {
+            curArticle = 0;
+            curSentence = 0;
+          }
+          curSentence = bricks_data[curArticle].content.length - 1;
+          cleanedSentences = bricks_data[curArticle].content;
+        }
+      } else if (nav === "next") {
+        if (bricks_data[curArticle].content.length - 1 > curSentence) {
+          ++curSentence;
+        } else {
+          curArticle++;
+          if (bricks_data[curArticle] === undefined) {
+            curArticle = 0;
+            curSentence = 0;
+          }
+          cleanedSentences = bricks_data[curArticle].content;
+          curSentence = 0;
+        }
       }
-    } else if (nav === "next") {
-      if (bricks_data[curArticle].content.length - 1 > curSentence) {
-        ++curSentence;
-      } else {
-        curArticle++;
-        cleanedSentences = bricks_data[curArticle].content;
-        curSentence = 0;
-      }
+
+      saveRate();
+
+      current_word = 0;
+      focusedIndex = 0;
+      stt_text = "";
+      similarity = "";
+      isCorrectSpanString = false;
+      isTip = false;
+      isSynt = false;
+      span_equal = true;
+
+      sentence = cleanedSentences[curSentence];
+
+      tts.Speak_server($llang, sentence, "", "");
+
+      article_name =
+        bricks_data[curArticle].title || "\u00a0\u00a0\u00a0\u00a0\u00a0";
+
+      words = formatWords(sentence);
+      // Создаём массив для предложения с placeholder'ами
+      formattedSentence = formatWords(sentence);
+
+      globalSentenceIndex = getGlobalSentenceIndex();
+
+      MakeBricks();
+    } catch (error) {
+      console.error("Error in navSentence:", error);
     }
-
-    saveRate();
-
-    current_word = 0;
-    focusedIndex = 0;
-    stt_text = "";
-    similarity = "";
-    isCorrectSpanString = false;
-    isTip = false;
-    isSynt = false;
-    span_equal = true;
-
-    sentence = cleanedSentences[curSentence];
-
-    tts.Speak_server($llang, sentence, "", "");
-
-    article_name =
-      bricks_data[curArticle].title || "\u00a0\u00a0\u00a0\u00a0\u00a0";
-
-    words = formatWords(sentence);
-    // Создаём массив для предложения с placeholder'ами
-    formattedSentence = formatWords(sentence);
-
-    globalSentenceIndex = getGlobalSentenceIndex();
-
-    MakeBricks();
   };
 
   function getCorrectSpanString(isCorrect) {
@@ -410,7 +424,7 @@
     const endSpeak = () => {
       if (isEndSpeak === true)
         setTimeout(() => {
-          if (!isSTT) navSentence(++curSentence);
+          if (!isSTT) navSentence("next");
         }, 500);
       isEndSpeak = true;
     };
@@ -638,7 +652,6 @@
   }
 
   const toNextArticle = () => {
-    const arr = bricks_data;
     isCorrectSpanString = false;
 
     curArticle++;
@@ -648,8 +661,9 @@
     // if (curSentence < 0 || curSentence >= arr.length) return;
 
     // Если следующая статья не найдена — перейти к первой
-    if (!bricks_data[curArticle].content) {
+    if (!bricks_data[curArticle]) {
       curArticle = 0;
+      return;
     }
 
     cleanedSentences = bricks_data[curArticle].content;
