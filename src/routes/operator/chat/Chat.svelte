@@ -857,7 +857,10 @@
   </div>
 
   <div class="input-container">
-    <div class:blink={$blink_mic} style="margin-right:10px; ">
+    <div
+      class:blink={$blink_mic}
+      style="position:absolute; margin-right:10px; "
+    >
       <IconButton
         class="material-icons"
         aria-label="Back"
@@ -895,6 +898,7 @@
         style="
             width: 100%;
             padding: 10px;
+            text-indent: 40px; 
             font-size: 16px;
             line-height: 1.4;
             border: 1px solid #ccc;

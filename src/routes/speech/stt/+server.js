@@ -14,7 +14,7 @@ import { Transloc } from '../../translate/Transloc';
 
 import { Client } from '@gradio/client';
 
-import axios from 'axios';
+import speech from '@google-cloud/speech';
 
 import {SaveSTT} from '../../../lib/server/db';
 
@@ -86,14 +86,12 @@ export async function POST({ url, fetch, cookies, request }) {
 
     // const result = await queryHF(buffer);?
 
-    const result = await stt_karim_space(blob, from_lang, to_lang);//!
+    // const result = await stt_karim_space(blob, from_lang, to_lang);//!
 
     // const result = await stt_mms(blob, from_lang, to_lang);//!
 
 
-    // const result = await transcribeAudio(arrayBuffer,from_lang);
-
-   
+    const result = await stt_google(nodeBuffer,from_lang);   
 
     if (result) {
       resp = {
@@ -115,8 +113,6 @@ export async function POST({ url, fetch, cookies, request }) {
   }
 
   console.log(resp);
-
-
 
   let response = new Response(JSON.stringify({ resp }));
   response.headers.append('Access-Control-Allow-Origin', `*`);
@@ -173,113 +169,7 @@ const transcribeAudio = async(arrayBuffer, language) => {
   });
 };
 
-async function stt_sm4_space(blob, from_lang, to_lang) {
 
-  const app = await Client.connect( "facebook-seamless-m4t.hf.space/--replicas/ryeyq/");
-  const app_info = await app.view_api();
-  const from = ISO6391.getName(from_lang);
-  let result;
-  try{
-    result = await app.predict("/run", [		
-      "(S2TT,S2TT)", 
-      "file", // string  in 'Audio source' Radio component
-      blob, 	// blob in 'Input speech' Audio component
-      blob, 	// blob in 'Input speech' Audio component		
-      "Howdy!",	
-      `('${from}','${from}')`, 
-      `('${from}','${from}')`
-    ]);
-  }catch(ex){
-    console.log(ex)
-  }
- return result?.data;
-}
-
-
-async function stt_bluman(blob, from_lang, to_lang) {
-
-  const app = new Client(
-    'bluman1/seamless-m4t-v2-large-fixing'
-  );
- const app_info = await app.view_api();
- const from = ISO6391.getName(from_lang);
-  const to = ISO6391.getName(to_lang);
- const result = await app.predict('/s2tt', [
-   blob, // blob in 'Input speech' Audio component
-   from, // string  in 'Source language' Dropdown component
-   from, // string  in 'Target language' Dropdown component
- ]);
- return result.data[0];
-}
-
-async function stt_whisper(blob, from_lang, to_lang) {
-  const response = await fetch(
-    "https://api-inference.huggingface.co/models/openai/whisper-large-v3",
-    // "https://api-inference.huggingface.co/models/openai/whisper-small",
-    {
-      headers: {
-        Authorization: "Bearer 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",
-        "Content-Type": "application/json",
-      },
-      method: "POST",
-      body: blob,
-    }
-  );
-  const result  = await response.json();
-  return result.text;
-}
-
-async function stt_whisper_space(blob, from_lang, to_lang) {
-
-  const app = await Client.connect(
-    'https://openai-whisper.hf.space/'
-  );
-
-  // const audioArrayBuffer = await blob.arrayBuffer();
-
-  // const response_0 = await fetch("https://github.com/gradio-app/gradio/raw/main/test/test_files/audio_sample.wav");
-  // const exampleAudio = await response_0.blob();
-
-  const result = await app.predict('/predict', [
-    blob, // blob in 'Input speech' Audio component
-    "transcribe"
-  ]);
-  return result.data;
-}
-
-async function stt_sm4(blob, from_lang, to_lang) {
-
-  // Конвертируем Blob в ArrayBuffer
-  const audioArrayBuffer = await blob.arrayBuffer();
-
-  const response = await axios.post(
-    'https://api-inference.huggingface.co/models/facebook/wav2vec2-large-960h',
-    audioArrayBuffer,
-    {
-      headers: {
-        Authorization: `Bearer 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`,
-        'Content-Type': 'audio/wav', // Укажите правильный тип контента для вашего аудиофайла
-      },
-    }
-  );
-
-  return response.data.text;
-}
-
-
-async function stt_mms(arrayBuffer, from_lang, to_lang) {
-  try {
-    const app = await Client.connect('Nymbo/MMS');
-    const result = await app.predict('/predict', {
-      audio_data: arrayBuffer,
-      lang: 'nld (Dutch)'
-    });
-    return result.data[0];
-  } catch (error) {
-    console.error('Error in stt_mms:', error);
-    throw error; // Пробрасываем ошибку дальше, если нужно
-  }
-}
 
 // const client = await Client.connect("rafaaa2105/crisper-whisper");
 const client = await Client.connect("karim23657/Persian_Automatic_Speech_Recognition-asr");
@@ -306,124 +196,35 @@ async function stt_karim_space(arrayBuffer,  from_lang, to_lang) {
   }
 }
 
+async function stt_google(arrayBuffer,  from_lang, to_lang) {
 
-
-async function stt_as(audioUrl) {
-  const params = {
-    audio: audioUrl,
-  };
-  const transcript = await client.transcripts.transcribe(params);
-  return transcript;
-}
-
-async function stt(arrayBuffer, from_lang) {
-  try {
-    return await inference.automaticSpeechRecognition({
-      data: arrayBuffer,
-      model: 'openai/whisper-large-v3',
-    });
-  } catch (ex) {
-    console.log(ex);
-  }
-}
-
-async function stt_nl(arrayBuffer, from_lang) {
-  try {
-    const result =  await inference.automaticSpeechRecognition({
-      data: arrayBuffer,
-      model: 'golesheed/whisper-9-dutch',
-    });
-    return result.text;
-  } catch (ex) {
-    console.log(ex);
-  }
-}
-
-async function stt_en(arrayBuffer, from_lang) {
-  try {
-    return await inference.automaticSpeechRecognition({
-      data: arrayBuffer,
-      model: 'openai/whisper-large-v3',
-      language: from_lang,
-    });
-  } catch (ex) {
-    console.log(ex);
-  }
-}
-
-async function queryHF(data) {
-  const response = await fetch(
-    'https://api-inference.huggingface.co/models/GerwinVanGiessen/whisper-base-nl-1',//3
-    // 'https://api-inference.huggingface.co/models/openai/whisper-large-v3', //English 5!
-    // 'https://api-inference.huggingface.co/models/hannatoenbreker/whisper-dutch', //0
-    // 'https://api-inference.huggingface.co/models/renesteeman/whisper-tiny-dutch',//3
-    // 'https://api-inference.huggingface.co/models/nithinholla/wav2vec2-large-xlsr-53-dutch',//3
-    // 'https://api-inference.huggingface.co/models/jonatasgrosman/wav2vec2-xls-r-1b-dutch',//0
-    // 'https://api-inference.huggingface.co/models/jonatasgrosman/wav2vec2-large-xlsr-53-dutch',//0
-    // 'https://api-inference.huggingface.co/models/simonsr/wav2vec2-large-xlsr-dutch',//1
-    // 'https://api-inference.huggingface.co/models/wietsedv/wav2vec2-large-xlsr-53-dutch',//2
-    // 'https://api-inference.huggingface.co/models/bartelds/wav2vec2-dutch-large-ft-cgn-3hrs',//0
-    // 'https://api-inference.huggingface.co/models/MehdiHosseiniMoghadam/wav2vec2-large-xlsr-53-Dutch',//2
-    // "https://api-inference.huggingface.co/models/Clementapa/wav2vec2-base-960h-phoneme-reco-dutch",//0
-    // 'https://api-inference.huggingface.co/models/hannatoenbreker/whisper-dutch-small-v2',//!!!русский 5!!!
-    // 'https://api-inference.huggingface.co/models/renesteeman/whisper-tiny-dutch',//3
-    // 'https://api-inference.huggingface.co/models/renesteeman/whisper-tiny-dutch-25',//3
-    // 'https://api-inference.huggingface.co/models/golesheed/whisper-non-native-children-0-dutch',//0
-    // 'https://api-inference.huggingface.co/models/golesheed/whisper-non-native-adult-6-dutch', //English 5!
-    // 'https://api-inference.huggingface.co/models/golesheed/whisper-9-dutch', // 5!!
+  try{
     
+    const client = new speech.SpeechClient();
+    // const audioBytes = fs.readFileSync(filePath).toString('base64');
 
-    {
-      headers: {
-        Authorization: 'Bearer '+ HF_TOKEN,
-        language: 'nl',
-      },
-      method: 'POST',
-      body: data,
-    }
-  );
-  const result = await response.json();
-  return result.text;
-}
+    const audio = {
+      content: arrayBuffer,
+    };
+    const config = {
+      encoding: 'WEBM_OPUS', // Убедитесь, что это соответствует кодированию вашего аудио
+      sampleRateHertz: 48000, // Убедитесь, что это соответствует частоте дискретизации вашего аудио
+      languageCode: 'nl-BE', // Измените на желаемый язык (например, 'en-US' для английского)
+    };
 
-async function queryFF(text) {
-  const url = 'https://api.forefront.ai/v1/chat/completions';
-  const api_key = process.env.FOREFRONT_API_KEY;
+    const request = {
+      audio: audio,
+      config: config,
+    };
 
-  const options = {
-    method: 'POST',
-    headers: {
-      'content-type': 'application/json',
-      authorization: 'Bearer ${api_key}',
-    },
-    body: JSON.stringify({
-      model: 'beowolx/CodeNinja-1.0-OpenChat-7B',
-      messages: [
-        {
-          role: 'user',
-          content: text,
-        },
-      ],
-      max_tokens: 128,
-      temperature: 0.5,
-    }),
-  };
-
-  try {
-    const response = fetch(url, options);
-    return await response.json();
-  } catch (error) {
-    console.error(error);
-  }
-}
-
-async function queryT(arrayBuffer) {
-  const float32Array = new Float32Array(arrayBuffer);
-  let transcriber = await pipeline(
-    'automatic-speech-recognition',
-    'Xenova/whisper-tiny.en'
-  );
-  let out = await transcriber(float32Array);
-  console.log(out);
-  return out;
-}
+    // Выполняем распознавание
+    const [response] = await client.recognize(request);
+    return response.results
+      .map(result => result.alternatives[0].transcript)
+      .join('\n');
+  
+  }catch(ex){
+    console.log(ex)
+  }   
+  return result;
+} 
