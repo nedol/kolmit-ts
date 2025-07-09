@@ -263,6 +263,7 @@
 
   async function handleData(data) {
     try {
+      console.log(data);
       if (!data || !data.response) {
         throw new Error("Нет ответа от сервера.");
       }
@@ -341,7 +342,7 @@
             repliesTranslated: dataAr.result[$langs]?.reply || [],
           },
         ]);
-      } else if (dataAr.result[$llang]?.cor && dataAr.result[$llang]?.msg) {
+      } else if (dataAr.result[$llang]?.cor) {
         messages.update((msgs) => [
           ...msgs,
           {
