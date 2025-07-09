@@ -263,6 +263,9 @@
 
   async function handleData(data) {
     try {
+      if (!data || !data.response) {
+        throw new Error("Нет ответа от сервера.");
+      }
       if (data?.response?.tokens_limit) {
         const msg = await Transloc(
           "Вы достигли суточного лимита сообщений.",
