@@ -532,6 +532,7 @@
   }
 
   function SetInput(text: string) {
+    // userInput = userInput + "\u00A0\u00A0\u00A0\u00A0\u00A0";
     elInput.scrollIntoView({ behavior: "smooth", block: "end" });
     isTip = true;
     autoResize();
@@ -859,7 +860,7 @@
   <div class="input-container">
     <div
       class:blink={$blink_mic}
-      style="position:absolute; margin-right:10px; "
+      style="position:absolute; margin-right:10px; color:blue; "
     >
       <IconButton
         class="material-icons"
@@ -910,20 +911,22 @@
       />
     {/await}
 
-    <button
-      class:blink={$blink_arrow}
-      on:click={() => {
-        sendMessage();
-      }}
-      disabled={!isEdit || $loading}
-      aria-label="Отправить сообщение"
-    >
-      <IconButton class="material-icons">
-        <Icon tag="svg" viewBox="0 0 24 24">
-          <path fill="white" d={mdiSendOutline} />
-        </Icon>
-      </IconButton>
-    </button>
+    <div style="position:absolute; right:10px; bottom:10px;scale:1">
+      <button
+        class:blink={$blink_arrow}
+        on:click={() => {
+          sendMessage();
+        }}
+        disabled={!isEdit || $loading}
+        aria-label="Отправить сообщение"
+      >
+        <IconButton class="material-icons">
+          <Icon tag="svg" viewBox="0 0 24 24">
+            <path fill="blue" d={mdiSendOutline} />
+          </Icon>
+        </IconButton>
+      </button>
+    </div>
   </div>
 </div>
 
@@ -972,8 +975,7 @@
     display: flex;
     position: relative;
     flex-shrink: 0; /* Фиксируем контейнер ввода внизу */
-    left: 10px;
-    bottom: -6px;
+
     padding: 10px;
     background: #fff;
     border-top: 1px solid #ccc;
@@ -1054,8 +1056,7 @@
   button {
     padding: 8px 12px;
     border: none;
-    background: #007bff;
-    color: white;
+    background: transparent;
     border-radius: 5px;
     cursor: pointer;
   }
