@@ -82,39 +82,38 @@ export class SignalingChannel {
     }
   }
 
-  async SendMessage(par, cb) {
-    this.callback = cb;
+async SendMessage(par, cb) {
+  try {
     this.status = par.status;
 
-    try {
-        // Если соединение открыто, отправляем сразу
-        if (this.isSocketReady()) {
-            this.socket.send(JSON.stringify({ par }));
-            return;
-        }
-
-        // Добавляем в очередь, если не удалось отправить
-        console.log('Соединение не готово, добавление в очередь');
-        this.messageQueue.push(par);
-        
-        // Пытаемся переподключиться, если соединение закрыто или в процессе закрытия
-        if (!this.isSocketConnecting()) {
-            console.log('Попытка переподключения...');
-            this.initializeWebSocket();
-        }
-        
-        // Обработка специальных статусов
-        if (par.status === 'close') {
-            this.closeConnection();
-        } else if (par.status === 'open') {
-            this.initializeWebSocket();
-        }
-    } catch (error) {
-        console.error('Ошибка при отправке сообщения:', error);
-        // При ошибке также пытаемся переподключиться
-        this.initializeWebSocket();
+    // Если соединение открыто — отправляем сразу
+    if (this.isSocketReady()) {
+      this.callback = cb;
+      this.socket.send(JSON.stringify({ par }));
+      return;
     }
+
+    // Добавляем в очередь вместе с callback
+    console.log('Соединение не готово, добавление в очередь');
+    this.messageQueue.push({ par, cb });
+
+    // Пытаемся переподключиться, если не в процессе соединения
+    if (!this.isSocketConnecting()) {
+      console.log('Попытка переподключения...');
+      this.initializeWebSocket();
+    }
+
+    // Обработка специальных статусов
+    if (par.status === 'close') {
+      this.closeConnection();
+    } else if (par.status === 'open') {
+      this.initializeWebSocket();
+    }
+  } catch (error) {
+    console.error('Ошибка при отправке сообщения:', error);
+    this.initializeWebSocket();
   }
+}
 
   // Вспомогательные методы для проверки состояния сокета
   isSocketReady() {
@@ -139,8 +138,11 @@ export class SignalingChannel {
       this.socket &&
       this.socket.readyState === WebSocket.OPEN
     ) {
-      const par = this.messageQueue.shift();
+      const { par, cb } = this.messageQueue.shift();
+      if (cb) this.callback = cb;
       this.socket.send(JSON.stringify({ par }));
+      console.log('Сообщение отправлено из очереди:', par);
     }
   }
+
 }

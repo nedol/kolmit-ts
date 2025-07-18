@@ -122,7 +122,7 @@
 
   onMount(async () => {
     // Отправляем reminder при входе в компонент
-    if (context[0]) sendMessage(`Begin een gesprek in het Nederlands.`);
+    sendMessage(`Begin een gesprek in het Nederlands.`);
 
     messages.update((msgs) => [
       ...msgs,
@@ -968,11 +968,11 @@
     display: flex;
     position: absolute;
     top: 50px;
-    width: 98%;
+    min-width: 97%;
     flex-direction: column;
     /* height: 100vh; */
     /* height: calc(100vh - 42px); */
-    bottom: 7px;
+    bottom: 0px;
   }
 
   .input-container {

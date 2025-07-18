@@ -1,4 +1,4 @@
-import { CreateOperator, CheckOperator, GetUsers, GetGrammar} from '$lib/server/db.ts'; //src\lib\server\server.db.ts
+import { UpsertOperator, CheckOperator, GetUsers, GetGrammar} from '$lib/server/db.ts'; //src\lib\server\server.db.ts
 
 import pkg from 'nodemailer';
 const { Email } = pkg;
@@ -141,7 +141,7 @@ export async function POST({ request, url, fetch, cookies }) {
   switch (q.func) {
     case 'operator':
       if (q.email && q.psw) {
-        const par = await CreateOperator(q);
+        const par = await UpsertOperator(q);
         if (par) {
           if (q.lvl) {
             cookies.set(
@@ -176,6 +176,7 @@ export async function POST({ request, url, fetch, cookies }) {
               }
             );
           }
+
 
           resp = JSON.stringify({
             func: par.func,

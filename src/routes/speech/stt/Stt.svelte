@@ -77,6 +77,7 @@
   }
 
   function handleVisibilityChange() {
+    return; //TODO: убрать return, когда будет реализована перезапись микрофона
     if (document.hidden) {
       stopMicrophone(); // освобождаем микрофон при уходе в фон
     } else {

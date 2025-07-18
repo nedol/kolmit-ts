@@ -1,6 +1,7 @@
 import lodash from 'lodash';
 const { find, remove, findIndex } = lodash;
 import { Translate } from '../../routes/translate/Translate';
+import bcrypt from 'bcrypt';
 import md5 from 'md5';
 import postgres from 'postgres';
 import type { Sql } from 'postgres';
@@ -39,17 +40,18 @@ function getHash(par: string): string {
 
 interface EmailParams {
   abonent: string;
-  send_email: string;
+  email: string;
   lang: string;
   name: string;
 }
 
 export async function SendEmail(q: EmailParams): Promise<void> {
+  try{
   let operator = new Email();
-  const { abonent, send_email: mail, lang, name } = q;
+  const { abonent,  email, lang, name } = q;
 
   const helpLink = `https://kolmit.onrender.com/html/howto.${lang}.html`;
-  const link = `https://kolmit.onrender.com/?abonent=${abonent}&user=${mail}`;
+  const link = `https://kolmit.onrender.com/?abonent=${abonent}&user=${email}`;
 
   const subject = await Translate(
     'Приглашение присоединиться к приложению Kolmit',
@@ -103,9 +105,13 @@ export async function SendEmail(q: EmailParams): Promise<void> {
   </div>
 `;
 
-  operator.SendMail(mail, subject, html, (result) => {
+  operator.SendMail(email, subject, html, (result) => {
     console.log('Письмо успешно отправлено:', result);
   });
+} catch (error) {
+    console.error('Ошибка при отправке письма:', error);
+    throw new Error('Не удалось отправить письмо. Пожалуйста, попробуйте позже.');
+  }
 }
 
 export function SendEmailTodayPublished(q: {
@@ -153,6 +159,35 @@ export async function CreateOperator(  par: OperatorParams): Promise<OperatorPar
     };
   } catch (er) {
     console.log(er);
+  }
+}
+
+export async function UpsertOperator(par: OperatorParams): Promise<OperatorParams | undefined> {
+  try {
+    const hashedPsw = await bcrypt.hash(par.psw, 10);
+    const operatorId = md5(par.email); // для внутреннего ID
+
+    await sql`
+      INSERT INTO operators (email, name, operator, psw, picture, abonent)
+      VALUES (${par.email}, ${par.name}, ${operatorId}, ${hashedPsw}, ${par.picture}, ${par.abonent})
+      ON CONFLICT (operator, abonent) DO UPDATE SET
+        name = EXCLUDED.name,
+        email = EXCLUDED.email,
+        picture = EXCLUDED.picture
+    `;
+
+    
+    SendEmail(par, par.email); 
+
+    return {
+      operator: operatorId,
+      name: par.name,
+      email: par.email,
+      lang: par.lang
+    };
+  } catch (er) {
+    console.error("Error in upsert:", er);
+    return undefined;
   }
 }
 
@@ -275,6 +310,7 @@ export async function GetGroup(params: {
     group = [{
       owner: oper[0].abonent,
       level: Math.floor(oper[0].lvl / 10)*10 ,
+      lvl:oper[0].lvl,
       lang: oper[0].lang,
       name: oper[0].group
     }]

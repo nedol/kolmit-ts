@@ -351,13 +351,15 @@
   });
 </script>
 
-<main bind:this={main}>
+<module bind:this={main}>
   <!-- {@debug data} -->
   <div style="display: {data.quiz === 'bricks' ? 'block' : 'none'}">
     <Bricks bind:this={bricksComponent} {data} />
   </div>
-  <div style="display: {data.quiz === 'dialogs' ? 'block' : 'none'}">
-    <Chat quiz={data} bind:this={chatComponent} prompt_type="basic"></Chat>
+  <div
+    style="display: {data.quiz === 'dialogs' ? 'block' : 'none'}; height:95vh"
+  >
+    <!-- <Chat quiz={data} bind:this={chatComponent} prompt_type="basic"></Chat> -->
   </div>
 
   {#if module}
@@ -1474,8 +1476,8 @@
       {/each}
     </div>
   {/if}
-  <div style="height:50px"></div>
-</main>
+  <!-- <div style="height:50px"></div> -->
+</module>
 
 {#if isProgress}
   <div style="text-align:center">
@@ -1519,7 +1521,7 @@
     padding: 1px 1px; /* Отступы для лучшего внешнего вида */
     z-index: 1; /* Чтобы текст отображался поверх иконки */
   }
-  main {
+  module {
     position: fixed;
     top: 50px;
     left: 0;
