@@ -1,10 +1,11 @@
 {
   "name": "Kolmit",
   "short_name": "Kolmit",
-  "start_url": "/",
+  "start_url": "/?abonent=public",
   "display": "standalone",
   "theme_color": "#ffffff",
   "background_color": "#ffffff",
+  "scope": "/",
   "icons": [
     {
       "src": "/assets/img/kolobot.192.png",

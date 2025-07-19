@@ -5,7 +5,6 @@
   import Chat from "./operator/chat/Chat.svelte";
   import { SignalingChannel } from "./signalingChannel.ts";
   import { lesson, signal, langs, ice_conf, view } from "$lib/stores.ts";
-  import AddToHome from "$lib/components/AddToHome.svelte";
 
   $view = "greeting";
 
@@ -58,7 +57,7 @@
     $view = "login";
   }
 
-  if (data.group[0]?.level >= 0) {
+  if (data.group && data.group[0].level >= 0) {
     setContext("level", data.group[0].level);
   }
 
@@ -197,8 +196,6 @@
     </div>
   {/if}
 {/if}
-
-<AddToHome />
 
 <style>
   :global(.mdc-tab) {

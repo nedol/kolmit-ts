@@ -2,12 +2,13 @@
 import { sveltekit } from '@sveltejs/kit/vite';
 import { defineConfig } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
+import { SvelteKitPWA } from "@vite-pwa/sveltekit";
 
 export default defineConfig({
   plugins: [
     sveltekit(),
 
-    VitePWA({
+    SvelteKitPWA({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.svg', 'robots.txt', 'apple-touch-icon.png'],
       manifest: {
@@ -15,11 +16,12 @@ export default defineConfig({
         short_name: 'Kolmit',
         start_url: '/',
         display: 'standalone',
+         scope: '/',
         background_color: '#ffffff',
         theme_color: '#0d9488',
         icons: [
           {
-            src: '/assets/img/kolobot.192.pngssets/png',
+            src: '/assets/img/kolobot.192.png',
             sizes: '192x192',
             type: 'image/png'
           },
@@ -29,7 +31,7 @@ export default defineConfig({
             type: 'image/png'
           },
           {
-            src: '/assets/img/kolobot.512.pngssets/png',
+            src: '/assets/img/kolobot.512.png',
             sizes: '512x512',
             type: 'image/png',
             purpose: 'any maskable'
