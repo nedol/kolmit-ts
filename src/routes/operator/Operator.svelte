@@ -7,6 +7,8 @@
     AutoAdjust,
   } from "@smui-extra/bottom-app-bar";
 
+  import AddToHome from "$lib/components/AddToHome.svelte";
+
   import Button, { Label } from "@smui/button";
   import IconButton, { Icon } from "@smui/icon-button";
 

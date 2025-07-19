@@ -5,6 +5,7 @@
   import Chat from "./operator/chat/Chat.svelte";
   import { SignalingChannel } from "./signalingChannel.ts";
   import { lesson, signal, langs, ice_conf, view } from "$lib/stores.ts";
+  import AddToHome from "$lib/components/AddToHome.svelte";
 
   $view = "greeting";
 
@@ -196,6 +197,8 @@
     </div>
   {/if}
 {/if}
+
+<AddToHome />
 
 <style>
   :global(.mdc-tab) {
