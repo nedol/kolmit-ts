@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import { getContext, onMount } from "svelte";
   import Card, {
     Content,
@@ -21,7 +21,7 @@
   import pkg from "lodash";
   const { groupBy, find } = pkg;
 
-  let checked = false;
+  let chatComponent: Chat = "";
 
   let rtc;
 
