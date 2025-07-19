@@ -68,7 +68,7 @@
   export let loadTabs;
 
   function SetDlgDisplay() {
-    // $view = "chat";
+    $view = "chat";
   }
 
   setContext("SetDlgDisplay", SetDlgDisplay);
@@ -106,7 +106,7 @@
 
   operator.type = "operator";
 
-  export let tabs = ["ИИ", "УРОК", "ЧАТ"];
+  export let tabs = ["УРОК", "ЧАТ"];
   let active = "УРОК";
 
   const abonent = operator.abonent;
@@ -298,7 +298,7 @@
     selected.display = true;
   }
 
-  function OnClickCallButton() {
+  export function OnClickCallButton() {
     console.log("OnClickCallButton");
     switch ($call_but_status) {
       case "inactive":
@@ -492,16 +492,12 @@
   }
 
   async function OnClickTab(tab) {
-    if (tab === tabs[2]) {
+    if (tab === tabs[1]) {
       $view = "group";
       $showBottomAppBar = true;
-    } else if (tab === tabs[1]) {
+    } else if (tab === tabs[0]) {
       if ($view === "module") $lesson.data = { quiz: "" };
       $view = "module";
-    } else if (tab === tabs[0]) {
-      $view = "chat";
-
-      // $lesson.data = { quiz: "" };
     }
   }
 
@@ -539,7 +535,7 @@
     height: 95vh;
     top: 50px;
     position: relative;
-    overflow-y:hidden"
+    overflow-y: hidden"
 >
   <div style="flex: 1;   ">
     {#if $view === "group"}
@@ -559,112 +555,6 @@
         <Chat prompt_type="basic" bind:this={chatComponent} />
       </div>
     {/if}
-  </div>
-
-  <div class="bottom-app-bar-wrapper" class:hide={true}>
-    <BottomAppBar variant="static" slot="oper" bind:this={bottomAppBar}>
-      <Section>
-        <div class="remote_div">
-          <div class="user_placeholder"></div>
-
-          <VideoRemote
-            {...remote.video}
-            name={remote.text.name}
-            operator={operator.operator}
-            on:click={OnClickCallButton}
-            on:mute
-            bind:isRemoteAudioMute
-          ></VideoRemote>
-          {#if $call_but_status === "talk"}
-            <div class="speaker-button">
-              <IconButton on:click={toggle_remote_audio}>
-                <Icon tag="svg" viewBox="0 0 24 24">
-                  {#if !isRemoteAudioMute}
-                    <path fill="currentColor" d={mdiVolumeHigh} />
-                  {:else}
-                    <path fill="currentColor" d={mdiVolumeOff} />
-                  {/if}
-                </Icon>
-              </IconButton>
-            </div>
-          {/if}
-        </div>
-      </Section>
-      <Section>
-        {#if remote.text.display && remote.text.name}
-          <div
-            class="remote_text_display"
-            style="display:{remote.text.display};"
-          >
-            {#await Transloc("Тебя вызывает - ", "ru", $langs, remote.text.name) then data}
-              <p class="remote_msg">
-                {data}
-                {remote.text.name}
-              </p>
-            {/await}
-          </div>
-        {/if}
-      </Section>
-      <Section></Section>
-      <Section align="end">
-        <div
-          style="position: relative; top:-17px;right: 10px;z-index: 1; scale:1"
-        >
-          <CallButton on:click={OnClickCallButton}>
-            <b
-              class="call_cnt"
-              style="display:none;position: relative;left:25px;top:10px;color:#0e0cff;font-size: 12px;"
-              >100</b
-            >
-            <span
-              class="badge badge-primary badge-pill call-queue"
-              style="display:none;position: relative;right:0px;bottom:0px;color:#0e0cff;font-size: 12px;opacity:1"
-              >0</span
-            >
-          </CallButton>
-        </div>
-        <div
-          class="video"
-          on:click={OnClickVideoButton}
-          on:loadstart={OnPlayVideo}
-        >
-          {#if video_button_display}
-            <Icon tag="svg" viewBox="0 0 24 24">
-              <path fill="currentColor" style="color:grey" d={mdiAccountBox} />
-            </Icon>
-            <!-- <i class="video icofont-ui-video-chat"  on:click = {OnClickVideoButton}
-                          style="position: absolute; right: 0; top: 0; stroke:black; stroke-width: 2px; color: lightgrey; font-size: 30px; z-index: 20;"></i>  -->
-          {/if}
-
-          {#if video_progress}
-            <div style="position: absolute; top: -10px;">
-              <CircularProgress
-                style="height: 30px; width: 30px;"
-                indeterminate
-              />
-            </div>
-          {/if}
-        </div>
-
-        <div class="videolocal_div">
-          <VideoLocal {...local.video}>
-            <svelte:fragment slot="footer">
-              <div bind:this={container} />
-            </svelte:fragment>
-          </VideoLocal>
-        </div>
-      </Section>
-    </BottomAppBar>
-
-    {#await Transloc(rtcSupportText, "ru", $langs, "operator") then data}
-      <span style="position:fixed;bottom:0;font-size:smaller;color:red"
-        >{data}</span
-      >
-    {/await}
-
-    <!-- <VideoLocal {...local.video} /> -->
-    <AudioLocal {...local.audio} bind:paused={local.audio.paused} />
-    <!-- {@debug $call_but_status} -->
   </div>
 </div>
 

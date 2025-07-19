@@ -190,19 +190,19 @@
         {/if}
       {/each}
     </div>
-    {#if false || operator.operator === "45e487f5af70416e7d46d6a4b00985de" || operator.operator === "9d6850204195034c24d3b6d430393b33"}
-      <div class="flexy-dad tutor">
-        <div class="mdc-elevation--z{1} flexy-boy">
-          <Item style="text-align: center">
-            <Tutor name="AI Tutor"></Tutor>
+    <!-- {#if operator.operator === "45e487f5af70416e7d46d6a4b00985de" || operator.operator === "9d6850204195034c24d3b6d430393b33"} -->
+    <div class="flexy-dad tutor">
+      <div class="mdc-elevation--z{1} flexy-boy">
+        <Item style="text-align: center">
+          <Tutor name="AI Tutor"></Tutor>
 
-            <Supporting>
-              <Label>AI Tutor</Label>
-            </Supporting>
-          </Item>
-        </div>
+          <Supporting>
+            <Label>AI Tutor</Label>
+          </Supporting>
+        </Item>
       </div>
-    {/if}
+    </div>
+    <!-- {/if} -->
     <!-- <div class="empty" style="height:100px" /> -->
   </div>
   <!-- <div style="height:100px"></div> -->

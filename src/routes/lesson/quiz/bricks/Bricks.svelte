@@ -214,7 +214,7 @@
     const json = JSON.parse(text);
 
     // Собрать элементы из всех клауз
-    const elements = json.structure.flatMap((clause) => clause.elements);
+    const elements = json.structure; //.flatMap((clause) => clause.elements);
 
     // Разбить по словам и преобразовать
     return elements.flatMap((el) => {

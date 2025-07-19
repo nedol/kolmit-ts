@@ -1,7 +1,7 @@
 <script lang="ts">
   // let status = 'talk';
   // import 'long-press-event';
-  import { call_but_status } from '$lib/stores.ts';
+  import { call_but_status } from "$lib/stores.ts";
 
   let status: string;
   // export let OnLongPress;
@@ -31,13 +31,13 @@
 </div>
 
 <style>
-  .callButton{
+  .callButton {
     position: relative;
-    right: -10px;
+    right: 0px;
     z-index: 1;
   }
 
-  [status='call'] {
+  [status="call"] {
     /* -webkit-animation: rotation 1s 1 linear; */
     transform: rotate(0deg) !important;
     /* Start the shake animation and make the animation last for 0.5 seconds */
@@ -45,36 +45,35 @@
     /* When the animation is finished, start again */
     animation-iteration-count: infinite;
   }
-  [status='call'] g {
+  [status="call"] g {
     fill: orange;
   }
-  [status='talk'] {   
+  [status="talk"] {
     transform: rotate(0deg) !important;
   }
-  [status='talk'] g {
-
+  [status="talk"] g {
     fill: green;
   }
-  [status='muted'] {
+  [status="muted"] {
     transform: rotate(120deg) !important;
     color: #232323;
   }
-  [status='inactive'] {
+  [status="inactive"] {
     color: #dea677;
     transform: rotate(120deg);
   }
-  [status='inactive'] g {
+  [status="inactive"] g {
     fill: grey;
   }
-  [status='active'] {
+  [status="active"] {
     transform: rotate(120deg);
     color: black;
     opacity: 1;
   }
-  [status='active'] g {
+  [status="active"] g {
     fill: orange;
   }
-  [status='busy'] {
+  [status="busy"] {
     transform: rotate(120deg);
     opacity: 0.3;
     color: indianred;
