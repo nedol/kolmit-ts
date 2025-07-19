@@ -977,10 +977,9 @@
   .input-container {
     display: flex;
     position: absolute;
-    bottom: 0;
+    bottom: 10px;
     width: 95vw;
     flex-shrink: 0; /* Фиксируем контейнер ввода внизу */
-
     padding: 10px;
     background: #fff;
     border-top: 1px solid #ccc;
