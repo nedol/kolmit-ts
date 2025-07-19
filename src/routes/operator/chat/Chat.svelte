@@ -292,7 +292,6 @@
               behavior: "smooth",
               block: "end",
             });
-            elInput.scrollIntoView({ behavior: "smooth", block: "end" });
           }, 100);
         }
         return;
@@ -365,7 +364,6 @@
           behavior: "smooth",
           block: "end",
         });
-        elInput.scrollIntoView({ behavior: "smooth", block: "end" });
         $messages = $messages;
       }, 500);
 
@@ -457,7 +455,6 @@
         behavior: "smooth",
         block: "end",
       });
-      elInput.scrollIntoView({ behavior: "smooth", block: "end" });
       $messages = $messages; // Принудительное обновление
     }, 100);
   }
@@ -488,7 +485,6 @@
         behavior: "smooth",
         block: "end",
       });
-      elInput.scrollIntoView({ behavior: "smooth", block: "end" });
     }, 100);
   }
 
@@ -893,59 +889,30 @@
       </IconButton>
     </div>
 
-    {#if $loading}
-      {#await Transloc("AI печатает...", "ru", $langs, "chat") then data}
-        <textarea
-          disabled
-          rows="1"
-          bind:value={userInput}
-          bind:this={elInput}
-          on:input={() => SetInput(userInput)}
-          placeholder={data}
-          on:keydown={(e) => {
-            onKeydown(e.key);
-          }}
-          aria-label="Введите сообщение"
-          style="
-            width: 100%;
-            padding: 10px;
-            text-indent: 40px; 
-            font-size: 16px;
-            line-height: 1.4;
-            border: 1px solid #ccc;
-            resize: none;
-            overflow: hidden;
-            box-sizing: border-box;
-          "
-        />
-      {/await}
-    {:else}
-      {#await Transloc("Введите сообщение...", "ru", $langs, "chat") then data}
-        <textarea
-          rows="1"
-          bind:value={userInput}
-          bind:this={elInput}
-          on:input={() => SetInput(userInput)}
-          placeholder={isEdit ? data : ""}
-          on:keydown={(e) => {
-            onKeydown(e.key);
-          }}
-          disabled={!isEdit || $loading}
-          style="
-            width: 100%;
-            padding: 10px;
-            text-indent: 40px; 
-            font-size: 16px;
-            line-height: 1.4;
-            border: 1px solid #ccc;
-            resize: none;
-            overflow: hidden;
-            box-sizing: border-box;
-            height: 50px;
-          "
-        />
-      {/await}
-    {/if}
+    {#await Transloc($loading ? "AI печатает..." : "Введите сообщение...", "ru", $langs, "chat") then data}
+      <textarea
+        rows="1"
+        bind:value={userInput}
+        bind:this={elInput}
+        on:input={() => SetInput(userInput)}
+        on:keydown={(e) => onKeydown(e.key)}
+        placeholder={$loading || !isEdit ? data : ""}
+        disabled={$loading || !isEdit}
+        aria-label="Введите сообщение"
+        style="
+          width: 100%;
+          padding: 10px;
+          text-indent: 40px; 
+          font-size: 16px;
+          line-height: 1.4;
+          border: 1px solid #ccc;
+          resize: none;
+          overflow: hidden;
+          box-sizing: border-box;
+          height: 50px;
+        "
+      />
+    {/await}
 
     <div style="position:absolute; right:10px; bottom:10px;scale:1">
       <button
@@ -1009,7 +976,9 @@
 
   .input-container {
     display: flex;
-    position: relative;
+    position: absolute;
+    bottom: 0;
+    width: 95vw;
     flex-shrink: 0; /* Фиксируем контейнер ввода внизу */
 
     padding: 10px;
@@ -1028,7 +997,7 @@
     overflow-y: auto;
     padding: 10px;
     background-color: #f1f1f1;
-    bottom: 0px;
+    bottom: 85px;
     width: inherit;
   }
 
