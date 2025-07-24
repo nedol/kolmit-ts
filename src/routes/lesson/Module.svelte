@@ -6,7 +6,6 @@
 
   import { Transloc } from "../translate/Transloc.js";
 
-  // import Assistant from '../operator/chat/Assistant.svelte';
   import Bricks from "./quiz/bricks/Bricks.svelte";
 
   import Chat from "../operator/chat/Chat.svelte";
@@ -52,7 +51,6 @@
     msg,
     dc,
     call_but_status,
-    showBottomAppBar,
     OnCheckQU,
   } from "$lib/stores.ts";
 
@@ -173,7 +171,7 @@
       lesson_data = lessonData.data;
       module = lesson_data.module;
       $llang = lesson_data.lang;
-      // $showBottomAppBar = true;
+
       news = lessonData.data.module.themes[0].lessons[0].quizes;
       const oneWeekAgo = Date.now() - 3 * 24 * 60 * 60 * 1000; // Получаем временную метку, соответствующую одной неделе наз
       const tmp = [];
@@ -356,12 +354,15 @@
   <div style="display: {data.quiz === 'bricks' ? 'block' : 'none'}">
     <Bricks bind:this={bricksComponent} {data} />
   </div>
-  <div
-    style="display: {data.quiz === 'dialogs' ? 'block' : 'none'}; height:95vh"
-  >
-    <!-- <Chat quiz={data} bind:this={chatComponent} prompt_type="basic"></Chat> -->
-  </div>
 
+  {#if data.quiz === "dialogs"}
+    <div
+      style="display: {data.quiz === 'dialogs' ? 'block' : 'none'}; height:95vh"
+    >
+      <Chat quiz={data} bind:this={chatComponent} prompt_type={data.quiz}
+      ></Chat>
+    </div>
+  {/if}
   {#if module}
     <div style="display: {!module || data.quiz ? 'none' : 'block'}">
       {#each module.themes as theme, t}

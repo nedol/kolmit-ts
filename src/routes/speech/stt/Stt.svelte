@@ -11,10 +11,11 @@
 
   let operator = getContext("operator");
 
+  let mediaStream: any = getContext("mediaStream");
+
   // let MediaRecorder;
 
   let mediaRecorder: IMediaRecorder,
-    mediaStream: any,
     audioAnalyser: any,
     audioChunks: Array<Blob> = [],
     audioUrl,
@@ -35,20 +36,9 @@
 
   async function startMicrophone() {
     try {
-      mediaStream = await navigator.mediaDevices.getUserMedia({
-        audio: {
-          echoCancellation: true,
-          noiseSuppression: true,
-          autoGainControl: true,
-          channelCount: 1,
-          sampleRate: 48000,
-          sampleSize: 16,
-        },
-      });
+      if (!$mediaStream) throw new Error("Не удалось получить MediaStream");
 
-      if (!mediaStream) throw new Error("Не удалось получить MediaStream");
-
-      mediaRecorder = new MediaRecorder(mediaStream, { bitsPerSecond: 44100 });
+      mediaRecorder = new MediaRecorder($mediaStream, { bitsPerSecond: 44100 });
 
       mediaRecorder.ondataavailable = (e) => {
         audioChunks.push(e.data);
@@ -63,7 +53,7 @@
       const audioContext = new (window.AudioContext ||
         window.webkitAudioContext)();
       const mediaStreamSource =
-        audioContext.createMediaStreamSource(mediaStream);
+        audioContext.createMediaStreamSource($mediaStream);
 
       audioAnalyser = audioContext.createAnalyser();
       audioAnalyser.fftSize = 256;
@@ -91,7 +81,6 @@
     if (mediaStream) {
       mediaStream.getTracks().forEach((track) => track.stop());
       console.log("⛔ Микрофон остановлен");
-      mediaStream = null;
     }
   }
 
@@ -101,7 +90,7 @@
     try {
       // дополнительные настройки audioAnalyser
       startRecording();
-      checkAudio();
+      // checkAudio();
       // setTimeout(() => {
       // 	mediaRecorder.stop();
       // }, 4000);
@@ -234,7 +223,6 @@
 
   onDestroy(() => {
     mediaRecorder = "";
-    mediaStream = "";
     audioAnalyser = "";
     audioUrl = "";
     audioPlayer = "";
@@ -254,6 +242,7 @@
     position: relative;
     height: 50px;
     margin: 0 auto;
+    z-index: 6;
   }
   audio {
     height: inherit;

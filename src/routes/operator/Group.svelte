@@ -5,7 +5,7 @@
 
   import Tutor from "../tutor/Tutor.svelte";
 
-  import Chat from "../operator/chat/Chat.svelte";
+  import ChatSupport from "../operator/chat/ChatSupport.svelte";
 
   import ImageList, {
     Item,
@@ -19,7 +19,7 @@
   import pkg from "lodash";
   const { mapValues, find } = pkg;
 
-  export let rtc, oper_display;
+  export let oper_display;
 
   import {
     signal,
@@ -29,7 +29,6 @@
     msg,
     call_but_status,
     dc_state,
-    showBottomAppBar,
   } from "$lib/stores.ts";
 
   import User from "../user/User.svelte";
@@ -41,7 +40,7 @@
   let lang = $langs;
 
   let isChat = false;
-  let chatComponent: Chat = null;
+  let chatComponent: ChatSupport = null;
 
   export let group: pkg.List<any> | null | undefined = [];
 
@@ -52,19 +51,11 @@
     // Authorization: `Bearer ${token}`
   };
 
-  $: switch ($dc_state) {
-    case "open":
-      isChat = true;
-      break;
-    case "close":
-      isChat = false;
-      $showBottomAppBar = true;
-      break;
+  $: if ($call_but_status === "talk") {
+    isChat = true;
+  } else {
+    isChat = false;
   }
-
-  // $: if (chatComponent) {
-  //   chatComponent.SendMessage(`Blijf praten.`);
-  // }
 
   $: if ($msg) {
     onMessage($msg);
@@ -98,7 +89,6 @@
 
   onMount(async () => {
     // SendCheck({ func: 'check', type: 'user', abonent: operator.abonent, em: operator.em });
-    $showBottomAppBar = true;
   });
 
   function OnClickUpload() {}
@@ -155,58 +145,59 @@
   }
 </script>
 
-{#if isChat}
-  <div style="display: {isChat ? 'block' : 'none'}; height:90vh">
-    <Chat prompt_type={"basic"} bind:this={chatComponent} />
-  </div>
-  <!-- <div style="position:relative;height:50px"></div> -->
-{:else}
-  <!-- {@debug operator} -->
-  <div class="deps_div">
-    {#await Transloc("Нет пользователей онлайн", "ru", $langs, "group") then data}
-      <span
-        style="display:{no_users_display};position: relative;top:0px;text-align: center; font-size: smaller;
-      font-family: monospace;">{data}</span
-      >
-    {/await}
-    <div class="flexy-dad">
-      {#each group as user, i}
-        {#if user?.operator !== operator.operator}
-          <br />
-          <div
-            class="mdc-elevation--z{i + 1} flexy-boy"
-            style="display:block"
-            on:click={(ev) => {
-              OnClickUser({ user });
-            }}
-          >
-            <Item style="text-align: center">
-              <User bind:user_={user} bind:group {OnClickUpload} {rtc} />
-              <Supporting>
-                <Label>{user.name}</Label>
-              </Supporting>
-            </Item>
-          </div>
-        {/if}
-      {/each}
-    </div>
-    <!-- {#if operator.operator === "45e487f5af70416e7d46d6a4b00985de" || operator.operator === "9d6850204195034c24d3b6d430393b33"} -->
-    <div class="flexy-dad tutor">
-      <div class="mdc-elevation--z{1} flexy-boy">
-        <Item style="text-align: center">
-          <Tutor name="AI Tutor"></Tutor>
+<!-- {#if $dc_state === "open"} -->
+<div style="display: {isChat ? 'block' : 'none'}; height:90vh">
+  <ChatSupport prompt_type={"tutor"} bind:this={chatComponent} />
+</div>
+<!-- {/if} -->
+<!-- <div style="position:relative;height:50px"></div> -->
 
-          <Supporting>
-            <Label>AI Tutor</Label>
-          </Supporting>
-        </Item>
-      </div>
-    </div>
-    <!-- {/if} -->
-    <!-- <div class="empty" style="height:100px" /> -->
+<!-- {@debug operator} -->
+<div class="deps_div" style="display: {isChat ? 'none' : 'block'}; height:90vh">
+  {#await Transloc("Нет пользователей онлайн", "ru", $langs, "group") then data}
+    <span
+      style="display:{no_users_display};position: relative;top:0px;text-align: center; font-size: smaller;
+      font-family: monospace;">{data}</span
+    >
+  {/await}
+  <div class="flexy-dad">
+    {#each group as user, i}
+      {#if user?.operator !== operator.operator}
+        <br />
+        <div
+          class="mdc-elevation--z{i + 1} flexy-boy"
+          style="display:block"
+          on:click={(ev) => {
+            OnClickUser({ user });
+          }}
+        >
+          <Item style="text-align: center">
+            <User bind:user_={user} bind:group {OnClickUpload} />
+            <Supporting>
+              <Label>{user.name}</Label>
+            </Supporting>
+          </Item>
+        </div>
+      {/if}
+    {/each}
   </div>
-  <!-- <div style="height:100px"></div> -->
-{/if}
+  <!-- {#if operator.operator === "45e487f5af70416e7d46d6a4b00985de" || operator.operator === "9d6850204195034c24d3b6d430393b33"} -->
+  <div class="flexy-dad tutor">
+    <div class="mdc-elevation--z{1} flexy-boy">
+      <Item style="text-align: center">
+        <Tutor name="AI Tutor"></Tutor>
+
+        <Supporting>
+          <Label>AI Tutor</Label>
+        </Supporting>
+      </Item>
+    </div>
+  </div>
+  <!-- {/if} -->
+  <!-- <div class="empty" style="height:100px" /> -->
+</div>
+
+<!-- <div style="height:100px"></div> -->
 
 <style>
   .deps_div {
@@ -214,6 +205,7 @@
     overflow-y: scroll;
     margin-left: 0px;
     margin-top: 40px;
+    z-index: 0;
   }
   ::-webkit-scrollbar {
     display: none;

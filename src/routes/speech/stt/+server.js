@@ -86,12 +86,12 @@ export async function POST({ url, fetch, cookies, request }) {
 
     // const result = await queryHF(buffer);?
 
-    // const result = await stt_karim_space(blob, from_lang, to_lang);//!
+    const result = await stt_karim_space(blob, from_lang, to_lang);//!
 
     // const result = await stt_mms(blob, from_lang, to_lang);//!
 
 
-    const result = await stt_google(nodeBuffer,from_lang);   
+    // const result = await stt_google(nodeBuffer,from_lang);   
 
     if (result) {
       resp = {
@@ -172,9 +172,11 @@ const transcribeAudio = async(arrayBuffer, language) => {
 
 
 // const client = await Client.connect("rafaaa2105/crisper-whisper");
-const client = await Client.connect("karim23657/Persian_Automatic_Speech_Recognition-asr");
 
 async function stt_karim_space(arrayBuffer,  from_lang, to_lang) {
+
+  const client = await Client.connect("karim23657/Persian_Automatic_Speech_Recognition-asr");
+
 
   try{
     

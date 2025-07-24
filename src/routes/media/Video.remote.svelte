@@ -1,12 +1,12 @@
 <script>
-  import { onMount } from 'svelte';
+  import { onDestroy, onMount } from "svelte";
   import Card, {
     Content,
     PrimaryAction,
     Media,
     MediaContent,
-  } from '@smui/card';
-  import { muted } from '$lib/stores.ts';
+  } from "@smui/card";
+  import { muted } from "$lib/stores.ts";
   export let srcObject;
   export let poster;
   export let status;
@@ -16,29 +16,32 @@
   export let name, operator;
   let rv;
 
-  onMount(async () => {
-    rv = video_element;
-  });
-
-  $: if (rv && srcObject) {
-    rv.srcObject = srcObject;
-  } else if (rv && rv.srcObject) {
-    rv.srcObject.getVideoTracks().forEach((track) => {
-      track.stop();
-      rv.srcObject.removeTrack(track);
-    });
-    rv.src = '';
-  }
+  // $muted = true;
 
   $: if (status) {
     console.log(status);
   }
 
-  $: if (status === 'talk') {
+  onMount(async () => {
+    rv = video_element;
+    rv.poster = poster;
+  });
+
+  $: if (rv && srcObject) {
+    console.log();
+    rv.srcObject = srcObject;
     $muted = false;
-  } else {
-    $muted = true;
   }
+
+  onDestroy(() => {
+    if (rv && rv.srcObject) {
+      rv.srcObject.getVideoTracks().forEach((track) => {
+        track.stop();
+        rv.srcObject.removeTrack(track);
+      });
+      rv.src = "";
+    }
+  });
 </script>
 
 <div class="card-display" bind:this={parent_div}>
@@ -49,9 +52,9 @@
           <video
             class="user_video_remote"
             bind:this={video_element}
-            on:click    
-            muted={$muted}
+            on:click
             {status}
+            muted={$muted}
             {poster}
             autoplay
             playsinline
@@ -83,22 +86,22 @@
     margin-top: 5px;
     max-height: 70%;
   }
-  [status='call'] {
+  [status="call"] {
     opacity: 1;
   }
-  [status='talk'] {
+  [status="talk"] {
     opacity: 1;
   }
-  [status='muted'] {
+  [status="muted"] {
     opacity: 0.05;
   }
-  [status='inactive'] {
+  [status="inactive"] {
     opacity: 0.05;
   }
-  [status='active'] {
+  [status="active"] {
     opacity: 1;
   }
-  [status='busy'] {
+  [status="busy"] {
     opacity: 0.05;
   }
 </style>

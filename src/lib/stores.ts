@@ -23,5 +23,4 @@ export const dc_state = writable('close');
 export const con_state = writable('');
 export const sql_st = writable();
 export const muted = writable(true);
-export const showBottomAppBar = writable(true);
 export const OnCheckQU = writable();

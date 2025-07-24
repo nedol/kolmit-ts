@@ -53,6 +53,7 @@
     display: flex;
     flex-direction: column;
     width: 100%;
+    overflow: hidden;
     /* max-width: 64rem; */
     /* margin: 0 auto; */
     box-sizing: border-box;

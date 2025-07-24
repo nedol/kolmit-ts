@@ -2,7 +2,7 @@
   import { onDestroy, getContext, afterUpdate, onMount } from "svelte";
   import { writable, get } from "svelte/store";
   import { Transloc } from "../../translate/Transloc";
-  import { langs, llang, signal, dc, dc_state, muted } from "$lib/stores";
+  import { langs, llang, signal, dc, dc_state, msg } from "$lib/stores";
   import IconButton, { Icon } from "@smui/icon-button";
   import emojiRegex from "emoji-regex";
   import Badge from "@smui-extra/badge";
@@ -31,7 +31,9 @@
   let blink_arrow = writable(false);
   let blink_mic = writable(false);
 
-  $muted = true;
+  let operator = getContext("operator");
+  let level = getContext("level");
+  let mediaStream = getContext("mediaStream");
 
   export let prompt_type = "greeting",
     data,
@@ -95,9 +97,6 @@
 
   let dataAr: {};
 
-  let operator = getContext("operator");
-  let level = getContext("level");
-
   let lastMessage: string; // переменная для последнего сообщения
 
   // Время последнего сообщения (можно сохранять в localStorage для сохранения между перезагрузками)
@@ -110,21 +109,24 @@
 
   let isReminderSent = false; // Флаг для отслеживания отправки напоминания
 
-  let shownReplyTranslations = [];
+  let shownReplyTranslations: boolean[] = [];
 
-  interface FormattedSentence {
-    gr: string;
-    placeholder: string;
-    value: string;
-    word: string;
-    class: string;
+  $: if ($msg && $msg.stt_text) {
+    console.log($msg);
+
+    sendMessage({
+      stt: $msg.stt_text,
+      replies: $msg.replies,
+    });
+    $msg.stt_text = "";
   }
-
-  let formattedSentence: FormattedSentence[] = [];
 
   onMount(async () => {
     // Отправляем reminder при входе в компонент
-    sendMessage(`Begin een gesprek in het Nederlands.`);
+    sendMessage({
+      func: "getassistanttext",
+      text: `Begin een gesprek in het Nederlands.`,
+    });
 
     messages.update((msgs) => [
       ...msgs,
@@ -148,9 +150,10 @@
 
   export function Init(data) {
     $messages = [];
-    // if ($messages.length <= 1) {
-    sendMessage(`Begin een gesprek in het Nederlands.`);
-    // }
+    sendMessage({
+      func: "getassistanttext",
+      text: `Begin een gesprek in het Nederlands.`,
+    });
 
     if (context[0])
       messages.update((msgs) => [
@@ -176,22 +179,8 @@
   });
 
   // Отправка сообщения
-  async function sendMessage(msg: string = "") {
-    if (!userInput.trim() && !msg.trim()) return;
-
-    // Добавляем сообщение пользователя в список
-    if (!msg)
-      messages.update((msgs) => [
-        ...msgs,
-        {
-          id: crypto.randomUUID(),
-          role: "user",
-          text: userInput,
-          tr: "",
-          cor: "",
-          isTranslate: false,
-        },
-      ]);
+  async function sendMessage(msg: string | object = "") {
+    // if (!userInput.trim() && !msg.text.trim()) return;
 
     if (messagesContainer) {
       setTimeout(() => {
@@ -202,11 +191,7 @@
       }, 100);
     }
 
-    const userMessage = {
-      func: "",
-      text: msg ? msg : userInput,
-    };
-
+    const userMessage = msg ? msg : userInput;
     userInput = "";
     loading.set(true);
 
@@ -245,10 +230,8 @@
       type: prompt_type || "basic",
       name: quiz?.name || "chat",
       owner: operator.abonent,
-      conversationHistory,
-      userMessage,
       context: context,
-      words: words,
+      userMessage,
       langs: $langs,
       llang: $llang || "nl",
       level: level,
@@ -312,11 +295,26 @@
 
       if (elInput) elInput.style.height = "50px";
 
+      // if (
+      //   $dc &&
+      //   $dc.dc.readyState === "open" &&
+      //   data.response.result[$llang].stt
+      // ) {
+      //   await $dc.SendData(data.response.result, () => {
+      //     console.log();
+      //   });
+      // }
+
       // Проверка последнего сообщения
       const lastMsg = currentMessages[currentMessages.length - 1];
 
       // Если есть cor и последнее сообщение от assistant
-      if (dataAr.result[$llang]?.cor && lastMsg?.role === "assistant") {
+      if (
+        false &&
+        dataAr &&
+        dataAr.result[$llang]?.cor &&
+        lastMsg?.role === "assistant"
+      ) {
         const newMessages = [...currentMessages];
         // Вставляем cor перед последним сообщением
         newMessages.splice(-1, 0, {
@@ -328,18 +326,23 @@
           isTranslate: false,
         });
 
-        messages.set(newMessages);
+        // messages.set(newMessages);
+
         // Добавляем ответ AI в список
-      } else if (!dataAr.result[$llang]?.cor && dataAr.result[$llang]?.msg) {
-        SpeakText(dataAr.result[$llang]?.msg);
+      } else if (
+        dataAr &&
+        !dataAr.result[$llang]?.cor &&
+        (dataAr.result[$llang]?.stt || dataAr.result[$llang]?.msg)
+      ) {
+        // SpeakText(dataAr.result[$llang]?.msg);
 
         messages.update((msgs) => [
           ...msgs,
           {
             id: crypto.randomUUID(),
             role: "assistant",
-            text: dataAr.result[$llang]?.msg,
-            tr: dataAr.result[$langs]?.msg,
+            text: dataAr.result[$llang]?.stt || dataAr.result[$llang]?.msg,
+            tr: dataAr.result[$langs]?.stt || dataAr.result[$langs]?.msg,
             cor: "",
             isTranslate: false,
             replies: dataAr.result[$llang]?.reply || [],
@@ -376,17 +379,6 @@
       localStorage.setItem("lastMessageTime", lastMessageTime.toString()); // Сохраняем время
       // resetReminderTimer();
 
-      async function removeEmojis(input: string) {
-        const regex = emojiRegex();
-        return input.replace(regex, "");
-      }
-
-      async function extractAIContent(input: string) {
-        const aiRegex = /<ai>([\s\S]*?)<\/ai>/;
-        const match = input.match(aiRegex);
-        return match ? match[1].trim() : null;
-      }
-
       if (dataAr[$llang]) {
         tts?.Speak_server($llang, dataAr[$llang].msg, "", "");
       }
@@ -414,10 +406,31 @@
     $dc_state = "close";
   }
 
-  async function SttResult(text: string) {
+  async function SttResult(text: {}) {
     try {
-      userInput = text[$llang];
+      // userInput = text[$llang];
       stt_text = text[$llang];
+
+      if ($dc && $dc.dc.readyState === "open" && text[$llang]) {
+        await $dc.SendData(
+          { stt_text, replies: [$messages[$messages.length - 1].replies] },
+          () => {
+            console.log();
+          }
+        );
+      }
+
+      messages.update((msgs) => [
+        ...msgs,
+        {
+          id: crypto.randomUUID(),
+          role: "user",
+          text: text[$llang],
+          tr: "",
+          cor: "",
+          isTranslate: false,
+        },
+      ]);
 
       if (isEdit) {
         elInput.value = userInput;
@@ -431,26 +444,34 @@
     }
   }
 
+  async function toggleMic() {
+    try {
+      $mediaStream
+        .getAudioTracks()
+        .forEach((track) => (track.enabled = isListening)); //микрофон выключен
+    } catch (ex) {}
+  }
+
   function onClickMicrophone() {
-    if (isListening) {
-      stt_text = "";
-      stt?.MediaRecorderStop();
-      isListening = false;
+    try {
+      if (isListening) {
+        stt_text = "";
+        stt.MediaRecorderStop();
+        isListening = false;
+        toggleMic();
+      } else {
+        stt_text = "";
 
-      $muted = true;
+        $blink_mic = false;
 
-      return;
-    } else {
-      stt_text = "";
+        // SttResult(); //Test
+        stt.startAudioMonitoring($llang, $langs);
 
-      $muted = false;
+        isListening = true;
 
-      $blink_mic = false;
-
-      stt.startAudioMonitoring($llang, $langs);
-
-      isListening = true;
-    }
+        toggleMic();
+      }
+    } catch (ex) {}
   }
 
   async function toggleTranslation(message: Message, i) {

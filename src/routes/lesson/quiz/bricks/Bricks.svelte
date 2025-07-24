@@ -1,12 +1,6 @@
 <script lang="ts">
   import { onMount, getContext, onDestroy } from "svelte";
-  import {
-    langs,
-    llang,
-    showBottomAppBar,
-    signal,
-    lesson,
-  } from "$lib/stores.ts";
+  import { langs, llang, signal, lesson } from "$lib/stores.ts";
   import { slide } from "svelte/transition";
   import ConText from "../Context.svelte";
   import { Transloc } from "../../../translate/Transloc";
@@ -149,11 +143,7 @@
     mdiTranslateOff,
   } from "@mdi/js";
 
-  onMount(() => {
-    setTimeout(() => {
-      $showBottomAppBar = false; //test
-    }, 3000);
-  });
+  onMount(() => {});
 
   function extractTagName(tagString: string) {
     const match = tagString.match(/^<(\w+)/); // Находим первую часть тега
@@ -731,7 +721,6 @@
   }
 
   onDestroy(async () => {
-    $showBottomAppBar = true;
     bricks_data = null;
     if (audio) {
       audio.pause();
@@ -745,10 +734,10 @@
 
 {#if isChat}
   <Chat
-    quiz={data}
     context={getCurrentArticle()}
     bind:this={chatComponent}
     prompt_type="basic"
+    isHearing="true"
   ></Chat>
 {:else}
   {#if bricks_data?.length < 1}
@@ -1142,10 +1131,10 @@
 
       <div
         style="
-      text-align: center;  
-      margin-top: 30px;
-      max-width: 100%;
-    "
+          text-align: center;  
+          margin-top: 30px;
+          max-width: 100%;
+        "
       >
         <span style="color: darkgreen;">
           {@html stt_text}

@@ -1,38 +1,38 @@
-<script  lang="ts">
+<script lang="ts">
   // @ts-nocheck
 
-  import { onMount, onDestroy, getContext } from 'svelte';
-  import TopAppBar, { Row, Title, Section } from '@smui/top-app-bar';
-  import Badge from '@smui-extra/badge';
-  import Select, { Option } from '@smui/select';
+  import { onMount, onDestroy, getContext } from "svelte";
+  import TopAppBar, { Row, Title, Section } from "@smui/top-app-bar";
+  import Badge from "@smui-extra/badge";
+  import Select, { Option } from "@smui/select";
 
   // import words from './80.json';
-  import { Transloc } from '../../../translate/Transloc';
+  import { Transloc } from "../../../translate/Transloc";
   // translate.engine = 'google';
   // translate.from = $llang;
 
-  import { langs } from '$lib/stores.ts';
+  import { langs } from "$lib/stores.ts";
 
-  import langs_list from '$lib/dict/learn_langs_list.json';
+  import langs_list from "$lib/dict/learn_langs_list.json";
 
   let lang_menu = false;
 
-  import ISO6391 from 'iso-google-locales';
+  import ISO6391 from "iso-google-locales";
 
-  import CircularProgress from '@smui/circular-progress';
+  import CircularProgress from "@smui/circular-progress";
 
-  import TTS from '../../../speech/tts/Tts.svelte';
+  import TTS from "../../../speech/tts/Tts.svelte";
   let tts;
 
-  import Accordion, { Panel, Header, Content } from '@smui-extra/accordion';
-  import IconButton, { Icon } from '@smui/icon-button';
+  import Accordion, { Panel, Header, Content } from "@smui-extra/accordion";
+  import IconButton, { Icon } from "@smui/icon-button";
   import {
     mdiShareVariant,
     mdiPagePreviousOutline,
     mdiChevronDownCircleOutline,
     mdiHelp,
     mdiVolumeHigh,
-  } from '@mdi/js';
+  } from "@mdi/js";
 
   import {
     lesson,
@@ -42,18 +42,16 @@
     dc_state,
     msg,
     call_but_status,
-    showBottomAppBar,
     OnCheckQU,
-  } from '$lib/stores.ts';
-
+  } from "$lib/stores.ts";
 
   export let data;
 
-  const abonent = getContext('abonent');
+  const abonent = getContext("abonent");
 
   let words = [],
     word,
-    example = '&nbsp;';
+    example = "&nbsp;";
   let shuffleWords;
   let hints = {};
   let currentWordIndex = 0;
@@ -63,7 +61,7 @@
   let arrayOfArrays;
   let userContent = [];
   let div_input = [];
-  let result = '&nbsp;';
+  let result = "&nbsp;";
   let resultElement;
   let hintIndex = 0;
   let showHints = {};
@@ -77,16 +75,16 @@
   let focus_pos = 0;
   let level = data.level;
   let share_button = false;
-  let share_button_class = 'button_shared_false';
+  let share_button_class = "button_shared_false";
   let share_mode = false;
   let isFlipped = false;
-  let hint_example = '';
+  let hint_example = "";
   let label = {};
-  label[true] = 'Ожидай вопрос';
-  label[false] = 'Выбери слово';
+  label[true] = "Ожидай вопрос";
+  label[false] = "Выбери слово";
 
   $: switch ($call_but_status) {
-    case 'talk':
+    case "talk":
       break;
     default:
       share_mode = false;
@@ -99,7 +97,7 @@
   let counter = 0;
   let isVisible = false;
 
-  let names = data.name?.split(',');
+  let names = data.name?.split(",");
 
   // Создаем массив промисов для каждого запроса
 
@@ -117,7 +115,7 @@
 
         showHints[isFlipped] = true;
 
-        if ($call_but_status !== 'active' && !isFlipped) {
+        if ($call_but_status !== "active" && !isFlipped) {
           onShare();
         }
 
@@ -136,7 +134,7 @@
     makeExample();
   }
 
-  $: if ($msg?.lesson?.quiz === 'word' && !$msg.lesson.isFlipped) {
+  $: if ($msg?.lesson?.quiz === "word" && !$msg.lesson.isFlipped) {
     try {
       if ($msg.lesson.words_data) {
         words = $msg.lesson.words_data;
@@ -146,54 +144,53 @@
         level = $msg.lesson.level;
         share_mode = true;
         showHints[isFlipped] = false;
-        $OnCheckQU(null, 'word', $msg.lesson.name);
+        $OnCheckQU(null, "word", $msg.lesson.name);
       } else if (
         ($msg.lesson.word_correct || $msg.lesson.word_correct == 0) &&
         hints
       ) {
-        hints[isFlipped][$msg.lesson.word_correct].disabled = 'disabled';
-        hint_example = '';
+        hints[isFlipped][$msg.lesson.word_correct].disabled = "disabled";
+        hint_example = "";
         doneWords_2 = $msg.lesson.done_words;
       } else if (
         ($msg.lesson.word_error || $msg.lesson.word_error == 0) &&
         hints
       ) {
         // hints[isFlipped][$msg.lesson.word_correct].disabled = 'disabled';
-        hint_example = '';
+        hint_example = "";
       } else if ($msg.lesson.word_index || $msg.lesson.word_index == 0) {
         currentWord = words[$msg.lesson.word_index];
         currentWordIndex = $msg.lesson.word_index;
         showHints[isFlipped] = true;
-        label[true] = 'Заполни пропуски';
-        label[false] = 'Твой ход. Выбери слово';
+        label[true] = "Заполни пропуски";
+        label[false] = "Твой ход. Выбери слово";
         level = $msg.lesson.level;
         makeExample();
-        setTimeout(()=>{
-         $msg = '';
-        },10)
-    
+        setTimeout(() => {
+          $msg = "";
+        }, 10);
       } else if ($msg?.lesson.word_flip) {
         isFlipped = $msg.lesson.word_flip;
         $msg.lesson.word_flip = null;
         hints[isFlipped] = hints[isFlipped];
         showHints[isFlipped] = false;
-        label[true] = 'Ожидай вопрос';
-        resultElement = '';
-        result = '';
-        hint_example = '';
-        example = '';
+        label[true] = "Ожидай вопрос";
+        resultElement = "";
+        result = "";
+        hint_example = "";
+        example = "";
       }
     } catch (ex) {
       console.log(ex);
     }
   }
 
-  $: if ($msg?.lesson?.quiz === 'word' && $msg.lesson.isFlipped) {
+  $: if ($msg?.lesson?.quiz === "word" && $msg.lesson.isFlipped) {
     if ($msg.lesson.word_index || $msg.lesson.word_index == 0) {
       currentWord = words[$msg.lesson.word_index];
       currentWordIndex = $msg.lesson.word_index;
-      label[true] = 'Заполни пропуски';
-      label[false] = 'Твой ход. Выбери слово';
+      label[true] = "Заполни пропуски";
+      label[false] = "Твой ход. Выбери слово";
       showHints[isFlipped] = true;
       level = $msg.lesson.level;
       makeExample();
@@ -206,37 +203,37 @@
       isFlipped = !$msg.lesson.isFlipped;
       showHints[isFlipped] = false;
 
-      $OnCheckQU(null, 'word', $msg.lesson.name);
+      $OnCheckQU(null, "word", $msg.lesson.name);
     } else if (
       ($msg.lesson.word_correct || $msg.lesson.word_correct == 0) &&
       hints
     ) {
-      hints[isFlipped][$msg.lesson.word_correct].disabled = 'disabled';
-      hint_example = '';
+      hints[isFlipped][$msg.lesson.word_correct].disabled = "disabled";
+      hint_example = "";
       doneWords_2 = $msg.lesson.done_words;
     } else if (
       ($msg.lesson.word_error || $msg.lesson.word_error == 0) &&
       hints
     ) {
       // hints[isFlipped][$msg.lesson.word_correct].disabled = 'disabled';
-      hint_example = '';
+      hint_example = "";
     } else if ($msg.lesson.word_flip) {
       isFlipped = $msg.lesson.word_flip;
       hints[isFlipped] = hints[isFlipped];
       $msg.lesson.word_flip = null;
       showHints[isFlipped] = false;
-      label[true] = 'Ожидай вопрос';
-      resultElement = '';
-      result = '';
-      hint_example = '';
-      example = '';
+      label[true] = "Ожидай вопрос";
+      resultElement = "";
+      result = "";
+      hint_example = "";
+      example = "";
     }
   }
 
   $: if ($msg?.msg) {
     (async () => {
-      alert(await Transloc($msg?.msg, 'ru', $langs,data.name));
-      if ($msg) $msg.msg = '';
+      alert(await Transloc($msg?.msg, "ru", $langs, data.name));
+      if ($msg) $msg.msg = "";
     })();
   }
 
@@ -248,7 +245,7 @@
     share_button_class = `button_shared_${share_mode}`;
     const lesson = {
       lesson: {
-        quiz: 'word',
+        quiz: "word",
         name: data.name,
         llang: $llang,
         level: level,
@@ -343,18 +340,23 @@
   async function makeExample() {
     if (!currentWord) return;
 
-    resultElement = '';
-    example = '';
+    resultElement = "";
+    example = "";
 
     if (currentWord.example[$langs]) {
-      example = currentWord['example'][$langs];
+      example = currentWord["example"][$langs];
     } else if (currentWord.example[$llang]) {
-      example = await Transloc(currentWord['example'][$llang], $llang, $langs,data.name);
+      example = await Transloc(
+        currentWord["example"][$llang],
+        $llang,
+        $langs,
+        data.name
+      );
     }
 
     const regex = /(<<\w+>>)\s+(<<\w+>>)/;
     const match = example.match(regex);
-    let original = '';
+    let original = "";
     if (match) {
       original = `${match[0]} ${match[1]}`;
     }
@@ -363,34 +365,34 @@
     resultElement = replaceWordWithInput(
       currentWord?.example[$llang]
         ? currentWord?.example[$llang]
-        : await Transloc(currentWord.example['ru'], 'ru', $llang,data.name),
+        : await Transloc(currentWord.example["ru"], "ru", $llang, data.name),
       `${original}`
     );
 
-    if (example.includes('<<') && example.includes('>>')) {
+    if (example.includes("<<") && example.includes(">>")) {
       example = example?.replace(
         /<<([^<>]+)>>/gu,
-        level.includes('A1')
+        level.includes("A1")
           ? '<span style="color:green" onclick=OnClickInput><b>$1</b></span>'
-          : '$1'
+          : "$1"
       );
     } else if (example.includes('"')) {
       example = example?.replace(
         /"([^"]+)"/gu,
-        level.includes('A1')
+        level.includes("A1")
           ? '<span style="color:green" onclick=OnClickInput><b>$1</b></span>'
-          : '$1'
+          : "$1"
       );
     }
 
     setTimeout(() => {
       const wAr = extractWords(currentWord?.example[$llang]);
-      const spanElements = document.querySelectorAll('.sentence_span');
+      const spanElements = document.querySelectorAll(".sentence_span");
       spanElements.forEach((spanElement, i) => {
-        div_input[i].style.display = '';
+        div_input[i].style.display = "";
         spanElement.appendChild(div_input[i]); // Используем cloneNode, чтобы не удалить div_input из DOM
         // spanElement.style.width = "50px";
-        resultElementWidth[i] = getTextWidth(wAr[i], '20px Arial');
+        resultElementWidth[i] = getTextWidth(wAr[i], "20px Arial");
       });
     }, 100);
 
@@ -436,8 +438,8 @@
 
   function getTextWidth(text, font) {
     // Создаем элемент canvas
-    const canvas = document.createElement('canvas');
-    const context = canvas.getContext('2d');
+    const canvas = document.createElement("canvas");
+    const context = canvas.getContext("2d");
 
     // Устанавливаем шрифт
     context.font = font;
@@ -453,7 +455,7 @@
     if (!isFlipped) {
       const data = {
         lesson: {
-          quiz: 'word',
+          quiz: "word",
           level: level,
           word_index: i,
           isFlipped: isFlipped,
@@ -461,42 +463,42 @@
       };
       SendData(data);
       showHints[isFlipped] = false;
-      ev.target.classList.add('selected');
-      label[false] = 'Ожидай вопрос';
+      ev.target.classList.add("selected");
+      label[false] = "Ожидай вопрос";
     } else {
       showCheckButton = true;
       div_input.forEach((di) => {
-        di.style.color = '';
+        di.style.color = "";
       });
-      const span_cnt = countWordOccurrences(resultElement, '<span');
+      const span_cnt = countWordOccurrences(resultElement, "<span");
       function extractSpans(htmlString) {
         // Создаем новый DOMParser
         const parser = new DOMParser();
         // Парсим HTML-строку в документ
-        const doc = parser.parseFromString(htmlString, 'text/html');
+        const doc = parser.parseFromString(htmlString, "text/html");
         // Находим все элементы <span> в документе
-        const spans = doc.querySelectorAll('span');
+        const spans = doc.querySelectorAll("span");
         // Преобразуем NodeList в массив
         return Array.from(spans);
       }
 
       const arSpan = extractSpans(resultElement);
-      const words = arSpan.length > 1 ? word.split(' ') : [word];
+      const words = arSpan.length > 1 ? word.split(" ") : [word];
 
-      div_input[0].style.width = '';
+      div_input[0].style.width = "";
 
       arSpan.forEach((el, i) => {
         if (word.includes(el.attributes.value.nodeValue.toLowerCase())) {
           userContent[i] = el.attributes.value.nodeValue;
-          el.style.width = getTextWidth(userContent[i], '20px Arial');
+          el.style.width = getTextWidth(userContent[i], "20px Arial");
         } else {
-          userContent[i] = words[i] ? words[i] : '';
+          userContent[i] = words[i] ? words[i] : "";
         }
       });
     }
 
     hint_example = replaceWord(words[i].example[$langs]);
-    
+
     checkInput();
   }
 
@@ -525,9 +527,9 @@
     currentWordIndex = 0;
     currentWord = words[currentWordIndex];
     makeExample();
-    userContent[0] = '&nbsp;';
-    userContent[1] = '&nbsp;';
-    result = '&nbsp;';
+    userContent[0] = "&nbsp;";
+    userContent[1] = "&nbsp;";
+    result = "&nbsp;";
   }
 
   function jumpNext10() {
@@ -535,10 +537,10 @@
     currentWordIndex = nextIndex;
     currentWord = words[currentWordIndex];
     makeExample();
-    userContent[0] = '&nbsp;';
-    userContent[1] = '&nbsp;';
+    userContent[0] = "&nbsp;";
+    userContent[1] = "&nbsp;";
     hintIndex = 0;
-    result = '';
+    result = "";
 
     showSpeakerButton = false;
   }
@@ -578,33 +580,33 @@
   }
 
   function checkInput() {
-    if (userContent.length < 1 || !userContent[0].replace(/&nbsp;/g, ''))
+    if (userContent.length < 1 || !userContent[0].replace(/&nbsp;/g, ""))
       return;
 
     let thisErrorIndex = 0;
     const targetWords = extractWords(currentWord.example[$llang]);
 
     let correctCount = 0;
-    result = '';
+    result = "";
 
     userContent.forEach((userInput, i) => {
       // userContent[i] = '';
       if (!userInput) userInput = userContent[0];
       userInput = userInput
-        .replace(/&nbsp;/g, '')
-        .replace(/<\/?![^>]+(>|$)/g, '')
+        .replace(/&nbsp;/g, "")
+        .replace(/<\/?![^>]+(>|$)/g, "")
         .trim();
 
       if (targetWords[i] && userInput)
         if (
           userInput?.toLowerCase() ===
-          targetWords[i].toLowerCase().replace('_', ' ')
+          targetWords[i].toLowerCase().replace("_", " ")
         ) {
           // result[i] = `<span class="correct">${targetWords[i]}</span>`;
-          if (div_input[i]) div_input[i].style.color = 'green';
+          if (div_input[i]) div_input[i].style.color = "green";
           correctCount++;
         } else {
-          if (div_input[i]) div_input[i].style.color = 'red';
+          if (div_input[i]) div_input[i].style.color = "red";
           thisErrorIndex++;
           errorIndex++;
         }
@@ -615,7 +617,7 @@
 
       const data = {
         lesson: {
-          quiz: 'word',
+          quiz: "word",
           word_correct: currentWordIndex,
           done_words: doneWords,
         },
@@ -631,13 +633,13 @@
     } else {
       errorIndex++;
       errorIndex = 0;
-      label[true] = 'Исправь ошибку';
+      label[true] = "Исправь ошибку";
     }
     // console.log(targetWords.length)
   }
 
   function onChangeUserContent(ev) {
-    let ar = document.getElementsByClassName('empty_block');
+    let ar = document.getElementsByClassName("empty_block");
     if (ar.length > 0) {
       // console.log(ar.length);
       ar[0].remove();
@@ -646,25 +648,25 @@
 
   function showHint() {
     showCheckButton = true;
-    const words = extractWords(currentWord.example[$llang]).join(' ');
+    const words = extractWords(currentWord.example[$llang]).join(" ");
 
     let i = 0,
       w = 0;
 
     if (hintIndex == 0) {
-      userContent[0] = '&nbsp;';
-      userContent[1] = '&nbsp;';
-      div_input[0].style.color = '#2196f3';
-      div_input[1].style.color = '#2196f3';
-      div_input[0].style.width = getTextWidth(words, '20px Arial') + 'px';
-      div_input[1].style.width = getTextWidth(words, '20px Arial') + 'px';
+      userContent[0] = "&nbsp;";
+      userContent[1] = "&nbsp;";
+      div_input[0].style.color = "#2196f3";
+      div_input[1].style.color = "#2196f3";
+      div_input[0].style.width = getTextWidth(words, "20px Arial") + "px";
+      div_input[1].style.width = getTextWidth(words, "20px Arial") + "px";
     }
 
     for (let char of words) {
       // word = word.replace(/[.,\/#!?$%\^&\*;:{}=_`~()]/g, '');
-      if (char == ' ') {
+      if (char == " ") {
         w++;
-        if (userContent[w] === '&nbsp;') userContent[w] = '';
+        if (userContent[w] === "&nbsp;") userContent[w] = "";
         continue;
       }
 
@@ -672,7 +674,7 @@
         console.log(char);
         userContent[w] += char;
 
-        result = ''; // Очистим результат при каждой новой подсказке
+        result = ""; // Очистим результат при каждой новой подсказке
         showSpeakerButton = true; // Устанавливаем видимость кнопки
         setFocus();
 
@@ -690,17 +692,17 @@
     // currentWord = words[currentWordIndex];
     // makeExample();
 
-    userContent[0] = '&nbsp;';
-    userContent[1] = '&nbsp;';
+    userContent[0] = "&nbsp;";
+    userContent[1] = "&nbsp;";
 
     errorIndex = 0;
 
-    label[isFlipped] = 'Выбери слово';
+    label[isFlipped] = "Выбери слово";
 
-    resultElement = '';
-    result = '';
-    hint_example = '';
-    example = '';
+    resultElement = "";
+    result = "";
+    hint_example = "";
+    example = "";
 
     hintIndex = 0;
 
@@ -713,7 +715,7 @@
 
     const data = {
       lesson: {
-        quiz: 'word',
+        quiz: "word",
         word_flip: isFlipped,
       },
     };
@@ -739,8 +741,8 @@
   }
 
   function speak(text) {
-    text = text.replace(/<<|>>/g, '');
-    text = text.replace(/_/g, ' ');
+    text = text.replace(/<<|>>/g, "");
+    text = text.replace(/_/g, " ");
     // Speak(text);
     tts.Speak($llang, text);
 
@@ -775,7 +777,7 @@
   function setLang(ev) {
     let lang = ev.currentTarget.outerText;
     let code = ISO6391.getCode(lang);
-    if (code !== 'English') {
+    if (code !== "English") {
       $llang = code;
     }
     // console.log($langs);
@@ -786,9 +788,7 @@
     $llang = _llang;
 
     // $view = 'lesson';
-    $lesson.data.quiz = '';
-
-    $showBottomAppBar = true;
+    $lesson.data.quiz = "";
   });
 </script>
 
@@ -875,13 +875,13 @@
             {#if isFlipped}
               {#if showNextButton}
                 <button on:click={nextWord} class="next-button"
-                  >{#await Transloc('Вперед', 'ru', $langs) then data}
+                  >{#await Transloc("Вперед", "ru", $langs) then data}
                     {data}
                   {/await}</button
                 >
               {:else if showCheckButton}
                 <button on:click={checkInput} class="check-button">
-                  {#await Transloc('Проверить', 'ru', $langs) then data}
+                  {#await Transloc("Проверить", "ru", $langs) then data}
                     {data}
                   {/await}
                 </button>
@@ -935,11 +935,11 @@
         </div>
       {/if} -->
 
-      {#await Transloc(label[isFlipped], 'ru', $langs) then data}
+      {#await Transloc(label[isFlipped], "ru", $langs) then data}
         <div class="title">{data}</div>
       {/await}
     {:else}
-      {#await Transloc(label[isFlipped], 'ru', $langs) then data}
+      {#await Transloc(label[isFlipped], "ru", $langs) then data}
         <div class="title">{data}:</div>
       {/await}
       {#if showHints[isFlipped]}
@@ -962,25 +962,25 @@
                   on:click={() => {
                     OnClickHint(
                       this,
-                      extractWords(hint.example[$llang]).join(' '),
+                      extractWords(hint.example[$llang]).join(" "),
                       i
                     );
                   }}
                 >
-                  {@html extractWords(hint.example[$llang]).join(' ') +
-                    '&nbsp;' +
-                    '&nbsp;'}
+                  {@html extractWords(hint.example[$llang]).join(" ") +
+                    "&nbsp;" +
+                    "&nbsp;"}
                 </span>
                 <!-- {/if} -->
               {:else}
-                {#await Transloc(hint?.example['ru'], 'ru', $llang) then data}
+                {#await Transloc(hint?.example["ru"], "ru", $llang) then data}
                   <span
                     class="hint_button {hint.disabled}"
                     on:click={(ev) => {
-                      OnClickHint(ev, extractWords(data).join(' '), i);
+                      OnClickHint(ev, extractWords(data).join(" "), i);
                     }}
                   >
-                    {@html extractWords(data).join(' ') + '&nbsp;' + '&nbsp;'}
+                    {@html extractWords(data).join(" ") + "&nbsp;" + "&nbsp;"}
                   </span>
                 {/await}
               {/if}
@@ -1002,25 +1002,25 @@
                     ev,
                     extractWords(
                       hint?.example[isFlipped ? $llang : $langs]
-                    ).join(' '),
+                    ).join(" "),
                     i
                   );
                 }}
               >
-                {@html extractWords(hint?.example[$langs]).join(' ') +
-                  '&nbsp;' +
-                  '&nbsp;'}
+                {@html extractWords(hint?.example[$langs]).join(" ") +
+                  "&nbsp;" +
+                  "&nbsp;"}
               </span>
               <!-- {/if} -->
             {:else}
-              {#await Transloc(hint?.example['ru'], 'ru', $langs) then data}
+              {#await Transloc(hint?.example["ru"], "ru", $langs) then data}
                 <span
                   class="hint_button {hint.disabled}"
                   on:click={(ev) => {
-                    OnClickHint(ev, extractWords(data).join(' '), i);
+                    OnClickHint(ev, extractWords(data).join(" "), i);
                   }}
                 >
-                  {@html extractWords(data).join(' ') + '&nbsp;' + '&nbsp;'}
+                  {@html extractWords(data).join(" ") + "&nbsp;" + "&nbsp;"}
                 </span>
               {/await}
             {/if}
@@ -1179,10 +1179,10 @@
     font-size: 15px;
     scale: 1.5;
     font-variation-settings:
-      'FILL' 0,
-      'wght' 400,
-      'GRAD' 0,
-      'opsz' 24;
+      "FILL" 0,
+      "wght" 400,
+      "GRAD" 0,
+      "opsz" 24;
   }
 
   .hint-button {

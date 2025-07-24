@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount, onDestroy, getContext, setContext } from "svelte";
+  import { writable } from "svelte/store";
   import { createEventDispatcher } from "svelte";
   import "../assets/icofont/icofont.min.css";
   import BottomAppBar, {
@@ -32,7 +33,6 @@
     con_state,
     call_but_status,
     langs,
-    showBottomAppBar,
   } from "$lib/stores.ts";
 
   import CircularProgress from "@smui/circular-progress";
@@ -45,12 +45,8 @@
 
   import CallButton from "./callbutton/CallButtonOperator.svelte";
   // import BurgerMenu from './menu/BurgerMenu.svelte';
-  import VideoLocal from "./Video.local.svelte";
-  import VideoRemote from "./Video.remote.svelte";
 
   import Download from "./Download.svelte";
-  import AudioLocal from "./Audio.local.svelte";
-  import AudioRemote from "./Audio.remote.svelte";
 
   import Module from "../lesson/Module.svelte";
 
@@ -58,6 +54,9 @@
 
   import pkg from "lodash";
   const { find } = pkg;
+
+  let mediaStream = writable();
+  setContext("mediaStream", mediaStream);
 
   import { msg } from "$lib/stores.ts";
   $: if ($msg) {
@@ -122,6 +121,49 @@
 
   let isHidden = false;
 
+  onMount(async () => {
+    checkWebRTCSupport();
+
+    try {
+      $rtc = new RTCOperator(operator, name, $signal);
+      initRTC();
+    } catch (ex) {
+      console.log();
+    }
+
+    try {
+    } catch (ex) {
+      console.log("Web Audio API is not supported in this browser");
+    }
+
+    // Добавьте слушателя событий для скрытия списка команд при клике за его пределами
+    // document.addEventListener('click', handleOutsideClick);
+    if (detectDevice())
+      document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    $mediaStream = await navigator.mediaDevices.getUserMedia({
+      audio: {
+        echoCancellation: true,
+        noiseSuppression: true,
+        autoGainControl: true,
+        channelCount: 1,
+        sampleRate: 48000,
+        sampleSize: 16,
+      },
+      // video: {
+      //   width: { ideal: 1280 },
+      //   height: { ideal: 720 },
+      //   frameRate: { ideal: 30 },
+      // },
+    });
+
+    setTimeout(() => {
+      if (!operator.lvl && abonent === "public") {
+        // $view = "chat";
+      }
+    }, 1000);
+  });
+
   function handleVisibilityChange() {
     isHidden = document.hidden;
     if (isHidden) {
@@ -160,55 +202,26 @@
     }
   }
 
-  onMount(async () => {
-    checkWebRTCSupport();
-
-    try {
-      $rtc = new RTCOperator(operator, name, $signal);
-      initRTC();
-    } catch (ex) {
-      console.log();
-    }
-
-    try {
-    } catch (ex) {
-      console.log("Web Audio API is not supported in this browser");
-    }
-
-    // Добавьте слушателя событий для скрытия списка команд при клике за его пределами
-    // document.addEventListener('click', handleOutsideClick);
-    if (detectDevice())
-      document.addEventListener("visibilitychange", handleVisibilityChange);
-
-    // if (operator.length <= 1) $view = "module";
-
-    // loadTabs();
-
-    setTimeout(() => {
-      if (!operator.lvl && abonent === "public") {
-        // $view = "chat";
-      }
-    }, 1000);
-  });
-
   let progress = {
     display: "block",
     value: 0,
   };
 
-  let local = {
+  let local = writable({
     video: {
       display: "none",
       srcObject: "",
       poster: "",
     },
     audio: {
-      paused: true,
+      paused: false,
       src: "",
     },
-  };
+  });
 
-  let remote = {
+  setContext("local", local);
+
+  let remote = writable({
     text: {
       display: "none",
       msg: "",
@@ -220,7 +233,9 @@
       srcObject: "",
       poster: "/assets/operator.svg",
     },
-  };
+  });
+
+  setContext("remote", remote);
 
   let profile = {
     display: "none",
@@ -260,7 +275,7 @@
     $rtc.PlayCallCnt = () => {
       // video_progress = false;
 
-      local.audio.paused = false;
+      $local.audio.paused = false;
 
       call_cnt = 10;
 
@@ -270,7 +285,7 @@
         if (call_cnt === 0) {
           clearInterval(inter);
           call_cnt = 10;
-          local.audio.paused = true;
+          $local.audio.paused = true;
           return;
         }
       }, 2000);
@@ -279,18 +294,24 @@
     };
 
     $rtc.GetRemoteVideo = () => {
-      return remote.video.srcObject;
-    };
-    $rtc.SetLocalVideo = (src: string) => {
-      if (src) local.video.srcObject = src;
+      return $remote.video.srcObject;
     };
 
-    $rtc.SetRemoteVideo = (src: string) => {
+    $rtc.SetLocalVideo = (src: string) => {
+      if (src) {
+        // $local.video.srcObject = src;
+      }
+    };
+
+    $rtc.SetRemoteVideo = async (src: string) => {
       // if ($call_but_status === 'talk') {
-      remote.video.poster = $posterst;
-      // local.audio.paused = true;
-      remote.video.srcObject = src;
-      remote.video.display = "block";
+      $remote.video.poster = $posterst;
+      // $local.audio.paused = true;
+      $remote.video.srcObject = src;
+      $remote.video.display = "block";
+
+      const ls = await $rtc.localStream;
+      ls.getAudioTracks().forEach((track) => (track.enabled = false)); //микрофон выключен
 
       // }
     };
@@ -301,10 +322,11 @@
   }
 
   export function OnClickCallButton() {
-    console.log("OnClickCallButton");
+    // console.log("OnClickCallButton");
     switch ($call_but_status) {
       case "inactive":
         try {
+          $remote.video.srcObject = "";
           // Добавьте слушателя событий для скрытия списка команд при клике за его пределами
           // document.addEventListener('click', handleOutsideClick);
           if (detectDevice())
@@ -327,18 +349,18 @@
         // let audioCtx = new AudioContext();
 
         // // Источник звука (например, <audio> элемент)
-        // if (window.user?.localSound) {
+        // if (window.user?.$localSound) {
 
-        //   const localSoundSrc = audioCtx.createMediaElementSource(window.user?.localSound);
+        //   const $localSoundSrc = audioCtx.createMediaElementSource(window.user?.$localSound);
 
         //   // Подключение к выходному устройству
-        //   localSoundSrc.connect(audioCtx.destination);
+        //   $localSoundSrc.connect(audioCtx.destination);
 
         //   // Сохранение источника (если необходимо)
-        //   $rtc.localSoundSrc = localSoundSrc;
+        //   $rtc.$localSoundSrc = $localSoundSrc;
 
         // } else {
-        //   console.log('No local sound element found.');
+        //   console.log('No $local sound element found.');
         // }
 
         $rtc.Offer();
@@ -357,12 +379,13 @@
           isRemoteAudioMute = false;
           $rtc.OnTalk();
           video_button_display = true;
-          remote.text.display = "none";
+          $remote.text.display = "none";
         } else {
           $call_but_status = "inactive";
+          $remote.video.srcObject = "";
         }
 
-        local.audio.paused = true;
+        $local.audio.paused = true;
         clearInterval(inter);
         call_cnt = 10;
 
@@ -373,15 +396,15 @@
 
         break;
       case "talk":
-        local.video.display = "none";
-        local.audio.paused = true;
+        $local.video.display = "none";
+        $local.audio.paused = true;
         video_button_display = false;
-        remote.video.display = "none";
-        remote.video.srcObject = "";
-        remote.video.poster = "";
-        remote.text.display = "none";
-        remote.text.name = "";
-        remote.text.email = "";
+        $remote.video.display = "none";
+        $remote.video.srcObject = "";
+        $remote.video.poster = "";
+        $remote.text.display = "none";
+        $remote.text.name = "";
+        $remote.text.email = "";
 
         $call_but_status = "inactive";
         $rtc.DC.SendDCClose();
@@ -412,15 +435,13 @@
 
   function OnClickVideoButton() {
     $call_but_status = "talk";
-    local.audio.paused = true;
-    local.video.display = "block";
+    $local.audio.paused = true;
+    $local.video.display = "block";
     video_button_display = false;
     video_progress = true;
 
     if ($rtc.DC.dc.readyState === "open") {
-      $rtc.GetUserMedia({ audio: 1, video: 1 }, function () {
-        $rtc.SendVideoOffer($rtc.main_pc);
-      });
+      $rtc.SendVideoOffer($rtc.main_pc);
     }
   }
 
@@ -438,12 +459,16 @@
   $: switch ($dc_state) {
     case "open":
       $call_but_status = "call"; //дубль
-      local.audio.paused = false;
+      $local.audio.paused = true;
       break;
     case "close":
-      $call_but_status = "inactive";
-      remote.video.display = "none";
-      local.audio.paused = true;
+      // $call_but_status = "inactive";
+      // $remote.video.display = "none";
+      $local.audio.paused = true;
+      break;
+    case "talk":
+      $remote.video.display = "none";
+      $local.audio.paused = false;
       break;
   }
 
@@ -451,22 +476,21 @@
     if (data.func === "close") {
       $call_but_status = "inactive";
       $rtc.DC.CloseDC();
-      local.audio.paused = true;
+      $local.audio.paused = true;
     }
 
     if (data.call || data.func === "call") {
-      $showBottomAppBar = true;
       // $call_but_status = 'call';//дубль
-      remote.text.display = "block";
+      $remote.text.display = "block";
       video_button_display = false;
-      local.audio.paused = false;
+      $local.audio.paused = false;
 
       if (data.profile) {
-        // remote.video.poster = data.profile.img;
-        if (data.profile.img) remote.video.display = "block";
+        // $remote.video.poster = data.profile.img;
+        if (data.profile.img) $remote.video.display = "block";
 
-        remote.text.name = data.profile.name;
-        remote.text.email = data.profile.email;
+        $remote.text.name = data.profile.name;
+        $remote.text.email = data.profile.email;
       }
 
       if ($click_call_func) $rtc.OnCall();
@@ -474,13 +498,13 @@
 
     if (data.func === "talk") {
       $call_but_status = "talk";
-      local.audio.paused = true;
+      $local.audio.paused = true;
       video_button_display = true;
-      remote.text.display = "none";
+      $remote.text.display = "none";
     }
 
     if (data.camera) {
-      local.video.src = that.localStream;
+      $local.video.src = that.$localStream;
     }
 
     if (data.lesson) {
@@ -489,14 +513,13 @@
     }
   }
 
-  function toggle_remote_audio() {
+  function toggle_$remote_audio() {
     isRemoteAudioMute = !isRemoteAudioMute;
   }
 
   async function OnClickTab(tab) {
     if (tab === tabs[1]) {
       $view = "group";
-      $showBottomAppBar = true;
     } else if (tab === tabs[0]) {
       if ($view === "module") $lesson.data = { quiz: "" };
       $view = "module";
@@ -542,7 +565,7 @@
   <div style="flex: 1;   ">
     {#if $view === "group"}
       <div>
-        <Group {$rtc} />
+        <Group />
       </div>
     {/if}
 
@@ -554,7 +577,7 @@
 
     {#if $view === "chat"}
       <div>
-        <Chat prompt_type="basic" bind:this={chatComponent} />
+        <Chat prompt_type="basic" isHearing="true" bind:this={chatComponent} />
       </div>
     {/if}
   </div>

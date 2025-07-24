@@ -24,7 +24,6 @@ export class RTCBase {
 		this.startTime;
 
 		this.phone = '';
-
 		// this.vr = new VideoRecorder();
 		// this.vr.open();
 	}
@@ -75,23 +74,25 @@ export class RTCBase {
 		this.fileInput.dispatchEvent(new Event('click'));
 	}
 
-	GetUserMedia(opts, cb) {
+    GetUserMedia(opts, cb) {
 		let that = this;
-		navigator.mediaDevices
+		this.mediaStream = navigator.mediaDevices
 			.getUserMedia(opts)
 			.then((stream) => this.gotStream(stream, cb))
 			.catch(function (e) {
 				if (e.name === 'NotFoundError' || e.name === 'NotReadableError') {
 					if (opts.audio) alert('Something wrong with mic?');
 					if (opts.video) alert('Something wrong with camera?');
-
-					cb(false);
 				}
 			});
 	}
 
 	get RemoteStream() {
 		return this.remoteStream;
+	}
+
+    get  LocalStream() {
+		return this.localStream;
 	}
 
 	async InitRTC(pc_key, cb) {

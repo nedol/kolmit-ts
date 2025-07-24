@@ -33,7 +33,6 @@
     dc,
     msg,
     call_but_status,
-    showBottomAppBar,
     OnCheckQU,
   } from "$lib/stores.ts";
 
@@ -187,11 +186,6 @@
 
   onMount(async () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
-    setTimeout(() => {
-      if (!share_mode) {
-        $showBottomAppBar = false; //test
-      }
-    }, 3000);
   });
 
   function flipCard() {
@@ -630,7 +624,6 @@
     stt_text = "";
     stt = "";
     tts = "";
-    $showBottomAppBar = true;
     await SendCommand("quit", null);
   });
 </script>

@@ -1,27 +1,23 @@
-<script lang='ts'>
-  import { getContext, onMount } from 'svelte';
+<script>
+  import { onMount } from "svelte";
   import Card, {
     Content,
     PrimaryAction,
     Media,
     MediaContent,
-  } from '@smui/card';
+  } from "@smui/card";
 
-  export let display = 'block';
-  export let status;
-
-  export let isRemoteAudioMute = false;
-  export let card;
   export let srcObject;
-  export let operator;
-  export let name;
   export let poster;
+  export let status;
+  let muted = true;
+  export let video_element, card;
+  export let parent_div;
+  export let name, operator;
+  let rv;
 
-
-  let rv, video;
   onMount(async () => {
-    rv = video;
-     rv.poster = poster;
+    rv = video_element;
   });
 
   $: if (rv && srcObject) {
@@ -31,70 +27,53 @@
       track.stop();
       rv.srcObject.removeTrack(track);
     });
-    rv.src = '';
-  }else if(rv && poster){
-    rv.poster = poster;
+    rv.src = "";
   }
 
-
+  //   $: if (status === "talk") {
+  //     muted = true;
+  //   } else {
+  //     muted = true;
+  //   }
 </script>
 
-<!-- <div
-	style="
-    display:{display};
-    position: relative;
-    width: 55px;
-	margin: 0 auto;
-    background-color: transparent;
-    border-radius:5px;"
-> -->
-<div class="card-display" bind:this={card} style="display:{display}">
-  <div class="card-container">
-    <Card style="min-width: 60px;">
+<div class="card-display" bind:this={parent_div}>
+  <div class="card-container" bind:this={card}>
+    <Card style="min-width: 50px;">
       <Media class="card-media-square" aspectRatio="square">
         <MediaContent>
           <video
-            class="oper_video_remote"
-            bind:this={video}
+            class="user_video_remote"
+            bind:this={video_element}
             on:click
             on:mute
-						muted={isRemoteAudioMute}
             {status}
-
+            {muted}
+            {poster}
             autoplay
             playsinline
-            poster={poster}
           >
             <track kind="captions" />
           </video>
         </MediaContent>
       </Media>
       <!-- <Content style="color: #888; font-size:smaller">{name}</Content> -->
-      <!-- <h3
+      <h3
         class="mdc-typography--subtitle2"
-        style="margin: 0; color: #888;font-size:smaller;text-align:center;z-index:1"
+        style="margin: 0; color: #888;font-size:x-small;text-align:center;z-index:1"
       >
         {#if name}
           {name.slice(0, 8)}
         {:else}
           {operator.slice(0, 8)}
         {/if}
-      </h3> -->
+      </h3>
     </Card>
   </div>
 </div>
-
-<!-- </div> -->
+<slot />
 
 <style>
-  .card-container {
-    position: relative;
-    left: -8px;
-    scale: 0.8;
-    bottom: 20px;
-   
-  }
-
   video {
     display: block;
     margin-right: auto;
@@ -103,9 +82,22 @@
     max-width: 50px;
     max-height: 50px;
   }
-
-  .oper_video_remote {
-    position: relative;
-    top: 7px;
+  [status="call"] {
+    opacity: 1;
+  }
+  [status="talk"] {
+    opacity: 1;
+  }
+  [status="muted"] {
+    opacity: 0.3;
+  }
+  [status="inactive"] {
+    opacity: 0.3;
+  }
+  [status="active"] {
+    opacity: 1;
+  }
+  [status="busy"] {
+    opacity: 0.3;
   }
 </style>

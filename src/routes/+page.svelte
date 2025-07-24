@@ -5,6 +5,7 @@
   import Chat from "./operator/chat/Chat.svelte";
   import { SignalingChannel } from "./signalingChannel.ts";
   import { lesson, signal, langs, ice_conf, view } from "$lib/stores.ts";
+  // import AddToHome from "$lib/components/AddToHome.svelte";
 
   $view = "greeting";
 
@@ -66,9 +67,19 @@
   setContext("operator", firstOperator);
   setContext("abonent", data.abonent);
 
-  onMount(async () => {
-    Init();
+  const loadTabs = async () => {
+    const titles = ["УРОК", "ЧАТ"];
+    tabs = await Promise.all(
+      titles.map(async (title) => {
+        const translated = await Transloc(title, "ru", $langs, "");
+        return translated.slice(0, 4);
+      })
+    );
+  };
 
+  Init();
+
+  onMount(async () => {
     if (!operator) {
       view.set("login");
     }
@@ -91,7 +102,7 @@
     $signal = new SignalingChannel(firstOperator.operator);
 
     if ($view == "greeting") {
-      chatComponent.Init("Begin een gesprek in het Nederlands.");
+      // chatComponent.Init("Begin een gesprek in het Nederlands.");
     }
 
     langs.set(
@@ -122,25 +133,14 @@
         console.log(error);
       });
   }
-
-  const loadTabs = async () => {
-    const titles = ["УРОК", "ЧАТ"];
-    tabs = await Promise.all(
-      titles.map(async (title) => {
-        const translated = await Transloc(title, "ru", $langs, "");
-        return translated.slice(0, 4);
-      })
-    );
-  };
 </script>
 
 {#if $view === "greeting"}
-  <div style="display: {$view === 'greeting' ? 'block' : 'none'}">
-    <!-- <Chat prompt_type={"greeting"} bind:this={chatComponent} /> -->
-  </div>
+  <Chat prompt_type={"greeting"} bind:this={chatComponent} isHearing="true" />
 {:else if $view === "login"}
   <Login {operator} {abonent} {user_pic} />
 {:else}
+  <!-- <AddToHome /> -->
   <div>
     <Operator
       bind:this={operatorComponent}
@@ -281,6 +281,7 @@
     justify-content: center; /* Выравниваем содержимое по центру вертикально */
     align-items: center; /* Выравниваем содержимое по центру горизонтально */
     background-color: white;
+    z-index: 5;
     /* opacity: 50%; */
   }
 

@@ -36,7 +36,7 @@
 
 {#if showButton}
   <button
-    style="position:fixed; left:0;top:0;background-color:white;width:50vw"
+    style="position:fixed; top:0;left:0"
     on:click={installApp}
     class="add-btn"
     aria-label="Добавить на главный экран"
