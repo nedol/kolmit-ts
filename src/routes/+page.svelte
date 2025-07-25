@@ -2,9 +2,17 @@
   import { onMount, setContext } from "svelte";
   import Operator from "./operator/Operator.svelte";
   import Login from "./site/Login.svelte";
-  import Chat from "./operator/chat/Chat.svelte";
+
   import { SignalingChannel } from "./signalingChannel.ts";
-  import { lesson, signal, langs, ice_conf, view } from "$lib/stores.ts";
+  import {
+    lesson,
+    signal,
+    langs,
+    ice_conf,
+    view,
+    mediaStream,
+  } from "$lib/stores.ts";
+
   import AddToHome from "$lib/components/AddToHome.svelte";
 
   $view = "";
@@ -16,12 +24,11 @@
   import { Transloc } from "./translate/Transloc";
 
   import langs_list from "$lib/dict/google_lang_list.json";
+  import Level from "./Level.svelte";
 
   let operatorComponent: Operator = "";
 
   let tabs = [];
-
-  let chatComponent;
 
   let lang_menu = false;
   interface OperatorData {
@@ -78,10 +85,27 @@
   };
 
   onMount(async () => {
-    if (data.group) Init();
+    $mediaStream = await navigator.mediaDevices.getUserMedia({
+      audio: {
+        echoCancellation: true,
+        noiseSuppression: true,
+        autoGainControl: true,
+        channelCount: 1,
+        sampleRate: 48000,
+        sampleSize: 16,
+      },
+      // video: {
+      //   width: { ideal: 1280 },
+      //   height: { ideal: 720 },
+      //   frameRate: { ideal: 30 },
+      // },
+    });
 
-    if (!operator) {
-      view.set("login");
+    if (!data.operator[0].operator) {
+      $view = "login";
+    } else {
+      Init();
+      if (!data.operator[0].lvl) $view = "level";
     }
   });
 
@@ -101,7 +125,7 @@
 
     $signal = new SignalingChannel(firstOperator.operator);
 
-    if ($view == "greeting") {
+    if ($view == "level") {
       // chatComponent.Init("Begin een gesprek in het Nederlands.");
     }
 
@@ -135,8 +159,8 @@
   }
 </script>
 
-{#if $view === "greeting"}
-  <Chat prompt_type={"greeting"} bind:this={chatComponent} isHearing="true" />
+{#if $view === "level"}
+  <Level></Level>
 {:else if $view === "login"}
   <Login {operator} {abonent} {user_pic} />
 {:else}

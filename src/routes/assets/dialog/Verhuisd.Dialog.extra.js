@@ -690,7 +690,7 @@ export let dialog_data = {
 				ru: 'До вечера! Привет!',
 				uk: 'До вечора! Привіт!',
 				fr: 'À ce soir ! Salutations !',
-				en: 'See you tonight! Greetings!',
+				en: 'See you tonight! levels!',
 				de: 'Bis heute Abend! Grüße!'
 			},
 

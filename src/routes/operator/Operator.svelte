@@ -7,6 +7,8 @@
     AutoAdjust,
   } from "@smui-extra/bottom-app-bar";
 
+  import Level from "../Level.svelte";
+
   import { writable } from "svelte/store";
 
   import Button, { Label } from "@smui/button";
@@ -119,22 +121,6 @@
 
   onMount(async () => {
     checkWebRTCSupport();
-
-    $mediaStream = await navigator.mediaDevices.getUserMedia({
-      audio: {
-        echoCancellation: true,
-        noiseSuppression: true,
-        autoGainControl: true,
-        channelCount: 1,
-        sampleRate: 48000,
-        sampleSize: 16,
-      },
-      // video: {
-      //   width: { ideal: 1280 },
-      //   height: { ideal: 720 },
-      //   frameRate: { ideal: 30 },
-      // },
-    });
 
     try {
       $rtc = new RTCOperator(operator, name, $signal);
@@ -529,59 +515,69 @@
   });
 </script>
 
-<!-- {@debug $view} -->
+{#if $view === "level"}
+  <Level></Level>
+{:else}
+  <div style="position: fixed;">
+    <TabBar {tabs} let:tab bind:active>
+      <Tab
+        {tab}
+        minWidth
+        on:click={() => {
+          OnClickTab(tab);
+        }}
+      >
+        <div style=" text-align: left;">
+          <Button
+            class="lvl_span"
+            style="position: relative;"
+            color="secondary"
+          >
+            <Label>
+              {tab}
+            </Label>
+          </Button>
+        </div>
+      </Tab>
+    </TabBar>
+  </div>
 
-<div style="position: fixed;">
-  <TabBar {tabs} let:tab bind:active>
-    <Tab
-      {tab}
-      minWidth
-      on:click={() => {
-        OnClickTab(tab);
-      }}
-    >
-      <div style=" text-align: left;">
-        <Button class="lvl_span" style="position: relative;" color="secondary">
-          <Label>
-            {tab}
-          </Label>
-        </Button>
-      </div>
-    </Tab>
-  </TabBar>
-</div>
-
-<div
-  style="
+  <div
+    style="
     display: flex;
     flex-direction: column;
     height: 95vh;
     top: 50px;
     position: relative;
     overflow-y: hidden"
->
-  <div style="flex: 1;   ">
-    {#if $view === "group"}
-      <div>
-        <Group />
-      </div>
-    {/if}
+  >
+    <div style="flex: 1;   ">
+      {#if $view === "group"}
+        <div>
+          <Group />
+        </div>
+      {/if}
 
-    {#if $view === "module"}
-      <div>
-        <Module data={operator} />
-      </div>
-    {/if}
+      {#if $view === "module"}
+        <div>
+          <Module data={operator} />
+        </div>
+      {/if}
 
-    {#if $view === "chat"}
-      <div>
-        <Chat prompt_type="basic" isHearing="true" bind:this={chatComponent} />
-      </div>
-    {/if}
+      {#if $view === "chat"}
+        <div>
+          <Chat
+            prompt_type="basic"
+            isHearing="true"
+            bind:this={chatComponent}
+          />
+        </div>
+      {/if}
+    </div>
   </div>
-</div>
 
-<!-- <div class="empty" style="position:relative;height:70px"></div> -->
+  <!-- <div class="empty" style="position:relative;height:70px"></div> -->
+{/if}
 
 <style lang="scss">
   /* Hide everything above this component. */

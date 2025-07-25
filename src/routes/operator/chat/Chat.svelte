@@ -33,7 +33,7 @@
 
   $muted = true;
 
-  export let prompt_type = "greeting",
+  export let prompt_type = "level",
     data,
     quiz = { quiz: "" },
     context: string[] = [];
