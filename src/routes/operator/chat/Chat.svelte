@@ -257,7 +257,7 @@
 
     console.log("SendMessage", params);
 
-    $signal.SendMessage(params, async (res) => {
+    $signal?.SendMessage(params, async (res) => {
       console.log("handleData", res);
       handleData(res);
       isTranslate = false;
@@ -447,9 +447,9 @@
 
       $blink_mic = false;
 
-      stt.startAudioMonitoring($llang, $langs);
-
       isListening = true;
+
+      stt.startAudioMonitoring($llang, $langs);
     }
   }
 

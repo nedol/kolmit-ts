@@ -1,6 +1,5 @@
 <script lang="ts">
   import { onMount, onDestroy, getContext, setContext } from "svelte";
-  import { writable } from "svelte/store";
   import { createEventDispatcher } from "svelte";
   import "../assets/icofont/icofont.min.css";
   import BottomAppBar, {
@@ -8,7 +7,7 @@
     AutoAdjust,
   } from "@smui-extra/bottom-app-bar";
 
-  import AddToHome from "$lib/components/AddToHome.svelte";
+  import { writable } from "svelte/store";
 
   import Button, { Label } from "@smui/button";
   import IconButton, { Icon } from "@smui/icon-button";
@@ -32,7 +31,7 @@
     dc_state,
     con_state,
     call_but_status,
-    langs,
+    mediaStream,
   } from "$lib/stores.ts";
 
   import CircularProgress from "@smui/circular-progress";
@@ -54,9 +53,6 @@
 
   import pkg from "lodash";
   const { find } = pkg;
-
-  let mediaStream = writable();
-  setContext("mediaStream", mediaStream);
 
   import { msg } from "$lib/stores.ts";
   $: if ($msg) {
@@ -124,6 +120,22 @@
   onMount(async () => {
     checkWebRTCSupport();
 
+    $mediaStream = await navigator.mediaDevices.getUserMedia({
+      audio: {
+        echoCancellation: true,
+        noiseSuppression: true,
+        autoGainControl: true,
+        channelCount: 1,
+        sampleRate: 48000,
+        sampleSize: 16,
+      },
+      // video: {
+      //   width: { ideal: 1280 },
+      //   height: { ideal: 720 },
+      //   frameRate: { ideal: 30 },
+      // },
+    });
+
     try {
       $rtc = new RTCOperator(operator, name, $signal);
       initRTC();
@@ -140,22 +152,6 @@
     // document.addEventListener('click', handleOutsideClick);
     if (detectDevice())
       document.addEventListener("visibilitychange", handleVisibilityChange);
-
-    $mediaStream = await navigator.mediaDevices.getUserMedia({
-      audio: {
-        echoCancellation: true,
-        noiseSuppression: true,
-        autoGainControl: true,
-        channelCount: 1,
-        sampleRate: 48000,
-        sampleSize: 16,
-      },
-      // video: {
-      //   width: { ideal: 1280 },
-      //   height: { ideal: 720 },
-      //   frameRate: { ideal: 30 },
-      // },
-    });
 
     setTimeout(() => {
       if (!operator.lvl && abonent === "public") {
@@ -322,7 +318,7 @@
   }
 
   export function OnClickCallButton() {
-    // console.log("OnClickCallButton");
+    console.log("OnClickCallButton");
     switch ($call_but_status) {
       case "inactive":
         try {
@@ -383,6 +379,8 @@
         } else {
           $call_but_status = "inactive";
           $remote.video.srcObject = "";
+          $rtc.DC.SendDCClose();
+          $rtc.OnInactive();
         }
 
         $local.audio.paused = true;
@@ -513,7 +511,7 @@
     }
   }
 
-  function toggle_$remote_audio() {
+  function toggle_remote_audio() {
     isRemoteAudioMute = !isRemoteAudioMute;
   }
 

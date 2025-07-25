@@ -2,7 +2,15 @@
   import { onDestroy, getContext, afterUpdate, onMount } from "svelte";
   import { writable, get } from "svelte/store";
   import { Transloc } from "../../translate/Transloc";
-  import { langs, llang, signal, dc, dc_state, msg } from "$lib/stores";
+  import {
+    langs,
+    llang,
+    signal,
+    dc,
+    dc_state,
+    msg,
+    mediaStream,
+  } from "$lib/stores";
   import IconButton, { Icon } from "@smui/icon-button";
   import emojiRegex from "emoji-regex";
   import Badge from "@smui-extra/badge";
@@ -33,7 +41,6 @@
 
   let operator = getContext("operator");
   let level = getContext("level");
-  let mediaStream = getContext("mediaStream");
 
   export let prompt_type = "greeting",
     data,
@@ -83,7 +90,6 @@
   export let isHearing = false;
 
   let isText = true;
-
   let isTranslate = false;
   let isTip = false;
 

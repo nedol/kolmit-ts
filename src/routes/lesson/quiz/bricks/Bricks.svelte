@@ -513,8 +513,6 @@
 
     stt.startAudioMonitoring($llang, $langs);
 
-    // const text = dialog_data.content[cur_qa].user1[llang].replace(/[^\w\s]/gi, ''); //.split(' ');
-
     isListening = true;
   }
 
@@ -526,8 +524,6 @@
     stt_text = text[$llang];
     const correct_str = getCorrectSpanString(true);
     sent_compare = correct_str;
-
-    // formattedSentence = correct_str;
 
     const numbers = sent_compare.match(/\d+/g);
     if (numbers)
@@ -1120,6 +1116,7 @@
             </Badge>
           </IconButton>
         </div>
+
         <Stt
           bind:this={stt}
           {SttResult}

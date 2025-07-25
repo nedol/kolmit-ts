@@ -69,6 +69,7 @@
   let isPlayAuto = false;
 
   let isSTT = false;
+  let isWaitingSttResult = false;
 
   let isCollapsed = true;
 
@@ -441,6 +442,7 @@
     }
 
     stt.startAudioMonitoring($llang, $langs);
+    isWaitingSttResult = true;
 
     // const text = dialog_data.content[cur_qa].user1[llang].replace(/[^\w\s]/gi, ''); //.split(' ');
 
@@ -453,6 +455,8 @@
 
   function SttResult(text) {
     stt_text = text[$llang];
+
+    isWaitingSttResult = false;
 
     let content = isFlipped
       ? dialog_data.content[cur_qa].user1[$llang]
@@ -974,12 +978,14 @@
                       {/await}
                     {/if}
                   </div>
-                  <Stt
-                    bind:this={stt}
-                    {SttResult}
-                    {StopListening}
-                    bind:display_audio
-                  ></Stt>
+                  {#if isWaitingSttResult}
+                    <Stt
+                      bind:this={stt}
+                      {SttResult}
+                      {StopListening}
+                      bind:display_audio
+                    ></Stt>
+                  {/if}
                 </div>
               {/if}
             </Section>
@@ -1099,12 +1105,14 @@
                       </Badge>
                     </IconButton>
                   </div>
-                  <Stt
-                    bind:this={stt}
-                    {SttResult}
-                    {StopListening}
-                    bind:display_audio
-                  ></Stt>
+                  {#if isWaitingSttResult}
+                    <Stt
+                      bind:this={stt}
+                      {SttResult}
+                      {StopListening}
+                      bind:display_audio
+                    ></Stt>
+                  {/if}
                 </div>
               {/if}
             </Section>

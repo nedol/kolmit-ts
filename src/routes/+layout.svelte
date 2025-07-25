@@ -6,7 +6,6 @@
   import "./smui.1.css";
   // import './smui.2.css';
   import { onMount } from "svelte";
-  import AddToHome from "$lib/components/AddToHome.svelte";
 
   onMount(() => {
     window.addEventListener("beforeinstallprompt", (e) => {
@@ -29,7 +28,6 @@
 
 <div class="app">
   <main>
-    <AddToHome />
     <slot></slot>
   </main>
 

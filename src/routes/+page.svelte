@@ -5,9 +5,9 @@
   import Chat from "./operator/chat/Chat.svelte";
   import { SignalingChannel } from "./signalingChannel.ts";
   import { lesson, signal, langs, ice_conf, view } from "$lib/stores.ts";
-  // import AddToHome from "$lib/components/AddToHome.svelte";
+  import AddToHome from "$lib/components/AddToHome.svelte";
 
-  $view = "greeting";
+  $view = "";
 
   import ISO6391 from "iso-google-locales";
 
@@ -77,9 +77,9 @@
     );
   };
 
-  Init();
-
   onMount(async () => {
+    if (data.group) Init();
+
     if (!operator) {
       view.set("login");
     }
@@ -140,7 +140,7 @@
 {:else if $view === "login"}
   <Login {operator} {abonent} {user_pic} />
 {:else}
-  <!-- <AddToHome /> -->
+  <AddToHome />
   <div>
     <Operator
       bind:this={operatorComponent}

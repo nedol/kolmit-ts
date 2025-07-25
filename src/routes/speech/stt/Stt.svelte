@@ -2,7 +2,9 @@
   import { onMount, onDestroy, getContext } from "svelte";
   import { MediaRecorder } from "extendable-media-recorder";
   import type { IBlobEvent, IMediaRecorder } from "extendable-media-recorder";
+
   // import { CreateMLCEngine } from '@mlc-ai/web-llm';
+  import { mediaStream } from "$lib/stores.ts";
 
   export let SttResult: string,
     StopListening,
@@ -10,8 +12,6 @@
     original: string;
 
   let operator = getContext("operator");
-
-  let mediaStream: any = getContext("mediaStream");
 
   // let MediaRecorder;
 

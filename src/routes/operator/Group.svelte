@@ -145,11 +145,11 @@
   }
 </script>
 
-<!-- {#if $dc_state === "open"} -->
-<div style="display: {isChat ? 'block' : 'none'}; height:90vh">
-  <ChatSupport prompt_type={"tutor"} bind:this={chatComponent} />
-</div>
-<!-- {/if} -->
+{#if isChat}
+  <div style="display: 'block'; height:90vh">
+    <ChatSupport prompt_type={"tutor"} bind:this={chatComponent} />
+  </div>
+{/if}
 <!-- <div style="position:relative;height:50px"></div> -->
 
 <!-- {@debug operator} -->
