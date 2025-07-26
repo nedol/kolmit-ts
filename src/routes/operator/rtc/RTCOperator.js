@@ -128,7 +128,7 @@ export class RTCOperator extends RTCBase {
     par.abonent = this.abonent.toLowerCase();
     par.operator = this.operator.toLowerCase();
     par.status = status;
-    this.signal.SendMessage(par, () => {
+    this.signal?.SendMessage(par, () => {
       this.status = status;
     });
   }

@@ -8,6 +8,7 @@
   } from "@smui-extra/bottom-app-bar";
 
   import Level from "../Level.svelte";
+  import { SignalingChannel } from "../signalingChannel.ts";
 
   import { writable } from "svelte/store";
 
@@ -123,6 +124,7 @@
     checkWebRTCSupport();
 
     try {
+      $signal = new SignalingChannel(operator);
       $rtc = new RTCOperator(operator, name, $signal);
       initRTC();
     } catch (ex) {
