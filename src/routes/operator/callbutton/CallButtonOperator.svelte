@@ -46,7 +46,7 @@
     animation-iteration-count: infinite;
   }
   [status="call"] g {
-    fill: orange;
+    fill: grey;
   }
   [status="talk"] {
     transform: rotate(0deg) !important;
@@ -63,7 +63,7 @@
     transform: rotate(120deg);
   }
   [status="inactive"] g {
-    fill: grey;
+    fill: white;
   }
   [status="active"] {
     transform: rotate(120deg);
@@ -71,7 +71,7 @@
     opacity: 1;
   }
   [status="active"] g {
-    fill: orange;
+    fill: grey;
   }
   [status="busy"] {
     transform: rotate(120deg);

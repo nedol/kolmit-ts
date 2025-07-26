@@ -6,7 +6,6 @@
   import DropdownList from "./DropdownList.svelte";
   import VideoLocal from "../media/Video.local.svelte";
   import VideoRemote from "../media/Video.remote.svelte";
-  import CallButtonUser from "./CallButtonUser.svelte";
   import Download from "./Download.svelte";
   import AudioLocal from "../media/Audio.local.svelte";
   import AudioRemote from "../media/Audio.remote.svelte";

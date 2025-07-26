@@ -14,7 +14,7 @@ export async function load({ fetch, cookies, route, url }) {
 
 	let res;
 
-	let abonent = url.searchParams.get('abonent');
+	let abonent = url.searchParams.get('abonent') || 'public';
 	let lang = url.searchParams.get('lang');
 	let name = url.searchParams.get('name');
 	let operator = url.searchParams.get('operator');

@@ -25,7 +25,7 @@
     silenceTimer;
 
   const threshold = 10;
-  const silenceDelay = 2000; //  секунды тишины
+  const silenceDelay = 3000; //  секунды тишины
   let checkLoop = true;
   let from_lang = "en";
   let to_lang = "en";
@@ -90,7 +90,7 @@
     try {
       // дополнительные настройки audioAnalyser
       startRecording();
-      // checkAudio();
+      checkAudio();
       // setTimeout(() => {
       // 	mediaRecorder.stop();
       // }, 4000);
