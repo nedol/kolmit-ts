@@ -25,7 +25,7 @@ export class Peer {
 		par.desc = desc; //.sdp.replace(/max-message-size:([0-9]+)/g, 'max-message-size:'+262144+'\r\n');
 		par.status = 'call';
 
-		return await this.signal.SendMessage(par);
+		return await this.signal?.SendMessage(par);
 	}
 
 	async SendCand(cand) {
@@ -38,7 +38,7 @@ export class Peer {
 		par.status = 'call';
 		par.abonent = that.rtc.abonent;
 
-		return await this.signal.SendMessage(par);
+		return await this.signal?.SendMessage(par);
 	}
 
 	async SendOffer() {
@@ -52,7 +52,7 @@ export class Peer {
 		par.cand = this.params['loc_cand'];
 		par.status = 'offer';
 
-		const res = await this.signal.SendMessage(par, (data) => {
+		const res = await this.signal?.SendMessage(par, (data) => {
 
 		});
 	
