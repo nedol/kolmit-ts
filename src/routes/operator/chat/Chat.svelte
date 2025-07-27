@@ -672,46 +672,15 @@
         bind:this={lastMessage}
       >
         <!--strong>{message.role === 'user' ? 'Вы' : 'AI'}:</strong-->
-        {#if message.cor}
-          {#if isCorrection}
-            <div class="correction_container" bind:this={cor_el}>
-              {#if message.isTranslate}
-                {#if translatedMessages.has(message.cor)}
-                  <cor>
-                    {@html translatedMessages.get(message.cor)}
-                    <div on:click={() => toggleTranslation(message, index)}>
-                      <IconButton>
-                        <Icon tag="svg" viewBox="0 0 24 24">
-                          <path
-                            fill={message.role === "user"
-                              ? "red"
-                              : "currentColor"}
-                            d={mdiTranslate}
-                          />
-                        </Icon>
-                      </IconButton>
-                    </div>
-                  </cor>
-                {:else if message.tr}
-                  <cor
-                    >{@html message.tr}
-                    <div on:click={() => toggleTranslation(message, index)}>
-                      <IconButton>
-                        <Icon tag="svg" viewBox="0 0 24 24">
-                          <path
-                            fill={message.role === "user"
-                              ? "red"
-                              : "currentColor"}
-                            d={mdiTranslate}
-                          />
-                        </Icon>
-                      </IconButton>
-                    </div>
-                  </cor>
-                {:else}
-                  {#await Transloc(message.cor, $llang, $langs, "chat") then data}
+        {#if message.cor.length > 0}
+          {#each message.cor as cor, cor_ind}
+            <!-- {@debug cor} -->
+            {#if isCorrection}
+              <div class="correction_container" bind:this={cor_el}>
+                {#if message.isTranslate}
+                  {#if translatedMessages.has(cor.message)}
                     <cor>
-                      {@html data}
+                      {@html translatedMessages.get(cor.message)}
                       <div on:click={() => toggleTranslation(message, index)}>
                         <IconButton>
                           <Icon tag="svg" viewBox="0 0 24 24">
@@ -725,37 +694,71 @@
                         </IconButton>
                       </div>
                     </cor>
-                  {/await}
+                  {:else if message.tr}
+                    <cor
+                      >{@html message.tr[cor_ind].message}
+                      <div on:click={() => toggleTranslation(message, index)}>
+                        <IconButton>
+                          <Icon tag="svg" viewBox="0 0 24 24">
+                            <path
+                              fill={message.role === "user"
+                                ? "red"
+                                : "currentColor"}
+                              d={mdiTranslate}
+                            />
+                          </Icon>
+                        </IconButton>
+                      </div>
+                    </cor>
+                  {:else}
+                    {#await Transloc(cor.message, $llang, $langs, "chat") then data}
+                      <cor>
+                        {@html data}
+                        <div on:click={() => toggleTranslation(message, index)}>
+                          <IconButton>
+                            <Icon tag="svg" viewBox="0 0 24 24">
+                              <path
+                                fill={message.role === "user"
+                                  ? "red"
+                                  : "currentColor"}
+                                d={mdiTranslate}
+                              />
+                            </Icon>
+                          </IconButton>
+                        </div>
+                      </cor>
+                    {/await}
+                  {/if}
+                {:else}
+                  <cor>
+                    {@html cor.message}
+                    <div on:click={() => toggleTranslation(message, index)}>
+                      <IconButton>
+                        <Icon tag="svg" viewBox="0 0 24 24">
+                          <path
+                            fill={message.role === "user"
+                              ? "red"
+                              : "currentColor"}
+                            d={mdiTranslateOff}
+                          />
+                        </Icon>
+                      </IconButton>
+                    </div>
+                  </cor>
                 {/if}
-              {:else}
-                <cor>
-                  {@html message.cor}
-                  <div on:click={() => toggleTranslation(message, index)}>
-                    <IconButton>
-                      <Icon tag="svg" viewBox="0 0 24 24">
-                        <path
-                          fill={message.role === "user"
-                            ? "red"
-                            : "currentColor"}
-                          d={mdiTranslateOff}
-                        />
-                      </Icon>
-                    </IconButton>
-                  </div>
-                </cor>
-              {/if}
+              </div>
+            {/if}
+            <div on:click={() => toggleCorrection(index)}>
+              <IconButton>
+                <Icon tag="svg" viewBox="0 0 24 24">
+                  <path
+                    fill={message.role === "user" ? "red" : "currentColor"}
+                    d={mdiAlertCircleCheckOutline}
+                  />
+                </Icon>
+              </IconButton>
             </div>
-          {/if}
-          <div on:click={() => toggleCorrection(index)}>
-            <IconButton>
-              <Icon tag="svg" viewBox="0 0 24 24">
-                <path
-                  fill={message.role === "user" ? "red" : "currentColor"}
-                  d={mdiAlertCircleCheckOutline}
-                />
-              </Icon>
-            </IconButton>
-          </div>
+          {/each}
         {/if}
 
         {#if message.isTranslate && translatedMessages.has(message.text)}
