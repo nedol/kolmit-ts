@@ -175,21 +175,6 @@
     />
   </div>
 
-  <div class="callbutton">
-    <CallButton on:click={operatorComponent.OnClickCallButton}>
-      <b
-        class="call_cnt"
-        style="display:none;position: relative;left:25px;top:10px;color:#0e0cff;font-size: 12px;"
-        >100</b
-      >
-      <span
-        class="badge badge-primary badge-pill call-queue"
-        style="display:none;position: relative;right:0px;bottom:0px;color:#0e0cff;font-size: 12px;opacity:1"
-        >0</span
-      >
-    </CallButton>
-  </div>
-
   <span class="lvl_span">
     {lvl}
   </span>
@@ -247,28 +232,12 @@
     font-weight: bold;
   }
 
-  .callbutton {
-    position: absolute;
-    top: 20px;
-    width: 25px;
-    height: 25px;
-    right: 140px;
-    border: 0px solid;
-    color: gray;
-    border-radius: 50%;
-    padding: 0px;
-    font-size: 1em;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
   .lang_span {
     position: absolute;
     top: 12px;
     width: 25px;
     height: 25px;
-    right: 20px;
+    right: 5vw;
     border: 1px solid;
     color: gray;
     border-radius: 50%;
@@ -285,7 +254,7 @@
     top: 12px;
     width: 25px;
     height: 25px;
-    right: 70px;
+    right: 20vw;
     border: 1px solid;
     color: white;
     background-color: red;

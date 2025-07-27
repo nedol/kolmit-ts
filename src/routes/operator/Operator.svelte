@@ -48,6 +48,8 @@
   import CallButton from "./callbutton/CallButtonOperator.svelte";
   // import BurgerMenu from './menu/BurgerMenu.svelte';
 
+  let operatorComponent: Operator = "";
+
   import Download from "./Download.svelte";
 
   import Module from "../lesson/Module.svelte";
@@ -543,6 +545,16 @@
       </Tab>
     </TabBar>
   </div>
+  <div class="callbutton">
+    <CallButton on:click={OnClickCallButton}>
+      <b
+        class="call_cnt"
+        style="display:none;position: relative;left:25px;top:10px;color:#0e0cff;font-size: 12px;"
+        >100</b
+      >
+      <span class="badge badge-primary badge-pill call-queue">0</span>
+    </CallButton>
+  </div>
 
   <div
     style="
@@ -601,6 +613,22 @@
     // display: none;
     transform: translateY(100px); // Смещаем вниз
     transition: transform 0.7s ease; // Плавное задвигание
+  }
+
+  .callbutton {
+    position: absolute;
+    top: 20px;
+    width: 25px;
+    height: 25px;
+    right: 40vw;
+    border: 0px solid;
+    color: gray;
+    border-radius: 50%;
+    padding: 0px;
+    font-size: 1em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   /* Если не скрыт, панель остается на месте */

@@ -196,21 +196,30 @@
   function onClickQuiz(type, theme, name, level) {
     try {
       console.log();
+
+      main.scrollTo(0, -200);
+
       data.theme = theme.name[$llang];
       lesson_data?.module.themes.map((theme) => {
         theme.new_cnt = 0;
       });
-      data.name = name;
+
       data.llang = $llang;
       data.level = level;
       data.quiz = type;
       data.abonent = operator.abonent;
 
-      // main.scrollIntoView();
-      main.scrollTo(0, -200);
+      if (data.quiz === "bricks" && data.name !== name) {
+        data.name = name;
+        bricksComponent.Init(data);
+        return;
+      }
 
-      if (data.quiz === "bricks") bricksComponent.Init(data);
-      else if (data.quiz === "dialogs") chatComponent.Init(data);
+      data.name = name;
+
+      // main.scrollIntoView();
+
+      if (data.quiz === "dialogs") chatComponent.Init(data);
 
       // if (ev.currentTarget.attributes['highlight'])
       //   data.highlight = ev.currentTarget.attributes['highlight'].value;

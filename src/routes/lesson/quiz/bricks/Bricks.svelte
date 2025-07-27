@@ -59,8 +59,6 @@
 
   let tts: Tts | null = null; // Если `Tts` — это класс или компонент Svelte
 
-  let synt = "";
-
   interface Word {
     gr: string;
     placeholder: string;
@@ -143,7 +141,9 @@
     mdiTranslateOff,
   } from "@mdi/js";
 
-  onMount(() => {});
+  onMount(() => {
+    Init(data);
+  });
 
   function extractTagName(tagString: string) {
     const match = tagString.match(/^<(\w+)/); // Находим первую часть тега
@@ -732,7 +732,7 @@
   <Chat
     context={getCurrentArticle()}
     bind:this={chatComponent}
-    prompt_type="basic"
+    prompt_type="bricks"
     isHearing="true"
   ></Chat>
 {:else}
@@ -960,7 +960,7 @@
 
   <!-- <div class="card"> -->
 
-  {#if bricks_data && bricks_data[curArticle].theme}
+  {#if bricks_data && bricks_data[curArticle] && bricks_data[curArticle].theme}
     <div class="bricks-header">
       <span
         class="bricks_name"
