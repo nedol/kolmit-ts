@@ -133,7 +133,7 @@ export class RTCOperator extends RTCBase {
     });
   }
 
-  SendOffer(key) {
+  SendOffer(key, cb) {
     let that = this;
     that.pcPull[key].params['loc_desc'] = '';
     that.pcPull[key].params['loc_cand'] = '';
@@ -146,7 +146,7 @@ export class RTCOperator extends RTCBase {
         })
       )
       .then(
-        (desc) => that.pcPull[key].onCreateOfferSuccess(desc),
+        (desc) => {that.pcPull[key].onCreateOfferSuccess(desc), cb(true)},
         that.pcPull[key].onCreateOfferError
       );
   }
@@ -155,11 +155,11 @@ export class RTCOperator extends RTCBase {
     this.SendOffer(key); // или можно вызвать SendVideoOffer из базового класса при необходимости
   }
 
-  async Offer() {
+  async Offer(cb) {
     this.Init(() => {
       if (this.pcPull[this.abonent].con.signalingState !== 'closed') {
 
-          this.SendOffer(this.abonent);
+          this.SendOffer(this.abonent, cb);
      
       }
     });

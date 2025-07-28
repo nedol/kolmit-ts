@@ -90,6 +90,7 @@ async SendMessage(par, cb) {
     if (this.isSocketReady()) {
       this.callback = cb;
       this.socket.send(JSON.stringify({ par }));
+      if(cb) cb(par )
       return;
     }
 

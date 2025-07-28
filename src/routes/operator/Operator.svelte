@@ -307,7 +307,7 @@
     selected.display = true;
   }
 
-  export function OnClickCallButton() {
+  export async function OnClickCallButton() {
     console.log("OnClickCallButton");
     switch ($call_but_status) {
       case "inactive":
@@ -349,9 +349,10 @@
         //   console.log('No $local sound element found.');
         // }
 
-        $rtc.Offer();
+        $rtc.Offer((res) => {
+          $call_but_status = "active";
+        });
 
-        $call_but_status = "active";
         break;
 
       case "active":

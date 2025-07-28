@@ -53,7 +53,7 @@ export class Peer {
 		par.status = 'offer';
 
 		const res = await this.signal?.SendMessage(par, (data) => {
-
+			return data;
 		});
 	
 		return res;
