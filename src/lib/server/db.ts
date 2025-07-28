@@ -11,7 +11,8 @@ let sql: Sql;
 
 import { sql_st } from '$lib/stores.ts';
 import { redirect } from '@sveltejs/kit';
-import {Email} from '$lib/email/email.js';
+import Email from '$lib/email/email.js';
+
 
 sql_st.subscribe((data) => {
   sql = data;
