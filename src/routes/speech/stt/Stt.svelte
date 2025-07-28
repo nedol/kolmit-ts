@@ -24,7 +24,9 @@
     soundTimer,
     silenceTimer;
 
-  const threshold = 10;
+  const threshold = 20; /*10–20 — это чувствительно (реагирует почти на всё).
+                        30–50 — нормально для распознавания речи (игнорирует фоновый шум).
+                        70–100+ — будет реагировать только на громкие звуки. */
   const silenceDelay = 3000; //  секунды тишины
   let checkLoop = true;
   let from_lang = "en";
@@ -100,30 +102,40 @@
   }
 
   // Функция для проверки уровня аудио и управления записью
+
   function checkAudio() {
     console.log("startRecording");
     const dataArray = new Uint8Array(audioAnalyser.frequencyBinCount);
-    const checkSilence = () => {
+
+    function checkSilence() {
       audioAnalyser.getByteFrequencyData(dataArray);
       const sum = dataArray.reduce((a, b) => a + b, 0);
       const average = sum / dataArray.length;
-      console.log("average:", average);
+
       if (average > threshold) {
-        console.log("threshold:", average);
-        clearTimeout(silenceTimer);
-        silenceTimer = "";
-        console.log("silenceTimer after:", silenceTimer);
+        // звук есть — сбрасываем таймер тишины
+        if (silenceTimer) {
+          clearTimeout(silenceTimer);
+          silenceTimer = null;
+          console.log("timer cleared, sound detected:", average);
+        }
       } else if (average <= threshold && isRecording) {
-        if (!silenceTimer)
+        // звук ниже порога — запускаем таймер, если он ещё не запущен
+        if (!silenceTimer) {
           silenceTimer = setTimeout(() => {
             MediaRecorderStop();
-            console.log("stopRecording:", average);
+            console.log("stopRecording due to silence:", average);
+            silenceTimer = null;
           }, silenceDelay);
+        }
       }
-      if (checkLoop) {
+
+      // продолжаем цикл только если нужно
+      if (checkLoop && isRecording) {
         requestAnimationFrame(checkSilence);
       }
-    };
+    }
+
     checkSilence();
   }
 

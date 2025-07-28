@@ -1,147 +1,98 @@
-import { WriteTranslate, ReadSpeech } from '$lib/server/db.ts'; 
-import md5 from 'md5'; // Импортируем библиотеку для генерации md5
+import { WriteTranslate, ReadSpeech } from '$lib/server/db.ts';
+import md5 from 'md5';
 import { HttpsProxyAgent } from 'https-proxy-agent';
 import translatex from 'google-translate-api-x';
-import { translate } from 'deeplx';
-import { query } from '@ifyour/deeplx';
-
+import { translate as deeplTranslate } from 'deeplx';
+import { query as deeplxQuery } from '@ifyour/deeplx';
 import { config } from 'dotenv';
-config()
-
-const GOOGLE_PROJECT_ID = process.env.GOOGLE_PROJECT_ID
-
 import { TranslationServiceClient } from '@google-cloud/translate';
-
 import fs from 'fs';
-import path from 'path';
 
+// Load environment variables
+config();
 
+// Google Cloud Project ID
+const GOOGLE_PROJECT_ID: string | undefined = process.env.GOOGLE_PROJECT_ID;
+
+// Prepare Google credentials for Translation API
 if (process.env.GOOGLE_CREDENTIALS_BASE64) {
   const decoded = Buffer.from(process.env.GOOGLE_CREDENTIALS_BASE64, 'base64').toString('utf-8');
   fs.writeFileSync('/tmp/service-account.json', decoded);
   process.env.GOOGLE_APPLICATION_CREDENTIALS = '/tmp/service-account.json';
 }
 
-
-
-// Define supported languages
-const langs = [
-  "bg", "cs", "da", "de", "el", "en", "es", "et", "fi", "fr", "hu", "id", "it", "ja", "ko", "lt", "lv", "nb", "nl", "pl", "pt", "ro", "ru", "sk", "sl", "sv", "zh"
+// Supported languages for DeepL
+const langs: string[] = [
+  'bg', 'cs', 'da', 'de', 'el', 'en', 'es', 'et', 'fi', 'fr', 'hu', 'id', 'it', 'ja', 'ko', 'lt', 'lv', 'nb', 'nl', 'pl', 'pt', 'ro', 'ru', 'sk', 'sl', 'sv', 'zh'
 ];
 
-// Map to track pending translations (caching)
-// const pendingTranslations = new Map<string, Promise<string>>(); 
+// Google Translation API client
+const googleClient = new TranslationServiceClient();
 
-async function deeplx_query(text, to, from) { 
-  
-  // 🔹 Отладка: что было ДО и ПОСЛЕ замены
-  // console.log("Before protection:", text);
-  text = preserveQuotedText(text);
-  // console.log("After protection:", text);
-
-  const params = {
-    "text": text.modifiedString,
-    "source_lang": from,
-    "target_lang": to,
-    "preserve_formatting": 1
-  };
-
-  // 🔹 Проверяем, что отправляется в API
-  // console.log("Query params:", params);
-
-  const res = await query(
-    params,
-    // {proxyEndpoint: "https://27.68.171.103:1080"}
-  );
-  // res.data = revertProtectedText(res.data);
-  return res.data;
-}
-
-function preserveQuotedText(str) {
-  // Регулярное выражение для поиска текста в кавычках
+/**
+ * Preserve quoted text from translation by replacing with placeholders.
+ */
+function preserveQuotedText(str: string): { modifiedString: string; quotedTexts: string[] } {
   const regex = /(['"])(.*?)\1/g;
-  
-  // Массив для хранения текста в кавычках
-  let quotedTexts = [];
-  
-  // Ищем все фрагменты в кавычках и сохраняем их
-  str = str.replace(regex, (match, quote, text) => {
-      quotedTexts.push(text);
-      return `${quote}__@__${quote}`; // Заменяем фрагмент на плейсхолдер
+  const quotedTexts: string[] = [];
+
+  const modifiedString = str.replace(regex, (match, quote, text) => {
+    quotedTexts.push(text);
+    return `${quote}__@__${quote}`;
   });
 
-  // Возвращаем объект с исходной строкой и массивом найденных фрагментов
-  return {
-      modifiedString: str,
-      quotedTexts: quotedTexts
+  return { modifiedString, quotedTexts };
+}
+
+/**
+ * Restore previously preserved quoted text back to translated string.
+ */
+function restoreQuotedText(modifiedString: string, quotedTexts: string[]): string {
+  return modifiedString.replace(/__@__/g, () => quotedTexts.shift() || '');
+}
+
+/**
+ * Call DeepLx API for translation.
+ */
+async function deeplx_query(text: string, to: string, from: string): Promise<string> {
+  const preserved = preserveQuotedText(text);
+  const params = {
+    text: preserved.modifiedString,
+    source_lang: from,
+    target_lang: to,
+    preserve_formatting: 1
   };
-}
 
-function restoreQuotedText(modifiedString, quotedTexts) {
-  return modifiedString.replace(/__@__/g, () => {
-      return quotedTexts.shift(); // Вставляем фрагмент обратно
-  });
-}
-
-
-// Translation function
-// Translation function with optimizations
-export async function Translate(
-  text: string,
-  from: string,
-  to: string,
-  quiz: string
-): Promise<string> {
-  if (!text?.trim()) return '';
-
-  // Pre-process text once
-  const processedText = text.replace(/\r\n/g, ' ');
-  const sentences = processedText.split(/(?<=[.!?])\s+/).filter(s => s.trim() && s !== '"');
-  const translatedChunks: string[] = [];
-
-  // Process sentences in parallel batches
-  const batchSize = 5;
-  const batchCount = Math.ceil(sentences.length / batchSize);
-
-  for (let batchIndex = 0; batchIndex < batchCount; batchIndex++) {
-    const start = batchIndex * batchSize;
-    const end = start + batchSize;
-    const chunk = sentences.slice(start, end).join(' ').trim();
-
-    if (!chunk) continue;
-
-    // Handle special quotes more efficiently
-    const normalizedChunk = chunk.replace(/<</g, ' ').replace(/>>/g, ' ');
-    const cacheKey = md5(normalizedChunk);
-
-    console.log('Before ReadSpeech. Cashe:'+cacheKey+", normalizedChunk:"+normalizedChunk)
-
-
-    // Check for pending translations first
-    // if (pendingTranslations.has(cacheKey)) {
-    //   console.log(`Waiting for existing translation: ${chunk.substring(0, 30)}...`);
-    //   translatedChunks.push(await pendingTranslations.get(cacheKey));
-    //   continue;
-    // }
-
-
-    // Check cache
-    const cached = await ReadSpeech({ lang: to, key: cacheKey });
-    if (cached?.translate) {
-      translatedChunks.push(cached.translate);
-      continue;
-    }
-
-    // Create and store translation promise
-    const translationPromise = translateChunk(normalizedChunk, from, to, cacheKey, quiz || cached?.quiz);
-    // pendingTranslations.set(cacheKey, translationPromise);
-    translatedChunks.push(await translationPromise);
+  try {
+    const res = await deeplxQuery(params);
+    return restoreQuotedText(res.data, preserved.quotedTexts);
+  } catch (err) {
+    console.error('DeepLx query failed:', err);
+    throw new Error('DeepLx API error');
   }
-
-  return translatedChunks.join(' ').trim();
 }
 
-// Extracted chunk translation logic
+/**
+ * Call Google Cloud Translation API.
+ */
+async function translate_(text: string, from = 'nl', to = 'ru'): Promise<string> {
+  if (!GOOGLE_PROJECT_ID) throw new Error('Missing GOOGLE_PROJECT_ID');
+
+  const request = {
+    parent: `projects/${GOOGLE_PROJECT_ID}/locations/global`,
+    contents: [text],
+    mimeType: 'text/plain',
+    sourceLanguageCode: from,
+    targetLanguageCode: to
+  };
+
+  const [response] = await googleClient.translateText(request);
+  return response.translations?.[0]?.translatedText || '';
+}
+
+/**
+ * Translate single chunk using multiple providers (DeepLx → Google fallback)
+ */
 async function translateChunk(
   chunk: string,
   from: string,
@@ -155,93 +106,75 @@ async function translateChunk(
 
   try {
     if (langs.includes(to)) {
-      // Try DeepL first for supported languages
-      // throw new Error("process.env.TRANSLATE_DEEPL");
-
-     if(modifiedString.split(' ').length<4){
-      
-      result = await translatex(modifiedString, { from: from , to: to, forceBatch: true ,
-        requestOptions: {
-          agent: new HttpsProxyAgent('https://164.132.175.159:3128')
-        }
-      });  
-      result = result.text;
-      provider = 'google-x';
-
-     }else{
-      result = await deeplx_query(modifiedString, to.toUpperCase(), from.toUpperCase())
-      provider = 'deepl';
-     }
-
-      if (!result){
-        console.log('deepl failed')
-        throw new Error("Текст не может быть пустым.");
+      // Short sentences → use google-translate-api-x, otherwise DeepLx
+      if (modifiedString.split(' ').length < 4) {
+        const googleX = await translatex(modifiedString, {
+          from,
+          to,
+          forceBatch: true,
+          requestOptions: {
+            agent: new HttpsProxyAgent('https://164.132.175.159:3128')
+          }
+        });
+        result = googleX.text;
+        provider = 'google-x';
+      } else {
+        result = await deeplx_query(modifiedString, to.toUpperCase(), from.toUpperCase());
+        provider = 'deepl';
       }
-     
-    
     } else {
-
-      result  = await translate_(modifiedString, from.toUpperCase(),to.toUpperCase())
+      // Use Google API for unsupported languages
+      result = await translate_(modifiedString, from.toUpperCase(), to.toUpperCase());
       provider = 'google';
-
-      if (!result){
-        console.log('google failed')
-        throw new Error("Текст не может быть пустым.")
-      }
     }
-
-  } catch (primaryError) {
-    console.error('Primary translation failed, using fallback:', primaryError);
+  } catch (err) {
+    console.error('Primary translation failed, fallback to Google:', err);
     try {
-
-      result  = await translate_(modifiedString, from.toUpperCase(),to.toUpperCase())
+      result = await translate_(modifiedString, from.toUpperCase(), to.toUpperCase());
       provider = 'google';
-
     } catch (fallbackError) {
-      console.error('Google translation failed:', fallbackError);
+      console.error('Fallback Google translation failed:', fallbackError);
     }
   }
 
-  // Restore quoted text if we modified it
   result = restoreQuotedText(result, quotedTexts);
 
-  // Cache the result if needed
   if (quiz) {
-    await WriteTranslate({
-      lang: to,
-      key: cacheKey,
-      text: chunk,
-      translate: result,
-      provider,
-      quiz
-    });
+    await WriteTranslate({ lang: to, key: cacheKey, text: chunk, translate: result, provider, quiz });
   }
 
-  // Clean up
-  // pendingTranslations.delete(cacheKey);
   return result;
 }
 
+/**
+ * Main translation function used in SvelteKit.
+ */
+export async function Translate(text: string, from: string, to: string, quiz: string): Promise<string> {
+  if (!text?.trim()) return '';
 
+  const processedText = text.replace(/\r\n/g, ' ');
+  const sentences = processedText.split(/(?<=[.!?])\s+/).filter(s => s.trim() && s !== '"');
+  const translatedChunks: string[] = [];
 
-const client = new TranslationServiceClient();
+  const batchSize = 5;
+  for (let i = 0; i < sentences.length; i += batchSize) {
+    const chunk = sentences.slice(i, i + batchSize).join(' ').trim();
+    if (!chunk) continue;
 
-async function translate_(text, from = 'nl', to = 'ru') {
-  const projectId = GOOGLE_PROJECT_ID;  // Замените на ваш projectId
-  console.log('projectId:',projectId)
-  const location = 'global';  // Можно использовать 'global', если у вас нет специфического региона
+    const normalizedChunk = chunk.replace(/<</g, ' ').replace(/>>/g, ' ');
+    const cacheKey = md5(normalizedChunk);
 
-  const request = {
-    parent: `projects/${projectId}/locations/${location}`,
-    contents: [text],
-    mimeType: 'text/plain', // Тип контента
-    sourceLanguageCode: from, // Исходный язык
-    targetLanguageCode: to,   // Язык перевода
-  };
+    // Try cache first
+    const cached = await ReadSpeech({ lang: to, key: cacheKey });
+    if (cached?.translate) {
+      translatedChunks.push(cached.translate);
+      continue;
+    }
 
-  const [response] = await client.translateText(request);
-  return response.translations[0].translatedText;
+    // Translate and store
+    const translated = await translateChunk(normalizedChunk, from, to, cacheKey, quiz || cached?.quiz);
+    translatedChunks.push(translated);
+  }
+
+  return translatedChunks.join(' ').trim();
 }
-
-
-  

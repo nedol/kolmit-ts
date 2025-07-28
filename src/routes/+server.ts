@@ -1,4 +1,4 @@
-import { UpsertOperator, CheckOperator, GetUsers, GetGrammar} from '$lib/server/db.ts'; //src\lib\server\server.db.ts
+import  {UpsertOperator, CheckOperator, GetUsers, GetGrammar} from '$lib/server/db.ts'; //src\lib\server\server.db.ts
 
 import pkg from 'nodemailer';
 const { Email } = pkg;

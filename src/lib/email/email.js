@@ -1,6 +1,5 @@
-'use strict';
 
-var nodemailer = require('nodemailer');
+import nodemailer from 'nodemailer';
 
 module.exports = class Email {
   constructor() {

@@ -1,7 +1,8 @@
 import lodash from 'lodash';
 const { find, remove, findIndex } = lodash;
 import { Translate } from '../../routes/translate/Translate';
-import bcrypt from 'bcrypt';
+import pkg from 'bcrypt';
+const {bcrypt} = pkg;
 import md5 from 'md5';
 import postgres from 'postgres';
 import type { Sql } from 'postgres';
@@ -10,7 +11,7 @@ let sql: Sql;
 
 import { sql_st } from '$lib/stores.ts';
 import { redirect } from '@sveltejs/kit';
-import Email from './email.js';
+import {Email} from '$lib/email/email.js';
 
 sql_st.subscribe((data) => {
   sql = data;
@@ -1505,7 +1506,7 @@ export async function SaveSTT(operator, text='', lang='nl', original=null){
 }
 
 export async function SetRate(par) {
-  console.log(par); // Debugging purposes
+  // console.log(par); // Debugging purposes
 
   try {
     const result = await sql`

@@ -748,17 +748,17 @@
                 {/if}
               </div>
             {/if}
-            <div on:click={() => toggleCorrection(index)}>
-              <IconButton>
-                <Icon tag="svg" viewBox="0 0 24 24">
-                  <path
-                    fill={message.role === "user" ? "red" : "currentColor"}
-                    d={mdiAlertCircleCheckOutline}
-                  />
-                </Icon>
-              </IconButton>
-            </div>
           {/each}
+          <div on:click={() => toggleCorrection(index)}>
+            <IconButton>
+              <Icon tag="svg" viewBox="0 0 24 24">
+                <path
+                  fill={message.role === "user" ? "red" : "currentColor"}
+                  d={mdiAlertCircleCheckOutline}
+                />
+              </Icon>
+            </IconButton>
+          </div>
         {/if}
 
         {#if message.isTranslate && translatedMessages.has(message.text)}

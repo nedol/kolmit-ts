@@ -12,9 +12,6 @@ import speech from "@google-cloud/speech";
 const speechClient = new speech.SpeechClient();
 
 
-import { WriteTransloc, ReadSpeech } from '$lib/server/db.ts'; //src\lib\server\server.db.ts
-
-
 import { Buffer } from 'buffer';
 
 import wav from 'wav';  // Модуль для работы с WAV файлами
@@ -22,22 +19,11 @@ import wav from 'wav';  // Модуль для работы с WAV файлам�
 import md5 from 'md5'; // Импортируем библиотеку для генерации md5
 import fs from 'fs-extra'; // Импортируем fs-extra для работы с файловой системой
 
-import { json } from '@sveltejs/kit';
-
-import axios from 'axios';
-
 import { config } from 'dotenv';
 config();
 
-const HF_TOKEN = process.env.HF_TOKEN_3;
-
-import ISO6391 from 'iso-google-locales';
 
 const audioDir = path.join(__dirname, 'audio'); // Директория для сохранения аудиофайлов
-
-import { client } from '@gradio/client';
-
-const projectId = 'firebase-infodesk';
 
 /** @type {import('./$types').RequestHandler} */
 export async function POST({ url, fetch, cookies, request, response }) {
@@ -58,27 +44,6 @@ export async function POST({ url, fetch, cookies, request, response }) {
   return response;
 }
 
-//FAKE:
-async function tts_huggin(text, from, to) {
-  const ttsUrl = 'https://api.dialogflow.com/v1/tts';
-  const ttsHeaders = {
-    Authorization: 'Bearer ' + HF_TOKEN,
-    'Content-Type': 'application/json',
-  };
-  const ttsData = {
-    text: text,
-    languageCode: 'nl-BE',
-    voice: 'female',
-  };
-
-  try {
-    const ttsRes = await axios.post(ttsUrl, ttsData, { headers: ttsHeaders });
-    ttsResponse = ttsRes.data.audioContent;
-  } catch (error) {
-    console.error(error);
-  }
-  let result;
-}
 
 
 async function tts_google(text, lang, abonent, quiz) {
@@ -97,7 +62,7 @@ async function tts_google(text, lang, abonent, quiz) {
           lang: lang,
           slow: false,
           host: 'https://translate.google.com',
-          timeout: 10000,
+          timeout: 30000,
           splitPunct: ',.?!'
         });
 

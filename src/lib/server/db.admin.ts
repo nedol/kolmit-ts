@@ -1,5 +1,5 @@
 import md5 from 'md5';
-import { getLevels, SendEmail } from './db.ts';
+import { getLevels, SendEmail } from './db.js';
 import postgres from 'postgres';
 import type { Sql } from 'postgres';
 
